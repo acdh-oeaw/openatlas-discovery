@@ -7,7 +7,7 @@ name: Jane Doe
 role: Project Lead
 ---
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae nisl euismod, ultricies nisl vi
+Some description about Jane Doe.
 ::
 
 ::TeamEntry
