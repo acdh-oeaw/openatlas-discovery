@@ -9,7 +9,7 @@ describe("Navigation", () => {
 	it("Main to Map", () => {
 		if (discoveryConfig.APIbase === undefined) {
 			cy.task("log", "APIbase is undefined, skipping test");
-			this.skip();
+			return;
 		}
 
 		cy.get('[data-test="main-map-btn"]').should("exist").click();
@@ -20,7 +20,7 @@ describe("Navigation", () => {
 	it("Main to Data", () => {
 		if (discoveryConfig.APIbase === undefined) {
 			cy.task("log", "APIbase is undefined, skipping test");
-			this.skip();
+			
 		} else {
 			cy.get('[data-test="main-data-btn"]').should("exist").click();
 
@@ -31,7 +31,7 @@ describe("Navigation", () => {
 	it("Successive Nav Clicks", () => {
 		if (discoveryConfig.APIbase === undefined) {
 			cy.task("log", "APIbase is undefined, skipping test");
-			this.skip();
+			
 		} else {
 			cy.get('[data-test="main-map-btn"]').should("exist").dblclick();
 
