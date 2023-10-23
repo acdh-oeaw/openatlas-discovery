@@ -8,12 +8,12 @@ jobs:
     outputs:
       environment: ${{ steps.get_environment_from_git_ref.outputs.environment }}
       environment_short: ${{ steps.get_environment_from_git_ref.outputs.environment_short }}
-      image_tagged: openatlas-discovery
-      registry_root: ghcr.io/acdh-oeaw/openatlas-discovery/
+      image_tagged: oad-approaching-byzantium
+      registry_root: ghcr.io/acdh-oeaw/oad-approaching-byzantium
       default_port: "5000"
       submodules: "true"
       herokuish_base_image: ghcr.io/acdh-oeaw/herokuish-for-cypress/main:latest-22
-      APP_NAME: openatlas-discovery
+      APP_NAME: oad-approaching-byzantium
       # This together with the branch name is also used as the namespace to deploy to
       APP_ROOT: "/"
       # SERVICE_ID: "99999" # Better use GtiHub environment variables for this
