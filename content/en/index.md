@@ -1,13 +1,9 @@
 ---
 title: Home
 navigation:
-  title: OpenAtlas Disovery
+  title: Approaching Byzantium
 ---
-![logo](/logo.svg)
 
-# OpenAtlas Discovery
+![logo](/approaching_byzantium_logo.png)
 
-This is a prototype for [OpenAtlas](https://openatlas.eu/){:target="\_blank"} projects. Demo data
-kindly provided by: _The Ethnonym of the Vlachs in the Written Sources and the Toponymy in the
-Historical Region of Macedonia_ (11th-16th Cent.)
-[More information](http://dpp.oeaw.ac.at/index.php?seite=CaseStudies&submenu=skopje){:target="\_blank"},
+The [Approaching Byzantium in Ottoman Istanbul: the Reception of the Byzantine Heritage of Constantinople by Scholars from the Holy Roman Empire in the 16th century project analyzes how visiting the city of Constantinople affected the reception of Byzantium by humanists from the Holy Roman Empire in the 16th century](https://www.byzanz-mainz.de/en/no_cache/research-byzanz/details-projects/article/approaching-byzantium-in-ottoman-istanbul-the-reception-of-the-byzantine-heritage-of-constantinople-1/), when the former Byzantine capital was the seat of the Ottoman Empire.

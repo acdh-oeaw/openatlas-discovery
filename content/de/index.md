@@ -1,13 +1,10 @@
 ---
 title: Home
 navigation:
-  title: OpenAtlas Discovery
+  title: Approaching Byzantium
 ---
-![logo](/OpenAtlasDiscovery_logo.jpg)
 
-# OpenAtlas Discovery
+![logo](/approaching_byzantium_logo.png)
 
-Das ist ein Prototyp für [OpenAtlas](https://openatlas.eu/){:target="\_blank"} Projekte. Demo Daten
-freundlicherweise zur Verfügung gestellt von: _The Ethnonym of the Vlachs in the Written Sources and
-the Toponymy in the Historical Region of Macedonia_ (11th-16th Cent.)
-[Weitere Informationen](http://dpp.oeaw.ac.at/index.php?seite=CaseStudies&submenu=skopje){:target="\_blank"},
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
