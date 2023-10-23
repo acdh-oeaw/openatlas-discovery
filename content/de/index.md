@@ -2,4 +2,4 @@
 
 # FemCare Vienna
 
-Wilkommen auf der Demo Präsentationsseite (in Entstehung) für das FemCareVienna Projekt.
+Wilkommen auf der (in Entstehung befindenden) Demo der Präsentationsseite für das FemCareVienna Projekt.
