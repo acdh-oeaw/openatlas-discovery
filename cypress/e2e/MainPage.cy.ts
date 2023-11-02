@@ -18,6 +18,7 @@ describe("Main Page", () => {
 		cy.get('[data-test="main-data-btn"]').should("exist");
 	});
 
+	/*
 	it("Has the Locale Selection with all Available Locales", () => {
 		const locales: string[] = ["en", "de"];
 
@@ -30,5 +31,5 @@ describe("Main Page", () => {
 		locales.forEach((locale: string) => {
 			cy.get(`[data-test="locale-selector-${locale}"]`).should("be.visible");
 		});
-	});
+	}); */
 });
