@@ -1,10 +1,10 @@
-![logo](/OpenAtlasDiscovery_logo.jpg)
+![logo](/logo.jpg)
 
-# FemCare Vienna
+# FemCareVienna
 
-Willkommen auf der (in Entstehung befindenden) Demo der Präsentationsseite für das FemCareVienna Projekt.
-
-## Bürgerspital
-
-![buergerspital_image](https://upload.wikimedia.org/wikipedia/commons/c/c9/Steyr_Michaelerplatz_2_%2801%29.JPG) 
-
+The FemCareVienna project (FWF individual grant P 36459-G) aims to elucidate
+the history of medical care for woman through an interdisciplinary study of
+the historical and bioarchaeological record pertaining to the Hospital of the
+Elisabethians in Vienna. Central to the project are the life histories of 390
+patients from the 18th century whose skeletal human remains were excavated
+from the hospital cemetery.
