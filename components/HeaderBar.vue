@@ -33,8 +33,6 @@
 		</client-only>
 
 		<v-divider vertical />
-
-		<LocaleDropDown />
 	</v-app-bar>
 </template>
 <script setup lang="ts">
