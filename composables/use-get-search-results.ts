@@ -23,6 +23,29 @@ export const categories = [
 	"valueTypeID",
 ] as const;
 
+/**
+ * The columns that can be sorted on.
+ * @id apiColumns
+ */
+export const columns = [
+	"id",
+	"name",
+	"cidoc_class",
+	"system_class",
+	"begin_from",
+	"begin_to",
+	"end_from",
+	"end_to",
+] as const;
+
+export type Column = (typeof columns)[number];
+
+// Write a check to see if an object is of typed column
+export function isColumn(value: unknown): value is Column {
+	return columns.includes(value as Column);
+}
+
+
 export type Category = (typeof categories)[number];
 
 export const operators = [
@@ -97,11 +120,12 @@ export interface GetSearchResultsResponse {
 
 export function useGetSearchResults(params: MaybeRef<GetSearchResultsParams>) {
 	const api = useApiClient();
-	const creatEntity = useCreateEntity();
+	const createEntity = useCreateEntity();
 
 	return useQuery({
 		queryKey: ["search-results", params] as const,
-		async queryFn({ queryKey: [, params], signal }) {
+		async queryFn({ queryKey, signal }) {
+			const [, params] = queryKey;
 			const search = params.search?.map((value) => {
 				return JSON.stringify(value);
 			});
@@ -120,7 +144,7 @@ export function useGetSearchResults(params: MaybeRef<GetSearchResultsParams>) {
 			const results: Array<Entity> = [];
 
 			response.results.forEach((result) => {
-				const entity = creatEntity(result);
+				const entity = createEntity(result);
 				results.push(entity);
 			});
 

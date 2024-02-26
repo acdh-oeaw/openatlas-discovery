@@ -53,6 +53,7 @@
 		"no-descriptions": "No descriptions available."
 	},
 	"EntityPage": {
+		"details": "Details",
 		"images": "Images ({count})",
 		"map": "Map",
 		"network": "Network Visualization",
@@ -132,6 +133,7 @@
 		"header": {
 			"begin": "Begin",
 			"class": "Class",
+			"dates": "Dates",
 			"description": "Description",
 			"end": "End",
 			"name": "Name"

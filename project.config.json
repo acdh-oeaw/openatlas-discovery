@@ -1,6 +1,6 @@
 {
 	"colors": {
-		"accent": "#b8cf5b",
+		"brand": "#b8cf5b",
 		"geojson": "#69c0ef"
 	},
 	"defaultLocale": "en",
@@ -11,5 +11,5 @@
 		"withTextDark": "/assets/images/logo-with-text-dark.svg"
 	},
 	"imprint": "acdh-ch",
-	"twitter": "@acdh_oeaw"
+	"twitter": "@openatlas_eu"
 }
