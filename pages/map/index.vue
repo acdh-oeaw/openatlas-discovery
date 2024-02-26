@@ -17,7 +17,6 @@ const env = useRuntimeConfig();
 		<div>
 			<PageTitle class="sr-only">{{ t("MapPage.title") }}</PageTitle>
 		</div>
-
 		<template v-if="env.public.NUXT_PUBLIC_DATABASE !== 'disabled'">
 			<ErrorBoundary>
 				<DataMapView />

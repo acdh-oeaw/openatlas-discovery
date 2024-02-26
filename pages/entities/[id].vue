@@ -2,9 +2,31 @@
 import { groupByToMap } from "@acdh-oeaw/lib";
 import { z } from "zod";
 
-// defineRouteRules({
-// 	prerender: true,
-// });
+
+const NetworkNodes = z.object({
+	id: z.string(),
+	attributes: z.array(z.object({
+		label: z.string(),
+		color: z.string(),
+	})),
+});
+
+type NetworkNode = z.infer<typeof NetworkNodes>;
+
+const NetworkEdges = z.object({
+	source: z.string(),
+	target: z.string(),
+})
+
+let nodes: NetworkNode;
+
+/** const NetworkDataSchema = z.object({
+	nodes: z.string().array(),
+	edges: z.string().array(),
+});
+
+
+type NetworkData = z.infer<typeof NetworkDataSchema>; */
 
 definePageMeta({
 	title: "EntityPage.meta.title",
@@ -45,6 +67,16 @@ const entities = computed(() => {
 	return data.value?.features ?? [];
 });
 
+function getNodes() {
+	data.value?.features[0]?.relations?.forEach((element) => {
+		const id = element.relationTo?.split("/").at(-1);
+		if (id != null) {
+			nodes.push();
+		}
+	});
+	getEdges();
+}
+function getEdges() {}
 useHead({
 	title: computed(() => {
 		return entity.value?.properties.title ?? t("EntityPage.meta.title");
@@ -64,6 +96,12 @@ const tabs = computed(() => {
 		tabs.push({
 			id: "images",
 			label: t("EntityPage.images", { count: entity.value.depictions.length }),
+		});
+	}
+	if (entity.value?.relations != null) {
+		tabs.push({
+			id: "network",
+			label: t("EntityPage.network"),
 		});
 	}
 	return tabs;
@@ -92,7 +130,7 @@ const relationsByType = computed(() => {
 				</CardContent>
 			</Card>
 
-			<Tabs v-if="tabs.length > 0" :default-value="tabs[0]?.id">
+			<Tabs v-if="tabs.length > 0" :default-value="tabs[0]?.id" @click="getNodes">
 				<TabsList>
 					<TabsTrigger v-for="tab of tabs" :key="tab.id" :value="tab.id">
 						{{ tab.label }}
@@ -102,10 +140,10 @@ const relationsByType = computed(() => {
 				<TabsContent v-for="tab of tabs" :key="tab.id" :value="tab.id">
 					<EntityGeoMap v-if="tab.id === 'geo-map'" :entities="entities" />
 					<EntityImages v-else-if="tab.id === 'images'" :images="entity.depictions" />
+					<EntityNetwork v-if="tab.id === 'network'" :network-data="networkData" />
 				</TabsContent>
 			</Tabs>
-
-			<pre>{{ relationsByType }}</pre>
+			{{ nodes }}
 		</template>
 
 		<template v-else-if="isLoading">

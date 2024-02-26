@@ -55,6 +55,7 @@
 	"EntityPage": {
 		"images": "Images ({count})",
 		"map": "Map",
+		"network": "Network Visualization",
 		"meta": {
 			"title": "Entity"
 		}
