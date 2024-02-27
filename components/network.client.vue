@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import Graph from "graphology";
+import circlepack from "graphology-layout/circlepack";
 import Sigma, { type Camera } from "sigma";
 import type { Coordinates, EdgeDisplayData, NodeDisplayData } from "sigma/types";
 import { nextTick, onMounted, ref } from "vue";
-import { z } from "zod";
 
-const router = useRouter();
-const route = useRoute();
+import type { NetworkEdge, NetworkNode } from "@/types/network-visualisation";
+
+interface NetworkNodes extends Array<NetworkNode> {}
+interface NetworkEdges extends Array<NetworkEdge> {}
 
 interface State {
 	hoveredNode?: string;
@@ -19,41 +21,20 @@ interface State {
 	// State derived from hovered node:
 	hoveredNeighbors?: Set<string>;
 }
+const props = defineProps<{
+	networkData: Array<{
+		nodes: NetworkNodes;
+		edges: NetworkEdges;
+	}>;
+	height: number;
+	width: number;
+}>();
 
-const { data, isPending, isPlaceholderData } = useGetSearchResults(
-	computed(() => {
-		const { search, category, ...params } = searchFilters.value;
-
-		return {
-			...params,
-			search:
-				search.length > 0
-					? [{ [category]: [{ operator: "like", values: [search], logicalOperator: "and" }] }]
-					: [],
-			type_id: [],
-			view_classes: ["actor", "event", "place", "reference", "source"],
-			limit: 0,
-		};
-	}),
-);
-
-const entities = computed(() => {
-	return (
-		data.value?.results.flatMap((result) => {
-			return result.features;
-		}) ?? []
-	);
-});
-
-const entitiesById = computed(() => {
-	return keyByToMap(entities.value, (entity) => {
-		return entity.properties._id;
-	});
-});
-
-
+console.log(props.networkData);
 const graph = new Graph();
-graph.import();
+graph.import({ nodes: props.networkData[0]?.nodes, edges: props.networkData[0]?.edges });
+
+circlepack.assign(graph, { scale: 100 });
 
 let searchInput = "";
 
@@ -66,67 +47,73 @@ const state = ref<State>({ searchQuery: "" });
 
 onMounted(async () => {
 	await nextTick(() => {
-		const container = document.getElementById("sigma-container")!;
-		renderer = new Sigma(graph, container, {
-			minCameraRatio: 0.1,
-			maxCameraRatio: 10,
-		});
-		camera = renderer.getCamera();
+		if (document.getElementById("sigma-container") != null) {
+			console.log("entered");
+			const container = document.getElementById("sigma-container");
+			renderer = new Sigma(graph, container, {
+				minCameraRatio: 0.1,
+				maxCameraRatio: 10,
+			});
+			camera = renderer.getCamera();
 
-		renderer.on("enterNode", ({ node }) => {
-			setHoveredNode(node);
-			nodeReducer();
-			edgeReducer();
-		});
+			renderer.on("enterNode", ({ node }) => {
+				setHoveredNode(node);
+				nodeReducer();
+				edgeReducer();
+			});
 
-		renderer.on("leaveNode", () => {
-			setHoveredNode(undefined);
-		});
+			renderer.on("leaveNode", () => {
+				setHoveredNode(undefined);
+			});
 
-		renderer.on("downNode", (e) => {
-			isDragging = true;
-			draggedNode = e.node;
-			graph.setNodeAttribute(draggedNode, "highlighted", true);
-		});
+			renderer.on("downNode", (e) => {
+				isDragging = true;
+				draggedNode = e.node;
+				graph.setNodeAttribute(draggedNode, "highlighted", true);
+			});
 
-		renderer.getMouseCaptor().on("mousemovebody", (e) => {
-			if (!isDragging || !draggedNode) return;
+			renderer.getMouseCaptor().on("mousemovebody", (e) => {
+				if (!isDragging || !draggedNode) return;
 
-			// Get new position of node
-			const pos = renderer?.viewportToGraph(e);
+				// Get new position of node
+				const pos = renderer?.viewportToGraph(e);
 
-			graph.setNodeAttribute(draggedNode, "x", pos?.x);
-			graph.setNodeAttribute(draggedNode, "y", pos?.y);
+				graph.setNodeAttribute(draggedNode, "x", pos?.x);
+				graph.setNodeAttribute(draggedNode, "y", pos?.y);
 
-			// Prevent sigma to move camera:
-			e.preventSigmaDefault();
-			e.original.preventDefault();
-			e.original.stopPropagation();
-		});
+				// Prevent sigma to move camera:
+				e.preventSigmaDefault();
+				e.original.preventDefault();
+				e.original.stopPropagation();
+			});
 
-		// On mouse up, we reset the autoscale and the dragging mode
-		renderer.getMouseCaptor().on("mouseup", () => {
-			if (draggedNode) {
-				graph.removeNodeAttribute(draggedNode, "highlighted");
-			}
-			isDragging = false;
-			draggedNode = null;
-		});
+			// On mouse up, we reset the autoscale and the dragging mode
+			renderer.getMouseCaptor().on("mouseup", () => {
+				if (draggedNode) {
+					graph.removeNodeAttribute(draggedNode, "highlighted");
+				}
+				isDragging = false;
+				draggedNode = null;
+			});
 
-		// Disable the autoscale at the first down interaction
-		renderer.getMouseCaptor().on("mousedown", () => {
-			if (!renderer?.getCustomBBox()) renderer?.setCustomBBox(renderer.getBBox());
-		});
+			// Disable the autoscale at the first down interaction
+			renderer.getMouseCaptor().on("mousedown", () => {
+				if (!renderer?.getCustomBBox()) renderer?.setCustomBBox(renderer.getBBox());
+			});
 
-		const searchSuggestions = document.getElementById("suggestions") as HTMLDataListElement;
-		searchSuggestions.innerHTML = graph
-			.nodes()
-			.map((node) => {
-				return `<option value="${graph.getNodeAttribute(node, "label")}"></option>`;
-			})
-			.join("\n");
+			/*
+			const searchSuggestions = document.getElementById("suggestions") as HTMLDataListElement;
+			searchSuggestions.innerHTML = graph
+				.nodes()
+				.map((node) => {
+					return `<option value="${graph.getNodeAttribute(node, "label")}"></option>`;
+				})
+				.join("\n");
+				*/
+		}
 	});
 });
+/*
 
 // Bind search input interactions:
 function search(searchInput: string) {
@@ -181,7 +168,7 @@ function setSearchQuery(query: string) {
 
 	// Refresh rendering:
 	renderer?.refresh();
-}
+}*/
 // Actions:
 
 function setHoveredNode(node?: string) {
@@ -272,6 +259,7 @@ function resetZoom() {
 
 <template>
 	<div id="sigma-container"></div>
+	<!--
 	<div id="search">
 		<input
 			id="search-input"
@@ -284,6 +272,7 @@ function resetZoom() {
 		/>
 		<datalist id="suggestions"></datalist>
 	</div>
+-->
 	<div id="controls">
 		<div class="input">
 			<label for="zoom-in">Zoom in</label>
@@ -308,9 +297,10 @@ body {
 html,
 body,
 #sigma-container {
+	position: relative;
 	overflow: hidden;
-	width: 100vw;
-	height: 100vh;
+	width: 100%;
+	height: 100%;
 	margin: 0;
 	padding: 0;
 }

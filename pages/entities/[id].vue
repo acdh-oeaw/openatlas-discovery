@@ -3,31 +3,11 @@ import { groupByToMap, keyByToMap } from "@acdh-oeaw/lib";
 import { z } from "zod";
 
 import { useIdPrefix } from "@/composables/use-id-prefix";
+import { networkConfig } from "@/config/network-visualisation.config";
+import type { NetworkEdge, NetworkNode } from "@/types/network-visualisation";
 
-const NetworkNodes = z.object({
-	id: z.string(),
-	attributes: z.array(z.object({
-		label: z.string(),
-		color: z.string(),
-	})),
-});
-
-type NetworkNode = z.infer<typeof NetworkNodes>;
-
-const NetworkEdges = z.object({
-	source: z.string(),
-	target: z.string(),
-})
-
-let nodes: NetworkNode;
-
-/** const NetworkDataSchema = z.object({
-	nodes: z.string().array(),
-	edges: z.string().array(),
-});
-
-
-type NetworkData = z.infer<typeof NetworkDataSchema>; */
+interface NetworkNodes extends Array<NetworkNode> {}
+interface NetworkEdges extends Array<NetworkEdge> {}
 
 definePageMeta({
 	title: "EntityPage.meta.title",
@@ -69,16 +49,44 @@ const entities = computed(() => {
 	return data.value?.features ?? [];
 });
 
-function getNodes() {
+let nodes: NetworkNodes = [];
+// let targets: Array<string> = [];
+let edges: NetworkEdges = [];
+let networkData: Array<{
+	nodes: NetworkNodes;
+	edges: NetworkEdges;
+}> = [];
+
+const networkGraph = computed(() => {
+	const id = route.params.id as string;
+	nodes.push({
+		key: id,
+		attributes: {
+			label: data.value?.features[0]?.properties.title,
+			color: networkConfig.sourceNodeColor,
+			size: networkConfig.sourceNodeSize,
+		},
+	});
 	data.value?.features[0]?.relations?.forEach((element) => {
-		const id = element.relationTo?.split("/").at(-1);
-		if (id != null) {
-			nodes.push();
+		const relationId = element.relationTo?.split("/").at(-1);
+		if (relationId != null) {
+			nodes.push({
+				key: relationId,
+				attributes: {
+					label: element.label,
+					color: networkConfig.relationsNodeColor,
+					size: networkConfig.relationNodeSize,
+				},
+			});
+			edges.push({ source: id, target: relationId });
 		}
 	});
-	getEdges();
-}
-function getEdges() {}
+	// edges.push({ source: id, target: targets });
+	networkData.push({ nodes: nodes, edges: edges });
+	console.log("Network Data: ", networkData);
+	return networkData;
+});
+
 useHead({
 	title: computed(() => {
 		return entity.value?.properties.title ?? t("EntityPage.meta.title");
@@ -140,7 +148,7 @@ const typesById = computed(() => {
 				</CardContent>
 			</Card>
 
-			<Tabs v-if="tabs.length > 0" :default-value="tabs[0]?.id" @click="getNodes">
+			<Tabs v-if="tabs.length > 0" :default-value="tabs[0]?.id">
 				<TabsList>
 					<TabsTrigger v-for="tab of tabs" :key="tab.id" :value="tab.id">
 						{{ tab.label }}
@@ -150,7 +158,7 @@ const typesById = computed(() => {
 				<TabsContent v-for="tab of tabs" :key="tab.id" :value="tab.id">
 					<EntityGeoMap v-if="tab.id === 'geo-map'" :entities="entities" />
 					<EntityImages v-else-if="tab.id === 'images'" :images="entity.depictions" />
-					<EntityNetwork v-if="tab.id === 'network'" :network-data="networkData" />
+					<EntityNetwork v-if="tab.id === 'network'" :network-data="networkGraph" />
 				</TabsContent>
 			</Tabs>
 
