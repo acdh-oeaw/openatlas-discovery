@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import Graph from "graphology";
 import circlepack from "graphology-layout/circlepack";
+import forceAtlas2 from "graphology-layout-forceatlas2";
+import FA2Layout from "graphology-layout-forceatlas2/worker";
 import Sigma, { type Camera } from "sigma";
-import type { Coordinates, EdgeDisplayData, NodeDisplayData } from "sigma/types";
+import type { EdgeDisplayData, NodeDisplayData } from "sigma/types";
 import { nextTick, onMounted, ref } from "vue";
 
 import type { NetworkEdge, NetworkNode } from "@/types/network-visualisation";
@@ -30,13 +32,25 @@ const props = defineProps<{
 	width: number;
 }>();
 
-console.log(props.networkData);
+let hoverTimeOut: ReturnType<typeof setTimeout>;
+
 const graph = new Graph();
 graph.import({ nodes: props.networkData[0]?.nodes, edges: props.networkData[0]?.edges });
 
 circlepack.assign(graph, { scale: 100 });
+const settings = forceAtlas2.inferSettings(graph);
+forceAtlas2.assign(graph, { settings, iterations: 600 });
+//forceLayout.assign(graph, 50);
 
-let searchInput = "";
+/*
+const sensibleSettings = forceAtlas2.inferSettings(graph);
+const fa2Layout = new FA2Layout(graph, {
+	settings: sensibleSettings,
+});
+
+**/
+
+// let searchInput = "";
 
 let draggedNode = null as string | null;
 let isDragging = false;
@@ -48,7 +62,6 @@ const state = ref<State>({ searchQuery: "" });
 onMounted(async () => {
 	await nextTick(() => {
 		if (document.getElementById("sigma-container") != null) {
-			console.log("entered");
 			const container = document.getElementById("sigma-container");
 			renderer = new Sigma(graph, container, {
 				minCameraRatio: 0.1,
@@ -57,12 +70,17 @@ onMounted(async () => {
 			camera = renderer.getCamera();
 
 			renderer.on("enterNode", ({ node }) => {
-				setHoveredNode(node);
-				nodeReducer();
-				edgeReducer();
+				console.log("enteredNode");
+				hoverTimeOut = setTimeout(() => {
+					setHoveredNode(node);
+					nodeReducer();
+					edgeReducer();
+				}, 300);
 			});
 
 			renderer.on("leaveNode", () => {
+				console.log("leaveNode");
+				clearTimeout(hoverTimeOut);
 				setHoveredNode(undefined);
 			});
 
@@ -113,12 +131,13 @@ onMounted(async () => {
 		}
 	});
 });
-/*
 
+/*
 // Bind search input interactions:
 function search(searchInput: string) {
 	setSearchQuery(searchInput || "");
 }
+
 
 function setSearchQuery(query: string) {
 	state.value.searchQuery = query;
@@ -172,8 +191,9 @@ function setSearchQuery(query: string) {
 // Actions:
 
 function setHoveredNode(node?: string) {
-	console.log("entered.");
+	console.log(node);
 	if (node) {
+		console.log("entered.");
 		state.value.hoveredNode = node;
 		state.value.hoveredNeighbors = new Set(graph.neighbors(node));
 	} else {
@@ -191,11 +211,7 @@ function setHoveredNode(node?: string) {
 // 3. If there is a hovered node, all non-neighbor nodes are greyed
 function nodeReducer() {
 	renderer?.setSetting("nodeReducer", (node, data) => {
-		console.log("Node ", node);
-		console.log("Data ", data);
 		const res: Partial<NodeDisplayData> = { ...data };
-
-		console.log("Result", res);
 
 		if (
 			state.value.hoveredNeighbors &&
@@ -227,7 +243,8 @@ function edgeReducer() {
 		const res: Partial<EdgeDisplayData> = { ...data };
 
 		if (state.value.hoveredNode && !graph.hasExtremity(edge, state.value.hoveredNode)) {
-			res.color = "rgb(400, 400, 400)";
+			console.log(graph.hasExtremity(edge, state.value.hoveredNode));
+			res.hidden = true;
 		}
 
 		if (
@@ -305,6 +322,10 @@ body,
 	padding: 0;
 }
 
+#buttons {
+	position: absolute;
+}
+
 #controls {
 	position: absolute;
 	top: 1em;
@@ -322,20 +343,6 @@ body,
 	display: none;
 }
 
-.input label {
-	position: absolute;
-	top: 100%;
-	left: 50%;
-	margin-top: 0.3em;
-	padding: 0.2em;
-	border-radius: 2px;
-	background: black;
-	color: #fff;
-	font-size: 0.8em;
-	white-space: nowrap;
-	transform: translateX(-50%);
-}
-
 .input button {
 	display: inline-block;
 	width: 2.5em;
@@ -346,11 +353,5 @@ body,
 	outline: none;
 	text-align: center;
 	cursor: pointer;
-}
-
-#search {
-	position: absolute;
-	top: 1em;
-	left: 1em;
 }
 </style>
