@@ -1,7 +1,21 @@
 {
 	"colors": {
 		"brand": "#b8cf5b",
-		"geojson": "#69c0ef"
+		"geojson": "#69c0ef",
+		"entityColors": {
+			"place": "#69c0ef",
+			"source": "#D60C19",
+			"person": "#ffca3a",
+			"group": "#f48c06",
+			"move": "#e85d04",
+			"event": "#ff595e",
+			"activity": "#9d0208",
+			"acquisition": "#6a040f",
+			"feature": "#6a4c93",
+			"artifact": "9d4edd",
+			"file": "#ee6c4d",
+			"type": "#b8cf5b"
+		}
 	},
 	"defaultLocale": "en",
 	"logos": {

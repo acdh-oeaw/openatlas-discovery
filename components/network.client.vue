@@ -1,16 +1,12 @@
 <script setup lang="ts">
 import Graph from "graphology";
-import circlepack from "graphology-layout/circlepack";
-import forceAtlas2 from "graphology-layout-forceatlas2";
-import FA2Layout from "graphology-layout-forceatlas2/worker";
+import circularpack from "graphology-layout/circlepack";
 import Sigma, { type Camera } from "sigma";
 import type { EdgeDisplayData, NodeDisplayData } from "sigma/types";
 import { nextTick, onMounted, ref } from "vue";
 
-import type { NetworkEdge, NetworkNode } from "@/types/network-visualisation";
-
-interface NetworkNodes extends Array<NetworkNode> {}
-interface NetworkEdges extends Array<NetworkEdge> {}
+import { networkConfig } from "@/config/network-visualisation.config";
+import { colors } from "@/project.config.json";
 
 interface State {
 	hoveredNode?: string;
@@ -24,171 +20,141 @@ interface State {
 	hoveredNeighbors?: Set<string>;
 }
 const props = defineProps<{
-	networkData: Array<{
-		nodes: NetworkNodes;
-		edges: NetworkEdges;
-	}>;
-	height: number;
-	width: number;
+	networkData: EntityFeature;
+	id: number;
 }>();
 
+const { getUnprefixedId } = useIdPrefix();
+
+interface NetworkContext {
+	graph: Graph;
+	renderer: Sigma | null;
+	camera: Camera | null;
+}
+
+const context: NetworkContext = {
+	graph: new Graph(),
+	renderer: null,
+	camera: null,
+};
+
+const { entityColors } = colors;
+const defaultColor = "#666";
+
+watch(
+	() => {
+		return props.networkData;
+	},
+	(networkData) => {
+		/** Clear previous graph data. */
+		context.graph.clear();
+
+		/** Add source node. */
+		context.graph.addNode(props.id, {
+			label: networkData.properties.title,
+			color: getNodeColor(networkData.systemClass),
+			size: networkConfig.sourceNodeSize,
+		});
+
+		/** Add relations to target nodes. */
+		networkData.relations?.forEach((element) => {
+			if (element.relationTo == null) return;
+
+			const relationId = getUnprefixedId(element.relationTo);
+			const nodeClass = element.relationSystemClass;
+
+			if (nodeClass == null) return;
+
+			context.graph.addNode(relationId, {
+				label: element.label,
+				color: getNodeColor(nodeClass),
+				size: networkConfig.relationNodeSize,
+			});
+
+			context.graph.addEdge(props.id, relationId);
+		});
+
+		circularpack.assign(context.graph, { scale: 100 });
+	},
+	{ immediate: true },
+);
+
+function getNodeColor(nodeClass: string) {
+	// @ts-expect-error It's fine.
+	return entityColors[nodeClass] ?? defaultColor;
+}
+
 let hoverTimeOut: ReturnType<typeof setTimeout>;
-
-const graph = new Graph();
-graph.import({ nodes: props.networkData[0]?.nodes, edges: props.networkData[0]?.edges });
-
-circlepack.assign(graph, { scale: 100 });
-const settings = forceAtlas2.inferSettings(graph);
-forceAtlas2.assign(graph, { settings, iterations: 600 });
-//forceLayout.assign(graph, 50);
-
-/*
-const sensibleSettings = forceAtlas2.inferSettings(graph);
-const fa2Layout = new FA2Layout(graph, {
-	settings: sensibleSettings,
-});
-
-**/
 
 // let searchInput = "";
 
 let draggedNode = null as string | null;
 let isDragging = false;
 
-let renderer = null as Sigma | null;
-let camera = null as Camera | null;
 const state = ref<State>({ searchQuery: "" });
 
 onMounted(async () => {
-	await nextTick(() => {
-		if (document.getElementById("sigma-container") != null) {
-			const container = document.getElementById("sigma-container");
-			renderer = new Sigma(graph, container, {
-				minCameraRatio: 0.1,
-				maxCameraRatio: 10,
-			});
-			camera = renderer.getCamera();
+	await nextTick();
 
-			renderer.on("enterNode", ({ node }) => {
-				console.log("enteredNode");
-				hoverTimeOut = setTimeout(() => {
-					setHoveredNode(node);
-					nodeReducer();
-					edgeReducer();
-				}, 300);
-			});
+	const container = document.getElementById("sigma-container");
+	if (container == null) return;
 
-			renderer.on("leaveNode", () => {
-				console.log("leaveNode");
-				clearTimeout(hoverTimeOut);
-				setHoveredNode(undefined);
-			});
+	context.renderer = new Sigma(context.graph, container, {
+		minCameraRatio: 0.1,
+		maxCameraRatio: 10,
+	});
 
-			renderer.on("downNode", (e) => {
-				isDragging = true;
-				draggedNode = e.node;
-				graph.setNodeAttribute(draggedNode, "highlighted", true);
-			});
+	context.camera = context.renderer.getCamera();
 
-			renderer.getMouseCaptor().on("mousemovebody", (e) => {
-				if (!isDragging || !draggedNode) return;
+	context.renderer.on("enterNode", ({ node }) => {
+		hoverTimeOut = setTimeout(() => {
+			setHoveredNode(node);
+			nodeReducer();
+			edgeReducer();
+		}, 300);
+	});
 
-				// Get new position of node
-				const pos = renderer?.viewportToGraph(e);
+	context.renderer.on("leaveNode", () => {
+		clearTimeout(hoverTimeOut);
+		setHoveredNode(undefined);
+	});
 
-				graph.setNodeAttribute(draggedNode, "x", pos?.x);
-				graph.setNodeAttribute(draggedNode, "y", pos?.y);
+	context.renderer.on("downNode", (e) => {
+		isDragging = true;
+		draggedNode = e.node;
+		context.graph.setNodeAttribute(draggedNode, "highlighted", true);
+	});
 
-				// Prevent sigma to move camera:
-				e.preventSigmaDefault();
-				e.original.preventDefault();
-				e.original.stopPropagation();
-			});
+	context.renderer.getMouseCaptor().on("mousemovebody", (e) => {
+		if (!isDragging || !draggedNode) return;
 
-			// On mouse up, we reset the autoscale and the dragging mode
-			renderer.getMouseCaptor().on("mouseup", () => {
-				if (draggedNode) {
-					graph.removeNodeAttribute(draggedNode, "highlighted");
-				}
-				isDragging = false;
-				draggedNode = null;
-			});
+		// Get new position of node
+		const pos = context.renderer?.viewportToGraph(e);
 
-			// Disable the autoscale at the first down interaction
-			renderer.getMouseCaptor().on("mousedown", () => {
-				if (!renderer?.getCustomBBox()) renderer?.setCustomBBox(renderer.getBBox());
-			});
+		context.graph.setNodeAttribute(draggedNode, "x", pos?.x);
+		context.graph.setNodeAttribute(draggedNode, "y", pos?.y);
 
-			/*
-			const searchSuggestions = document.getElementById("suggestions") as HTMLDataListElement;
-			searchSuggestions.innerHTML = graph
-				.nodes()
-				.map((node) => {
-					return `<option value="${graph.getNodeAttribute(node, "label")}"></option>`;
-				})
-				.join("\n");
-				*/
+		// Prevent sigma to move camera:
+		e.preventSigmaDefault();
+		e.original.preventDefault();
+		e.original.stopPropagation();
+	});
+
+	// On mouse up, we reset the autoscale and the dragging mode
+	context.renderer.getMouseCaptor().on("mouseup", () => {
+		if (draggedNode) {
+			context.graph.removeNodeAttribute(draggedNode, "highlighted");
 		}
+		isDragging = false;
+		draggedNode = null;
+	});
+
+	// Disable the autoscale at the first down interaction
+	context.renderer.getMouseCaptor().on("mousedown", () => {
+		if (!context.renderer?.getCustomBBox())
+			context.renderer?.setCustomBBox(context.renderer.getBBox());
 	});
 });
-
-/*
-// Bind search input interactions:
-function search(searchInput: string) {
-	setSearchQuery(searchInput || "");
-}
-
-
-function setSearchQuery(query: string) {
-	state.value.searchQuery = query;
-
-	if (query) {
-		const lcQuery = query.toLowerCase();
-		const suggestions = graph
-			.nodes()
-			.map((n) => {
-				return {
-					id: n,
-					label: graph.getNodeAttribute(n, "label") as string,
-				};
-			})
-			.filter(({ label }) => {
-				return label.toLowerCase().includes(lcQuery);
-			});
-
-		// If we have a single perfect match, them we remove the suggestions, and
-		// we consider the user has selected a node through the datalist
-		// autocomplete:
-		if (suggestions.length === 1 && suggestions[0].label === query) {
-			state.value.selectedNode = suggestions[0].id;
-			state.value.suggestions = undefined;
-
-			// Move the camera to center it on the selected node:
-			const nodePosition = renderer?.getNodeDisplayData(state.value.selectedNode) as Coordinates;
-			renderer?.getCamera().animate(nodePosition, {
-				duration: 500,
-			});
-		}
-		// Else, we display the suggestions list:
-		else {
-			state.value.selectedNode = undefined;
-			state.value.suggestions = new Set(
-				suggestions.map(({ id }) => {
-					return id;
-				}),
-			);
-		}
-	}
-	// If the query is empty, then we reset the selectedNode / suggestions state:
-	else {
-		state.value.selectedNode = undefined;
-		state.value.suggestions = undefined;
-	}
-
-	// Refresh rendering:
-	renderer?.refresh();
-}*/
-// Actions:
 
 function setHoveredNode(node?: string) {
 	console.log(node);
@@ -262,35 +228,28 @@ function edgeReducer() {
 // Bind zoom manipulation buttons
 
 function zoom() {
-	camera?.animatedZoom({ duration: 600 });
+	context.camera?.animatedZoom({ duration: 600 });
 }
 
 function unZoom() {
-	camera?.animatedUnzoom({ duration: 600 });
+	context.camera?.animatedUnzoom({ duration: 600 });
 }
 
 function resetZoom() {
-	camera?.animatedReset({ duration: 600 });
+	context.camera?.animatedReset({ duration: 600 });
 }
+
+onScopeDispose(() => {
+	context.renderer?.kill();
+	context.graph.clear();
+	context.renderer = null;
+	context.camera = null;
+});
 </script>
 
 <template>
-	<div id="sigma-container"></div>
-	<!--
-	<div id="search">
-		<input
-			id="search-input"
-			v-model="searchInput"
-			aria-label="search"
-			type="search"
-			list="suggestions"
-			placeholder="Try searching for a node..."
-			@input="search(searchInput)"
-		/>
-		<datalist id="suggestions"></datalist>
-	</div>
--->
-	<div id="controls">
+	<div id="sigma-container" data-network-visualisation></div>
+	<div class="absolute inset-x-0 bottom-0 border-t bg-neutral-50">
 		<div class="input">
 			<label for="zoom-in">Zoom in</label>
 			<button id="zoom-in" @click="zoom">+</button>
@@ -306,52 +265,13 @@ function resetZoom() {
 	</div>
 </template>
 
-<style scoped>
-body {
-	font-family: sans-serif;
-}
-
-html,
-body,
-#sigma-container {
+<style>
+[data-network-visualisation] {
 	position: relative;
 	overflow: hidden;
 	width: 100%;
 	height: 100%;
 	margin: 0;
 	padding: 0;
-}
-
-#buttons {
-	position: absolute;
-}
-
-#controls {
-	position: absolute;
-	top: 1em;
-	right: 1em;
-	text-align: right;
-}
-
-.input {
-	position: relative;
-	display: inline-block;
-	vertical-align: middle;
-}
-
-.input:not(:hover) label {
-	display: none;
-}
-
-.input button {
-	display: inline-block;
-	width: 2.5em;
-	height: 2.5em;
-	border: 1px solid dimgrey;
-	border-radius: 2px;
-	background: white;
-	outline: none;
-	text-align: center;
-	cursor: pointer;
 }
 </style>

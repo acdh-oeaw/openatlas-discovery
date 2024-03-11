@@ -3,11 +3,6 @@ import { groupByToMap, keyByToMap } from "@acdh-oeaw/lib";
 import { z } from "zod";
 
 import { useIdPrefix } from "@/composables/use-id-prefix";
-import { networkConfig } from "@/config/network-visualisation.config";
-import type { NetworkEdge, NetworkNode } from "@/types/network-visualisation";
-
-interface NetworkNodes extends Array<NetworkNode> {}
-interface NetworkEdges extends Array<NetworkEdge> {}
 
 definePageMeta({
 	title: "EntityPage.meta.title",
@@ -47,44 +42,6 @@ const entity = computed(() => {
 
 const entities = computed(() => {
 	return data.value?.features ?? [];
-});
-
-let nodes: NetworkNodes = [];
-// let targets: Array<string> = [];
-let edges: NetworkEdges = [];
-let networkData: Array<{
-	nodes: NetworkNodes;
-	edges: NetworkEdges;
-}> = [];
-
-const networkGraph = computed(() => {
-	const id = route.params.id as string;
-	nodes.push({
-		key: id,
-		attributes: {
-			label: data.value?.features[0]?.properties.title,
-			color: networkConfig.sourceNodeColor,
-			size: networkConfig.sourceNodeSize,
-		},
-	});
-	data.value?.features[0]?.relations?.forEach((element) => {
-		const relationId = element.relationTo?.split("/").at(-1);
-		if (relationId != null) {
-			nodes.push({
-				key: relationId,
-				attributes: {
-					label: element.label,
-					color: networkConfig.relationsNodeColor,
-					size: networkConfig.relationNodeSize,
-				},
-			});
-			edges.push({ source: id, target: relationId });
-		}
-	});
-	// edges.push({ source: id, target: targets });
-	networkData.push({ nodes: nodes, edges: edges });
-	console.log("Network Data: ", networkData);
-	return networkData;
 });
 
 useHead({
@@ -158,7 +115,7 @@ const typesById = computed(() => {
 				<TabsContent v-for="tab of tabs" :key="tab.id" :value="tab.id">
 					<EntityGeoMap v-if="tab.id === 'geo-map'" :entities="entities" />
 					<EntityImages v-else-if="tab.id === 'images'" :images="entity.depictions" />
-					<EntityNetwork v-if="tab.id === 'network'" :network-data="networkGraph" />
+					<EntityNetwork v-if="tab.id === 'network'" :id="id" :network-data="entity" />
 				</TabsContent>
 			</Tabs>
 

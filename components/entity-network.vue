@@ -1,16 +1,7 @@
 <script setup lang="ts">
-import type { NetworkEdge, NetworkNode } from "@/types/network-visualisation";
-
-interface NetworkNodes extends Array<NetworkNode> {}
-interface NetworkEdges extends Array<NetworkEdge> {}
-
 const props = defineProps<{
-	networkData: Array<{
-		nodes: NetworkNodes;
-		edges: NetworkEdges;
-	}>;
-	nodes: NetworkNodes;
-	edges: NetworkEdges;
+	networkData: EntityFeature | undefined;
+	id: number;
 }>();
 </script>
 
@@ -19,6 +10,7 @@ const props = defineProps<{
 		<VisualisationContainer v-slot="{ height, width }">
 			<Network
 				v-if="height && width"
+				:id="props.id"
 				:network-data="props.networkData"
 				:height="height"
 				:width="width"

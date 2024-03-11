@@ -9,7 +9,7 @@ export const networkConfig = {
 
 export const layoutOptions: ForceAtlas2Settings = {
 	barnesHutOptimize: true,
-	gravity: 0.05,
+	gravity: 0.1,
 	outboundAttractionDistribution: false,
 	scalingRatio: 10,
 	slowDown: 15,
