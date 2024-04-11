@@ -7,14 +7,16 @@ A demo website is deplyed at <https://openatlas-discovery-demo.acdh-ch-dev.oeaw.
 ## Content management (CMS)
 
 The website comes with a content management system, which is deployed at `/admin` and commits all
-content chanes to the website repository on GitHub. All content is stored in plain text (markdown or
-json), and can also be edited directly with your favourite text editor.
+content changes to the website repository on GitHub. All content is stored in plain text (markdown
+or json), and can also be edited directly with your favourite text editor.
 
 - "Config" collection: Main configuration file for the website. Allows setting default locale, brand
   colors, logos. Saves to [`project.config.json`](project.config.json).
 - "Metadata" collection: Project metadata which needs translation in all suppoted languages. Saves
   to [`messages/:locale/project.json`](messages/en/project.json).
 - "Pages" collection: Custom content pages. Saves to [`content/pages/*.md`](content/pages).
+- "System pages" collection: Default pages, which cannot be deleted. Saves to
+  [`content/system-pages/*.md`](content/system-pages).
 - "Team" collection: Team members. Saves to [`content/team/*.md`](content/team).
 
 When developing locally, you can run a development CMS server with:
@@ -50,8 +52,8 @@ Environment variables:
   `/database` and `/maps` pages should be added to the website. Allowed values are: "enabled" or
   "disabled".
 
-- `NUXT_PUBLIC_MAP_BASELAYER_URL`: The map base layer used on the "/maps" page. Defaults to an
-  OpenStreetMap map.
+- `NUXT_PUBLIC_MAP_BASELAYER_URL_LIGHT` and `NUXT_PUBLIC_MAP_BASELAYER_URL_DARK`: The map base layer
+  used on the "/maps" page, in "light" and "dark" mode. Defaults to an OpenStreetMap map.
 - `NUXT_PUBLIC_MAP_BASELAYER_ATTRIBUTION`: Attribution text for the above map.
 
 - `NUXT_PUBLIC_MATOMO_BASE_URL` and `NUXT_PUBLIC_MATOMO_ID`: When using `matomo` for website
@@ -80,7 +82,7 @@ pnpm run dev
 The CMS allows signing in with a GitHub account via OAuth.
 
 In local development, this is optional: you can run a CMS proxy server, which commits content to the
-local filesystem, instead of GitHub, and requires to authentication.
+local filesystem, instead of GitHub, and requires no authentication.
 
 ```bash
 pnpm run dev:cms
@@ -99,6 +101,37 @@ To properly configure OAuth, create a "GitHub OAuth App" at
 ### Deployment
 
 The website is deployed via [GitHub action](./.github/workflows/build-deploy.yml).
+
+Or it can be deployed manually:
+
+As a (currently semi, as data is still being fetched from the API) static website:
+```bash
+pnpm run generate
+```
+
+At the moment this will be stuck after the nuxt generate step for about 15 minutes, despite having finished generating successfully.
+So alternatively you can run the following command to generate the static files:
+```bash
+pnpm run generate:server
+```
+Once it says `✔ You can now deploy .output/public to any static hosting!` you can stop the process.
+
+Then, run the following command to generate the `index.html` to fix the current issue of the index page not being generated when using nuxt/i18n:
+```bash
+pnpm run generate:reroute-index
+```
+
+Now you can deploy the static files to a web server.
+The generated files are in the `.output/public/` directory.
+
+---
+
+As a node.js server:
+```bash
+pnpm run build
+pnpm start
+```
+
 
 ### Issues
 

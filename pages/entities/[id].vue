@@ -3,9 +3,9 @@ import { groupByToMap, keyByToMap } from "@acdh-oeaw/lib";
 import { z } from "zod";
 
 import { useIdPrefix } from "@/composables/use-id-prefix";
+import { hasCoordinates } from "@/utils/has-geojson-coordinates";
 
 definePageMeta({
-	title: "EntityPage.meta.title",
 	validate(route) {
 		const env = useRuntimeConfig();
 		if (env.public.NUXT_PUBLIC_DATABASE === "disabled") return false;
@@ -17,8 +17,12 @@ definePageMeta({
 	},
 });
 
-const locale = useLocale();
 const t = useTranslations();
+
+usePageMetadata({
+	title: t("EntityPage.meta.title"),
+});
+
 const { getUnprefixedId } = useIdPrefix();
 
 const route = useRoute();
@@ -53,7 +57,7 @@ useHead({
 
 const tabs = computed(() => {
 	const tabs = [];
-	if (entity.value?.geometry != null) {
+	if (entity.value?.geometry != null && hasCoordinates(entity.value.geometry)) {
 		tabs.push({
 			id: "geo-map",
 			label: t("EntityPage.map"),

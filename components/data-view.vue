@@ -61,7 +61,6 @@ function onUpdateSorting(sorting: SortingState) {
 		column,
 		sort: sorting[0]?.desc ? "desc" : "asc",
 	});
-
 }
 
 const { data, error, isPending, isPlaceholderData, suspense } = useGetSearchResults(
@@ -105,11 +104,12 @@ const entities = computed(() => {
 			class="relative isolate grid size-full overflow-y-auto"
 			:class="{ 'opacity-50 grayscale': isLoading }"
 		>
-			<div v-if="useGetSearchResults.length > 0" class="grid gap-8">
+			<div v-if="entities.length > 0" class="grid content-start gap-8">
 				<SearchResultsTable
 					:entities="entities"
 					:sorting="sortingState"
-					@update:sorting="onUpdateSorting" />
+					@update:sorting="onUpdateSorting"
+				/>
 
 				<Pagination
 					v-if="data?.pagination != null"
@@ -140,13 +140,13 @@ const entities = computed(() => {
 							<PaginationEllipsis v-else :key="item.type" :index="index" />
 						</template>
 
-						<PaginationNext />
-						<PaginationLast />
+						<PaginationNext :disabled="data.pagination.totalPages < 2" />
+						<PaginationLast :disabled="data.pagination.totalPages < 2" />
 					</PaginationList>
 				</Pagination>
 			</div>
 
-			<div v-else>
+			<div v-else-if="!isLoading">
 				<Centered>{{ t("DataView.nothing-found") }}</Centered>
 			</div>
 

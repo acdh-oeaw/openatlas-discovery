@@ -24,7 +24,6 @@ export default defineNuxtConfig({
 	content: {
 		defaultLocale,
 		locales: Object.keys(localesMap),
-		markdown: {},
 	},
 	css: ["@fontsource-variable/inter/slnt.css", "tailwindcss/tailwind.css", "@/styles/index.css"],
 	devtools: {
@@ -43,6 +42,10 @@ export default defineNuxtConfig({
 			},
 		},
 		inlineRouteRules: true,
+	},
+	features: {
+		/** @see https://github.com/nuxt/nuxt/issues/21821 */
+		inlineStyles: false,
 	},
 	i18n: {
 		baseUrl,
@@ -67,6 +70,7 @@ export default defineNuxtConfig({
 		compressPublicAssets: true,
 		prerender: {
 			routes: ["/manifest.webmanifest", "/robots.txt", "/sitemap.xml"],
+			failOnError: false,
 		},
 	},
 	postcss: {

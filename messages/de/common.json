@@ -37,11 +37,13 @@
 		"end-date": "End-Datum",
 		"start-date": "Start-Datum"
 	},
+	"DataView": {
+		"nothing-found": "Keine Einträge zu dieser Suche."
+	},
 	"DataPage": {
 		"meta": {
 			"title": "Daten"
 		},
-		"nothing-found": "Nichts gefunden",
 		"search": "Suche",
 		"title": "Daten",
 		"work-in-progress": "Die Datenbank ist derzeit im Aufbau."
@@ -138,6 +140,7 @@
 			"end": "Ende",
 			"name": "Name"
 		},
+		"no-entries": "Keine Einträge zu dieser Suche.",
 		"search-results": "Suchergebnisse"
 	},
 	"SystemClassNames": {
