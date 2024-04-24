@@ -76,6 +76,7 @@
 		"openapi-typescript": "^7.0.0-next.8",
 		"pino-http": "^9.0.0",
 		"radix-vue": "^1.5.2",
+		"sigma": "3.0.0-beta.17",
 		"tailwind-merge": "^2.2.2",
 		"tsx": "^4.7.1",
 		"vee-validate": "^4.12.6",

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Graph from "graphology";
 import circularpack from "graphology-layout/circlepack";
+import { DotIcon } from "lucide-vue-next";
 import Sigma, { type Camera } from "sigma";
 import type { EdgeDisplayData, NodeDisplayData } from "sigma/types";
 import { nextTick, onMounted, ref } from "vue";
@@ -38,8 +39,10 @@ const context: NetworkContext = {
 	camera: null,
 };
 
+const router = useRouter();
 const { entityColors } = colors;
 const defaultColor = "#666";
+let usedEntities: [string | undefined] = [""];
 
 watch(
 	() => {
@@ -56,6 +59,10 @@ watch(
 			size: networkConfig.sourceNodeSize,
 		});
 
+		/** Add source node to agenda of nodes */
+
+		usedEntities.push(networkData.systemClass);
+
 		/** Add relations to target nodes. */
 		networkData.relations?.forEach((element) => {
 			if (element.relationTo == null) return;
@@ -65,10 +72,14 @@ watch(
 
 			if (nodeClass == null) return;
 
+			if (!usedEntities.includes(nodeClass)) {
+				usedEntities.push(nodeClass);
+			}
 			context.graph.addNode(relationId, {
 				label: element.label,
 				color: getNodeColor(nodeClass),
 				size: networkConfig.relationNodeSize,
+				url: element.relationTo,
 			});
 
 			context.graph.addEdge(props.id, relationId);
@@ -105,6 +116,12 @@ onMounted(async () => {
 	});
 
 	context.camera = context.renderer.getCamera();
+
+	context.renderer.on("clickNode", ({ node }) => {
+		console.log(node);
+
+		void router.push(node);
+	});
 
 	context.renderer.on("enterNode", ({ node }) => {
 		hoverTimeOut = setTimeout(() => {
@@ -161,14 +178,14 @@ function setHoveredNode(node?: string) {
 	if (node) {
 		console.log("entered.");
 		state.value.hoveredNode = node;
-		state.value.hoveredNeighbors = new Set(graph.neighbors(node));
+		state.value.hoveredNeighbors = new Set(context.graph.neighbors(node));
 	} else {
 		state.value.hoveredNode = undefined;
 		state.value.hoveredNeighbors = undefined;
 	}
 
 	// Refresh rendering:
-	renderer?.refresh();
+	context.renderer?.refresh();
 }
 
 // Render nodes accordingly to the internal state:
@@ -176,7 +193,7 @@ function setHoveredNode(node?: string) {
 // 2. If there is query, all non-matching nodes are greyed
 // 3. If there is a hovered node, all non-neighbor nodes are greyed
 function nodeReducer() {
-	renderer?.setSetting("nodeReducer", (node, data) => {
+	context.renderer?.setSetting("nodeReducer", (node, data) => {
 		const res: Partial<NodeDisplayData> = { ...data };
 
 		if (
@@ -205,18 +222,18 @@ function nodeReducer() {
 // 2. If there is a query, the edge is only visible if it connects two
 //    suggestions
 function edgeReducer() {
-	renderer?.setSetting("edgeReducer", (edge, data) => {
+	context.renderer?.setSetting("edgeReducer", (edge, data) => {
 		const res: Partial<EdgeDisplayData> = { ...data };
 
-		if (state.value.hoveredNode && !graph.hasExtremity(edge, state.value.hoveredNode)) {
-			console.log(graph.hasExtremity(edge, state.value.hoveredNode));
+		if (state.value.hoveredNode && !context.graph.hasExtremity(edge, state.value.hoveredNode)) {
+			console.log(context.graph.hasExtremity(edge, state.value.hoveredNode));
 			res.hidden = true;
 		}
 
 		if (
 			state.value.suggestions &&
-			(!state.value.suggestions.has(graph.source(edge)) ||
-				!state.value.suggestions.has(graph.target(edge)))
+			(!state.value.suggestions.has(context.graph.source(edge)) ||
+				!state.value.suggestions.has(context.graph.target(edge)))
 		) {
 			res.color = "rgb(400, 400, 400)";
 		}
@@ -248,30 +265,24 @@ onScopeDispose(() => {
 </script>
 
 <template>
-	<div id="sigma-container" data-network-visualisation></div>
-	<div class="absolute inset-x-0 bottom-0 border-t bg-neutral-50">
-		<div class="input">
-			<label for="zoom-in">Zoom in</label>
-			<button id="zoom-in" @click="zoom">+</button>
-		</div>
-		<div class="input">
-			<label for="zoom-out">Zoom out</label>
-			<button id="zoom-out" @click="unZoom">-</button>
-		</div>
-		<div class="input">
-			<label for="zoom-reset">Reset zoom</label>
-			<button id="zoom-reset" @click="resetZoom">⊙</button>
-		</div>
+	<div class="absolute z-10 m-3 flex w-full">
+		<Card class="w-max">
+			<span v-for="(color, entity) in entityColors" :key="entity">
+				<span v-if="usedEntities.includes(entity)" class="pr-4">
+					<DotIcon :size="50" :color="color" class="inline-block" />
+					<span>{{ entity }}</span>
+				</span>
+			</span>
+			<span v-for="entry in usedEntities" :key="entry">
+				<span
+					v-if="entry != null && entry !== '' && !Object.keys(entityColors).includes(entry)"
+					class="pr-4"
+				>
+					<DotIcon :size="50" :color="defaultColor" class="inline-block" />
+					<span>{{ entry }}</span>
+				</span>
+			</span>
+		</Card>
 	</div>
+	<div id="sigma-container" class="relative m-0 size-full overflow-hidden p-0"></div>
 </template>
-
-<style>
-[data-network-visualisation] {
-	position: relative;
-	overflow: hidden;
-	width: 100%;
-	height: 100%;
-	margin: 0;
-	padding: 0;
-}
-</style>
