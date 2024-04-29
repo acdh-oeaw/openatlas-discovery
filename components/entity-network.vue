@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import EntityDataGraph from "@/components/entity-data-graph.vue";
+
 const props = defineProps<{
 	networkData: EntityFeature | undefined;
 	id: number;
@@ -7,13 +9,11 @@ const props = defineProps<{
 
 <template>
 	<Card class="h-96 overflow-hidden">
-		<VisualisationContainer v-slot="{ height, width }">
-			<Network
-				v-if="height && width"
+		<VisualisationContainer>
+			<EntityDataGraph
+				v-if="props.networkData != null"
 				:id="props.id"
 				:network-data="props.networkData"
-				:height="height"
-				:width="width"
 			/>
 		</VisualisationContainer>
 	</Card>
