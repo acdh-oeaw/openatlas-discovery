@@ -3,8 +3,8 @@ import type { ForceAtlas2Settings } from "graphology-layout-forceatlas2";
 export const networkConfig = {
 	sourceNodeColor: project.colors.geojson,
 	relationsNodeColor: "#B8CF5D",
-	sourceNodeSize: 20,
-	relationNodeSize: 10,
+	sourceNodeSize: 4,
+	relationNodeSize: 4,
 };
 
 export const layoutOptions: ForceAtlas2Settings = {

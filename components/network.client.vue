@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import type Graph from "graphology";
+import circular from "graphology-layout/circular";
+import FA2LayoutSupervisor from "graphology-layout-forceatlas2/worker";
 import Sigma, { type Camera } from "sigma";
 import type { EdgeDisplayData, NodeDisplayData } from "sigma/types";
 import { nextTick, onMounted, ref } from "vue";
+
+import { layoutOptions } from "@/config/network-visualisation.config";
 
 interface State {
 	hoveredNode?: string;
@@ -31,6 +35,9 @@ const context: NetworkContext = {
 	camera: null,
 };
 
+circular.assign(context.graph);
+
+const locale = useLocale();
 const router = useRouter();
 let hoverTimeOut: ReturnType<typeof setTimeout>;
 
@@ -40,9 +47,12 @@ let draggedNode = null as string | null;
 let isDragging = false;
 
 const state = ref<State>({ searchQuery: "" });
+const layout = new FA2LayoutSupervisor(context.graph, { settings: layoutOptions });
 
 onMounted(async () => {
 	await nextTick();
+
+	layout.start();
 
 	const container = document.getElementById("sigma-container");
 	if (container == null) return;
@@ -55,7 +65,7 @@ onMounted(async () => {
 	context.camera = context.renderer.getCamera();
 
 	context.renderer.on("clickNode", ({ node }) => {
-		void router.push(node);
+		void router.push(`/${locale.value}/entities/` + node);
 	});
 
 	context.renderer.on("enterNode", ({ node }) => {
@@ -190,6 +200,7 @@ function resetZoom() {
 
 onScopeDispose(() => {
 	context.renderer?.kill();
+	layout.kill();
 	context.graph.clear();
 	context.renderer = null;
 	context.camera = null;
