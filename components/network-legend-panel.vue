@@ -5,6 +5,29 @@ const props = defineProps<{
 	systemClasses: Array<string>;
 }>();
 
+const labels = {
+	place: "Place",
+	source: "Source",
+	person: "Person",
+	group: "Group",
+	move: "Move",
+	event: "Event",
+	activity: "Activity",
+	acquisition: "Acqusition",
+	feature: "Feature",
+	human_remains: "Human Remains",
+	stratigraphic_unit: "Stratigraphic Unit",
+	artifact: "Artifact",
+	file: "File",
+	type: "Type",
+	object_location: "Object Location",
+	bibliography: "Bibliography",
+	edition: "Edition",
+	administrative_unit: "Administrative Unit",
+	reference_system: "Reference System",
+	source_translation: "Source Translation",
+};
+
 const systemClassColors = colors.entityColors;
 </script>
 
@@ -16,16 +39,18 @@ const systemClassColors = colors.entityColors;
 			v-for="el in props.systemClasses"
 			:key="el"
 			class="grid grid-cols-[auto_1fr] gap-3"
-			:style="`color: ${systemClassColors[el]}`"
+			:style="`color: ${systemClassColors[el] ? systemClassColors[el] : '#666'}`"
 		>
 			<div class="grid grid-cols-[auto_1fr] gap-2">
 				<input
 					:id="el"
 					type="checkbox"
 					name="systemClassCheckbox"
-					:style="`background-color: ${systemClassColors[el]}`"
+					:style="`accent-color: ${systemClassColors[el] ? systemClassColors[el] : '#666'}`"
+					checked
 				/>
-				{{ el }}
+				<span v-if="labels[el]">{{ labels[el] }}</span>
+				<span v-else> {{ el }}</span>
 			</div>
 		</div>
 	</aside>

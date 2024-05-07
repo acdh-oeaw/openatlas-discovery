@@ -8,8 +8,6 @@ const router = useRouter();
 const route = useRoute();
 const t = useTranslations();
 
-let systemClasses: Array<string> = [];
-
 const searchFiltersSchema = z.object({
 	category: z.enum(categories).catch("entityName"),
 	search: z.string().catch(""),
@@ -55,17 +53,22 @@ const isLoading = computed(() => {
 const entities = computed(() => {
 	return (
 		data.value?.results.flatMap((result) => {
-			getSystemClass(result.systemClass);
 			return result;
 		}) ?? []
 	);
 });
 
-function getSystemClass(entityClass: string) {
-	if (!systemClasses.includes(entityClass)) {
-		systemClasses.push(entityClass);
-	}
-}
+const systemClasses = computed(() => {
+	const systemClasses: Array<string> = [];
+
+	entities.value.forEach((entity) => {
+		if (!systemClasses.includes(entity.systemClass)) {
+			systemClasses.push(entity.systemClass);
+		}
+	});
+
+	return systemClasses;
+});
 </script>
 
 <template>
