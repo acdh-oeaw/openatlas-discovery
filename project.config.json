@@ -11,12 +11,12 @@
 			"event": "#ff595e",
 			"activity": "#9d0208",
 			"acquisition": "#6a040f",
-			"feature": "#6a4c93",
+			"feature": "#b8cf5b",
 			"human_remains": "#3d0066",
 			"stratigraphic_unit": "#9723c1",
-			"artifact": "#9d4edd",
-			"file": "#ee6c4d",
-			"type": "#b8cf5b"
+			"artifact": "#ee6c4d",
+			"file": "#9d4edd",
+			"type": "#6a4c93"
 		}
 	},
 	"defaultLocale": "en",

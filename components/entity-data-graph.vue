@@ -18,7 +18,7 @@ let graph = new Graph();
 
 const { entityColors } = colors;
 const defaultColor = "#666";
-let usedEntities: [string | undefined] = [""];
+let legendEntities: [string | undefined] = [""];
 
 watch(
 	() => {
@@ -37,7 +37,7 @@ watch(
 
 		/** Add source node to agenda of nodes */
 
-		usedEntities.push(networkData.systemClass);
+		legendEntities.push(networkData.systemClass);
 
 		/** Add relations to target nodes. */
 		networkData.relations?.forEach((element) => {
@@ -48,8 +48,8 @@ watch(
 
 			if (nodeClass == null) return;
 
-			if (!usedEntities.includes(nodeClass)) {
-				usedEntities.push(nodeClass);
+			if (!legendEntities.includes(nodeClass)) {
+				legendEntities.push(nodeClass);
 			}
 			graph.addNode(relationId, {
 				label: element.label,
@@ -76,12 +76,12 @@ function getNodeColor(nodeClass: string) {
 	<div class="absolute z-10 m-3 flex w-full">
 		<Card class="w-max">
 			<span v-for="(color, entity) in entityColors" :key="entity">
-				<span v-if="usedEntities.includes(entity)" class="pr-4">
+				<span v-if="legendEntities.includes(entity)" class="pr-4">
 					<DotIcon :size="50" :color="color" class="inline-block" />
 					<span>{{ entity }}</span>
 				</span>
 			</span>
-			<span v-for="entry in usedEntities" :key="entry">
+			<span v-for="entry in legendEntities" :key="entry">
 				<span
 					v-if="entry != null && entry !== '' && !Object.keys(entityColors).includes(entry)"
 					class="pr-4"

@@ -1,8 +1,49 @@
 <script lang="ts" setup>
+import { z } from "zod";
+
+import type { SearchFormData } from "@/components/search-form.vue";
+import { categories } from "@/composables/use-get-search-results";
+
+const router = useRouter();
+const route = useRoute();
+const t = useTranslations();
+
+let systemClasses: Array<string> = [];
+
+const searchFiltersSchema = z.object({
+	category: z.enum(categories).catch("entityName"),
+	search: z.string().catch(""),
+});
+
+const searchFilters = computed(() => {
+	return searchFiltersSchema.parse(route.query);
+});
+
+type SearchFilters = z.infer<typeof searchFiltersSchema>;
+
+function setSearchFilters(query: Partial<SearchFilters>) {
+	void router.push({ query });
+}
+
+function onChangeSearchFilters(values: SearchFormData) {
+	setSearchFilters(values);
+}
+
 const { data, error, isPending, isPlaceholderData, suspense } = useGetNetworkData(
 	computed(() => {
 		return {
-			exclude_system_classes: ["type", "object_location", "reference_system"],
+			exclude_system_classes: [
+				"type",
+				"object_location",
+				"reference_system",
+				"file",
+				"source_translation",
+				"source",
+				"bibliography",
+				"external_reference",
+				"administrative_unit",
+				"edition",
+			],
 		};
 	}),
 );
@@ -13,23 +54,37 @@ const isLoading = computed(() => {
 
 const entities = computed(() => {
 	return (
-		data.value?.results?.flatMap((result) => {
+		data.value?.results.flatMap((result) => {
+			getSystemClass(result.systemClass);
 			return result;
 		}) ?? []
 	);
 });
 
+function getSystemClass(entityClass: string) {
+	if (!systemClasses.includes(entityClass)) {
+		systemClasses.push(entityClass);
+	}
+}
 </script>
 
 <template>
-	<VisualisationContainer
-		v-slot="{ height, width }"
-		class="border"
-		:class="{ 'opacity-50 grayscale': isLoading }"
-	>
-		<DataGraph :network-data="entities" />
-		<Centered v-if="isLoading" class="pointer-events-none">
-			<LoadingIndicator class="text-neutral-950" size="lg" />
-		</Centered>
-	</VisualisationContainer>
+	<div class="relative grid grid-rows-[auto_1fr] gap-4">
+		<NetworkSearchForm :search="searchFilters.search" @submit="onChangeSearchFilters" />
+
+		<VisualisationContainer
+			v-slot="{ height, width }"
+			class="border"
+			:class="{ 'opacity-50 grayscale': isLoading }"
+		>
+			<NetworkLegendPanel
+				class="absolute bottom-0 right-0 z-10 m-3"
+				:system-classes="systemClasses"
+			></NetworkLegendPanel>
+			<DataGraph :network-data="entities" />
+			<Centered v-if="isLoading" class="pointer-events-none">
+				<LoadingIndicator class="text-neutral-950" size="lg" />
+			</Centered>
+		</VisualisationContainer>
+	</div>
 </template>

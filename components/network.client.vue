@@ -172,6 +172,12 @@ function edgeReducer() {
 			res.hidden = true;
 		}
 
+		if (context.graph.hasExtremity(edge, state.value.hoveredNode)) {
+			const edgeTargetNode = context.graph.getNodeAttributes(context.graph.source(edge));
+
+			return { ...data, color: edgeTargetNode.color, zIndex: 1 };
+		}
+
 		if (
 			state.value.suggestions &&
 			(!state.value.suggestions.has(context.graph.source(edge)) ||
