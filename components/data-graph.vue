@@ -39,12 +39,10 @@ watch(
 
 		//** Add edges */
 		networkData.forEach((entity) => {
-			entity.relations?.forEach((element) => {
+			entity.relations.forEach((element) => {
 				graph.addEdge(entity.id, element);
 			});
 		});
-
-
 	},
 	{ immediate: true },
 );

@@ -50,9 +50,11 @@ const state = ref<State>({ searchQuery: "" });
 const layout = new FA2LayoutSupervisor(context.graph, { settings: layoutOptions });
 
 onMounted(async () => {
-	await nextTick();
-
 	layout.start();
+
+	await new Promise((r) => {
+		return setTimeout(r, 100);
+	});
 
 	const container = document.getElementById("sigma-container");
 	if (container == null) return;
