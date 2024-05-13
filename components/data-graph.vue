@@ -40,7 +40,9 @@ watch(
 		//** Add edges */
 		networkData.forEach((entity) => {
 			entity.relations.forEach((element) => {
-				graph.addEdge(entity.id, element);
+				if (!graph.hasEdge(entity.id, element)) {
+					graph.addEdge(entity.id, element);
+				}
 			});
 		});
 	},
