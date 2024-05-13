@@ -4,7 +4,7 @@ import circular from "graphology-layout/circular";
 import FA2LayoutSupervisor from "graphology-layout-forceatlas2/worker";
 import Sigma, { type Camera } from "sigma";
 import type { EdgeDisplayData, NodeDisplayData } from "sigma/types";
-import { nextTick, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 
 import { layoutOptions } from "@/config/network-visualisation.config";
 
@@ -13,7 +13,11 @@ interface State {
 	searchQuery: string;
 
 	// State derived from query:
-	selectedNode?: string;
+	selectedNodes?: Array<{
+		id: string;
+		label: string;
+	}>;
+
 	suggestions?: Set<string>;
 
 	// State derived from hovered node:
@@ -21,6 +25,7 @@ interface State {
 }
 const props = defineProps<{
 	graph: Graph;
+	searchNode: string;
 }>();
 
 interface NetworkContext {
@@ -49,6 +54,51 @@ let isDragging = false;
 const state = ref<State>({ searchQuery: "" });
 const layout = new FA2LayoutSupervisor(context.graph, { settings: layoutOptions });
 
+watch(
+	() => {
+		return props.searchNode;
+	},
+	(searchNode) => {
+		context.graph.nodes().forEach((el) => {
+			context.graph.removeNodeAttribute(el, "highlighted");
+		});
+		const query = searchNode.toLowerCase();
+
+		if (query) {
+			const results = context.graph
+				.nodes()
+				.map((n) => {
+					return { id: n, label: context.graph.getNodeAttribute(n, "label") as string };
+				})
+				.filter(({ label }) => {
+					return label.toLowerCase().includes(query);
+				});
+
+			// If we have a single perfect match, them we remove the suggestions, and
+			// we consider the user has selected a node through the datalist
+			// autocomplete:
+			if (results.length >= 1) {
+				state.value.selectedNodes = results;
+				state.value.selectedNodes.forEach((el) => {
+					context.graph.setNodeAttribute(el.id, "highlighted", true);
+				});
+			}
+		}
+		// If the query is empty, then we reset the selectedNode / suggestions state:
+		else {
+			state.value.selectedNodes = undefined;
+		}
+
+		// Refresh rendering
+		// You can directly call `renderer.refresh()`, but if you need performances
+		// you can provide some options to the refresh method.
+		// In this case, we don't touch the graph data so we can skip its reindexation
+		context.renderer?.refresh({
+			skipIndexation: true,
+		});
+	},
+);
+
 onMounted(async () => {
 	layout.start();
 
@@ -72,6 +122,9 @@ onMounted(async () => {
 
 	context.renderer.on("enterNode", ({ node }) => {
 		hoverTimeOut = setTimeout(() => {
+			context.graph.nodes().forEach((el) => {
+				context.graph.removeNodeAttribute(el, "highlighted");
+			});
 			setHoveredNode(node);
 			nodeReducer();
 			edgeReducer();
@@ -149,14 +202,6 @@ function nodeReducer() {
 			res.label = "";
 			res.color = "rgb(400, 400, 400)";
 		}
-
-		if (state.value.selectedNode === node) {
-			res.highlighted = true;
-		} else if (state.value.suggestions && !state.value.suggestions.has(node)) {
-			res.label = "";
-			res.color = "rgb(400, 400, 400)";
-		}
-
 		return res;
 	});
 }

@@ -8,6 +8,7 @@ import { colors } from "../project.config.json";
 
 const props = defineProps<{
 	networkData: NetworkEntity;
+	searchNode: string;
 }>();
 
 let graph = new Graph();
@@ -75,5 +76,5 @@ function getNodeColor(nodeClass: string) {
 			</span>
 		</Card>
 	</div>
-	<Network v-if="graph.size > 0" :graph="graph"></Network>
+	<Network v-if="graph.size > 0" :graph="graph" :search-node="props.searchNode"></Network>
 </template>

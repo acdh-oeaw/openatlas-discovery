@@ -1,9 +1,23 @@
 <script setup lang="ts">
 import { colors } from "../project.config.json";
 
+export interface SearchFormData {
+	category: string;
+}
+
 const props = defineProps<{
 	systemClasses: Array<string>;
 }>();
+
+const emit = defineEmits<{
+	(event: "submit", values: SearchFormData): void;
+}>();
+
+function onSubmit(element: string) {
+	emit("submit", {
+		category: element,
+	});
+}
 
 const labels = {
 	place: "Place",
@@ -48,6 +62,7 @@ const systemClassColors = colors.entityColors;
 					name="systemClassCheckbox"
 					:style="`accent-color: ${systemClassColors[el] ? systemClassColors[el] : '#666'}`"
 					checked
+					@submit="onSubmit(el)"
 				/>
 				<span v-if="labels[el]">{{ labels[el] }}</span>
 				<span v-else> {{ el }}</span>

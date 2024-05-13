@@ -2,14 +2,12 @@
 import { z } from "zod";
 
 import type { SearchFormData } from "@/components/search-form.vue";
-import { categories } from "@/composables/use-get-search-results";
 
 const router = useRouter();
 const route = useRoute();
 const t = useTranslations();
 
 const searchFiltersSchema = z.object({
-	category: z.enum(categories).catch("entityName"),
 	search: z.string().catch(""),
 });
 
@@ -69,6 +67,7 @@ const systemClasses = computed(() => {
 
 	return systemClasses;
 });
+
 </script>
 
 <template>
@@ -83,8 +82,9 @@ const systemClasses = computed(() => {
 			<NetworkLegendPanel
 				class="absolute bottom-0 right-0 z-10 m-3"
 				:system-classes="systemClasses"
+				@submit="onChangeSearchFilters"
 			></NetworkLegendPanel>
-			<DataGraph :network-data="entities" />
+			<DataGraph :network-data="entities" :search-node="searchFilters.search" />
 			<Centered v-if="isLoading" class="pointer-events-none">
 				<LoadingIndicator class="text-neutral-950" size="lg" />
 			</Centered>
