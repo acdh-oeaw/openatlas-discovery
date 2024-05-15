@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { DotIcon } from "lucide-vue-next";
+
 import { colors } from "../project.config.json";
 
 export interface SearchFormData {
-	category: string;
+	category: string; // TODO: stricter typings
 }
 
 const props = defineProps<{
@@ -15,7 +17,7 @@ const emit = defineEmits<{
 
 function onSubmit(element: string) {
 	emit("submit", {
-		category: element,
+		category: element, //Array, checkbox-group html + how do i get teh values in the submit event handler
 	});
 }
 
@@ -56,14 +58,18 @@ const systemClassColors = colors.entityColors;
 			:style="`color: ${systemClassColors[el] ? systemClassColors[el] : '#666'}`"
 		>
 			<div class="grid grid-cols-[auto_1fr] gap-2">
-				<input
+				<!-- <input
 					:id="el"
 					type="checkbox"
 					name="systemClassCheckbox"
 					:style="`accent-color: ${systemClassColors[el] ? systemClassColors[el] : '#666'}`"
 					checked
-					@submit="onSubmit(el)"
-				/>
+					@change="onSubmit(el)"
+				/> -->
+				<span
+					class="m-1.5 size-2 rounded-full"
+					:style="`background-color: ${systemClassColors[el] ? systemClassColors[el] : '#666'}`"
+				></span>
 				<span v-if="labels[el]">{{ labels[el] }}</span>
 				<span v-else> {{ el }}</span>
 			</div>

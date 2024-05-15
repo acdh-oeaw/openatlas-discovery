@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { z } from "zod";
 
-import type { SearchFormData } from "@/components/search-form.vue";
+import type { SearchFormData as CategoryFormData } from "@/components/network-legend-panel.vue";
+import type { SearchFormData } from "@/components/network-search-form.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -17,12 +18,12 @@ const searchFilters = computed(() => {
 
 type SearchFilters = z.infer<typeof searchFiltersSchema>;
 
-function setSearchFilters(query: Partial<SearchFilters>) {
-	void router.push({ query });
+function onChangeSearchFilters(values: SearchFormData) {
+	void router.push({ query: { ...searchFilters.value, ...values } });
 }
 
-function onChangeSearchFilters(values: SearchFormData) {
-	setSearchFilters(values);
+function onChangeCategory(values: CategoryFormData) {
+	void router.push({ query: { ...searchFilters.value, ...values } });
 }
 
 const { data, error, isPending, isPlaceholderData, suspense } = useGetNetworkData(
@@ -39,6 +40,7 @@ const { data, error, isPending, isPlaceholderData, suspense } = useGetNetworkDat
 				"external_reference",
 				"administrative_unit",
 				"edition",
+				"type_tools",
 			],
 		};
 	}),
@@ -67,7 +69,6 @@ const systemClasses = computed(() => {
 
 	return systemClasses;
 });
-
 </script>
 
 <template>
@@ -82,7 +83,7 @@ const systemClasses = computed(() => {
 			<NetworkLegendPanel
 				class="absolute bottom-0 right-0 z-10 m-3"
 				:system-classes="systemClasses"
-				@submit="onChangeSearchFilters"
+				@submit="onChangeCategory"
 			></NetworkLegendPanel>
 			<DataGraph :network-data="entities" :search-node="searchFilters.search" />
 			<Centered v-if="isLoading" class="pointer-events-none">

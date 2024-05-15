@@ -92,5 +92,5 @@ function getNodeColor(nodeClass: string) {
 			</span>
 		</Card>
 	</div>
-	<Network v-if="graph !== undefined" :graph="graph"></Network>
+	<Network v-if="graph !== undefined" :graph="graph" search-node=""></Network>
 </template>

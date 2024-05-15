@@ -97,6 +97,7 @@ watch(
 			skipIndexation: true,
 		});
 	},
+	{ immediate: true },
 );
 
 onMounted(async () => {
