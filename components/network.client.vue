@@ -123,9 +123,9 @@ onMounted(async () => {
 
 	context.renderer.on("enterNode", ({ node }) => {
 		hoverTimeOut = setTimeout(() => {
-			context.graph.nodes().forEach((el) => {
-				context.graph.removeNodeAttribute(el, "highlighted");
-			});
+			// context.graph.nodes().forEach((el) => {
+			// 	context.graph.removeNodeAttribute(el, "highlighted");
+			// });
 			setHoveredNode(node);
 			nodeReducer();
 			edgeReducer();

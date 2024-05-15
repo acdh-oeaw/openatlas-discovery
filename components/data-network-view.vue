@@ -19,7 +19,14 @@ const searchFilters = computed(() => {
 type SearchFilters = z.infer<typeof searchFiltersSchema>;
 
 function onChangeSearchFilters(values: SearchFormData) {
-	void router.push({ query: { ...searchFilters.value, ...values } });
+	const query = { ...searchFilters.value, ...values };
+
+	if (values.search === "") {
+		// @ts-expect-error Fix me later please
+		delete query.search;
+	}
+
+	void router.push({ query });
 }
 
 function onChangeCategory(values: CategoryFormData) {
