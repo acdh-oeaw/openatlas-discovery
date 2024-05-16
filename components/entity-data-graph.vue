@@ -3,9 +3,9 @@ import Graph from "graphology";
 import circularpack from "graphology-layout/circlepack";
 import { DotIcon } from "lucide-vue-next";
 
-import type { EntityFeature } from "../composables/use-create-entity";
-import { networkConfig } from "../config/network-visualisation.config";
-import { colors } from "../project.config.json";
+import type { EntityFeature } from "@/composables/use-create-entity";
+import { networkConfig } from "@/config/network-visualisation.config";
+import { colors } from "@/project.config.json";
 
 const props = defineProps<{
 	networkData: EntityFeature;
@@ -14,11 +14,11 @@ const props = defineProps<{
 
 const { getUnprefixedId } = useIdPrefix();
 
-let graph = new Graph();
+const graph = new Graph();
 
 const { entityColors } = colors;
-const defaultColor = "#666";
-let legendEntities: [string | undefined] = [""];
+const defaultColor = project.colors.entityDefaultColor;
+const legendEntities: [string | undefined] = [""];
 
 watch(
 	() => {
@@ -60,8 +60,6 @@ watch(
 
 			graph.addEdge(props.id, relationId);
 		});
-
-		circularpack.assign(graph, { scale: 100 });
 	},
 	{ immediate: true },
 );
@@ -92,5 +90,5 @@ function getNodeColor(nodeClass: string) {
 			</span>
 		</Card>
 	</div>
-	<Network v-if="graph !== undefined" :graph="graph" search-node=""></Network>
+	<Network v-if="graph.size > 0" :graph="graph" />
 </template>

@@ -10,7 +10,6 @@ import { layoutOptions } from "@/config/network-visualisation.config";
 
 interface State {
 	hoveredNode?: string;
-	searchQuery: string;
 
 	// State derived from query:
 	selectedNodes?: Array<{
@@ -18,14 +17,12 @@ interface State {
 		label: string;
 	}>;
 
-	suggestions?: Set<string>;
-
 	// State derived from hovered node:
 	hoveredNeighbors?: Set<string>;
 }
 const props = defineProps<{
 	graph: Graph;
-	searchNode: string;
+	searchNode?: string;
 }>();
 
 interface NetworkContext {
@@ -46,13 +43,10 @@ const locale = useLocale();
 const router = useRouter();
 let hoverTimeOut: ReturnType<typeof setTimeout>;
 
-// let searchInput = "";
-
-let draggedNode = null as string | null;
-let isDragging = false;
-
-const state = ref<State>({ searchQuery: "" });
+const state = ref<State>({});
 const layout = new FA2LayoutSupervisor(context.graph, { settings: layoutOptions });
+
+const disabledNodeColor = project.colors.disabledNodeColor;
 
 watch(
 	() => {
@@ -62,7 +56,7 @@ watch(
 		context.graph.nodes().forEach((el) => {
 			context.graph.removeNodeAttribute(el, "highlighted");
 		});
-		const query = searchNode.toLowerCase();
+		const query = searchNode?.toLowerCase();
 
 		if (query) {
 			const results = context.graph
@@ -74,9 +68,6 @@ watch(
 					return label.toLowerCase().includes(query);
 				});
 
-			// If we have a single perfect match, them we remove the suggestions, and
-			// we consider the user has selected a node through the datalist
-			// autocomplete:
 			if (results.length >= 1) {
 				state.value.selectedNodes = results;
 				state.value.selectedNodes.forEach((el) => {
@@ -84,7 +75,7 @@ watch(
 				});
 			}
 		}
-		// If the query is empty, then we reset the selectedNode / suggestions state:
+		// If the query is empty, then we reset the selectedNode
 		else {
 			state.value.selectedNodes = undefined;
 		}
@@ -103,6 +94,7 @@ watch(
 onMounted(async () => {
 	layout.start();
 
+	// await the layout algorithm so the initial circular layout does not flash for a sec
 	await new Promise((r) => {
 		return setTimeout(r, 100);
 	});
@@ -136,42 +128,6 @@ onMounted(async () => {
 		clearTimeout(hoverTimeOut);
 		setHoveredNode(undefined);
 	});
-
-	context.renderer.on("downNode", (e) => {
-		isDragging = true;
-		draggedNode = e.node;
-		context.graph.setNodeAttribute(draggedNode, "highlighted", true);
-	});
-
-	context.renderer.getMouseCaptor().on("mousemovebody", (e) => {
-		if (!isDragging || !draggedNode) return;
-
-		// Get new position of node
-		const pos = context.renderer?.viewportToGraph(e);
-
-		context.graph.setNodeAttribute(draggedNode, "x", pos?.x);
-		context.graph.setNodeAttribute(draggedNode, "y", pos?.y);
-
-		// Prevent sigma to move camera:
-		e.preventSigmaDefault();
-		e.original.preventDefault();
-		e.original.stopPropagation();
-	});
-
-	// On mouse up, we reset the autoscale and the dragging mode
-	context.renderer.getMouseCaptor().on("mouseup", () => {
-		if (draggedNode) {
-			context.graph.removeNodeAttribute(draggedNode, "highlighted");
-		}
-		isDragging = false;
-		draggedNode = null;
-	});
-
-	// Disable the autoscale at the first down interaction
-	context.renderer.getMouseCaptor().on("mousedown", () => {
-		if (!context.renderer?.getCustomBBox())
-			context.renderer?.setCustomBBox(context.renderer.getBBox());
-	});
 });
 
 function setHoveredNode(node?: string) {
@@ -201,17 +157,15 @@ function nodeReducer() {
 			state.value.hoveredNode !== node
 		) {
 			res.label = "";
-			res.color = "rgb(400, 400, 400)";
+			res.color = disabledNodeColor;
 		}
 		return res;
 	});
 }
 
 // Render edges accordingly to the internal state:
-// 1. If a node is hovered, the edge is hidden if it is not connected to the
-//    node
-// 2. If there is a query, the edge is only visible if it connects two
-//    suggestions
+// If a node is hovered, the edge is hidden if it is not connected to the
+// node
 function edgeReducer() {
 	context.renderer?.setSetting("edgeReducer", (edge, data) => {
 		const res: Partial<EdgeDisplayData> = { ...data };
@@ -226,30 +180,8 @@ function edgeReducer() {
 			return { ...data, color: edgeTargetNode.color, zIndex: 1 };
 		}
 
-		if (
-			state.value.suggestions &&
-			(!state.value.suggestions.has(context.graph.source(edge)) ||
-				!state.value.suggestions.has(context.graph.target(edge)))
-		) {
-			res.color = "rgb(400, 400, 400)";
-		}
-
 		return res;
 	});
-}
-
-// Bind zoom manipulation buttons
-
-function zoom() {
-	context.camera?.animatedZoom({ duration: 600 });
-}
-
-function unZoom() {
-	context.camera?.animatedUnzoom({ duration: 600 });
-}
-
-function resetZoom() {
-	context.camera?.animatedReset({ duration: 600 });
 }
 
 onScopeDispose(() => {

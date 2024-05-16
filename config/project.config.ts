@@ -25,7 +25,12 @@ const schema = z.object({
 				feature: z.string().min(1),
 				artifact: z.string().min(1),
 				file: z.string().min(1),
+				human_remains: z.string().min(1),
+				stratigraphic_unit: z.string().min(1),
+				type: z.string().min(1),
 			}),
+			entityDefaultColor: z.string().min(1),
+			disabledNodeColor: z.string().min(1),
 		})
 		.transform((values) => {
 			const color = parse(values.brand);

@@ -17,7 +17,9 @@
 			"artifact": "#ee6c4d",
 			"file": "#9d4edd",
 			"type": "#6a4c93"
-		}
+		},
+		"entityDefaultColor": "#666",
+		"disabledNodeColor": "rgb(400, 400, 400)"
 	},
 	"defaultLocale": "en",
 	"logos": {

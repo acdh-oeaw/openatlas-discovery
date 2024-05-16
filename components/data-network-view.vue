@@ -88,10 +88,11 @@ const systemClasses = computed(() => {
 			:class="{ 'opacity-50 grayscale': isLoading }"
 		>
 			<NetworkLegendPanel
+				v-if="height && width"
 				class="absolute bottom-0 right-0 z-10 m-3"
 				:system-classes="systemClasses"
 				@submit="onChangeCategory"
-			></NetworkLegendPanel>
+			/>
 			<DataGraph :network-data="entities" :search-node="searchFilters.search" />
 			<Centered v-if="isLoading" class="pointer-events-none">
 				<LoadingIndicator class="text-neutral-950" size="lg" />

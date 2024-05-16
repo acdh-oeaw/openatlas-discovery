@@ -11,11 +11,10 @@ const props = defineProps<{
 	searchNode: string;
 }>();
 
-let graph = new Graph();
+const graph = new Graph();
 
 const { entityColors } = colors;
-const defaultColor = "#666";
-let usedEntities: [string | undefined] = [""];
+const defaultColor = colors.entityDefaultColor;
 
 watch(
 	() => {
@@ -27,7 +26,7 @@ watch(
 
 		if (networkData.length === 0) return;
 
-		/** Add all nodes */
+		/** Add all nodes. */
 		networkData.forEach((entity) => {
 			if (!graph.hasNode(entity.id) && entity.systemClass) {
 				graph.addNode(entity.id, {
@@ -38,7 +37,7 @@ watch(
 			}
 		});
 
-		//** Add edges */
+		//** Add edges. */
 		networkData.forEach((entity) => {
 			entity.relations.forEach((element) => {
 				if (!graph.hasEdge(entity.id, element)) {
@@ -57,24 +56,6 @@ function getNodeColor(nodeClass: string) {
 </script>
 
 <template>
-	<div class="absolute z-10 m-3 flex w-full">
-		<Card class="w-max">
-			<span v-for="(color, entity) in entityColors" :key="entity">
-				<span v-if="usedEntities.includes(entity)" class="pr-4">
-					<DotIcon :size="50" :color="color" class="inline-block" />
-					<span>{{ entity }}</span>
-				</span>
-			</span>
-			<span v-for="entry in usedEntities" :key="entry">
-				<span
-					v-if="entry != null && entry !== '' && !Object.keys(entityColors).includes(entry)"
-					class="pr-4"
-				>
-					<DotIcon :size="50" :color="defaultColor" class="inline-block" />
-					<span>{{ entry }}</span>
-				</span>
-			</span>
-		</Card>
-	</div>
-	<Network v-if="graph.size > 0" :graph="graph" :search-node="props.searchNode"></Network>
+	<div class="absolute z-10 m-3 flex w-full"></div>
+	<Network v-if="graph.size > 0" :graph="graph" :search-node="props.searchNode" />
 </template>
