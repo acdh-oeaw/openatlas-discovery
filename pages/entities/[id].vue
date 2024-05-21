@@ -5,12 +5,7 @@ import { z } from "zod";
 import { useIdPrefix } from "@/composables/use-id-prefix";
 import { hasCoordinates } from "@/utils/has-geojson-coordinates";
 
-// defineRouteRules({
-// 	prerender: true,
-// });
-
 definePageMeta({
-	title: "EntityPage.meta.title",
 	validate(route) {
 		const env = useRuntimeConfig();
 		if (env.public.NUXT_PUBLIC_DATABASE === "disabled") return false;
@@ -22,8 +17,12 @@ definePageMeta({
 	},
 });
 
-const locale = useLocale();
 const t = useTranslations();
+
+usePageMetadata({
+	title: t("EntityPage.meta.title"),
+});
+
 const { getUnprefixedId } = useIdPrefix();
 
 const route = useRoute();
@@ -70,6 +69,12 @@ const tabs = computed(() => {
 			label: t("EntityPage.images", { count: entity.value.depictions.length }),
 		});
 	}
+	if (entity.value?.relations != null) {
+		tabs.push({
+			id: "network",
+			label: t("EntityPage.network"),
+		});
+	}
 	return tabs;
 });
 
@@ -114,6 +119,7 @@ const typesById = computed(() => {
 				<TabsContent v-for="tab of tabs" :key="tab.id" :value="tab.id">
 					<EntityGeoMap v-if="tab.id === 'geo-map'" :entities="entities" />
 					<EntityImages v-else-if="tab.id === 'images'" :images="entity.depictions" />
+					<EntityNetwork v-if="tab.id === 'network'" :id="id" :network-data="entity" />
 				</TabsContent>
 			</Tabs>
 
