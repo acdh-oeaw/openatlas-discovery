@@ -50,19 +50,19 @@ const relationTypeLibrary: Ref<Record<string, string>> = computed(() => {
 
 const collapsibleRelations = [
 	{
-		relationType: "crm:OA7 has relationship to",
+		relationType: "crm:OA7_has_relationship_to",
 		title: t('Actor.Relations')
 	},
 	{
-		relationType: "crm:P107i is current or former member of",
+		relationType: "crm:P107i_is_current_or_former_member_of",
 		title: t('Actor.MemberOf')
 	},
 	{
-		relationType: "crm:P107 has current or former member",
+		relationType: "crm:P107_has_current_or_former_member",
 		title: t('Actor.hasMember')
 	}
-
 ]
+
 
 </script>
 
