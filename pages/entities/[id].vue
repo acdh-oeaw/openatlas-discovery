@@ -3,10 +3,6 @@ import { z } from "zod";
 
 import { hasCoordinates } from "@/utils/has-geojson-coordinates";
 
-// defineRouteRules({
-// 	prerender: true,
-// });
-
 definePageMeta({
 	validate(route) {
 		const env = useRuntimeConfig();
@@ -69,6 +65,12 @@ const tabs = computed(() => {
 			label: t("EntityPage.images", { count: entity.value.depictions.length }),
 		});
 	}
+	if (entity.value?.relations != null) {
+		tabs.push({
+			id: "network",
+			label: t("EntityPage.network"),
+		});
+	}
 	return tabs;
 });
 
@@ -106,6 +108,7 @@ const tabs = computed(() => {
 				<!-- <TabsContent v-for="tab of tabs" :key="tab.id" :value="tab.id">
 					<EntityGeoMap v-if="tab.id === 'geo-map'" :entities="entities" />
 					<EntityImages v-else-if="tab.id === 'images'" :images="entity.depictions" />
+					<EntityNetwork v-if="tab.id === 'network'" :id="id" :network-data="entity" />
 				</TabsContent>
 			</Tabs> -->
 

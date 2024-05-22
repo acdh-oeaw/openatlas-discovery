@@ -16,6 +16,7 @@
 			"data": "Data",
 			"home": "Home",
 			"map": "Map",
+			"network": "Network",
 			"team": "Team"
 		},
 		"navigation-main": "Main",
@@ -64,6 +65,7 @@
 		"details": "Details",
 		"images": "Images ({count})",
 		"map": "Map",
+		"network": "Network Visualization",
 		"meta": {
 			"title": "Entity"
 		},
@@ -112,6 +114,13 @@
 			"title": "Map"
 		},
 		"title": "Map",
+		"work-in-progress": "The database is currently work in progress."
+	},
+	"NetworkPage": {
+		"meta": {
+			"title": "Network Visualization"
+		},
+		"title": "Network Visualization",
 		"work-in-progress": "The database is currently work in progress."
 	},
 	"NotFoundPage": {
