@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+
 import { groupByToMap, keyByToMap } from "@acdh-oeaw/lib";
 import { z } from "zod";
 
@@ -36,12 +37,44 @@ const { data, error, isPending, isPlaceholderData, suspense } = useGetEntity(
 	}),
 );
 
+
+
 const isLoading = computed(() => {
 	return isPending.value || isPlaceholderData.value;
 });
 
 const entity = computed(() => {
 	return data.value?.features[0];
+});
+
+// Configuration for Mirador
+const miradorConfig = ref({
+	layout: "1x1",
+	mainMenuSettings: {
+		show: true
+	},
+	workspaceControlPanel: {
+		enabled: true
+	},
+	window: {
+		allowClose: false,
+		defaultSideBarPanel: 'attribution',
+		sideBarOpenByDefault: true,
+		forceDrawAnnotations: true,
+		highlightAllAnnotations: true
+	},
+	// workspace: {
+	// 	type: "mosaic"
+	// },
+	language: "en",
+	availableLanguages: {
+		de: "Deutsch",
+		en: "English",
+	},
+  windows: [{
+    manifestId: 'https://iiif.io/api/cookbook/recipe/0021-tagging/manifest.json',
+    thumbnailNavigationPosition: 'far-bottom'
+  }]
 });
 
 const entities = computed(() => {
@@ -107,6 +140,10 @@ const typesById = computed(() => {
 						<EntityDescriptions :descriptions="entity?.descriptions ?? []" />
 					</div>
 				</CardContent>
+			</Card>
+
+			<Card v-if="!isLoading">
+				<MiradorViewer :config="miradorConfig" />
 			</Card>
 
 			<Tabs v-if="tabs.length > 0" :default-value="tabs[0]?.id">

@@ -71,6 +71,7 @@
 		"is-ci": "^3.0.1",
 		"lucide-vue-next": "^0.358.0",
 		"maplibre-gl": "^4.1.1",
+		"mirador": "4.0.0-alpha.2",
 		"npm-run-all2": "^6.1.2",
 		"nuxt": "^3.11.0",
 		"openapi-typescript": "^7.0.0-next.8",
