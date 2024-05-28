@@ -288,18 +288,25 @@ collections:
         i18n: duplicate
         # hint: The last name
 
-      - name: academicTitle
-        label: Title
-        i18n: duplicate
-        # hint: The academic title
-        required: false
-
       - name: image
         label: Image
         i18n: duplicate
         # hint: The image
         widget: image
         required: false
+
+      - name: role
+        label: Project role
+        i18n: duplicate
+        widget: select
+        options:
+          - value: lead
+            label: Project lead
+          - value: member
+            label: Project member
+          - value: former
+            label: Former project member
+        default: member
 
       - name: body
         label: Short biography
