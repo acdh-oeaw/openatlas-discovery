@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 import { groupByToMap, keyByToMap } from "@acdh-oeaw/lib";
 import { z } from "zod";
 
@@ -37,44 +36,12 @@ const { data, error, isPending, isPlaceholderData, suspense } = useGetEntity(
 	}),
 );
 
-
-
 const isLoading = computed(() => {
 	return isPending.value || isPlaceholderData.value;
 });
 
 const entity = computed(() => {
 	return data.value?.features[0];
-});
-
-// Configuration for Mirador
-const miradorConfig = ref({
-	layout: "1x1",
-	mainMenuSettings: {
-		show: true
-	},
-	workspaceControlPanel: {
-		enabled: true
-	},
-	window: {
-		allowClose: false,
-		defaultSideBarPanel: 'attribution',
-		sideBarOpenByDefault: true,
-		forceDrawAnnotations: true,
-		highlightAllAnnotations: true
-	},
-	// workspace: {
-	// 	type: "mosaic"
-	// },
-	language: "en",
-	availableLanguages: {
-		de: "Deutsch",
-		en: "English",
-	},
-  windows: [{
-    manifestId: 'https://iiif.io/api/cookbook/recipe/0021-tagging/manifest.json',
-    thumbnailNavigationPosition: 'far-bottom'
-  }]
 });
 
 const entities = computed(() => {
@@ -94,6 +61,12 @@ const tabs = computed(() => {
 		tabs.push({
 			id: "geo-map",
 			label: t("EntityPage.map"),
+		});
+	}
+	if (entity.value?.depictions != null) {
+		tabs.push({
+			id: "iiif",
+			label: t("EntityPage.iiif", { count: entity.value.depictions.length }),
 		});
 	}
 	if (entity.value?.depictions != null) {
@@ -142,10 +115,6 @@ const typesById = computed(() => {
 				</CardContent>
 			</Card>
 
-			<Card v-if="!isLoading">
-				<MiradorViewer :config="miradorConfig" />
-			</Card>
-
 			<Tabs v-if="tabs.length > 0" :default-value="tabs[0]?.id">
 				<TabsList>
 					<TabsTrigger v-for="tab of tabs" :key="tab.id" :value="tab.id">
@@ -155,6 +124,7 @@ const typesById = computed(() => {
 				<!-- TODO: keep map alive -->
 				<TabsContent v-for="tab of tabs" :key="tab.id" :value="tab.id">
 					<EntityGeoMap v-if="tab.id === 'geo-map'" :entities="entities" />
+					<EntityMiradorViewer v-else-if="tab.id === 'iiif'" :images="entity.depictions" />
 					<EntityImages v-else-if="tab.id === 'images'" :images="entity.depictions" />
 					<EntityNetwork v-if="tab.id === 'network'" :id="id" :network-data="entity" />
 				</TabsContent>

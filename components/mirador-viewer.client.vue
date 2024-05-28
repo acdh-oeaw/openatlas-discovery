@@ -1,13 +1,14 @@
 <script lang="ts" setup>
-import Mirador from 'mirador';
-import { defineProps, onMounted } from 'vue';
+import Mirador from "mirador";
+import { defineProps, onMounted } from "vue";
 
 // Props
 const props = defineProps({
-  config: {
-    type: Object,
-    required: true
-  }
+	config: {
+		type: Object,
+		required: true,
+	},
+	images: Array<string>,
 });
 
 // Refs
@@ -18,13 +19,13 @@ const mirador = "mirador";
 
 // Methods
 const initMirador = () => {
-  Mirador.viewer({
-    id: mirador,
+	Mirador.viewer({
+		id: mirador,
 		...props.config,
-		// windows: [{
-		// 	manifestId: 'https://iiif.io/api/cookbook/recipe/0021-tagging/manifest.json',
-		// }]
-  });
+		windows: props.images?.map((url) => {
+			return { manifestId: url };
+		}),
+	});
 };
 
 // Lifecycle
@@ -32,10 +33,8 @@ onMounted(() => {
 	// TODO: We shouldn't rely on timeouts here, and find a more reliable solution
 	setTimeout(initMirador, 2000);
 });
-
-
 </script>
 
 <template>
-  <div :id="mirador"></div>
+	<div :id="mirador" class="relative"></div>
 </template>
