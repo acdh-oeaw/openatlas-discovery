@@ -22,6 +22,9 @@ export function useGetEntity(params: MaybeRef<GetEntityParams>) {
 					path: {
 						...params,
 					},
+					query: {
+						format: "lpx",
+					},
 				},
 				signal,
 			})) as GetEntityResponse;
