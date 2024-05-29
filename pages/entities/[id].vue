@@ -65,12 +65,6 @@ const tabs = computed(() => {
 	}
 	if (entity.value?.depictions != null) {
 		tabs.push({
-			id: "iiif",
-			label: t("EntityPage.iiif", { count: entity.value.depictions.length }),
-		});
-	}
-	if (entity.value?.depictions != null) {
-		tabs.push({
 			id: "images",
 			label: t("EntityPage.images", { count: entity.value.depictions.length }),
 		});
@@ -124,7 +118,6 @@ const typesById = computed(() => {
 				<!-- TODO: keep map alive -->
 				<TabsContent v-for="tab of tabs" :key="tab.id" :value="tab.id">
 					<EntityGeoMap v-if="tab.id === 'geo-map'" :entities="entities" />
-					<EntityMiradorViewer v-else-if="tab.id === 'iiif'" :images="entity.depictions" />
 					<EntityImages v-else-if="tab.id === 'images'" :images="entity.depictions" />
 					<EntityNetwork v-if="tab.id === 'network'" :id="id" :network-data="entity" />
 				</TabsContent>

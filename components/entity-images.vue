@@ -45,24 +45,26 @@ onMounted(() => {});
 </script>
 
 <template>
-	<Toggle class="absolute z-10 m-2" @click="toggleIIIF">
-		{{ t("EntityPage.iiif") }}
-	</Toggle>
-	<Carousel v-if="!show" @init-api="setApi">
-		<CarouselPrevious v-if="props.images.length > 2" />
-		<CarouselContent>
-			<CarouselItem v-for="(image, index) of props.images" :key="index" class="h-full">
-				<Card class="pb-3">
-					<figure class="grid h-96 grid-rows-[1fr_auto] gap-y-1.5 overflow-hidden">
-						<div class="relative">
-							<img alt="" class="absolute size-full object-contain" :src="image.url" />
-						</div>
-						<figcaption class="justify-self-center">{{ image.license }}</figcaption>
-					</figure>
-				</Card>
-			</CarouselItem>
-		</CarouselContent>
-		<CarouselNext v-if="props.images.length > 2" />
-	</Carousel>
-	<EntityMiradorViewer v-if="show && currentImage" :images="[currentImage]" />
+	<div class="relative">
+		<Carousel v-if="!show" @init-api="setApi">
+			<CarouselPrevious v-if="props.images.length > 2" />
+			<CarouselContent>
+				<CarouselItem v-for="(image, index) of props.images" :key="index" class="h-full">
+					<Card class="pb-3">
+						<figure class="grid h-96 grid-rows-[1fr_auto] gap-y-1.5 overflow-hidden">
+							<div class="relative">
+								<img alt="" class="absolute size-full object-contain" :src="image.url" />
+							</div>
+							<figcaption class="justify-self-center">{{ image.license }}</figcaption>
+						</figure>
+					</Card>
+				</CarouselItem>
+			</CarouselContent>
+			<CarouselNext v-if="props.images.length > 2" />
+		</Carousel>
+		<EntityMiradorViewer v-if="show && currentImage" :images="[currentImage]" />
+		<Toggle class="absolute bottom-0 right-0 z-10 m-4" @click="toggleIIIF">
+			{{ t("EntityPage.iiif") }}
+		</Toggle>
+	</div>
 </template>
