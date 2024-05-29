@@ -5,12 +5,20 @@ import { ChevronDown, ChevronUp } from 'lucide-vue-next';
 const { getUnprefixedId } = useIdPrefix();
 
 /** @param relations should be an  */
-const props = defineProps<{title: string, relations: EntityFeature["relations"], relationType: string}>();
+const props = defineProps<{title: string, relations: EntityFeature["relations"], relationType: RelationType}>();
 
 const filteredRelations = computed(() => {
 	return props.relations?.reduce((acc: Array<NonNullable<EntityFeature["relations"]>[0]>, relation) => {
-		if(relation.relationType !== props.relationType) return acc;
-		if(!relation.relationTo) return acc;
+		const {crmCode, inverse} = extractCrmCodeFromRelation(relation.relationType) ?? {};
+
+		if(crmCode !== props.relationType.crmCode || inverse !== Boolean(props.relationType.inverse)) {
+			return acc;
+		}
+		if(!relation.relationTo) {
+			return acc;
+		}
+
+
 		return [
 			...acc,
 			{

@@ -65,10 +65,10 @@
 		"details": "Details",
 		"images": "Bilder ({count})",
 		"map": "Karte",
-		"network": "Netzwerk-Visualisierung",
 		"meta": {
 			"title": "Entität"
 		},
+		"network": "Netzwerk-Visualisierung",
 		"sidebar": {
 			"toggle": "Details für {title} umschalten"
 		}
@@ -84,7 +84,8 @@
 		"try-again": "Erneut versuchen"
 	},
 	"Global": {
-		"ShowMore": "Mehr Anzeigen"
+		"ShowMore": "Mehr Anzeigen",
+		"TitleMissing": "Titel fehlt"
 	},
 	"ImprintPage": {
 		"error": {

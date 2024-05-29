@@ -65,10 +65,10 @@
 		"details": "Details",
 		"images": "Images ({count})",
 		"map": "Map",
-		"network": "Network Visualization",
 		"meta": {
 			"title": "Entity"
 		},
+		"network": "Network Visualization",
 		"sidebar": {
 			"toggle": "Toggle details for {title}"
 		}
@@ -84,7 +84,8 @@
 		"try-again": "Try again"
 	},
 	"Global": {
-		"ShowMore": "show more"
+		"ShowMore": "show more",
+		"TitleMissing": "Title Missing"
 	},
 	"ImprintPage": {
 		"error": {

@@ -14,7 +14,7 @@ interface Place {
 	relationType: string
 }
 
-
+// TODO: Make use of first and last event if no places are available
 const places = computed(() => {
 	return props.entity.relations?.reduce((acc: Array<Place>, relation) => {
 		if(relation.relationSystemClass !== "object_location") return acc;
@@ -34,35 +34,51 @@ const places = computed(() => {
 // TODO: Move this to a shared location and add localization
 const relationTypeLibrary: Ref<Record<string, string>> = computed(() => {
 	if(props.entity.systemClass === 'person') return {
-		'crm:P74 has current or former residence': 'Residence',
-		'crm:OA9 ends in': 'Died in',
-		'crm:OA8 begins in': 'Born in',
+		'crm:P74_has_current_or_former_residence': 'Residence',
+		'crm:OA9_ends_in': 'Died in',
+		'crm:OA8_begins_in': 'Born in',
 	}
 
 
 	return {
-		'crm:P74 has current or former residence': 'Residence',
-		'crm:OA9 ends in': 'Ended in',
-		'crm:OA8 begins in': 'Began in',
+		'crm:P74_has_current_or_former_residence': 'Residence',
+		'crm:OA9_ends_in': 'Ended in',
+		'crm:OA8_begins_in': 'Began in',
 	}
 
 });
 
-const collapsibleRelations = [
+const collapsibleRelations: Array<{
+	relationType: RelationType,
+	title: string
+}> = [
 	{
-		relationType: "crm:OA7_has_relationship_to",
-		title: t('Actor.Relations')
+		relationType: {
+			crmCode:"OA7"
+		},
+		title: t(getRelationGroupTitle({crmCode: "OA7"}))
 	},
 	{
-		relationType: "crm:P107i_is_current_or_former_member_of",
-		title: t('Actor.MemberOf')
+		relationType: {
+			crmCode: "P107",
+			inverse: true
+		},
+		title: t(getRelationGroupTitle({crmCode:"P107", inverse: true}))
 	},
 	{
-		relationType: "crm:P107_has_current_or_former_member",
-		title: t('Actor.hasMember')
+		relationType: {
+			crmCode: "P107"
+		},
+		title: t(getRelationGroupTitle({crmCode:"P107"}))
 	}
 ]
 
+const handledRelations = computed(() => {
+	return [
+		...collapsibleRelations.map(rel => {return rel.relationType},
+		...Object.keys(relationTypeLibrary.value)
+	)];
+})
 
 </script>
 
@@ -83,7 +99,7 @@ const collapsibleRelations = [
 	</div>
 	<GroupedRelationCollapsible
 		v-for="rel in collapsibleRelations"
-		:key="rel.relationType"
+		:key="rel.relationType.crmCode + rel.relationType.inverse"
 		:title="rel.title"
 		:relations="entity.relations"
 		:relation-type="rel.relationType"
