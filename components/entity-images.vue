@@ -63,7 +63,7 @@ onMounted(() => {});
 			<CarouselNext v-if="props.images.length > 2" />
 		</Carousel>
 		<EntityMiradorViewer v-if="show && currentImage" :images="[currentImage]" />
-		<Toggle class="absolute bottom-0 right-0 z-10 m-4" @click="toggleIIIF">
+		<Toggle variant="iiif" class="absolute bottom-0 right-0 z-10 m-4" @click="toggleIIIF">
 			{{ t("EntityPage.iiif") }}
 		</Toggle>
 	</div>
