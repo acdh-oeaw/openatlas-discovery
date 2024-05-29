@@ -1,11 +1,29 @@
 <script lang="ts" setup>
+import { Toggle } from "@/components/ui/toggle";
+
 const props = defineProps<{
-	images: Array<{ license: string; url: string }>;
+	images: Array<{
+		IIIFManifest: string | undefined;
+		license: string | undefined;
+		mimetype?: string | undefined;
+		title?: string | undefined;
+		url?: string | undefined;
+	}>;
 }>();
+
+const t = useTranslations();
+let show = ref(false);
+
+function toggleIIIF() {
+	show.value = !show.value;
+}
 </script>
 
 <template>
-	<Carousel class="mx-14">
+	<Toggle class="absolute z-10 m-2" @click="toggleIIIF">
+		{{ t("EntityPage.iiif") }}
+	</Toggle>
+	<Carousel v-if="!show">
 		<CarouselPrevious v-if="props.images.length > 2" />
 		<CarouselContent>
 			<CarouselItem v-for="(image, index) of props.images" :key="index" class="h-full">
@@ -21,4 +39,5 @@ const props = defineProps<{
 		</CarouselContent>
 		<CarouselNext v-if="props.images.length > 2" />
 	</Carousel>
+	<EntityMiradorViewer v-if="show" :images="props.images" />
 </template>

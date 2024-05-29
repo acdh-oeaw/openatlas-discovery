@@ -12,7 +12,6 @@ const props = defineProps({
 });
 
 // Refs
-const mirador = "mirador";
 
 // TODO: At the moment I assume there is a race condition where the div element isn't available yet,
 // at time of mounting.
@@ -28,10 +27,16 @@ const initMirador = () => {
 	});
 };
 
+const delayedInitMirador = () => {
+	setTimeout(initMirador, 100);
+};
+
+const mirador = "mirador";
+
 // Lifecycle
 onMounted(() => {
 	// TODO: We shouldn't rely on timeouts here, and find a more reliable solution
-	setTimeout(initMirador, 2000);
+	delayedInitMirador();
 });
 </script>
 

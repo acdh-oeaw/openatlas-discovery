@@ -58,6 +58,9 @@ dependencies:
   '@vueuse/nuxt':
     specifier: ^10.9.0
     version: 10.9.0(nuxt@3.11.2)(rollup@4.14.1)(vue@3.4.21)
+  class-variance-authority:
+    specifier: ^0.7.0
+    version: 0.7.0
   colorjs.io:
     specifier: ^0.5.0
     version: 0.5.0
@@ -130,6 +133,9 @@ dependencies:
   tailwind-merge:
     specifier: ^2.2.2
     version: 2.2.2
+  tify:
+    specifier: ^0.30.2
+    version: 0.30.2
   tsx:
     specifier: ^4.7.1
     version: 4.7.2
@@ -1934,7 +1940,7 @@ packages:
       '@mui/system': 5.15.15(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(react@18.3.1)
       '@mui/utils': 5.15.14(react@18.3.1)
       '@types/react-transition-group': 4.4.10
-      clsx: 2.0.0
+      clsx: 2.1.1
       prop-types: 15.8.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -5772,6 +5778,12 @@ packages:
     resolution: {integrity: sha512-tskPPKEs8D2KPafUypv2gxwJP8h/OaJmC82QQGGDQcHvXX43xF2VDACcJVmZ0EuSxkpO9Kc4MlrA3q0+FG58AQ==}
     dependencies:
       consola: 3.2.3
+
+  /class-variance-authority@0.7.0:
+    resolution: {integrity: sha512-jFI8IQw4hczaL4ALINxqLEXQbWcNjoSkloa4IaufXCJr6QawJyw7tuRysRsrE8w2p/4gGaxKIt/hX3qz/IbD1A==}
+    dependencies:
+      clsx: 2.0.0
+    dev: false
 
   /classnames@2.5.1:
     resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
@@ -12532,6 +12544,12 @@ packages:
   /throttle-debounce@3.0.1:
     resolution: {integrity: sha512-dTEWWNu6JmeVXY0ZYoPuH5cRIwc0MeGbJwah9KUNYSJwommQpCzTySTpEe8Gs1J23aeWEuAobe4Ag7EHVt/LOg==}
     engines: {node: '>=10'}
+    dev: false
+
+  /tify@0.30.2:
+    resolution: {integrity: sha512-PgzikMQCCHq13rAjbbY9JEIHpWTCGU1wQA7F00i6Qq8EBUO5GnGgWn9e6ueTjy8ldJP4JILsKocfjMBinN07ag==}
+    engines: {node: '>= 18', npm: '>= 9'}
+    requiresBuild: true
     dev: false
 
   /tiny-invariant@1.3.3:
