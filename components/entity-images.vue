@@ -24,6 +24,7 @@ function toggleIIIF() {
 
 function setApi(val: CarouselApi) {
 	api.value = val;
+	api.value.scrollTo(current.value, true);
 }
 
 watch(api, (api) => {
@@ -37,9 +38,10 @@ watch(api, (api) => {
 });
 
 const currentImage = computed(() => {
-	console.log(current.value);
 	return props.images[current.value];
 });
+
+onMounted(() => {});
 </script>
 
 <template>
