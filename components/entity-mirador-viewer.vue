@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { miradorConfig } from "@/config/mirador.config";
 
+
 const props = defineProps<{
 	images: Array<{
 		IIIFManifest: string | undefined;

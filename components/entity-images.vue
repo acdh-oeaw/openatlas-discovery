@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { CarouselApi } from "@/components/ui/carousel";
 import { Toggle } from "@/components/ui/toggle";
 
 const props = defineProps<{
@@ -11,19 +12,41 @@ const props = defineProps<{
 	}>;
 }>();
 
+const api = ref<CarouselApi>();
+const current = ref(0);
+
 const t = useTranslations();
 let show = ref(false);
 
 function toggleIIIF() {
 	show.value = !show.value;
 }
+
+function setApi(val: CarouselApi) {
+	api.value = val;
+}
+
+watch(api, (api) => {
+	if (!api) return;
+
+	current.value = api.selectedScrollSnap();
+
+	api.on("select", () => {
+		current.value = api.selectedScrollSnap();
+	});
+});
+
+const currentImage = computed(() => {
+	console.log(current.value);
+	return props.images[current.value];
+});
 </script>
 
 <template>
 	<Toggle class="absolute z-10 m-2" @click="toggleIIIF">
 		{{ t("EntityPage.iiif") }}
 	</Toggle>
-	<Carousel v-if="!show">
+	<Carousel v-if="!show" @init-api="setApi">
 		<CarouselPrevious v-if="props.images.length > 2" />
 		<CarouselContent>
 			<CarouselItem v-for="(image, index) of props.images" :key="index" class="h-full">
@@ -39,5 +62,5 @@ function toggleIIIF() {
 		</CarouselContent>
 		<CarouselNext v-if="props.images.length > 2" />
 	</Carousel>
-	<EntityMiradorViewer v-if="show" :images="props.images" />
+	<EntityMiradorViewer v-if="show && currentImage" :images="[currentImage]" />
 </template>
