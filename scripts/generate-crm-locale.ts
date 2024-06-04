@@ -52,12 +52,18 @@ const customDictionary: Record<string, Record<string, Partial<Translations>>> = 
 			titleInverse: "Member of",
 			groupTitle: "Members",
 		},
+		P74: {
+			title: "Residence",
+		},
 	},
 	de: {
 		P107: {
 			title: "hat Mitglied(er)",
 			titleInverse: "Mitglied bei",
 			groupTitle: "Mitglieder",
+		},
+		P74: {
+			title: "Residenz",
 		},
 	},
 };
