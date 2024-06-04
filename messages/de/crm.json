@@ -767,17 +767,17 @@
 		"groupTitle": "produced thing of product type",
 		"groupTitleInverse": "is produced by"
 	},
-	"P107": {
-		"title": "hat Mitglied(er)",
-		"titleInverse": "Mitglied bei",
-		"groupTitle": "Mitglieder",
-		"groupTitleInverse": "Mitglied bei"
-	},
 	"P134": {
 		"title": "setzte sich fort in",
 		"titleInverse": "wurde fortgesetzt durch",
 		"groupTitle": "setzte sich fort in",
 		"groupTitleInverse": "wurde fortgesetzt durch"
+	},
+	"P107": {
+		"title": "hat Mitglied(er)",
+		"titleInverse": "Mitglied bei",
+		"groupTitle": "Mitglieder",
+		"groupTitleInverse": "Mitglied bei"
 	},
 	"P146": {
 		"title": "entließ von",
@@ -857,12 +857,6 @@
 		"groupTitle": "übertrug Gewahrsam über",
 		"groupTitleInverse": "wechselte Gewahrsam durch"
 	},
-	"OA7": {
-		"title": "hat Beziehung zu",
-		"titleInverse": "hat Beziehung zu",
-		"groupTitle": "hat Beziehung zu",
-		"groupTitleInverse": "hat Beziehung zu"
-	},
 	"P52": {
 		"title": "hat derzeitigen Besitzer",
 		"titleInverse": "ist derzeitiger Besitzer von",
@@ -874,6 +868,12 @@
 		"titleInverse": "participated in",
 		"groupTitle": "was formed from",
 		"groupTitleInverse": "participated in"
+	},
+	"OA7": {
+		"title": "hat Beziehung zu",
+		"titleInverse": "hat Beziehung zu",
+		"groupTitle": "Beziehungen",
+		"groupTitleInverse": "Beziehungen"
 	},
 	"P167": {
 		"title": "was within",

@@ -55,6 +55,10 @@ const customDictionary: Record<string, Record<string, Partial<Translations>>> = 
 		P74: {
 			title: "Residence",
 		},
+		OA7: {
+			groupTitle: "Relationships",
+			groupTitleInverse: "Relationships",
+		},
 	},
 	de: {
 		P107: {
@@ -64,6 +68,10 @@ const customDictionary: Record<string, Record<string, Partial<Translations>>> = 
 		},
 		P74: {
 			title: "Residenz",
+		},
+		OA7: {
+			groupTitle: "Beziehungen",
+			groupTitleInverse: "Beziehungen",
 		},
 	},
 };

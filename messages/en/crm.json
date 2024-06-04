@@ -767,17 +767,17 @@
 		"groupTitle": "produced thing of product type",
 		"groupTitleInverse": "is produced by"
 	},
-	"P107": {
-		"title": "has Member(s)",
-		"titleInverse": "Member of",
-		"groupTitle": "Members",
-		"groupTitleInverse": "Member of"
-	},
 	"P134": {
 		"title": "continued",
 		"titleInverse": "was continued by",
 		"groupTitle": "continued",
 		"groupTitleInverse": "was continued by"
+	},
+	"P107": {
+		"title": "has Member(s)",
+		"titleInverse": "Member of",
+		"groupTitle": "Members",
+		"groupTitleInverse": "Member of"
 	},
 	"P146": {
 		"title": "separated from",
@@ -857,12 +857,6 @@
 		"groupTitle": "transferred custody of",
 		"groupTitleInverse": "custody transferred through"
 	},
-	"OA7": {
-		"title": "has relationship to",
-		"titleInverse": "has relationship to",
-		"groupTitle": "has relationship to",
-		"groupTitleInverse": "has relationship to"
-	},
 	"P52": {
 		"title": "has current owner",
 		"titleInverse": "is current owner of",
@@ -874,6 +868,12 @@
 		"titleInverse": "participated in",
 		"groupTitle": "was formed from",
 		"groupTitleInverse": "participated in"
+	},
+	"OA7": {
+		"title": "has relationship to",
+		"titleInverse": "has relationship to",
+		"groupTitle": "Relationships",
+		"groupTitleInverse": "Relationships"
 	},
 	"P167": {
 		"title": "was within",
