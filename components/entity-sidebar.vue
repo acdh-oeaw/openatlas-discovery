@@ -11,6 +11,13 @@ onMounted(() => {
 	openState.value = true;
 });
 
+const handledRelations = ref<Array<RelationType>>([]);
+
+const updateHandledRelations = (relations: Array<RelationType>) => {
+	handledRelations.value = [...relations];
+}
+
+
 </script>
 
 <template>
@@ -29,7 +36,7 @@ onMounted(() => {
 			<span class="sr-only">{{ t("EntityPage.sidebar.toggle", {title: entity.properties.title}) }}</span>
 		</summary>
 		<Card class="h-full overflow-y-scroll">
-			<EntityPrimaryDetails :entity="entity" />
+			<EntityPrimaryDetails :entity="entity" @handled-relations="updateHandledRelations" />
 
 
 			<slot name="custom-details" />
@@ -38,7 +45,7 @@ onMounted(() => {
 
 
 			<!-- <entity-details v-bind="details: {title: title, data: someData}" /> -->
-			<EntityDetails :relations="entity.relations" :types="entity.types" class="mx-4 mt-16" />
+			<EntityDetails :handled-relations="handledRelations" :relations="entity.relations" class="mx-4 mt-16" />
 
 		</Card>
 

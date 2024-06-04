@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import CustomPrimaryDetailsActor from '@/components/custom-primary-details-actor.vue';
 
-
 const props = defineProps<{
 	entity: EntityFeature,
 }>();
@@ -28,6 +27,32 @@ const entityPrimaryDetailsDict: Record<string, Component> = {
 	"group": CustomPrimaryDetailsActor,
 }
 
+const handledRelations: Array<RelationType> = [
+	{
+		crmCode: "P1" // "is identified by" are the aliases
+	},
+	{
+		crmCode: "P2" // "has type" are the types
+	}
+]
+
+const emit = defineEmits({
+	handledRelations(payload: Array<RelationType>) {
+		return payload;
+	}}
+);
+
+let alreadyEmitted = false;
+
+onMounted(() => {
+	if (!alreadyEmitted) emitHandledRelations([]);
+});
+
+function emitHandledRelations(relations: Array<RelationType>) {
+	alreadyEmitted = true;
+	emit("handledRelations", [...handledRelations, ...relations]);
+}
+
 </script>
 
 <template>
@@ -41,7 +66,12 @@ const entityPrimaryDetailsDict: Record<string, Component> = {
 		<div class="grid gap-4">
 			<EntityDescriptions :descriptions="entity?.descriptions ?? []" />
 
-			<component :is="customPrimaryDetails" v-if="customPrimaryDetails" :entity="entity" />
+			<component
+				:is="customPrimaryDetails"
+				v-if="customPrimaryDetails"
+				:entity="entity"
+				@handled-relations="emitHandledRelations"
+			/>
 
 			<!-- Types -->
 			<div class=" flex flex-row flex-wrap gap-1">

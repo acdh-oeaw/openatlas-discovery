@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { MapPinIcon } from 'lucide-vue-next';
 
-
 const {getUnprefixedId} = useIdPrefix();
 
 const t = useTranslations();
@@ -31,14 +30,14 @@ const places = computed(() => {
 	}, []);
 });
 
-// TODO: Move this to a shared location and add localization
+// TODO: Move this to a shared location and add localization like with `generate-crm-locale.ts`
+// However, OA8 & OA9 need to be handled differently for persons and there is currently no way to account for this in there
 const relationTypeLibrary: Ref<Record<string, string>> = computed(() => {
 	if(props.entity.systemClass === 'person') return {
 		'crm:P74_has_current_or_former_residence': 'Residence',
 		'crm:OA9_ends_in': 'Died in',
 		'crm:OA8_begins_in': 'Born in',
 	}
-
 
 	return {
 		'crm:P74_has_current_or_former_residence': 'Residence',
@@ -73,12 +72,34 @@ const collapsibleRelations: Array<{
 	}
 ]
 
-const handledRelations = computed(() => {
-	return [
-		...collapsibleRelations.map(rel => {return rel.relationType},
-		...Object.keys(relationTypeLibrary.value)
-	)];
+const relations: Array<RelationType> = [
+	{
+		crmCode: "P107"
+	},
+	{
+		crmCode: "P74"
+	},
+	{
+		crmCode: "OA7"
+	},
+	{
+		crmCode: "OA8"
+	},
+	{
+		crmCode: "OA9"
+	}
+]
+
+const emit = defineEmits({
+	handledRelations(payload: Array<RelationType>) {
+		return payload;
+	}}
+);
+
+onMounted(() => {
+	emit("handledRelations", relations);
 })
+
 
 </script>
 

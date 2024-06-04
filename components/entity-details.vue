@@ -9,27 +9,32 @@ const t = useTranslations();
 
 const props = defineProps<{
 	relations: EntityFeature["relations"],
-	types: EntityFeature["types"] }>();
+	handledRelations: Array<RelationType>
+}	>();
 
+const filteredRelations = computed(() => {
+	return props.relations?.filter((relation) => {
+		if(props.handledRelations.length === 0) return true;
+		return !props.handledRelations.some((handledRelation) => {
+			const relationType = extractCrmCodeFromRelation(relation.relationType);
+			if (!relationType) return false;
+			return handledRelation.crmCode === relationType.crmCode;
+		});
+	});
+})
 
 const relationsByType = computed(() => {
-	return groupByToMap(props.relations ?? [], (relation: NonNullable<EntityFeature["relations"]>[0]) => {
+	return groupByToMap(filteredRelations.value ?? [], (relation: NonNullable<EntityFeature["relations"]>[0]) => {
 		// FIXME: This used to use `relationType` (without the prefix)
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		return relation.relationSystemClass!;
 	});
 });
 
-const typesById = computed(() => {
-	return keyByToMap(props.types ?? [], (type: NonNullable<EntityFeature["types"]>[0]) => {
-		return type.identifier;
-	});
-});
-
 </script>
 
 <template>
-	<Card>
+	<Card v-if="filteredRelations && filteredRelations?.length > 0">
 		<CardHeader>
 			<CardTitle>{{ t("EntityPage.details") }}</CardTitle>
 		</CardHeader>
@@ -52,14 +57,6 @@ const typesById = computed(() => {
 									{{ relation.label }}
 								</NavLink>
 								<span v-else> {{ relation.label }} </span>
-								<span
-									v-if="
-										relation.relationSystemClass === 'type' &&
-										typesById.has(relation.relationTo)
-									"
-								>
-									({{ typesById.get(relation.relationTo)?.hierarchy }})
-								</span>
 							</li>
 						</ul>
 						<details v-if="relations.length > 10">
@@ -76,14 +73,6 @@ const typesById = computed(() => {
 										{{ relation.label }}
 									</NavLink>
 									<span v-else> {{ relation.label }} </span>
-									<span
-										v-if="
-											relation.relationSystemClass === 'type' &&
-											typesById.has(relation.relationTo)
-										"
-									>
-										({{ typesById.get(relation.relationTo)?.hierarchy }})
-									</span>
 								</li>
 							</ul>
 						</details>
