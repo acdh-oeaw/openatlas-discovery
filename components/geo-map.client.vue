@@ -21,6 +21,7 @@ const props = defineProps<{
 	features: Array<GeoJsonFeature>;
 	height: number;
 	width: number;
+	polygons: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -95,6 +96,7 @@ function init() {
 	const sourceId = "data";
 	map.addSource(sourceId, { type: "geojson", data: createFeatureCollection([]) });
 
+	console.log(sourceId);
 	//
 
 	map.addLayer({
@@ -110,16 +112,18 @@ function init() {
 
 	//
 
-	map.addLayer({
-		id: "polygons",
-		type: "fill",
-		source: sourceId,
-		filter: ["==", "$type", "Polygon"],
-		paint: {
-			"fill-color": colors.default,
-			"fill-opacity": 0.35,
-		},
-	});
+	// map.addLayer({
+	// 	id: "center-points",
+	// 	type: "circle",
+	// 	source: sourceId,
+	// 	filter: ["==", ["get", "$shapeType", ["get", "$type"]], "centerpoint"],
+	// 	paint: {
+	// 		"circle-color": "rgb(200, 200, 200)",
+	// 		"circle-radius": 50,
+	// 	},
+	// });
+
+	//
 
 	//
 
@@ -159,7 +163,7 @@ function init() {
 
 	//
 
-	update();
+	updateScope();
 }
 
 function dispose() {
@@ -168,9 +172,14 @@ function dispose() {
 
 watch(() => {
 	return props.features;
-}, update);
+}, updateScope);
 
-function update() {
+watch(() => {
+	console.log(props.polygons);
+	return props.polygons;
+}, updatePolygons);
+
+function updateScope() {
 	assert(context.map != null);
 	const map = context.map;
 
@@ -182,6 +191,27 @@ function update() {
 	if (geojson.features.length > 0) {
 		const bounds = turf.bbox(geojson);
 		map.fitBounds(bounds, { padding: 50 });
+	}
+}
+
+function updatePolygons() {
+	assert(context.map != null);
+	const sourceId = "data";
+
+	if (props.polygons) {
+		context.map.addLayer({
+			id: "polygons",
+			type: "fill",
+			source: sourceId,
+			filter: ["==", "$type", "Polygon"],
+			paint: {
+				"fill-color": colors.default,
+				"fill-opacity": 0.35,
+			},
+		});
+	}
+	if (!props.polygons && context.map.getLayer("polygons")) {
+		context.map.removeLayer("polygons");
 	}
 }
 

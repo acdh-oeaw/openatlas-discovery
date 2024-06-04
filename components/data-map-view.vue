@@ -43,6 +43,7 @@ const { data, error, isPending, isPlaceholderData, suspense } = useGetSearchResu
 					? [{ [category]: [{ operator: "like", values: [search], logicalOperator: "and" }] }]
 					: [],
 			show: ["geometry", "when"],
+			centroid: true,
 			system_classes: ["place"],
 			limit: 0,
 		};
@@ -67,6 +68,12 @@ const entitiesById = computed(() => {
 	});
 });
 
+let show = ref(false);
+
+function togglePolygons() {
+	show.value = !show.value;
+}
+
 /**
  * Reduce size of geojson payload, which has an impact on performance,
  * because `maplibre-gl` will serialize geojson features when sending them to the webworker.
@@ -84,12 +91,15 @@ function onLayerClick(features: Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "
 
 	features.forEach((feature) => {
 		const entity = entitiesById.value.get(feature.properties._id);
+		console.log(entity?.geometry);
 		if (entity != null) {
 			entitiesMap.set(feature.properties._id, entity);
 		}
 	});
 
 	const entities = Array.from(entitiesMap.values());
+
+	console.log(entities);
 
 	const point = turf.center(createFeatureCollection(entities));
 	const coordinates = point.geometry.coordinates;
@@ -119,11 +129,15 @@ watch(data, () => {
 			class="border"
 			:class="{ 'opacity-50 grayscale': isLoading }"
 		>
+			<div class="absolute z-10 mt-2 flex w-full justify-center">
+				<Toggle variant="iiif" @click="togglePolygons"> Polygons </Toggle>
+			</div>
 			<GeoMap
 				v-if="height && width"
 				:features="features"
 				:height="height"
 				:width="width"
+				:polygons="show"
 				@layer-click="onLayerClick"
 			>
 				<GeoMapPopup
