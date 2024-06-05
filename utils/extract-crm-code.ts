@@ -7,7 +7,7 @@ export interface RelationType {
 	inverse?: boolean;
 }
 
-export function extractCrmCodeFromRelation(relation?: string): RelationType | null {
+export function extractRelationTypeFromRelationString(relation?: string): RelationType | null {
 	if (!relation) return null;
 	let crmCode = relation.replace("crm:", "");
 	crmCode = crmCode.split("_")[0] ?? crmCode;

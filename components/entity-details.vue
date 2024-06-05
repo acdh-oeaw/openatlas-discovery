@@ -16,7 +16,7 @@ const filteredRelations = computed(() => {
 	return props.relations?.filter((relation) => {
 		if(props.handledRelations.length === 0) return true;
 		return !props.handledRelations.some((handledRelation) => {
-			const relationType = extractCrmCodeFromRelation(relation.relationType);
+			const relationType = extractRelationTypeFromRelationString(relation.relationType);
 			if (!relationType) return false;
 			return handledRelation.crmCode === relationType.crmCode;
 		});

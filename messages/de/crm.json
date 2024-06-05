@@ -1,4 +1,32 @@
 {
+	"person": {
+		"OA8": {
+			"title": "Geboren in",
+			"titleInverse": "Geburtort von"
+		},
+		"OA9": {
+			"title": "Gestorben in",
+			"titleInverse": "Sterbeort von"
+		}
+	},
+	"P107": {
+		"title": "hat Mitglied(er)",
+		"titleInverse": "Mitglied bei",
+		"groupTitle": "Mitglieder",
+		"groupTitleInverse": "Mitgliedschaften"
+	},
+	"P74": {
+		"title": "Residenz",
+		"titleInverse": "ist derzeitiger oder früherer Sitz von",
+		"groupTitle": "hat derzeitigen oder früheren Sitz",
+		"groupTitleInverse": "ist derzeitiger oder früherer Sitz von"
+	},
+	"OA7": {
+		"groupTitle": "Beziehungen",
+		"groupTitleInverse": "Beziehungen",
+		"title": "hat Beziehung zu",
+		"titleInverse": "hat Beziehung zu"
+	},
 	"P43": {
 		"title": "hat Dimension",
 		"titleInverse": "ist Dimension von",
@@ -142,12 +170,6 @@
 		"titleInverse": "wurde geboren durch",
 		"groupTitle": "brachte zur Welt",
 		"groupTitleInverse": "wurde geboren durch"
-	},
-	"P74": {
-		"title": "Residenz",
-		"titleInverse": "ist derzeitiger oder früherer Sitz von",
-		"groupTitle": "Residenz",
-		"groupTitleInverse": "ist derzeitiger oder früherer Sitz von"
 	},
 	"P124": {
 		"title": "wandelte um",
@@ -773,12 +795,6 @@
 		"groupTitle": "setzte sich fort in",
 		"groupTitleInverse": "wurde fortgesetzt durch"
 	},
-	"P107": {
-		"title": "hat Mitglied(er)",
-		"titleInverse": "Mitglied bei",
-		"groupTitle": "Mitglieder",
-		"groupTitleInverse": "Mitglied bei"
-	},
 	"P146": {
 		"title": "entließ von",
 		"titleInverse": "verlor Mitglied durch",
@@ -868,12 +884,6 @@
 		"titleInverse": "participated in",
 		"groupTitle": "was formed from",
 		"groupTitleInverse": "participated in"
-	},
-	"OA7": {
-		"title": "hat Beziehung zu",
-		"titleInverse": "hat Beziehung zu",
-		"groupTitle": "Beziehungen",
-		"groupTitleInverse": "Beziehungen"
 	},
 	"P167": {
 		"title": "was within",

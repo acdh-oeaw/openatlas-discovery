@@ -1,4 +1,32 @@
 {
+	"person": {
+		"OA8": {
+			"title": "Born in",
+			"titleInverse": "Birthplace of"
+		},
+		"OA9": {
+			"title": "Died in",
+			"titleInverse": "Deathplace of"
+		}
+	},
+	"P107": {
+		"title": "has Member(s)",
+		"titleInverse": "Member of",
+		"groupTitle": "Members",
+		"groupTitleInverse": "Memberships"
+	},
+	"P74": {
+		"title": "Residence",
+		"titleInverse": "is current or former residence of",
+		"groupTitle": "has current or former residence",
+		"groupTitleInverse": "is current or former residence of"
+	},
+	"OA7": {
+		"groupTitle": "Relationships",
+		"groupTitleInverse": "Relationships",
+		"title": "has relationship to",
+		"titleInverse": "has relationship to"
+	},
 	"P43": {
 		"title": "has dimension",
 		"titleInverse": "is dimension of",
@@ -142,12 +170,6 @@
 		"titleInverse": "was born",
 		"groupTitle": "brought into life",
 		"groupTitleInverse": "was born"
-	},
-	"P74": {
-		"title": "Residence",
-		"titleInverse": "is current or former residence of",
-		"groupTitle": "Residence",
-		"groupTitleInverse": "is current or former residence of"
 	},
 	"P124": {
 		"title": "transformed",
@@ -773,12 +795,6 @@
 		"groupTitle": "continued",
 		"groupTitleInverse": "was continued by"
 	},
-	"P107": {
-		"title": "has Member(s)",
-		"titleInverse": "Member of",
-		"groupTitle": "Members",
-		"groupTitleInverse": "Member of"
-	},
 	"P146": {
 		"title": "separated from",
 		"titleInverse": "lost member by",
@@ -868,12 +884,6 @@
 		"titleInverse": "participated in",
 		"groupTitle": "was formed from",
 		"groupTitleInverse": "participated in"
-	},
-	"OA7": {
-		"title": "has relationship to",
-		"titleInverse": "has relationship to",
-		"groupTitle": "Relationships",
-		"groupTitleInverse": "Relationships"
 	},
 	"P167": {
 		"title": "was within",

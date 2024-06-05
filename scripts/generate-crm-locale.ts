@@ -10,6 +10,17 @@
  * 		"groupTitle": "Group title",
  * 		"groupTitleInverse": "Inverse group title"
  * }
+ *
+ * for special cases, it's also possible to add translations specific to a system class:
+ * {
+ * 	"systemClassName": {
+ * 		"relationTypeCode": {
+ * 			"title": "Title",
+ * 			"titleInverse": "Inverse title",
+ * 			"groupTitle": "Group title",
+ * 			"groupTitleInverse": "Inverse group title"
+ * 		}
+ * 	}
  */
 
 import { mkdir, writeFile } from "node:fs/promises";
@@ -39,18 +50,32 @@ if (!result.success) {
 const baseUrl = result.data.NUXT_PUBLIC_API_BASE_URL;
 
 interface Translations {
-	title: string;
-	titleInverse: string;
+	title?: string;
+	titleInverse?: string;
 	groupTitle?: string;
 	groupTitleInverse?: string;
 }
 
-const customDictionary: Record<string, Record<string, Partial<Translations>>> = {
+const customDictionary: Record<
+	string,
+	Record<string, Translations | Record<string, Translations>>
+> = {
 	en: {
+		person: {
+			OA8: {
+				title: "Born in",
+				titleInverse: "Birthplace of",
+			},
+			OA9: {
+				title: "Died in",
+				titleInverse: "Deathplace of",
+			},
+		},
 		P107: {
 			title: "has Member(s)",
 			titleInverse: "Member of",
 			groupTitle: "Members",
+			groupTitleInverse: "Memberships",
 		},
 		P74: {
 			title: "Residence",
@@ -61,10 +86,21 @@ const customDictionary: Record<string, Record<string, Partial<Translations>>> = 
 		},
 	},
 	de: {
+		person: {
+			OA8: {
+				title: "Geboren in",
+				titleInverse: "Geburtort von",
+			},
+			OA9: {
+				title: "Gestorben in",
+				titleInverse: "Sterbeort von",
+			},
+		},
 		P107: {
 			title: "hat Mitglied(er)",
 			titleInverse: "Mitglied bei",
 			groupTitle: "Mitglieder",
+			groupTitleInverse: "Mitgliedschaften",
 		},
 		P74: {
 			title: "Residenz",
@@ -87,34 +123,26 @@ async function generate(locale = defaultLocale) {
 
 	const crmTypes = await apiClient.GET("/properties/");
 
-	const obj: Record<string, Translations> = {};
+	const obj: Record<string, Translations | Record<string, Translations>> =
+		customDictionary[locale] ?? {};
 
 	for (const [key, type] of Object.entries(crmTypes)) {
 		if (!type.code) continue;
 
-		const customTitle = customDictionary[locale]?.[type.code]?.title;
-		const customInverseTitle = customDictionary[locale]?.[type.code]?.titleInverse;
-		const customGroupTitle = customDictionary[locale]?.[type.code]?.groupTitle;
-		const customGroupInverseTitle = customDictionary[locale]?.[type.code]?.groupTitleInverse;
-
-		const title = customTitle ?? type.i18n[locale] ?? type.i18n[defaultLocale];
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+		const title = type.i18n[locale] ?? type.i18n[defaultLocale];
 		const inverseTitle =
-			customInverseTitle ??
 			//@ts-expect-error The type is not correct, its isn't a string
 			type.i18nInverse[locale] ??
 			//@ts-expect-error The type is not correct, its isn't a string
 			type.i18nInverse[defaultLocale] ??
 			title;
 
-		const typeTranslations: Translations = {
-			title: title ?? "TRANSLATION MISSING",
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			titleInverse: inverseTitle,
-			groupTitle: customGroupTitle ?? title,
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			groupTitleInverse: customGroupInverseTitle ?? inverseTitle,
-		};
+		const typeTranslations = obj[type.code] || {};
+		if (!typeTranslations.title) typeTranslations.title = title;
+		if (!typeTranslations.titleInverse) typeTranslations.titleInverse = inverseTitle;
+		if (!typeTranslations.groupTitle) typeTranslations.groupTitle = typeTranslations.title ?? title;
+		if (!typeTranslations.groupTitleInverse)
+			typeTranslations.groupTitleInverse = typeTranslations.titleInverse ?? inverseTitle;
 
 		obj[key] = typeTranslations;
 	}

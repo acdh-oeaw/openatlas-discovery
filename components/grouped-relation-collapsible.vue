@@ -9,7 +9,7 @@ const props = defineProps<{title: string, relations: EntityFeature["relations"],
 
 const filteredRelations = computed(() => {
 	return props.relations?.reduce((acc: Array<NonNullable<EntityFeature["relations"]>[0]>, relation) => {
-		const {crmCode, inverse} = extractCrmCodeFromRelation(relation.relationType) ?? {};
+		const {crmCode, inverse} = extractRelationTypeFromRelationString(relation.relationType) ?? {};
 
 		if(crmCode !== props.relationType.crmCode || inverse !== Boolean(props.relationType.inverse)) {
 			return acc;

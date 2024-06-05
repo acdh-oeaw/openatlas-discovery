@@ -10,7 +10,7 @@ const props = defineProps<{entity: EntityFeature}>();
 interface Place {
 	label: string,
 	id: string,
-	relationType: string
+	relationType: RelationType | null
 }
 
 // TODO: Make use of first and last event if no places are available
@@ -19,33 +19,33 @@ const places = computed(() => {
 		if(relation.relationSystemClass !== "object_location") return acc;
 		if(!relation.label || !relation.relationTo || !relation.relationType) return acc;
 		const id = getUnprefixedId(relation.relationTo);
+		const relationType = extractRelationTypeFromRelationString(relation.relationType);
+		const label = relation.label;
 		if(!id) return acc;
 		return [
 			...acc,
 			{
-				label: relation.label,
+				label,
 				id,
-				relationType: relation.relationType
+				relationType
 			}]
 	}, []);
 });
 
-// TODO: Move this to a shared location and add localization like with `generate-crm-locale.ts`
-// However, OA8 & OA9 need to be handled differently for persons and there is currently no way to account for this in there
-const relationTypeLibrary: Ref<Record<string, string>> = computed(() => {
-	if(props.entity.systemClass === 'person') return {
-		'crm:P74_has_current_or_former_residence': 'Residence',
-		'crm:OA9_ends_in': 'Died in',
-		'crm:OA8_begins_in': 'Born in',
+const getRelationTitle = (relation: RelationType) => {
+	if(props.entity.systemClass === 'person') {
+		return useRelationTitle(relation, 'person')
 	}
+	return useRelationTitle(relation)
+}
 
-	return {
-		'crm:P74_has_current_or_former_residence': 'Residence',
-		'crm:OA9_ends_in': 'Ended in',
-		'crm:OA8_begins_in': 'Began in',
+const getRelationGroupTitle = (relation: RelationType) => {
+	if(props.entity.systemClass === 'person') {
+		return useRelationGroupTitle(relation, 'person')
 	}
+	return useRelationGroupTitle(relation)
+}
 
-});
 
 const collapsibleRelations: Array<{
 	relationType: RelationType,
@@ -105,18 +105,24 @@ onMounted(() => {
 
 <template>
 	<div class="flex w-full flex-row flex-wrap gap-4">
-		<EntityPreviewLink
-			v-for="(place, index) in places"
-			:id="useToNumber(place.id).value"
+		<template
+			v-for="(place) in places"
 			:key="place.label || `place-${index}`"
 		>
-			<Card class="max-w-48 p-4">
-				<p class="pb-2 font-bold" >{{ relationTypeLibrary[place.relationType] ?? '' }}</p>
-				<p class="text-wrap text-muted-foreground">
-					<MapPinIcon class="mr-1 inline-block size-4" />{{ place.label }}
-				</p>
-			</Card>
-		</EntityPreviewLink>
+			<InfoCard
+				v-if="place.relationType"
+				class="max-w-48 p-4"
+				:icon="MapPinIcon"
+				:title="getRelationTitle(place.relationType)"
+				>
+				<template #content>
+					<EntityPreviewLink v-if="place.id" :id="useToNumber(place.id).value">
+						{{ place.label }}
+					</EntityPreviewLink>
+					{{ place.id ? '' : place.label }}
+				</template>
+			</InfoCard>
+		</template>
 	</div>
 	<GroupedRelationCollapsible
 		v-for="rel in collapsibleRelations"
