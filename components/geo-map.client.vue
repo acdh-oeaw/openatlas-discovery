@@ -35,7 +35,8 @@ const env = useRuntimeConfig();
 const theme = useColorMode();
 
 const colors = {
-	default: project.colors.geojson,
+	points: project.colors.geojsonPoints,
+	areaCenterPoints: project.colors.geojsonAreaCenterPoints,
 };
 
 const mapStyle = computed(() => {
@@ -93,41 +94,51 @@ function init() {
 
 	//
 
-	const sourceId = "data";
-	map.addSource(sourceId, { type: "geojson", data: createFeatureCollection([]) });
+	const sourcePointsId = "points-data";
+	const sourcePolygonsId = "polygon-data";
+	const sourceCenterPointsId = "centerpoints-data";
+	map.addSource(sourcePointsId, { type: "geojson", data: createFeatureCollection([]) });
+	map.addSource(sourcePolygonsId, { type: "geojson", data: createFeatureCollection([]) });
+	map.addSource(sourceCenterPointsId, { type: "geojson", data: createFeatureCollection([]) });
 
-	console.log(sourceId);
 	//
 
 	map.addLayer({
 		id: "points",
 		type: "circle",
-		source: sourceId,
+		source: sourcePointsId,
 		filter: ["==", "$type", "Point"],
 		paint: {
-			"circle-color": colors.default,
+			"circle-color": colors.points,
 			"circle-radius": 6,
 		},
 	});
 
 	//
 
-	// map.addLayer({
-	// 	id: "center-points",
-	// 	type: "circle",
-	// 	source: sourceId,
-	// 	filter: ["==", ["get", "$shapeType", ["get", "$type"]], "centerpoint"],
-	// 	paint: {
-	// 		"circle-color": "rgb(200, 200, 200)",
-	// 		"circle-radius": 50,
-	// 	},
-	// });
+	map.addLayer({
+		id: "centerpoints",
+		type: "circle",
+		source: sourceCenterPointsId,
+		filter: ["==", "$type", "Point"],
+		paint: {
+			"circle-color": colors.areaCenterPoints,
+			"circle-radius": 6,
+		},
+	});
 
 	//
 
 	//
 
 	map.on("click", "points", (event) => {
+		emit(
+			"layer-click",
+			(event.features ?? []) as Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">>,
+		);
+	});
+
+	map.on("click", "centerpoints", (event) => {
 		emit(
 			"layer-click",
 			(event.features ?? []) as Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">>,
@@ -147,6 +158,10 @@ function init() {
 		map.getCanvas().style.cursor = "pointer";
 	});
 
+	map.on("mouseenter", "centerpoints", () => {
+		map.getCanvas().style.cursor = "pointer";
+	});
+
 	map.on("mouseenter", "polygons", () => {
 		map.getCanvas().style.cursor = "pointer";
 	});
@@ -154,6 +169,10 @@ function init() {
 	//
 
 	map.on("mouseleave", "points", () => {
+		map.getCanvas().style.cursor = "";
+	});
+
+	map.on("mouseleave", "centerpoints", () => {
 		map.getCanvas().style.cursor = "";
 	});
 
@@ -183,29 +202,59 @@ function updateScope() {
 	assert(context.map != null);
 	const map = context.map;
 
-	const sourceId = "data";
-	const source = map.getSource(sourceId) as GeoJSONSource | undefined;
-	const geojson = createFeatureCollection(props.features);
-	source?.setData(geojson);
+	const sourcePointsId = "points-data";
+	const sourcePolygonsId = "polygon-data";
+	const sourceCenterPointsId = "centerpoints-data";
+	const sourcePoints = map.getSource(sourcePointsId) as GeoJSONSource | undefined;
+	const sourcePolygons = map.getSource(sourcePolygonsId) as GeoJSONSource | undefined;
+	const sourceCenterpoints = map.getSource(sourceCenterPointsId) as GeoJSONSource | undefined;
 
-	if (geojson.features.length > 0) {
-		const bounds = turf.bbox(geojson);
+	const points = props.features.filter((point) => {
+		if (point.geometry.type !== "Point") {
+			return false;
+		}
+		return point;
+	});
+
+	const polygons = props.features.filter((polygon) => {
+		if (polygon.geometry.type !== "GeometryCollection") {
+			return false;
+		}
+		return polygon;
+	});
+
+	const centerpoints = props.features.filter((centerpoint) => {
+		if (centerpoint.geometry.type !== "GeometryCollection") {
+			return false;
+		}
+		return centerpoint;
+	});
+
+	const geojsonPoints = createFeatureCollection(points);
+	const geojsonPolygons = createFeatureCollection(polygons);
+	const geojsonCenterPoints = createFeatureCollection(centerpoints);
+
+	sourcePoints?.setData(geojsonPoints);
+	sourcePolygons?.setData(geojsonPolygons);
+	sourceCenterpoints?.setData(geojsonCenterPoints);
+
+	if (geojsonPoints.features.length > 0) {
+		const bounds = turf.bbox(geojsonPoints);
 		map.fitBounds(bounds, { padding: 50 });
 	}
 }
 
 function updatePolygons() {
 	assert(context.map != null);
-	const sourceId = "data";
+	const sourcePolygonsId = "polygon-data";
 
 	if (props.polygons) {
 		context.map.addLayer({
 			id: "polygons",
 			type: "fill",
-			source: sourceId,
-			filter: ["==", "$type", "Polygon"],
+			source: sourcePolygonsId,
 			paint: {
-				"fill-color": colors.default,
+				"fill-color": colors.areaCenterPoints,
 				"fill-opacity": 0.35,
 			},
 		});

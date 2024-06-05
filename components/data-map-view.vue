@@ -91,7 +91,6 @@ function onLayerClick(features: Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "
 
 	features.forEach((feature) => {
 		const entity = entitiesById.value.get(feature.properties._id);
-		console.log(entity?.geometry);
 		if (entity != null) {
 			entitiesMap.set(feature.properties._id, entity);
 		}
@@ -99,12 +98,23 @@ function onLayerClick(features: Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "
 
 	const entities = Array.from(entitiesMap.values());
 
-	console.log(entities);
+	let coordinates = null;
 
-	const point = turf.center(createFeatureCollection(entities));
-	const coordinates = point.geometry.coordinates;
+	for (const entity of entities) {
+		if (entity.geometry.type === "GeometryCollection") {
+			coordinates = entity.geometry.geometries.find((g) => {
+				return g.type === "Point";
+			})?.coordinates;
 
-	popover.value = { coordinates, entities };
+			if (coordinates != null) break;
+		}
+	}
+
+	popover.value = {
+		coordinates:
+			coordinates ?? turf.center(createFeatureCollection(entities))?.geometry.coordinates,
+		entities,
+	};
 }
 
 watch(data, () => {
