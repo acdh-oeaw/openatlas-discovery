@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CustomPrimaryDetailsActor from '@/components/custom-primary-details-actor.vue';
+import CustomPrimaryDetailsPlace from '@/components/custom-primary-details-place.vue';
 
 const props = defineProps<{
 	entity: EntityFeature,
@@ -25,6 +26,7 @@ const customPrimaryDetails = computed(() => {
 const entityPrimaryDetailsDict: Record<string, Component> = {
 	"person": CustomPrimaryDetailsActor,
 	"group": CustomPrimaryDetailsActor,
+	"stratigraphic_unit": CustomPrimaryDetailsPlace,
 }
 
 const handledRelations: Array<RelationType> = [

@@ -18,7 +18,6 @@ const filteredRelations = computed(() => {
 			return acc;
 		}
 
-
 		return [
 			...acc,
 			{
