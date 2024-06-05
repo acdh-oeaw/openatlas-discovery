@@ -145,13 +145,6 @@ function init() {
 		);
 	});
 
-	map.on("click", "polygons", (event) => {
-		emit(
-			"layer-click",
-			(event.features ?? []) as Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">>,
-		);
-	});
-
 	//
 
 	map.on("mouseenter", "points", () => {
@@ -159,10 +152,6 @@ function init() {
 	});
 
 	map.on("mouseenter", "centerpoints", () => {
-		map.getCanvas().style.cursor = "pointer";
-	});
-
-	map.on("mouseenter", "polygons", () => {
 		map.getCanvas().style.cursor = "pointer";
 	});
 
