@@ -2,7 +2,6 @@
 import { keyByToMap } from "@acdh-oeaw/lib";
 import * as turf from "@turf/turf";
 import type { MapGeoJSONFeature } from "maplibre-gl";
-import { createSolutionBuilder } from "typescript";
 import { z } from "zod";
 
 import type { SearchFormData } from "@/components/search-form.vue";

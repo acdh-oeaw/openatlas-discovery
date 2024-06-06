@@ -44,6 +44,10 @@ const schema = z.object({
 				brandContrast: luminance > 0.5 ? "hsl(0deg 0% 0%)" : "hsl(0deg 0% 100%)",
 			};
 		}),
+	fullscreen: z.boolean(),
+	map: z.object({
+		startPage: z.boolean(),
+	}),
 	defaultLocale: z.enum(["de", "en"]),
 	logos: z.object({
 		light: z.string(),
