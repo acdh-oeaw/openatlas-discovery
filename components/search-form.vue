@@ -40,7 +40,7 @@ const searchLabelId = "search-field";
 		@submit.prevent="onSubmit"
 	>
 		<div class="grid gap-y-1">
-			<Label :for="filterLabelId">{{ t("SearchForm.filter") }}</Label>
+			<Label v-if="!project.fullscreen" :for="filterLabelId">{{ t("SearchForm.filter") }}</Label>
 			<!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
 			<Select name="category" :default-value="props.filter">
 				<SelectTrigger :id="filterLabelId" class="min-w-48">
@@ -55,7 +55,7 @@ const searchLabelId = "search-field";
 		</div>
 
 		<div class="grid gap-y-1">
-			<Label :for="searchLabelId">{{ t("SearchForm.search") }}</Label>
+			<Label v-if="!project.fullscreen" :for="searchLabelId">{{ t("SearchForm.search") }}</Label>
 			<Input
 				:id="searchLabelId"
 				:default-value="props.search"

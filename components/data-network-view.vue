@@ -4,6 +4,8 @@ import { z } from "zod";
 import type { SearchFormData as CategoryFormData } from "@/components/network-legend-panel.vue";
 import type { SearchFormData } from "@/components/network-search-form.vue";
 
+import { project } from "../config/project.config";
+
 const router = useRouter();
 const route = useRoute();
 const t = useTranslations();
@@ -79,8 +81,16 @@ const systemClasses = computed(() => {
 </script>
 
 <template>
-	<div class="relative grid grid-rows-[auto_1fr] gap-4">
-		<NetworkSearchForm :search="searchFilters.search" @submit="onChangeSearchFilters" />
+	<div :class="project.fullscreen ? 'relative grid' : 'relative grid grid-rows-[auto_1fr] gap-4'">
+		<NetworkSearchForm
+			:class="
+				project.fullscreen
+					? 'absolute z-10 bg-white dark:bg-neutral-900 max-w-[800px] w-full m-3 rounded-md p-6 bg-opacity-90 shadow-md'
+					: ''
+			"
+			:search="searchFilters.search"
+			@submit="onChangeSearchFilters"
+		/>
 
 		<VisualisationContainer
 			v-slot="{ height, width }"
@@ -89,7 +99,7 @@ const systemClasses = computed(() => {
 		>
 			<NetworkLegendPanel
 				v-if="height && width"
-				class="absolute bottom-0 right-0 z-10 m-3"
+				class="absolute bottom-0 right-0 z-10 m-3 bg-opacity-90"
 				:system-classes="systemClasses"
 				@submit="onChangeCategory"
 			/>
