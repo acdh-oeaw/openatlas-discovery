@@ -142,7 +142,7 @@ watch(data, () => {
 
 <template>
 	<div :class="project.fullscreen ? 'relative grid' : 'relative grid grid-rows-[auto_1fr] gap-4'">
-		<div class="absolute z-10 flex w-full justify-center">
+		<div :class="project.fullscreen ? 'absolute z-10 flex w-full justify-center' : ''">
 			<SearchForm
 				:class="
 					project.fullscreen
