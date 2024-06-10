@@ -67,6 +67,13 @@ function emitHandledRelations(relations: Array<RelationType>) {
 	<CardContent>
 		<div class="grid gap-4">
 			<EntityDescriptions :descriptions="entity?.descriptions ?? []" />
+			<!-- Types -->
+			<div class=" flex flex-row flex-wrap gap-1">
+				<TypesPopover
+					v-for="type in entity.types"
+					:key="(type.identifier ?? type.label) ?? 'missing'"
+					:type="type" />
+			</div>
 
 			<component
 				:is="customPrimaryDetails"
@@ -75,13 +82,6 @@ function emitHandledRelations(relations: Array<RelationType>) {
 				@handled-relations="emitHandledRelations"
 			/>
 
-			<!-- Types -->
-			<div class=" flex flex-row flex-wrap gap-1">
-				<TypesPopover
-					v-for="type in entity.types"
-					:key="(type.identifier ?? type.label) ?? 'missing'"
-					:type="type" />
-			</div>
 			<EntityImages v-if="images" :images="images" class="overflow-hidden"/>
 		</div>
 	</CardContent>
