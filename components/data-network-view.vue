@@ -8,7 +8,6 @@ import { project } from "../config/project.config";
 
 const router = useRouter();
 const route = useRoute();
-const t = useTranslations();
 
 const searchFiltersSchema = z.object({
 	search: z.string().catch(""),
@@ -17,8 +16,6 @@ const searchFiltersSchema = z.object({
 const searchFilters = computed(() => {
 	return searchFiltersSchema.parse(route.query);
 });
-
-type SearchFilters = z.infer<typeof searchFiltersSchema>;
 
 function onChangeSearchFilters(values: SearchFormData) {
 	const query = { ...searchFilters.value, ...values };
@@ -35,7 +32,8 @@ function onChangeCategory(values: CategoryFormData) {
 	void router.push({ query: { ...searchFilters.value, ...values } });
 }
 
-const { data, error, isPending, isPlaceholderData, suspense } = useGetNetworkData(
+const { data, isPending, isPlaceholderData } = useGetNetworkData(
+	// @ts-expect-error Includes custom, per-instance system classes.
 	computed(() => {
 		return {
 			exclude_system_classes: [
@@ -85,7 +83,7 @@ const systemClasses = computed(() => {
 		<NetworkSearchForm
 			:class="
 				project.fullscreen
-					? 'absolute z-10 bg-white dark:bg-neutral-900 max-w-[800px] w-full m-3 rounded-md p-6 bg-opacity-90 shadow-md'
+					? 'absolute z-10 bg-white/90 dark:bg-neutral-900 max-w-[800px] w-full m-3 rounded-md p-6 shadow-md'
 					: ''
 			"
 			:search="searchFilters.search"
@@ -99,7 +97,7 @@ const systemClasses = computed(() => {
 		>
 			<NetworkLegendPanel
 				v-if="height && width"
-				class="absolute bottom-0 right-0 z-10 m-3 bg-opacity-90"
+				class="absolute bottom-0 right-0 z-10 m-3 bg-white/90"
 				:system-classes="systemClasses"
 				@submit="onChangeCategory"
 			/>

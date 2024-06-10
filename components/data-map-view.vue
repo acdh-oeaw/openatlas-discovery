@@ -34,7 +34,7 @@ function onChangeSearchFilters(values: SearchFormData) {
 	setSearchFilters(values);
 }
 
-const { data, error, isPending, isPlaceholderData, suspense } = useGetSearchResults(
+const { data, isPending, isPlaceholderData } = useGetSearchResults(
 	computed(() => {
 		const { search, category, ...params } = searchFilters.value;
 
@@ -146,7 +146,7 @@ watch(data, () => {
 			<SearchForm
 				:class="
 					project.fullscreen
-						? 'bg-white dark:bg-neutral-900 max-w-[800px] w-full mt-2 rounded-md p-6 bg-opacity-90 shadow-md'
+						? 'bg-white/90 dark:bg-neutral-900 max-w-[800px] w-full mt-2 rounded-md p-6 shadow-md'
 						: ''
 				"
 				:filter="searchFilters.category"
@@ -162,7 +162,7 @@ watch(data, () => {
 		>
 			<div class="absolute bottom-0 z-10 mb-2 flex w-full justify-center">
 				<div
-					class="max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent bg-white bg-opacity-90 p-2 text-sm font-medium shadow-md dark:bg-neutral-900"
+					class="max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent bg-white/90 p-2 text-sm font-medium shadow-md dark:bg-neutral-900"
 				>
 					<div class="grid grid-cols-[auto_auto_1fr] items-center gap-3 align-middle">
 						<div class="grid grid-cols-[auto_1fr] gap-1">
