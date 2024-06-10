@@ -41,7 +41,10 @@
 	},
 	"DataMapView": {
 		"end-date": "End date",
-		"start-date": "Start date"
+		"start-date": "Start date",
+		"polygon": "Display Areas",
+		"centerpoint": "Area Point",
+		"point": "Location Point"
 	},
 	"DataPage": {
 		"meta": {
@@ -63,6 +66,7 @@
 	},
 	"EntityPage": {
 		"details": "Details",
+		"iiif": "IIIF-Viewer",
 		"images": "Images ({count})",
 		"map": "Map",
 		"meta": {

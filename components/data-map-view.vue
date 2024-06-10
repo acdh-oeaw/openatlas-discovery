@@ -9,6 +9,8 @@ import type { EntityFeature } from "@/composables/use-create-entity";
 import { categories } from "@/composables/use-get-search-results";
 import type { GeoJsonFeature } from "@/utils/create-geojson-feature";
 
+import { project } from "../config/project.config";
+
 const router = useRouter();
 const route = useRoute();
 const t = useTranslations();
@@ -32,7 +34,7 @@ function onChangeSearchFilters(values: SearchFormData) {
 	setSearchFilters(values);
 }
 
-const { data, error, isPending, isPlaceholderData, suspense } = useGetSearchResults(
+const { data, isPending, isPlaceholderData } = useGetSearchResults(
 	computed(() => {
 		const { search, category, ...params } = searchFilters.value;
 
@@ -43,6 +45,7 @@ const { data, error, isPending, isPlaceholderData, suspense } = useGetSearchResu
 					? [{ [category]: [{ operator: "like", values: [search], logicalOperator: "and" }] }]
 					: [],
 			show: ["geometry", "when"],
+			centroid: true,
 			system_classes: ["place"],
 			limit: 0,
 		};
@@ -67,6 +70,12 @@ const entitiesById = computed(() => {
 	});
 });
 
+let show = ref(false);
+
+function togglePolygons() {
+	show.value = !show.value;
+}
+
 /**
  * Reduce size of geojson payload, which has an impact on performance,
  * because `maplibre-gl` will serialize geojson features when sending them to the webworker.
@@ -74,6 +83,18 @@ const entitiesById = computed(() => {
 const features = computed(() => {
 	return entities.value.map((entity) => {
 		return createGeoJsonFeature(entity);
+	});
+});
+
+const centerpoints = computed(() => {
+	return features.value.filter((centerpoint) => {
+		return centerpoint.geometry.type === "GeometryCollection";
+	});
+});
+
+const points = computed(() => {
+	return features.value.filter((point) => {
+		return point.geometry.type === "Point";
 	});
 });
 
@@ -91,10 +112,23 @@ function onLayerClick(features: Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "
 
 	const entities = Array.from(entitiesMap.values());
 
-	const point = turf.center(createFeatureCollection(entities));
-	const coordinates = point.geometry.coordinates;
+	let coordinates = null;
 
-	popover.value = { coordinates, entities };
+	for (const entity of entities) {
+		if (entity.geometry.type === "GeometryCollection") {
+			coordinates = entity.geometry.geometries.find((g) => {
+				return g.type === "Point";
+			})?.coordinates;
+
+			if (coordinates != null) break;
+		}
+	}
+
+	popover.value = {
+		coordinates:
+			coordinates ?? turf.center(createFeatureCollection(entities))?.geometry.coordinates,
+		entities,
+	};
 }
 
 watch(data, () => {
@@ -107,23 +141,58 @@ watch(data, () => {
 </script>
 
 <template>
-	<div class="relative grid grid-rows-[auto_1fr] gap-4">
-		<SearchForm
-			:filter="searchFilters.category"
-			:search="searchFilters.search"
-			@submit="onChangeSearchFilters"
-		/>
+	<div :class="project.fullscreen ? 'relative grid' : 'relative grid grid-rows-[auto_1fr] gap-4'">
+		<div :class="project.fullscreen ? 'absolute z-10 flex w-full justify-center' : ''">
+			<SearchForm
+				:class="
+					project.fullscreen
+						? 'bg-white/90 dark:bg-neutral-900 max-w-[800px] w-full mt-2 rounded-md p-6 shadow-md'
+						: ''
+				"
+				:filter="searchFilters.category"
+				:search="searchFilters.search"
+				@submit="onChangeSearchFilters"
+			/>
+		</div>
 
 		<VisualisationContainer
 			v-slot="{ height, width }"
 			class="border"
 			:class="{ 'opacity-50 grayscale': isLoading }"
 		>
+			<div class="absolute bottom-0 z-10 mb-2 flex w-full justify-center">
+				<div
+					class="max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent bg-white/90 p-2 text-sm font-medium shadow-md dark:bg-neutral-900"
+				>
+					<div class="grid grid-cols-[auto_auto_1fr] items-center gap-3 align-middle">
+						<div class="grid grid-cols-[auto_1fr] gap-1">
+							<span
+								class="m-1.5 size-2 rounded-full"
+								:style="`background-color: ${project.colors.geojsonPoints}`"
+							></span>
+							{{ $t("DataMapView.point") }} ({{ points.length }})
+						</div>
+						<div class="grid grid-cols-[auto_1fr] gap-1">
+							<span
+								class="m-1.5 size-2 rounded-full"
+								:style="`background-color: ${project.colors.geojsonAreaCenterPoints}`"
+							></span>
+							{{ $t("DataMapView.centerpoint") }} ({{ centerpoints.length }})
+						</div>
+						<div>
+							<Toggle variant="iiif" @click="togglePolygons">
+								{{ $t("DataMapView.polygon") }}
+							</Toggle>
+						</div>
+					</div>
+				</div>
+			</div>
 			<GeoMap
 				v-if="height && width"
 				:features="features"
 				:height="height"
 				:width="width"
+				:polygons="show"
 				@layer-click="onLayerClick"
 			>
 				<GeoMapPopup

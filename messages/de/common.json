@@ -41,7 +41,10 @@
 	},
 	"DataMapView": {
 		"end-date": "End-Datum",
-		"start-date": "Start-Datum"
+		"start-date": "Start-Datum",
+		"polygon": "Flächen anzeigen",
+		"centerpoint": "Flächenpunkt",
+		"point": "Ortspunkt"
 	},
 	"DataPage": {
 		"meta": {
@@ -63,6 +66,7 @@
 	},
 	"EntityPage": {
 		"details": "Details",
+		"iiif": "IIIF-Ansicht",
 		"images": "Bilder ({count})",
 		"map": "Karte",
 		"meta": {

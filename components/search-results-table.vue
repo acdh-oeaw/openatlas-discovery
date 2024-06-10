@@ -147,13 +147,13 @@ const cols = [
 							description.value,
 						);
 					}
-					return;
+					return undefined;
 				});
 		},
 	}),
 	columnHelper.accessor(
 		(row) => {
-			return `${row.when?.timespans?.[0]?.start?.earliest} `;
+			return `${String(row.when?.timespans?.[0]?.start?.earliest)} `;
 		},
 		{
 			id: "begin_from",
@@ -167,7 +167,7 @@ const cols = [
 	),
 	columnHelper.accessor(
 		(row) => {
-			return `${row.when?.timespans?.[0]?.end?.earliest} `;
+			return `${String(row.when?.timespans?.[0]?.end?.earliest)} `;
 		},
 		{
 			id: "end_from",
