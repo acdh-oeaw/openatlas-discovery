@@ -27,6 +27,18 @@
 		"title": "hat Beziehung zu",
 		"titleInverse": "hat Beziehung zu"
 	},
+	"OA8": {
+		"title": "Beginnt in",
+		"titleInverse": "ist erster Ort von",
+		"groupTitle": "Beginnt in",
+		"groupTitleInverse": "ist erster Ort von"
+	},
+	"P53": {
+		"title": "Ort",
+		"titleInverse": "ist früherer oder derzeitiger Standort von",
+		"groupTitle": "Ort",
+		"groupTitleInverse": "ist früherer oder derzeitiger Standort von"
+	},
 	"P43": {
 		"title": "hat Dimension",
 		"titleInverse": "ist Dimension von",
@@ -98,12 +110,6 @@
 		"titleInverse": "wurde benutzt von",
 		"groupTitle": "benutzte das bestimmte Verfahren",
 		"groupTitleInverse": "wurde benutzt von"
-	},
-	"P53": {
-		"title": "hat früheren oder derzeitigen Standort",
-		"titleInverse": "ist früherer oder derzeitiger Standort von",
-		"groupTitle": "hat früheren oder derzeitigen Standort",
-		"groupTitleInverse": "ist früherer oder derzeitiger Standort von"
 	},
 	"P42": {
 		"title": "wies zu",
@@ -182,12 +188,6 @@
 		"titleInverse": "is parent of",
 		"groupTitle": "has parent",
 		"groupTitleInverse": "is parent of"
-	},
-	"OA8": {
-		"title": "beginnt in",
-		"titleInverse": "ist erster Ort von",
-		"groupTitle": "beginnt in",
-		"groupTitleInverse": "ist erster Ort von"
 	},
 	"P20": {
 		"title": "hatte den bestimmten Zweck",

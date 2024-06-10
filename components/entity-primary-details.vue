@@ -1,6 +1,17 @@
 <script setup lang="ts">
 import CustomPrimaryDetailsActor from '@/components/custom-primary-details-actor.vue';
 import CustomPrimaryDetailsPlace from '@/components/custom-primary-details-place.vue';
+import { MapPinIcon } from 'lucide-vue-next';
+
+const getRelationTitle = (relation: RelationType) => {
+	return useRelationTitle(relation, props.entity.systemClass)
+}
+
+const getRelationGroupTitle = (relation: RelationType) => {
+	return useRelationGroupTitle(relation, props.entity.systemClass)
+}
+
+const {getUnprefixedId} = useIdPrefix();
 
 const props = defineProps<{
 	entity: EntityFeature,
@@ -55,6 +66,31 @@ function emitHandledRelations(relations: Array<RelationType>) {
 	emit("handledRelations", [...handledRelations, ...relations]);
 }
 
+interface Place {
+	label: string,
+	id: string,
+	relationType: RelationType | null
+}
+
+// TODO: For instances where there is no location set (at least for actors), make use of first and last event if no places are available
+const places = computed(() => {
+	return props.entity.relations?.reduce((acc: Array<Place>, relation) => {
+		if(relation.relationSystemClass !== "object_location") return acc;
+		if(!relation.label || !relation.relationTo || !relation.relationType) return acc;
+		const id = getUnprefixedId(relation.relationTo);
+		const relationType = extractRelationTypeFromRelationString(relation.relationType);
+		const label = relation.label;
+		if(!id) return acc;
+		return [
+			...acc,
+			{
+				label,
+				id,
+				relationType
+			}]
+	}, []);
+});
+
 </script>
 
 <template>
@@ -67,6 +103,28 @@ function emitHandledRelations(relations: Array<RelationType>) {
 	<CardContent>
 		<div class="grid gap-4">
 			<EntityDescriptions :descriptions="entity?.descriptions ?? []" />
+
+			<div class="flex w-full flex-row flex-wrap gap-4">
+				<template
+					v-for="(place) in places"
+					:key="place.label || `place-${index}`"
+				>
+					<InfoCard
+						v-if="place.relationType"
+						class="max-w-48 p-4"
+						:icon="MapPinIcon"
+						:title="getRelationTitle(place.relationType)"
+						>
+						<template #content>
+							<EntityPreviewLink v-if="place.id" :id="useToNumber(place.id).value">
+								{{ place.label }}
+							</EntityPreviewLink>
+							{{ place.id ? '' : place.label }}
+						</template>
+					</InfoCard>
+				</template>
+			</div>
+
 			<!-- Types -->
 			<div class=" flex flex-row flex-wrap gap-1">
 				<TypesPopover

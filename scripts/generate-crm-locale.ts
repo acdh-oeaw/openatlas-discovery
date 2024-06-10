@@ -84,6 +84,9 @@ const customDictionary: Record<
 			groupTitle: "Relationships",
 			groupTitleInverse: "Relationships",
 		},
+		P53: {
+			title: "Location",
+		},
 	},
 	de: {
 		person: {
@@ -108,6 +111,12 @@ const customDictionary: Record<
 		OA7: {
 			groupTitle: "Beziehungen",
 			groupTitleInverse: "Beziehungen",
+		},
+		OA8: {
+			title: "Beginnt in",
+		},
+		P53: {
+			title: "Ort",
 		},
 	},
 };

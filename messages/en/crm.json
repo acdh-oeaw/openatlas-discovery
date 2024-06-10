@@ -27,6 +27,12 @@
 		"title": "has relationship to",
 		"titleInverse": "has relationship to"
 	},
+	"P53": {
+		"title": "Location",
+		"titleInverse": "is former or current location of",
+		"groupTitle": "Location",
+		"groupTitleInverse": "is former or current location of"
+	},
 	"P43": {
 		"title": "has dimension",
 		"titleInverse": "is dimension of",
@@ -98,12 +104,6 @@
 		"titleInverse": "was used by",
 		"groupTitle": "used specific technique",
 		"groupTitleInverse": "was used by"
-	},
-	"P53": {
-		"title": "has former or current location",
-		"titleInverse": "is former or current location of",
-		"groupTitle": "has former or current location",
-		"groupTitleInverse": "is former or current location of"
 	},
 	"P42": {
 		"title": "assigned",
