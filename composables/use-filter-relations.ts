@@ -12,8 +12,6 @@ export const useFilterRelations = (
 	const { relationType, systemClass } = toValue(filters);
 	const rels = toValue(relations);
 
-	console.log({ rels, relationType, systemClass });
-
 	const test = rels.reduce((acc: Relations, relation): Relations => {
 		if (!relation.relationType) return acc;
 
