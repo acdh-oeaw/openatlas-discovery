@@ -133,6 +133,10 @@
 	"RelationType": {
 		"CurrentOrFormerResidency": "Residency"
 	},
+	"Relations": {
+		"Artifacts": "Artifacts",
+		"HumanRemains": "Human Remains"
+	},
 	"SearchForm": {
 		"filter": "Filter",
 		"filters": {

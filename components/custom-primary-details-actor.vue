@@ -72,7 +72,7 @@ const collapsibleRelations: Array<{
 	}
 ]
 
-const relations: Array<RelationType> = [
+const handledRelations: Array<RelationType> = [
 	{
 		crmCode: "P107"
 	},
@@ -97,7 +97,7 @@ const emit = defineEmits({
 );
 
 onMounted(() => {
-	emit("handledRelations", relations);
+	emit("handledRelations", handledRelations);
 })
 
 

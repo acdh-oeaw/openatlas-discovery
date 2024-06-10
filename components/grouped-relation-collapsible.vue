@@ -1,13 +1,16 @@
 <script lang="ts" setup>
+import { useFilterRelations } from "@/composables/use-filter-relations";
 import { groupByToMap } from "@acdh-oeaw/lib";
 import { ChevronDown, ChevronUp } from 'lucide-vue-next';
 
 const { getUnprefixedId } = useIdPrefix();
 
 /** @param relations should be an  */
-const props = defineProps<{title: string, relations: EntityFeature["relations"], relationType: RelationType}>();
+const props = defineProps<{title: string, relations: EntityFeature["relations"], relationType: RelationType, systemClass?: string}>();
 
-const filteredRelations = computed(() => {
+const filteredRelations = useFilterRelations(props.relations, { relationType: props.relationType, systemClass: props.systemClass });
+
+computed(() => {
 	return props.relations?.reduce((acc: Array<NonNullable<EntityFeature["relations"]>[0]>, relation) => {
 		const {crmCode, inverse} = extractRelationTypeFromRelationString(relation.relationType) ?? {};
 
@@ -29,7 +32,7 @@ const filteredRelations = computed(() => {
 });
 
 const groupedByType = computed(() => {
-	return groupByToMap(filteredRelations.value ?? [], (rel): string | null | undefined => {return rel.type});
+	return groupByToMap(filteredRelations ?? [], (rel): string | null | undefined => {return rel.type});
 });
 
 const relationsWithoutType = computed(() => {
@@ -40,7 +43,7 @@ const relationsWithoutType = computed(() => {
 
 const isOpen = ref(false)
 
-if(filteredRelations.value?.length && filteredRelations.value.length === 1) isOpen.value = true;
+if(filteredRelations?.length && filteredRelations.length === 1) isOpen.value = true;
 
 </script>
 

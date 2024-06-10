@@ -1,10 +1,7 @@
 <script lang="ts" setup>
 import { ChevronDown, ChevronsUpDown,ChevronUp } from 'lucide-vue-next';
 
-const { getUnprefixedId } = useIdPrefix();
-
 defineProps<{title: string, relations: Array<NonNullable<EntityFeature["relations"]>[0]>}>();
-
 
 const isOpen = ref(false)
 </script>

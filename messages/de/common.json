@@ -133,6 +133,10 @@
 	"RelationType": {
 		"CurrentOrFormerResidency": "Residenz"
 	},
+	"Relations": {
+		"Artifacts": "Artefakte",
+		"HumanRemains": "Menschliche Überreste"
+	},
 	"SearchForm": {
 		"filter": "Filter",
 		"filters": {
