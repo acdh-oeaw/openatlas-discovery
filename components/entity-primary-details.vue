@@ -16,14 +16,24 @@ const {getUnprefixedId} = useIdPrefix();
 const props = defineProps<{
 	entity: EntityFeature,
 }>();
+interface Image {
+	IIIFManifest: string | undefined;
+	license: string | undefined;
+	mimetype?: string | undefined;
+	title?: string | undefined;
+	url?: string | undefined;
+}
 
 const images = computed(() => {
 	return props.entity.depictions
-		?.reduce((acc: Array<{url: string, license:string}>, depiction) => {
+		?.reduce((acc: Array<Image>, depiction) => {
 			if (depiction.url && depiction.license) {
 				acc.push({
 					url: depiction.url,
-					license: depiction.license
+					license: depiction.license,
+					IIIFManifest: depiction.IIIFManifest,
+					mimetype: depiction.mimetype,
+					title: depiction.title
 				});
 			}
 			return acc;
