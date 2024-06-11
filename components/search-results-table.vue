@@ -12,11 +12,11 @@ import {
 } from "@tanstack/vue-table";
 import { ArrowUpDown } from "lucide-vue-next";
 
-import EntityPreviewLink from "@/components/entity-preview-link.vue";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { EntityFeature } from "@/composables/use-create-entity";
 import { isColumn } from "@/composables/use-get-search-results";
+import NavLink from "@/components/nav-link.vue";
 
 const emit = defineEmits({
 	"update:sorting"(sorting: SortingState) {
@@ -120,10 +120,11 @@ const cols = [
 		cell: (info) => {
 			const title = info.getValue();
 			return h(
-				EntityPreviewLink,
+				NavLink,
 				{
-					id: useToNumber(info.row.original.properties._id).value,
-					label: title,
+					class:
+						"underline decoration-dotted transition hover:no-underline focus-visible:no-underline",
+					href: { path: `/entities/${encodeURIComponent(info.row.original.properties._id)}` },
 				},
 				title,
 			);
