@@ -21,7 +21,7 @@ const props = defineProps<{
 	features: Array<GeoJsonFeature>;
 	height: number;
 	width: number;
-	polygons: boolean;
+	hasPolygons: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -61,7 +61,7 @@ async function create() {
 	const map = new GeoMap({
 		center: [initialViewState.longitude, initialViewState.latitude],
 		container: elementRef.value,
-		maxZoom: 16,
+		maxZoom: 24,
 		minZoom: 1,
 		pitch: initialViewState.pitch,
 		style: mapStyle.value,
@@ -172,6 +172,7 @@ function init() {
 	//
 
 	updateScope();
+	updatePolygons();
 }
 
 function dispose() {
@@ -183,7 +184,7 @@ watch(() => {
 }, updateScope);
 
 watch(() => {
-	return props.polygons;
+	return props.hasPolygons;
 }, updatePolygons);
 
 function updateScope() {
@@ -202,7 +203,7 @@ function updateScope() {
 	});
 
 	const polygons = props.features.filter((polygon) => {
-		return polygon.geometry.type === "GeometryCollection";
+		return polygon.geometry.type === "GeometryCollection" || "Polygon";
 	});
 
 	const centerpoints = props.features.filter((centerpoint) => {
@@ -219,6 +220,9 @@ function updateScope() {
 
 	if (geojsonPoints.features.length > 0) {
 		const bounds = turf.bbox(geojsonPoints);
+		map.fitBounds(bounds, { padding: 50, maxZoom: 16});
+	} else if (geojsonCenterPoints.features.length > 0) {
+		const bounds = turf.bbox(geojsonCenterPoints);
 		map.fitBounds(bounds, { padding: 50 });
 	}
 }
@@ -227,7 +231,8 @@ function updatePolygons() {
 	assert(context.map != null);
 	const sourcePolygonsId = "polygon-data";
 
-	if (props.polygons) {
+	if (props.hasPolygons) {
+
 		context.map.addLayer({
 			id: "polygons",
 			type: "fill",
@@ -238,7 +243,7 @@ function updatePolygons() {
 			},
 		});
 	}
-	if (!props.polygons && context.map.getLayer("polygons")) {
+	if (!props.hasPolygons && context.map.getLayer("polygons")) {
 		context.map.removeLayer("polygons");
 	}
 }

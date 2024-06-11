@@ -24,6 +24,7 @@ export function useGetEntity(params: MaybeRef<GetEntityParams>) {
 					},
 					query: {
 						format: "lpx",
+						centroid: true,
 					},
 				},
 				signal,

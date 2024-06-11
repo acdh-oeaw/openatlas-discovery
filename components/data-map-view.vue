@@ -46,7 +46,7 @@ const { data, isPending, isPlaceholderData } = useGetSearchResults(
 					: [],
 			show: ["geometry", "when"],
 			centroid: true,
-			system_classes: ["place"],
+			system_classes: ["place", "object_location"],
 			limit: 0,
 		};
 	}),
@@ -192,7 +192,7 @@ watch(data, () => {
 				:features="features"
 				:height="height"
 				:width="width"
-				:polygons="show"
+				:has-polygons="show"
 				@layer-click="onLayerClick"
 			>
 				<GeoMapPopup
