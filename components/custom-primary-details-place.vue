@@ -45,11 +45,11 @@ onMounted(() => {
 
 <template>
 	<GroupedRelationCollapsible
-			v-for="rel in collapsibleRelations"
-			:key="rel.relationType.crmCode + rel.relationType.inverse"
-			:title="rel.title"
-			:relations="entity.relations"
-			:system-class="rel.systemClass"
-			:relation-type="rel.relationType"
-		/>
+		v-for="rel in collapsibleRelations"
+		:key="rel.relationType.crmCode + rel.relationType.inverse"
+		:title="rel.title"
+		:relations="entity.relations"
+		:system-class="rel.systemClass"
+		:relation-type="rel.relationType"
+	/>
 </template>
