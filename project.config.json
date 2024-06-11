@@ -23,9 +23,9 @@
 		"disabledNodeColor": "#aaa"
 	},
 	"map": {
-		"startPage": false
+		"startPage": true
 	},
-	"fullscreen": false,
+	"fullscreen": true,
 	"defaultLocale": "en",
 	"logos": {
 		"light": "/assets/images/logo.svg",
