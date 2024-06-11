@@ -42,11 +42,7 @@ const updateHandledRelations = (relations: Array<RelationType>) => {
 			<slot name="custom-details" />
 			<!-- <component v-if="hasCustomDetails" v-bind:is="entityDetailsDict" bind:entity-data /> -->
 
-
-
-			<!-- <entity-details v-bind="details: {title: title, data: someData}" /> -->
 			<EntityDetails :handled-relations="handledRelations" :relations="entity.relations" class="mx-4 mt-16" />
-
 		</Card>
 
 	</details>

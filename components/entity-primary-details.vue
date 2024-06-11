@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import CustomPrimaryDetailsActor from '@/components/custom-primary-details-actor.vue';
 import CustomPrimaryDetailsPlace from '@/components/custom-primary-details-place.vue';
+import CustomPrimaryDetailsFeature from '@/components/custom-primary-details-feature.vue';
 import { MapPinIcon } from 'lucide-vue-next';
 
 const getRelationTitle = (relation: RelationType) => {
@@ -16,6 +17,7 @@ const {getUnprefixedId} = useIdPrefix();
 const props = defineProps<{
 	entity: EntityFeature,
 }>();
+
 interface Image {
 	IIIFManifest: string | undefined;
 	license: string | undefined;
@@ -48,16 +50,17 @@ const entityPrimaryDetailsDict: Record<string, Component> = {
 	"person": CustomPrimaryDetailsActor,
 	"group": CustomPrimaryDetailsActor,
 	"stratigraphic_unit": CustomPrimaryDetailsPlace,
+	"feature": CustomPrimaryDetailsFeature
 }
 
-const handledRelations: Array<RelationType> = [
+const handledRelations: Set<RelationType> = new Set([
 	{
 		crmCode: "P1" // "is identified by" are the aliases
 	},
 	{
 		crmCode: "P2" // "has type" are the types
-	}
-]
+	},
+])
 
 const emit = defineEmits({
 	handledRelations(payload: Array<RelationType>) {
@@ -73,7 +76,8 @@ onMounted(() => {
 
 function emitHandledRelations(relations: Array<RelationType>) {
 	alreadyEmitted = true;
-	emit("handledRelations", [...handledRelations, ...relations]);
+	for (const relation of relations) handledRelations.add(relation);
+	emit("handledRelations", [...handledRelations]);
 }
 
 interface Place {
@@ -100,6 +104,16 @@ const places = computed(() => {
 			}]
 	}, []);
 });
+
+watchEffect( () => {
+	if(!places.value || places.value.length === 0) return;
+	const relTypes = places.value.map(place => place.relationType);
+	for(const type of relTypes) {
+		if(type) handledRelations.add(type);
+	}
+	emitHandledRelations([]);
+});
+
 
 </script>
 

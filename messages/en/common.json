@@ -40,11 +40,11 @@
 		}
 	},
 	"DataMapView": {
-		"end-date": "End date",
-		"start-date": "Start date",
-		"polygon": "Display Areas",
 		"centerpoint": "Area Point",
-		"point": "Location Point"
+		"end-date": "End date",
+		"point": "Location Point",
+		"polygon": "Display Areas",
+		"start-date": "Start date"
 	},
 	"DataPage": {
 		"meta": {
@@ -77,6 +77,10 @@
 			"toggle": "Toggle details for {title}"
 		}
 	},
+	"EntitySidebar": {
+		"NextFeature": "NextFeature",
+		"PreviousFeature": "Previous Feature"
+	},
 	"ErrorBoundary": {
 		"error": "Error"
 	},
@@ -88,6 +92,8 @@
 		"try-again": "Try again"
 	},
 	"Global": {
+		"Next": "Next",
+		"Previous": "Previous",
 		"ShowMore": "show more",
 		"TitleMissing": "Title Missing"
 	},
