@@ -17,8 +17,6 @@ const t = useTranslations();
 
 const currentView = useGetCurrentView();
 
-console.log(currentView.value);
-
 const searchFiltersSchema = z.object({
 	category: z.enum(categories).catch("entityName"),
 	search: z.string().catch(""),
