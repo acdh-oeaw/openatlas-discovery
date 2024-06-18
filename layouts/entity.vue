@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { MapIcon, WaypointsIcon } from "lucide-vue-next";
 import { z } from "zod";
 
 const t = useTranslations();
@@ -55,13 +56,14 @@ const currentView = computed(() => {
 <template>
 	<NuxtLayout name="default">
 		<MainContent class="container relative grid h-full py-8">
-			<div class="flex justify-end">
-
+			<div class="absolute right-4 top-1/2 z-20 bg-white/90 dark:bg-neutral-900 rounded-md p-6 shadow-md">
 				<NavLink
 					class="flex items-center gap-1 underline decoration-dotted hover:no-underline"
 					:href="{ path: `/entities/${id}/${currentView === 'network' ? 'map' : 'network'}` }"
 				>
-				{{ currentView === "network" ? 'to map' : 'to network' }}
+					<MapIcon v-if="currentView === 'network'" class="size-6" />
+					<WaypointsIcon v-else class="size-6" />
+					<span class="sr-only">{{ currentView === 'network' ? t('MapPage.title') : t('NetworkPage.title') }}</span>
 				</NavLink>
 				<NavLink
 					class="flex items-center gap-1 underline decoration-dotted hover:no-underline"
