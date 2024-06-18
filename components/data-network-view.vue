@@ -37,6 +37,7 @@ const { data, isPending, isPlaceholderData } = useGetNetworkData(
 	computed(() => {
 		return {
 			exclude_system_classes: [
+				// TO-DO: Currently there is an issue: filtering by case study and system_class type will return no results
 				"type",
 				"object_location",
 				"reference_system",
