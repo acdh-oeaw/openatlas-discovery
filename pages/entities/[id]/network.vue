@@ -11,7 +11,7 @@ const env = useRuntimeConfig();
 <template>
 	<template v-if="env.public.NUXT_PUBLIC_DATABASE !== 'disabled'">
 		<ErrorBoundary>
-			<DataNetworkView></DataNetworkView>
+			<DataNetworkView />
 		</ErrorBoundary>
 	</template>
 	<template v-else>
