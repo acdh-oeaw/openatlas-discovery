@@ -149,16 +149,13 @@ useHead({
 
 		<AppHeader />
 		<ErrorBoundary>
+			<MainContent class="container relative grid h-full py-8">
 				<template v-if="entity != null">
-				<EntitySidebar :entity="entity" />
-				</template>
-				<template v-else-if="isLoading">
-					<Centered class="pointer-events-none opacity-50">
-						<LoadingIndicator />
-					</Centered>
+					<EntitySidebar :entity="entity" />
 				</template>
 				<slot />
-		</ErrorBoundary>
+			</MainContent>
+			</ErrorBoundary>
 		<AppFooter />
 
 		<Toaster position="bottom-right" />
