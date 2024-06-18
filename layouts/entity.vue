@@ -20,6 +20,7 @@ usePageMetadata({
 });
 
 const route = useRoute();
+const router = useRouter();
 const id = computed(() => {
 	return Number(route.params.id as string);
 });
@@ -45,10 +46,30 @@ useHead({
 	}),
 });
 
+const currentView = computed(() => {
+	return route.path.split("/").pop();
+});
+
+
 </script>
 <template>
 	<NuxtLayout name="default">
 		<MainContent class="container relative grid h-full py-8">
+			<div class="flex justify-end">
+
+				<NavLink
+					class="flex items-center gap-1 underline decoration-dotted hover:no-underline"
+					:href="{ path: `/entities/${id}/${currentView === 'network' ? 'map' : 'network'}` }"
+				>
+				{{ currentView === "network" ? 'to map' : 'to network' }}
+				</NavLink>
+				<NavLink
+					class="flex items-center gap-1 underline decoration-dotted hover:no-underline"
+					:href="{ path: `/entities/${id+1}/${currentView}` }"
+				>
+				 Next entity
+				</NavLink>
+			</div>
 			<template v-if="entity != null">
 				<EntitySidebar :entity="entity" />
 			</template>
