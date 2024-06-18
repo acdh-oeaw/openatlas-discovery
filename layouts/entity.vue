@@ -21,7 +21,6 @@ usePageMetadata({
 
 const route = useRoute();
 const id = computed(() => {
-	console.log("route params", route.params)
 	return Number(route.params.id as string);
 });
 
@@ -36,7 +35,6 @@ const isLoading = computed(() => {
 });
 
 const entity = computed(() => {
-	console.log("data", data.value)
 	return data.value?.features[0];
 });
 
