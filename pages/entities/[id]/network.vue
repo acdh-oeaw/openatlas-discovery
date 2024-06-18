@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 definePageMeta({
-	layout: "network"
+	layout: "visualization"
 });
 
 const t = useTranslations();

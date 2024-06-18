@@ -46,7 +46,8 @@ const currentView = useGetCurrentView();
 			</div>
 			<template v-if="env.public.NUXT_PUBLIC_DATABASE !== 'disabled'">
 				<ErrorBoundary>
-					<DataNetworkView />
+					<DataMapView v-if="currentView === 'map'" />
+					<DataNetworkView v-else />
 				</ErrorBoundary>
 			</template>
 			<template v-else>

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 definePageMeta({
-	layout: "map"
+	layout: "visualization"
 });
 
 const t = useTranslations();
