@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import { z } from "zod";
 
-import { hasCoordinates } from "@/utils/has-geojson-coordinates";
-
 definePageMeta({
 	validate(route) {
 		const env = useRuntimeConfig();
@@ -51,28 +49,6 @@ useHead({
 	// TODO: description, other metadata
 });
 
-const tabs = computed(() => {
-	const tabs = [];
-	if (entity.value?.geometry != null && hasCoordinates(entity.value.geometry)) {
-		tabs.push({
-			id: "geo-map",
-			label: t("EntityPage.map"),
-		});
-	}
-	if (entity.value?.depictions != null) {
-		tabs.push({
-			id: "images",
-			label: t("EntityPage.images", { count: entity.value.depictions.length }),
-		});
-	}
-	if (entity.value?.relations != null) {
-		tabs.push({
-			id: "network",
-			label: t("EntityPage.network"),
-		});
-	}
-	return tabs;
-});
 
 </script>
 
@@ -81,37 +57,7 @@ const tabs = computed(() => {
 		<template v-if="entity != null">
 			<EntitySidebar :entity="entity" />
 
-
 			<EntityGeoMap :entities="entities" />
-
-<!--
-			<Card>
-				<CardHeader>
-					<EntitySystemClass :system-class="entity.systemClass" />
-					<PageTitle>{{ entity.properties.title }}</PageTitle>
-				</CardHeader>
-				<CardContent>
-					<div class="grid gap-4">
-						<EntityTimespans :timespans="entity.when?.timespans" />
-						<EntityDescriptions :descriptions="entity?.descriptions ?? []" />
-					</div>
-				</CardContent>
-			</Card> -->
-
-			<!-- <Tabs v-if="tabs.length > 0" :default-value="tabs[0]?.id">
-				<TabsList>
-					<TabsTrigger v-for="tab of tabs" :key="tab.id" :value="tab.id">
-						{{ tab.label }}
-					</TabsTrigger>
-				</TabsList> -->
-				<!-- TODO: keep map alive -->
-				<!-- <TabsContent v-for="tab of tabs" :key="tab.id" :value="tab.id">
-					<EntityGeoMap v-if="tab.id === 'geo-map'" :entities="entities" />
-					<EntityImages v-else-if="tab.id === 'images'" :images="entity.depictions" />
-					<EntityNetwork v-if="tab.id === 'network'" :id="id" :network-data="entity" />
-				</TabsContent>
-			</Tabs> -->
-
 		</template>
 
 		<template v-else-if="isLoading">

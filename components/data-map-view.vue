@@ -187,6 +187,7 @@ watch(data, () => {
 					</div>
 				</div>
 			</div>
+
 			<GeoMap
 				v-if="height && width"
 				:features="features"
