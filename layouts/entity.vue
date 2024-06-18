@@ -63,12 +63,6 @@ const currentView = useGetCurrentView();
 					<WaypointsIcon v-else class="size-6" />
 					<span class="sr-only">{{ currentView === 'network' ? t('MapPage.title') : t('NetworkPage.title') }}</span>
 				</NavLink>
-				<NavLink
-					class="flex items-center gap-1 underline decoration-dotted hover:no-underline"
-					:href="{ path: `/entities/${id+1}/${currentView}` }"
-				>
-				 Next entity
-				</NavLink>
 			</div>
 			<template v-if="entity != null">
 				<EntitySidebar :entity="entity" />
