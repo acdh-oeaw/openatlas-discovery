@@ -15,6 +15,10 @@ const router = useRouter();
 const route = useRoute();
 const t = useTranslations();
 
+const currentView = useGetCurrentView();
+
+console.log(currentView.value);
+
 const searchFiltersSchema = z.object({
 	category: z.enum(categories).catch("entityName"),
 	search: z.string().catch(""),
@@ -209,7 +213,7 @@ watch(data, () => {
 						<strong class="font-medium">
 							<NavLink
 								class="flex items-center gap-1 underline decoration-dotted hover:no-underline"
-								:href="{ path: `/entities/${entity.properties._id}` }"
+								:href="{ path: `/entities/${entity.properties._id}/${currentView}` }"
 							>
 								<Component :is="getEntityIcon(entity.systemClass)" class="size-3.5 shrink-0" />
 								{{ entity.properties.title }}

@@ -47,9 +47,7 @@ useHead({
 	}),
 });
 
-const currentView = computed(() => {
-	return route.path.split("/").pop();
-});
+const currentView = useGetCurrentView();
 
 
 </script>
