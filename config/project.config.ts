@@ -14,6 +14,7 @@ const schema = z.object({
 			brand: z.string().min(1),
 			geojsonPoints: z.string().min(1),
 			geojsonAreaCenterPoints: z.string().min(1),
+			geojsonMovement: z.string().min(1),
 			entityColors: z.object({
 				place: z.string().min(1),
 				source: z.string().min(1),

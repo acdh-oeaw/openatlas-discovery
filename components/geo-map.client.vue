@@ -19,9 +19,11 @@ import type { GeoJsonFeature } from "@/utils/create-geojson-feature";
 
 const props = defineProps<{
 	features: Array<GeoJsonFeature>;
+	movements: Array<GeoJsonFeature>;
 	height: number;
 	width: number;
 	polygons: boolean;
+	showMovements: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -37,6 +39,7 @@ const theme = useColorMode();
 const colors = {
 	points: project.colors.geojsonPoints,
 	areaCenterPoints: project.colors.geojsonAreaCenterPoints,
+	movement: project.colors.geojsonMovement,
 };
 
 const mapStyle = computed(() => {
@@ -97,9 +100,11 @@ function init() {
 	const sourcePointsId = "points-data";
 	const sourcePolygonsId = "polygon-data";
 	const sourceCenterPointsId = "centerpoints-data";
+	const sourceMovePointsId = "move-points-data";
 	map.addSource(sourcePointsId, { type: "geojson", data: createFeatureCollection([]) });
 	map.addSource(sourcePolygonsId, { type: "geojson", data: createFeatureCollection([]) });
 	map.addSource(sourceCenterPointsId, { type: "geojson", data: createFeatureCollection([]) });
+	map.addSource(sourceMovePointsId, { type: "geojson", data: createFeatureCollection([]) });
 
 	//
 
@@ -128,6 +133,17 @@ function init() {
 	});
 
 	//
+
+	map.addLayer({
+		id: "movements",
+		type: "circle",
+		source: sourceMovePointsId,
+		filter: ["==", "$type", "Point"],
+		paint: {
+			"circle-color": colors.movement,
+			"circle-radius": 6,
+		},
+	});
 
 	//
 
@@ -186,6 +202,10 @@ watch(() => {
 	return props.polygons;
 }, updatePolygons);
 
+watch(() => {
+	return props.showMovements;
+}, updateMovements);
+
 function updateScope() {
 	assert(context.map != null);
 	const map = context.map;
@@ -193,9 +213,11 @@ function updateScope() {
 	const sourcePointsId = "points-data";
 	const sourcePolygonsId = "polygon-data";
 	const sourceCenterPointsId = "centerpoints-data";
+	const sourceMovePointsId = "move-points-data";
 	const sourcePoints = map.getSource(sourcePointsId) as GeoJSONSource | undefined;
 	const sourcePolygons = map.getSource(sourcePolygonsId) as GeoJSONSource | undefined;
 	const sourceCenterpoints = map.getSource(sourceCenterPointsId) as GeoJSONSource | undefined;
+	const sourceMovePoints = map.getSource(sourceMovePointsId) as GeoJSONSource | undefined;
 
 	const points = props.features.filter((point) => {
 		return point.geometry.type === "Point";
@@ -209,13 +231,17 @@ function updateScope() {
 		return centerpoint.geometry.type === "GeometryCollection";
 	});
 
+	const movements = props.movements;
+
 	const geojsonPoints = createFeatureCollection(points);
 	const geojsonPolygons = createFeatureCollection(polygons);
 	const geojsonCenterPoints = createFeatureCollection(centerpoints);
+	const geojsonMovePoints = createFeatureCollection(movements);
 
 	sourcePoints?.setData(geojsonPoints);
 	sourcePolygons?.setData(geojsonPolygons);
 	sourceCenterpoints?.setData(geojsonCenterPoints);
+	sourceMovePoints?.setData(geojsonMovePoints);
 
 	if (geojsonPoints.features.length > 0) {
 		const bounds = turf.bbox(geojsonPoints);
@@ -240,6 +266,30 @@ function updatePolygons() {
 	}
 	if (!props.polygons && context.map.getLayer("polygons")) {
 		context.map.removeLayer("polygons");
+	}
+}
+
+function updateMovements() {
+	assert(context.map != null);
+	const sourceMovePointsId = "move-points-data";
+
+	if (props.showMovements) {
+		context.map.addLayer({
+			id: "movement-line",
+			type: "line",
+			source: sourceMovePointsId,
+			layout: {
+				"line-join": "round",
+				"line-cap": "round",
+			},
+			paint: {
+				"line-color": colors.movement,
+				"line-width": 8,
+			},
+		});
+	}
+	if (!props.showMovements && context.map.getLayer("movement-line")) {
+		context.map.removeLayer("movement-line");
 	}
 }
 

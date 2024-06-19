@@ -46,7 +46,7 @@ const { data, isPending, isPlaceholderData } = useGetSearchResults(
 					: [],
 			show: ["geometry", "when"],
 			centroid: true,
-			system_classes: ["place"],
+			system_classes: ["place", "move"],
 			limit: 0,
 		};
 	}),
@@ -71,9 +71,14 @@ const entitiesById = computed(() => {
 });
 
 let show = ref(false);
+let showMovements = ref(false);
 
 function togglePolygons() {
 	show.value = !show.value;
+}
+
+function toggleMovements() {
+	showMovements.value = !showMovements.value;
 }
 
 /**
@@ -82,6 +87,15 @@ function togglePolygons() {
  */
 const features = computed(() => {
 	return entities.value.map((entity) => {
+		return createGeoJsonFeature(entity);
+	});
+});
+
+const movements = computed(() => {
+	const move = entities.value.filter((move) => {
+		return move.systemClass === "move";
+	});
+	return move.map((entity) => {
 		return createGeoJsonFeature(entity);
 	});
 });
@@ -164,7 +178,7 @@ watch(data, () => {
 				<div
 					class="max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent bg-white/90 p-2 text-sm font-medium shadow-md dark:bg-neutral-900"
 				>
-					<div class="grid grid-cols-[auto_auto_1fr] items-center gap-3 align-middle">
+					<div class="grid grid-cols-[auto_auto_auto_auto_1fr] items-center gap-3 align-middle">
 						<div class="grid grid-cols-[auto_1fr] gap-1">
 							<span
 								class="m-1.5 size-2 rounded-full"
@@ -179,9 +193,21 @@ watch(data, () => {
 							></span>
 							{{ $t("DataMapView.centerpoint") }} ({{ centerpoints.length }})
 						</div>
+						<div class="grid grid-cols-[auto_1fr] gap-1">
+							<span
+								class="m-1.5 size-2 rounded-full"
+								:style="`background-color: ${project.colors.geojsonMovement}`"
+							></span>
+							{{ $t("DataMapView.movement") }} ({{ movements.length }})
+						</div>
 						<div>
 							<Toggle variant="iiif" @click="togglePolygons">
 								{{ $t("DataMapView.polygon") }}
+							</Toggle>
+						</div>
+						<div>
+							<Toggle variant="iiif" @click="toggleMovements">
+								{{ $t("DataMapView.showMovement") }}
 							</Toggle>
 						</div>
 					</div>
@@ -190,9 +216,11 @@ watch(data, () => {
 			<GeoMap
 				v-if="height && width"
 				:features="features"
+				:movements="movements"
 				:height="height"
 				:width="width"
 				:polygons="show"
+				:show-movements="showMovements"
 				@layer-click="onLayerClick"
 			>
 				<GeoMapPopup

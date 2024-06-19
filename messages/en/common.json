@@ -38,8 +38,10 @@
 		"end-date": "End date",
 		"start-date": "Start date",
 		"polygon": "Display Areas",
-		"centerpoint": "Area Point",
-		"point": "Location Point"
+		"centerpoint": "Area",
+		"point": "Location",
+		"movement": "Movement",
+		"showMovement": "Display Movement"
 	},
 	"DataView": {
 		"nothing-found": "No entries found for this search."

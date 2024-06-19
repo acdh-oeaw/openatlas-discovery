@@ -3,6 +3,7 @@
 		"brand": "#b8cf5b",
 		"geojsonPoints": "#69c0ef",
 		"geojsonAreaCenterPoints": "#b8cf5b",
+		"geojsonMovement": "#D0031E",
 		"entityColors": {
 			"stratigraphic_unit": "#9723c1",
 			"place": "#69c0ef",
