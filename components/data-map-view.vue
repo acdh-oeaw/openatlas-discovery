@@ -204,18 +204,26 @@ watchEffect(() => {
 				project.fullscreen ? 'absolute z-10 flex w-full justify-center pointer-events-none' : ''
 			"
 		>
-			<SearchForm
-				:class="
-					project.fullscreen
-						? 'bg-white/90 dark:bg-neutral-900 max-w-[800px] w-full mt-2 rounded-md p-6 shadow-md pointer-events-auto'
-						: ''
-				"
-				:category="searchFilters.category"
-				:search="searchFilters.search"
-				@submit="onChangeSearchFilters"
-			/>
+			<div class="hidden lg:inline">
+				<SearchForm
+					:class="
+						project.fullscreen
+							? 'bg-white/90 dark:bg-neutral-900 max-w-[800px] w-full mt-2 rounded-md p-6 shadow-md pointer-events-auto'
+							: ''
+					"
+					:category="searchFilters.category"
+					:search="searchFilters.search"
+					@submit="onChangeSearchFilters"
+				/>
+			</div>
+			<div class="pointer-events-auto lg:hidden">
+				<MobileSearchForm
+					:category="searchFilters.category"
+					:search="searchFilters.search"
+					@submit="onChangeSearchFilters"
+				/>
+			</div>
 		</div>
-
 		<VisualisationContainer
 			v-slot="{ height, width }"
 			class="border"

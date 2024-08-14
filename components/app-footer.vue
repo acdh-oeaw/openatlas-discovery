@@ -17,7 +17,7 @@ const links = computed(() => {
 
 <template>
 	<footer class="border-t opacity-80">
-		<div class="container grid gap-4 py-6 text-sm sm:grid-cols-3 sm:items-center">
+		<div class="container grid grid-cols-2 gap-4 py-6 text-sm sm:items-center">
 			<div class="sm:justify-self-start">
 				<I18nT keypath="AppFooter.with-love">
 					<HeartIcon class="inline-flex size-5" />
@@ -30,7 +30,7 @@ const links = computed(() => {
 				</I18nT>
 			</div>
 
-			<nav :aria-label="t('AppFooter.navigation-secondary')" class="sm:justify-self-center">
+			<nav :aria-label="t('AppFooter.navigation-secondary')" class="ml-auto sm:justify-self-center">
 				<ul class="flex items-center gap-6" role="list">
 					<li v-for="(link, key) of links" :key="key">
 						<NavLink

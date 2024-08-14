@@ -3,25 +3,15 @@ title: About the project
 navigation:
   title: About the project
 ---
-Elit anim cillum labore tempor Lorem irure voluptate qui nisi. Nostrud ut incididunt sint laborum ad
-est enim do qui. Occaecat labore ea adipisicing est esse enim amet irure non. Non ex et magna elit
-consequat cupidatat. Officia velit aute voluptate velit minim ullamco. Enim laboris irure sunt
-aliquip reprehenderit consequat cillum labore eiusmod ad cupidatat aliqua consectetur magna.
 
-Eiusmod excepteur amet id aliqua nostrud fugiat excepteur laboris elit nulla sunt adipisicing. Magna
-officia eu voluptate ad amet enim laboris laborum. Ut occaecat exercitation cillum ullamco veniam
-consequat ea Lorem veniam. Tempor officia pariatur est tempor aliquip exercitation reprehenderit
-aliquip cillum in enim pariatur amet. Duis anim cupidatat nulla tempor commodo magna pariatur
-laboris irure.
+THANADOS (The Anthropological and Archaeological Database of Sepultures) deals with the digital
+collection and presentation of Early Medieval cemeteries in the area of present day Austria.
 
-Velit irure eu voluptate ipsum nulla incididunt. Consectetur veniam irure minim ea sint proident
-minim nisi commodo culpa dolore ex. Cillum nostrud voluptate commodo tempor ut consectetur. Dolor
-cillum esse nostrud eu veniam pariatur eiusmod eiusmod enim aliquip Lorem aliqua nulla exercitation.
-Exercitation non fugiat ea dolore nulla. Sunt esse eiusmod qui ea. Ipsum dolore non cupidatat velit
-commodo et pariatur.
+Within THANADOS hitherto published information on Early Medieval burials was digitized and
+translated to English language. The data are mapped using the CIDOC CRM and provided online. The
+information can be explored via a digital catalogue and within an interactive map. Cartographic
+visualisations as well as charts and plots are created dynamically based on real archaeological
+research data.
 
-Ea reprehenderit Lorem cillum exercitation id est officia culpa irure ipsum fugiat tempor ullamco.
-Elit tempor labore occaecat culpa do tempor tempor. Eiusmod anim esse tempor deserunt deserunt aute
-aliquip eu cupidatat ad qui incididunt mollit est. Nisi ad nisi pariatur voluptate irure minim culpa
-voluptate aliqua et. Velit magna consequat incididunt dolor nulla consectetur sunt pariatur enim
-laborum culpa deserunt.
+It aims at providing a best practice way on how to disseminate archaeological sources and research
+in the 21st century against the background of digital humanities.

@@ -3,25 +3,15 @@ title: Über das Projekt
 navigation:
   title: Über das Projekt
 ---
-Elit anim cillum labore tempor Lorem irure voluptate qui nisi. Nostrud ut incididunt sint laborum ad
-est enim do qui. Occaecat labore ea adipisicing est esse enim amet irure non. Non ex et magna elit
-consequat cupidatat. Officia velit aute voluptate velit minim ullamco. Enim laboris irure sunt
-aliquip reprehenderit consequat cillum labore eiusmod ad cupidatat aliqua consectetur magna.
 
-Eiusmod excepteur amet id aliqua nostrud fugiat excepteur laboris elit nulla sunt adipisicing. Magna
-officia eu voluptate ad amet enim laboris laborum. Ut occaecat exercitation cillum ullamco veniam
-consequat ea Lorem veniam. Tempor officia pariatur est tempor aliquip exercitation reprehenderit
-aliquip cillum in enim pariatur amet. Duis anim cupidatat nulla tempor commodo magna pariatur
-laboris irure.
+THANADOS (Die Anthropologische und Archäologische Datenbank von Sepulturen) beschäftigt sich mit der
+digitalen Sammlung und Darstellung frühmittelalterlicher Friedhöfe im heutigen Österreich.
 
-Velit irure eu voluptate ipsum nulla incididunt. Consectetur veniam irure minim ea sint proident
-minim nisi commodo culpa dolore ex. Cillum nostrud voluptate commodo tempor ut consectetur. Dolor
-cillum esse nostrud eu veniam pariatur eiusmod eiusmod enim aliquip Lorem aliqua nulla exercitation.
-Exercitation non fugiat ea dolore nulla. Sunt esse eiusmod qui ea. Ipsum dolore non cupidatat velit
-commodo et pariatur.
+Innerhalb von THANADOS wurden bisher veröffentlichte Informationen zu frühmittelalterlichen
+Bestattungen digitalisiert und ins Englische übersetzt. Die Daten werden unter Verwendung des CIDOC
+CRM kartiert und online bereitgestellt. Die Informationen können über einen digitalen Katalog und
+eine interaktive Karte erkundet werden. Kartografische Visualisierungen sowie Diagramme und Grafiken
+werden dynamisch auf Basis realer archäologischer Forschungsdaten erstellt.
 
-Ea reprehenderit Lorem cillum exercitation id est officia culpa irure ipsum fugiat tempor ullamco.
-Elit tempor labore occaecat culpa do tempor tempor. Eiusmod anim esse tempor deserunt deserunt aute
-aliquip eu cupidatat ad qui incididunt mollit est. Nisi ad nisi pariatur voluptate irure minim culpa
-voluptate aliqua et. Velit magna consequat incididunt dolor nulla consectetur sunt pariatur enim
-laborum culpa deserunt.
+Ziel ist es, einen Best-Practice-Ansatz zur Verbreitung archäologischer Quellen und Forschung im 21.
+Jahrhundert im Kontext der digitalen Geisteswissenschaften zu bieten.
