@@ -80,7 +80,7 @@ export default defineNuxtConfig({
 		},
 		langDir: "messages",
 		locales: files,
-		strategy: "prefix",
+		strategy: "prefix_except_default",
 	},
 	imports: {
 		dirs: ["@/config/"],
