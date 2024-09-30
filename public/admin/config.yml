@@ -335,7 +335,7 @@ collections:
     label: System pages
     label_singular: System page
     i18n: true
-    folder: content/system-pages
+    folder: content/system-pages/de
     create: false
     delete: false
     fields:
@@ -397,7 +397,7 @@ collections:
     label: Pages
     label_singular: Page
     i18n: true
-    folder: content/pages
+    folder: content/pages/de
     create: true
     delete: true
     fields:
@@ -442,7 +442,7 @@ collections:
     label: Team
     label_singular: Team member
     i18n: true
-    folder: content/team
+    folder: content/team/de
     media_folder: /public/assets/images/team
     public_folder: /assets/images/team
     identifier_field: lastName
