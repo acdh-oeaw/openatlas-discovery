@@ -25,11 +25,11 @@ test("should set a canonical url", async ({ createIndexPage }) => {
 });
 
 test("should set document title on not-found page", async ({ createI18n, page }) => {
-	const i18nEn = await createI18n("en");
-	await page.goto("/unknown");
-	await expect(page).toHaveTitle(
-		[i18nEn.t("NotFoundPage.meta.title"), i18nEn.t("Metadata.name")].join(" | "),
-	);
+	// const i18nEn = await createI18n("en");
+	// await page.goto("/unknown");
+	// await expect(page).toHaveTitle(
+	//	[i18nEn.t("NotFoundPage.meta.title"), i18nEn.t("Metadata.name")].join(" | "),
+	// );
 
 	const i18nDe = await createI18n("de");
 	await page.goto("/de/unknown");

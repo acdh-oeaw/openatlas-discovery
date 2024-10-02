@@ -127,6 +127,7 @@ async function writeCrmMessages(obj: object, locale: string) {
 		encoding: "utf-8",
 	});
 }
+
 /**
  * Generates CRM messages for the specified locale.
  * @param locale - The locale for which to generate CRM messages. Defaults to `defaultLocale` if not provided.

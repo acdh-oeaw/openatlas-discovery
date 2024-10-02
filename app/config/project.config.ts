@@ -49,7 +49,7 @@ const schema = v.object({
 	network: v.object({
 		excludeSystemClasses: v.array(v.string()),
 	}),
-	defaultLocale: v.picklist(["de", "en"]),
+	defaultLocale: v.picklist(["de"]),
 	footer: v.object({
 		partner_logos: v.array(
 			v.object({
