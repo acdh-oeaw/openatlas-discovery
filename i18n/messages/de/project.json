@@ -1,8 +1,8 @@
 {
 	"__cms__": true,
 	"Metadata": {
-		"name": "OpenAtlas Discovery",
-		"shortName": "OpenAtlas Discovery",
-		"description": "OpenAtlas ist eine Open-Source-Datenbanksoftware, die speziell für die Erfassung, Bearbeitung und Verwaltung von Forschungsdaten aus verschiedenen Bereichen der Geisteswissenschaften entwickelt wurde."
+		"name": "FemCare Vienna",
+		"shortName": "FemCare Vienna",
+		"description": "Das Projekt **FemCare Vienna** (FWF-Einzelstipendium P 36459-G) hat das Ziel, die Geschichte der medizinischen Betreuung von Frauen durch eine interdisziplinäre Untersuchung der historischen und bioarchäologischen Aufzeichnungen im Zusammenhang mit dem Krankenhaus der Elisabethianer in Wien aufzuklären. Im Mittelpunkt des Projekts stehen die Lebensgeschichten von 390 Patienten aus dem 18. Jahrhundert, deren menschliche Skelettreste auf dem Krankenhausfriedhof ausgegraben wurden."
 	}
 }
