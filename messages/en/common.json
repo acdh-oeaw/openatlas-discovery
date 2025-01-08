@@ -65,7 +65,7 @@
 		"no-descriptions": "No descriptions available."
 	},
 	"EntityPage": {
-		"details": "Details",
+		"details": "Further Information",
 		"iiif": "IIIF-Viewer",
 		"images": "Images ({count})",
 		"map": "Map",

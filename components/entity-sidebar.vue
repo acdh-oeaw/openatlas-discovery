@@ -59,7 +59,7 @@ const updateHandledRelations = (relations: Array<RelationType>) => {
 				<EntityDetails
 					:handled-relations="handledRelations"
 					:relations="entity.relations"
-					class="mx-4 mt-16"
+					class="mx-6 mb-4 rounded-md border px-4 py-3 text-sm"
 				/>
 			</Card>
 			<summary

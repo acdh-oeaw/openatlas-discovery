@@ -65,7 +65,7 @@
 		"no-descriptions": "Keine Beschreibungen verfügbar."
 	},
 	"EntityPage": {
-		"details": "Details",
+		"details": "Weitere Informationen",
 		"iiif": "IIIF-Ansicht",
 		"images": "Bilder ({count})",
 		"map": "Karte",

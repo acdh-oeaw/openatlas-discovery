@@ -48,6 +48,7 @@ const customPrimaryDetails = computed(() => {
 const entityPrimaryDetailsDict: Record<string, Component> = {
 	person: CustomPrimaryDetailsActor,
 	group: CustomPrimaryDetailsActor,
+	place: CustomPrimaryDetailsPlace,
 	stratigraphic_unit: CustomPrimaryDetailsPlace,
 	feature: CustomPrimaryDetailsFeature,
 };
@@ -170,14 +171,14 @@ function copyEntity() {
 				/>
 			</div>
 
+			<EntityImages v-if="images" :images="images" class="overflow-hidden" />
+
 			<component
 				:is="customPrimaryDetails"
 				v-if="customPrimaryDetails"
 				:entity="entity"
 				@handled-relations="emitHandledRelations"
 			/>
-
-			<EntityImages v-if="images" :images="images" class="overflow-hidden" />
 		</div>
 	</CardContent>
 </template>
