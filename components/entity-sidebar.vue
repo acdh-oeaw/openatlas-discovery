@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-vue-next";
 
+import RelationListEntry from "./relation-list-entry.vue";
+
 const t = useTranslations();
 
 const props = defineProps<{
@@ -45,18 +47,19 @@ const updateHandledRelations = (relations: Array<RelationType>) => {
 		<details
 			:class="
 				props.noTableSidebar
-					? 'group z-10 mb-2 mr-2 h-full translate-x-[-25vw] transition-transform duration-300 open:translate-x-0 absolute w-1/4'
-					: 'group z-10 mb-2 mr-2 h-full translate-x-[-25vw] transition-transform duration-300 open:translate-x-0'
+					? 'group grid h-full z-10 mb-2 mr-2 translate-x-[-25vw] transition-transform duration-300 open:translate-x-0 absolute w-1/4'
+					: 'group grid h-full z-10 mb-2 mr-2 translate-x-[-25vw] transition-transform duration-300 open:translate-x-0'
 			"
 			:open="openState"
 		>
-			<Card class="relative h-full overflow-y-scroll">
+			<Card class="relative h-full max-h-full">
 				<EntityPrimaryDetails :entity="entity" @handled-relations="updateHandledRelations" />
 
 				<slot name="custom-details" />
 				<!-- <component v-if="hasCustomDetails" v-bind:is="entityDetailsDict" bind:entity-data /> -->
 
 				<EntityDetails
+					v-if="entity.relations && entity.relations?.length > 0"
 					:handled-relations="handledRelations"
 					:relations="entity.relations"
 					class="mx-6 mb-4 rounded-md border px-4 py-3 text-sm"

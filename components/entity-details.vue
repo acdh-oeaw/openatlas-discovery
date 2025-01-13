@@ -3,8 +3,6 @@ import { groupByToMap } from "@acdh-oeaw/lib";
 
 import { useIdPrefix } from "@/composables/use-id-prefix";
 
-import CardContent from "./ui/card/CardContent.vue";
-
 const { getUnprefixedId } = useIdPrefix();
 
 const t = useTranslations();
@@ -50,7 +48,7 @@ const currentMode = computed(() => {
 </script>
 
 <template>
-	<div>
+	<div v-if="relationsByType.values.length > 0">
 		<h1 class="pb-2 font-semibold leading-none tracking-tight">{{ t("EntityPage.details") }}</h1>
 		<dl
 			class="grid gap-x-8 gap-y-4 sm:grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] sm:justify-start"

@@ -8,7 +8,6 @@ const { getUnprefixedId } = useIdPrefix();
 
 <template v-if="relations?.length">
 	<div class="space-x-4 px-4"></div>
-	{{ title }}
 	<RelationListEntry
 		v-for="relation in relations"
 		:key="getUnprefixedId(relation.relationTo ? relation.relationTo : '')"

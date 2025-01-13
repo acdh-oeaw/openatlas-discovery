@@ -6,6 +6,7 @@ import {
 	ShapesIcon,
 	TextIcon,
 	UserIcon,
+	UsersIcon,
 } from "lucide-vue-next";
 
 type Icon = typeof CalendarFoldIcon;
@@ -24,7 +25,7 @@ const icons: Record<string, Icon> = {
 	feature: MapPinIcon,
 	file: TextIcon,
 	find: MapPinIcon,
-	group: UserIcon,
+	group: UsersIcon,
 	human_remains: BoneIcon,
 	move: CalendarFoldIcon,
 	object_location: MapPinIcon,
