@@ -42,12 +42,14 @@ onMounted(() => {
 </script>
 
 <template>
-	<GroupedRelationCollapsible
-		v-for="rel in collapsibleRelations"
-		:key="rel.relationType.crmCode + rel.relationType.inverse"
-		:title="rel.title"
-		:relations="entity.relations"
-		:system-class="rel.systemClass"
-		:relation-type="rel.relationType"
-	/>
+	<div class="flex w-full grow basis-1/2 gap-4">
+		<GroupedRelationCollapsible
+			v-for="rel in collapsibleRelations"
+			:key="rel.relationType.crmCode + rel.relationType.inverse"
+			:title="rel.title"
+			:relations="entity.relations"
+			:system-class="rel.systemClass"
+			:relation-type="rel.relationType"
+		/>
+	</div>
 </template>

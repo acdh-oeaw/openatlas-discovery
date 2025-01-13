@@ -2,7 +2,7 @@
 const { getUnprefixedId } = useIdPrefix();
 const route = useRoute();
 
-defineProps<{ relation: NonNullable<EntityFeature["relations"]>[0] }>();
+defineProps<{ type?: string; relation: NonNullable<EntityFeature["relations"]>[0] }>();
 
 function getPath() {
 	if (route.path.includes("visualization")) {
@@ -11,13 +11,15 @@ function getPath() {
 	return "";
 }
 
+const t = useTranslations();
+
 const currentMode = computed(() => {
 	return route.query.mode;
 });
 </script>
 
 <template>
-	<div class="flex justify-between">
+	<div class="grid grid-cols-[auto_1fr] items-center justify-between gap-2">
 		<div>
 			<Component
 				:is="getEntityIcon(relation.relationSystemClass)"
@@ -33,10 +35,8 @@ const currentMode = computed(() => {
 			>
 				{{ relation.label }}
 			</NavLink>
-			<!-- <EntityPreviewLink :id="useToNumber(getUnprefixedId(relation.relationTo ?? '')).value" as-child>
-				{{ relation.label }}
-			</EntityPreviewLink> -->
 		</div>
+		<span class="text-xs text-muted-foreground">{{ type ? type : t("EntityPage.noType") }}</span>
 		<SimpleTimespan class="ml-4" :timespans="relation.when?.timespans" />
 	</div>
 </template>

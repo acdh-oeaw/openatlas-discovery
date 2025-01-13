@@ -66,6 +66,7 @@
 	},
 	"EntityPage": {
 		"details": "Further Information",
+		"noType": "No Type",
 		"iiif": "IIIF-Viewer",
 		"images": "Images ({count})",
 		"map": "Map",

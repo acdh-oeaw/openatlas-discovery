@@ -29,6 +29,9 @@ importers:
       '@nuxtjs/mdc':
         specifier: ^0.8.2
         version: 0.8.2(magicast@0.3.4)(rollup@4.18.0)
+      '@radix-icons/vue':
+        specifier: ^1.0.0
+        version: 1.0.0(vue@3.4.30(typescript@5.5.2))
       '@stefanprobst/netlify-cms-oauth-client':
         specifier: ^0.4.0
         version: 0.4.0
@@ -1592,6 +1595,11 @@ packages:
 
   '@protobufjs/utf8@1.1.0':
     resolution: {integrity: sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==}
+
+  '@radix-icons/vue@1.0.0':
+    resolution: {integrity: sha512-gKWWk9tTK/laDRRNe5KLLR8A0qUwx4q4+DN8Fq48hJ904u78R82ayAO3TrxbNLgyn2D0h6rRiGdLzQWj7rPcvA==}
+    peerDependencies:
+      vue: '>= 3'
 
   '@react-aria/live-announcer@3.3.4':
     resolution: {integrity: sha512-w8lxs35QrRrn6pBNzVfyGOeqWdxeVKf9U6bXIVwhq7rrTqRULL8jqy8RJIMfIs1s8G5FpwWYjyBOjl2g5Cu1iA==}
@@ -9455,6 +9463,10 @@ snapshots:
   '@protobufjs/pool@1.1.0': {}
 
   '@protobufjs/utf8@1.1.0': {}
+
+  '@radix-icons/vue@1.0.0(vue@3.4.30(typescript@5.5.2))':
+    dependencies:
+      vue: 3.4.30(typescript@5.5.2)
 
   '@react-aria/live-announcer@3.3.4':
     dependencies:
