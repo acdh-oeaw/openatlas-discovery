@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-vue-next";
 
-import RelationListEntry from "./relation-list-entry.vue";
-
 const t = useTranslations();
 
 const props = defineProps<{
@@ -52,7 +50,9 @@ const updateHandledRelations = (relations: Array<RelationType>) => {
 			"
 			:open="openState"
 		>
-			<Card class="relative h-full max-h-full">
+			<div
+				class="relative h-full max-h-full overflow-y-auto rounded-lg border bg-card text-card-foreground shadow"
+			>
 				<EntityPrimaryDetails :entity="entity" @handled-relations="updateHandledRelations" />
 
 				<slot name="custom-details" />
@@ -64,7 +64,7 @@ const updateHandledRelations = (relations: Array<RelationType>) => {
 					:relations="entity.relations"
 					class="mx-6 mb-4 rounded-md border px-4 py-3 text-sm"
 				/>
-			</Card>
+			</div>
 			<summary
 				class="absolute left-full top-1/2 block -translate-x-2 rounded-md bg-[hsl(var(--card))] py-2 pl-1 shadow-md"
 				style="top: calc(50% - 40px)"

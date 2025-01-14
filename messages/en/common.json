@@ -150,6 +150,7 @@
 		"CurrentOrFormerResidency": "Residency"
 	},
 	"Relations": {
+		"Features": "Features",
 		"Artifacts": "Artifacts",
 		"HumanRemains": "Human Remains"
 	},

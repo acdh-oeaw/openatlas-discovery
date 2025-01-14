@@ -171,6 +171,8 @@ watch(data, () => {
 	popover.value = null;
 });
 
+const selectionCoordinates = ref<[number, number] | undefined>(undefined);
+
 watchEffect(() => {
 	if (mode.value && selection.value) {
 		const entity = entities.value.find((feature) => {
@@ -179,22 +181,20 @@ watchEffect(() => {
 		});
 
 		if (entity) {
-			let coordinates = null;
-
 			if (entity.geometry.type === "GeometryCollection") {
-				coordinates = entity.geometry.geometries.find((g) => {
+				selectionCoordinates.value = entity.geometry.geometries.find((g) => {
 					return g.type === "Point";
 				})?.coordinates as [number, number] | undefined;
 			}
 
 			if (entity.geometry.type === "Point") {
-				coordinates = entity.geometry.coordinates as unknown as [number, number];
+				selectionCoordinates.value = entity.geometry.coordinates as unknown as [number, number];
 			}
 
+			if (selectionCoordinates.value === undefined) return;
+
 			popover.value = {
-				coordinates:
-					coordinates ??
-					(turf.center(createFeatureCollection([entity])).geometry.coordinates as [number, number]),
+				coordinates: selectionCoordinates.value,
 				entities: [entity],
 			};
 		}
@@ -260,6 +260,7 @@ watchEffect(() => {
 				:height="height"
 				:width="width"
 				:has-polygons="show"
+				:current-selection="selectionCoordinates"
 				@layer-click="onLayerClick"
 			>
 				<GeoMapPopup

@@ -17,6 +17,7 @@ const props = defineProps<{
 	relations: EntityFeature["relations"];
 	relationType: RelationType;
 	systemClass?: string;
+	showOnMap: boolean;
 }>();
 type Relations = Array<NonNullable<EntityFeature["relations"]>[0]>;
 
@@ -78,16 +79,17 @@ const groupedByType = computed(() => {
 					<AccordionTrigger class="grid grid-cols-[auto_1fr] place-items-end">
 						<h4 class="text-sm font-semibold">
 							{{ title }}
-							{{
-								filteredRelations?.length
-									? `(${filteredRelations.length})`
-									: ""
-							}}
+							{{ filteredRelations?.length ? `(${filteredRelations.length})` : "" }}
 						</h4>
 					</AccordionTrigger>
 					<AccordionContent>
 						<template v-for="[type, rels] in groupedByType" :key="type">
-							<RelationCollapsible class="mb-8" :title="type ?? ''" :relations="rels" />
+							<RelationCollapsible
+								class="mb-8"
+								:title="type ?? ''"
+								:relations="rels"
+								:show-icon="props.showOnMap"
+							/>
 						</template>
 					</AccordionContent>
 				</AccordionItem>

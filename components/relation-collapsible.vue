@@ -2,6 +2,7 @@
 defineProps<{
 	title: string;
 	relations: Array<NonNullable<EntityFeature["relations"]>[0]>;
+	showIcon: boolean;
 }>();
 const { getUnprefixedId } = useIdPrefix();
 </script>
@@ -13,5 +14,6 @@ const { getUnprefixedId } = useIdPrefix();
 		:key="getUnprefixedId(relation.relationTo ? relation.relationTo : '')"
 		:relation="relation"
 		:type="title"
+		:show-icon="showIcon"
 	/>
 </template>

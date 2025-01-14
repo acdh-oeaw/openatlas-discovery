@@ -22,6 +22,7 @@ const props = defineProps<{
 	height: number;
 	width: number;
 	hasPolygons?: boolean;
+	currentSelection?: [number, number];
 }>();
 
 const emit = defineEmits<{
@@ -177,6 +178,14 @@ function dispose() {
 	context.map?.remove();
 }
 
+watch(
+	() => {
+		return props.currentSelection;
+	},
+	zoomToSelection,
+	{ immediate: true },
+);
+
 watch(() => {
 	return props.features;
 }, updateScope);
@@ -242,6 +251,13 @@ function updatePolygons() {
 	}
 	if (!props.hasPolygons && context.map.getLayer("polygons")) {
 		context.map.removeLayer("polygons");
+	}
+}
+
+function zoomToSelection() {
+	console.log(props.currentSelection);
+	if (props.currentSelection) {
+		context.map?.flyTo({ center: props.currentSelection });
 	}
 }
 

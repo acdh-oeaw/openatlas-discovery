@@ -1,8 +1,14 @@
 <script lang="ts" setup>
+import { MapPinXIcon } from "lucide-vue-next";
+
 const { getUnprefixedId } = useIdPrefix();
 const route = useRoute();
 
-defineProps<{ type?: string; relation: NonNullable<EntityFeature["relations"]>[0] }>();
+defineProps<{
+	showIcon: boolean;
+	type?: string;
+	relation: NonNullable<EntityFeature["relations"]>[0];
+}>();
 
 function getPath() {
 	if (route.path.includes("visualization")) {
@@ -60,6 +66,12 @@ function hasValidTimespans(timespans: Array<any> | null | undefined): boolean {
 
 		<template v-if="hasValidTimespans(relation.when?.timespans)">
 			<SimpleTimespan class="text-xs" :timespans="relation.when?.timespans" />
+		</template>
+		<template v-if="showIcon">
+			<Button variant="outline">
+				<span class="text-xs font-normal">Show on Map</span>
+				<!--<SvgoShowOnMap :fill="brand"/>  -->
+			</Button>
 		</template>
 	</div>
 </template>

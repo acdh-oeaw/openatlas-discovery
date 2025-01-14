@@ -19,3 +19,5 @@ export interface LinkedPlace extends LinkedPlacesModel {
 }
 
 export type NetworkEntity = components["schemas"]["NetworkVisualisationModel"]["results"];
+
+export type GetLinkedEntitiesResponse = components["schemas"]["EntitiesOutputModel"]["results"];
