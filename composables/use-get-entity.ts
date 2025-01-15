@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/vue-query";
 
-import { type EntityFeature, useCreateEntity } from "@/composables/use-create-entity";
+import { useCreateEntity } from "@/composables/use-create-entity";
 import { useCreateLinkedEntities } from "@/composables/use-create-linked-entities";
 import type { operations } from "@/lib/api-client/api";
-import type { LinkedPlace } from "@/types/api";
+import type { ExtendedEntities, LinkedPlace } from "@/types/api";
 
 export interface GetEntityParams
 	extends NonNullable<operations["GetEntity"]["parameters"]["path"]> {}
@@ -47,7 +47,8 @@ export function useGetEntity(params: MaybeRef<GetEntityParams>) {
 						query: {
 							format: "lpx",
 							centroid: true,
-							show: ["types"],
+							show: ["types", "geometry"],
+							limit: 0,
 						},
 					},
 					signal,
@@ -61,13 +62,17 @@ export function useGetEntity(params: MaybeRef<GetEntityParams>) {
 				}),
 			);
 
-			console.log("Entity", entity);
-
 			if (entity.features[0] != null) {
-				entity.features[0].relations = [...(entity.features[0].relations ?? []), ...linkedEntities];
+				const mergedRelations = entity.features[0].relations?.map((feature) => {
+					return {
+						...feature,
+						...linkedEntities.find((entity) => {
+							return entity["@id"] === feature.relationTo;
+						}),
+					};
+				});
+				entity.features[0].relations = mergedRelations;
 			}
-
-			console.log("LinkedEntites", linkedEntities);
 			console.log("Entity with relations:", entity.features);
 			return entity;
 		},

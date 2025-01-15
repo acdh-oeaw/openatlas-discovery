@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { MapPinXIcon } from "lucide-vue-next";
-
 const { getUnprefixedId } = useIdPrefix();
 const route = useRoute();
 
-defineProps<{
+const t = useTranslations();
+
+const props = defineProps<{
 	showIcon: boolean;
 	type?: string;
 	relation: NonNullable<EntityFeature["relations"]>[0];
@@ -38,6 +38,15 @@ function hasValidTimespans(timespans: Array<any> | null | undefined): boolean {
 		);
 	});
 }
+
+const centroid = computed(() => {
+	if (props.relation.geometry.type === "GeometryCollection") {
+		return props.relation.geometry.geometries.find((a) => {
+			return a.shapeType === "centerpoint";
+		});
+	}
+	return undefined;
+});
 </script>
 
 <template>
@@ -56,7 +65,7 @@ function hasValidTimespans(timespans: Array<any> | null | undefined): boolean {
 						query: { mode: currentMode, selection: getUnprefixedId(relation.relationTo ?? '') },
 					}"
 				>
-					{{ relation.label }}
+					{{ relation.properties.title }}
 				</NavLink>
 				<template v-if="type != null">
 					<span class="text-xs text-muted-foreground">{{ type }}</span>
@@ -68,9 +77,8 @@ function hasValidTimespans(timespans: Array<any> | null | undefined): boolean {
 			<SimpleTimespan class="text-xs" :timespans="relation.when?.timespans" />
 		</template>
 		<template v-if="showIcon">
-			<Button variant="outline">
-				<span class="text-xs font-normal">Show on Map</span>
-				<!--<SvgoShowOnMap :fill="brand"/>  -->
+			<Button :disabled="centroid === undefined" variant="outline">
+				<span class="text-xs font-normal">{{ t("EntityPage.showOnMap") }}</span>
 			</Button>
 		</template>
 	</div>

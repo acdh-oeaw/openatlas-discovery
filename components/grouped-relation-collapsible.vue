@@ -37,7 +37,7 @@ watch(
 );
 
 computed(() => {
-	return props.relations?.reduce(
+	return props.relations.reduce(
 		(acc: Array<NonNullable<EntityFeature["relations"]>[0]>, relation) => {
 			const { crmCode, inverse } =
 				extractRelationTypeFromRelationString(relation.relationType) ?? {};
@@ -66,7 +66,7 @@ computed(() => {
 
 const groupedByType = computed(() => {
 	return groupByToMap(filteredRelations.value, (rel): string | null | undefined => {
-		return rel.type;
+		return rel.types ? rel.types[0]?.label : null;
 	});
 });
 </script>
