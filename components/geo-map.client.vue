@@ -254,10 +254,9 @@ function updatePolygons() {
 	}
 }
 
-function zoomToSelection() {
-	console.log(props.currentSelection);
-	if (props.currentSelection) {
-		context.map?.flyTo({ center: props.currentSelection });
+function zoomToSelection(selection: [number, number] | undefined) {
+	if (selection) {
+		context.map?.flyTo({ center: selection });
 	}
 }
 

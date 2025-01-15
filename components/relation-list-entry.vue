@@ -1,8 +1,10 @@
 <script lang="ts" setup>
 const { getUnprefixedId } = useIdPrefix();
-const route = useRoute();
 
 const t = useTranslations();
+
+const route = useRoute();
+const router = useRouter();
 
 const props = defineProps<{
 	showIcon: boolean;
@@ -15,6 +17,10 @@ function getPath() {
 		return "visualization";
 	}
 	return "";
+}
+
+function setShowOnMap() {
+	void router.push({ query: { ...route.query, detail: getUnprefixedId(props.relation["@id"]) } });
 }
 
 const currentMode = computed(() => {
@@ -77,7 +83,7 @@ const centroid = computed(() => {
 			<SimpleTimespan class="text-xs" :timespans="relation.when?.timespans" />
 		</template>
 		<template v-if="showIcon">
-			<Button :disabled="centroid === undefined" variant="outline">
+			<Button :disabled="centroid === undefined" variant="outline" @click="setShowOnMap()">
 				<span class="text-xs font-normal">{{ t("EntityPage.showOnMap") }}</span>
 			</Button>
 		</template>
