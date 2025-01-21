@@ -12,10 +12,13 @@ const props = defineProps<{
 	relations: EntityFeature["relations"];
 	handledRelations: Array<RelationType>;
 }>();
+console.log(props.handledRelations);
+const redundantSystemClasses = ["source"];
 
 const filteredRelations = computed(() => {
 	return props.relations?.filter((relation) => {
 		if (props.handledRelations.length === 0) return true;
+		if (redundantSystemClasses.includes(relation.systemClass)) return false;
 		return !props.handledRelations.some((handledRelation) => {
 			const relationType = extractRelationTypeFromRelationString(relation.relationType);
 			if (!relationType) return false;

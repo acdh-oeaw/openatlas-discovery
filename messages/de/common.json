@@ -153,7 +153,8 @@
 	"Relations": {
 		"Features": "Features",
 		"Artifacts": "Artefakte",
-		"HumanRemains": "Menschliche Überreste"
+		"HumanRemains": "Menschliche Überreste",
+		"Sources": "Quellen"
 	},
 	"SearchForm": {
 		"filter": "Filter",

@@ -39,6 +39,16 @@ const collapsibleRelations: Array<{
 		fullWidth: false,
 		showOnMap: false,
 	},
+	{
+		relationType: {
+			crmCode: "P67",
+			inverse: true,
+		},
+		systemClass: "source",
+		title: t("Relations.Sources"),
+		fullWidth: true,
+		showOnMap: false,
+	},
 ];
 
 const emit = defineEmits({
@@ -59,7 +69,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="w-full gap-4">
+	<div class="flex w-full flex-col gap-4">
 		<GroupedRelationCollapsible
 			v-for="rel in collapsibleRelations.filter((a) => a.fullWidth === true)"
 			:key="rel.relationType.crmCode + rel.relationType.inverse"

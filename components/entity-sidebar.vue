@@ -51,7 +51,7 @@ const updateHandledRelations = (relations: Array<RelationType>) => {
 			:open="openState"
 		>
 			<div
-				class="relative h-full max-h-full overflow-y-auto rounded-lg border bg-card text-card-foreground shadow"
+				class="relative h-full max-h-full overflow-y-auto rounded-lg border bg-card px-6 py-4 text-card-foreground shadow"
 			>
 				<EntityPrimaryDetails :entity="entity" @handled-relations="updateHandledRelations" />
 
@@ -62,7 +62,7 @@ const updateHandledRelations = (relations: Array<RelationType>) => {
 					v-if="entity.relations && entity.relations?.length > 0"
 					:handled-relations="handledRelations"
 					:relations="entity.relations"
-					class="mx-6 mb-4 rounded-md border px-4 py-3 text-sm"
+					class="rounded-md border px-4 py-3 text-sm"
 				/>
 			</div>
 			<summary
