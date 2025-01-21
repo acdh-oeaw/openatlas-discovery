@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Graph from "graphology";
+import { useTemplateRef } from "vue";
 
 import { networkConfig } from "@/config/network-visualisation.config";
 import type { NetworkEntity } from "@/types/api";
@@ -58,12 +59,27 @@ function getNodeColor(nodeClass: string) {
 	//@ts-expect-error: no error occurs
 	return entityColors[nodeClass] ?? defaultColor;
 }
+
+const networkRef = useTemplateRef("networkClient");
+function emitNetworkControls(args: string) {
+	if (networkRef.value) networkRef.value.handleNetworkControls(args);
+}
+
+const layoutIsRunning = computed(() => {
+	return networkRef.value?.isRunning;
+});
+
+defineExpose({
+	emitNetworkControls,
+	layoutIsRunning,
+});
 </script>
 
 <template>
 	<div class="absolute z-10 m-3 flex w-full"></div>
 	<Network
 		v-if="graph.size > 0"
+		ref="networkClient"
 		:graph="graph"
 		:search-node="props.searchNode"
 		:detail-node="props.detailNode"

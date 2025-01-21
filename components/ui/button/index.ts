@@ -14,6 +14,7 @@ export const buttonVariants = variants({
 			ghost: "hover:bg-accent hover:text-accent-foreground",
 			link: "text-primary underline-offset-4 hover:underline",
 			brand: "bg-brand text-brand-foreground shadow hover:bg-brand/90",
+			transparent: "bg-none dark:text-black",
 		},
 		size: {
 			default: "h-9 px-4 py-2",

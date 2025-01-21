@@ -139,7 +139,17 @@
 			"title": "Network Visualization"
 		},
 		"title": "Network Visualization",
-		"work-in-progress": "The database is currently work in progress."
+		"work-in-progress": "The database is currently work in progress.",
+		"controls": {
+			"start": "Pause",
+			"pause": "Play",
+			"zoomIn": "Zoom in",
+			"zoomOut": "Zoom out",
+			"reset-zoom": "Reset zoom",
+			"fullscreen": "Fullscreen",
+			"reset-fullscreen": "Exit fullscreen",
+			"download": "Download network-graph"
+		}
 	},
 	"NotFoundPage": {
 		"meta": {
