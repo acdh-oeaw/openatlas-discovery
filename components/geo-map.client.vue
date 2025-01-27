@@ -292,14 +292,16 @@ function updateMovements() {
 			.map((movement) => {
 				if (movement.geometry.type === "GeometryCollection") {
 					const geometries = movement.geometry.geometries;
-
-					if (geometries.length < 2) {
+					const points = geometries.filter((geometry) => {
+						return geometry.type === "Point";
+					});
+					if (points.length < 2) {
 						console.warn("Invalid geometries or not enough points:", geometries);
 						return null;
 					}
 
-					const startPoint = geometries[0];
-					const endPoint = geometries[1];
+					const startPoint = points[0];
+					const endPoint = points[1];
 
 					if (
 						startPoint?.type === "Point" &&
@@ -308,8 +310,6 @@ function updateMovements() {
 						Array.isArray(endPoint.coordinates)
 					) {
 						// Create a curved line between the two points
-						const arc = drawArc(startPoint.coordinates, endPoint.coordinates);
-						console.log("ARC", arc);
 						return drawArc(startPoint.coordinates, endPoint.coordinates);
 					} else {
 						console.warn("Start or End Point is not valid:", { startPoint, endPoint });
@@ -325,7 +325,6 @@ function updateMovements() {
 			}),
 	};
 
-	console.log(curvedMovements);
 	const sourceMoveLines = context.map.getSource(sourceMoveLinesId) as GeoJSONSource | undefined;
 	sourceMoveLines?.setData(curvedMovements);
 
@@ -357,18 +356,18 @@ function drawArc(start: GeoJSON.Position, end: GeoJSON.Position) {
 		coordinates: [start, end],
 	};
 
-	route = turf.toWgs84(route);
-	const lineD = turf.distance(start, end);
+	route = turf.projection.toWgs84(route);
+	const lineD = turf.distance(
+		route.coordinates[0] as turf.Coord,
+		route.coordinates[1] as turf.Coord,
+		{ units: "kilometers" },
+	);
 	const mp = turf.midpoint(route.coordinates[0] as turf.Coord, route.coordinates[1] as turf.Coord);
 	const center = turf.destination(
 		mp,
 		lineD,
 		turf.bearing(route.coordinates[0] as turf.Coord, route.coordinates[1] as turf.Coord) - 90,
 	);
-
-	console.log("distance", turf.distance(center, route.coordinates[0] as turf.Coord));
-	console.log(turf.bearing(center, route.coordinates[1] as turf.Coord));
-	console.log(turf.bearing(center, route.coordinates[0] as turf.Coord));
 	const lA = turf.lineArc(
 		center,
 		turf.distance(center, route.coordinates[0] as turf.Coord),
@@ -376,7 +375,7 @@ function drawArc(start: GeoJSON.Position, end: GeoJSON.Position) {
 		turf.bearing(center, route.coordinates[0] as turf.Coord),
 	);
 
-	return turf.toMercator(lA);
+	return turf.projection.toMercator(lA);
 }
 
 defineExpose(context);
