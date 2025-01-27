@@ -289,7 +289,7 @@ function updateMovements() {
 	const curvedMovements: GeoJSON.FeatureCollection<GeoJSON.LineString> = {
 		type: "FeatureCollection",
 		features: props.movements
-			.map((movement) => {
+			.flatMap((movement) => {
 				if (movement.geometry.type === "GeometryCollection") {
 					const geometries = movement.geometry.geometries;
 					const points = geometries.filter((geometry) => {
@@ -299,22 +299,20 @@ function updateMovements() {
 						console.warn("Invalid geometries or not enough points:", geometries);
 						return null;
 					}
+					return points.slice(1).map((point, index) => {
+						const startPoint = points[index];
+						const endPoint = point;
 
-					const startPoint = points[0];
-					const endPoint = points[1];
+						if (!startPoint) return null;
 
-					if (
-						startPoint?.type === "Point" &&
-						endPoint?.type === "Point" &&
-						Array.isArray(startPoint.coordinates) &&
-						Array.isArray(endPoint.coordinates)
-					) {
-						// Create a curved line between the two points
-						return drawArc(startPoint.coordinates, endPoint.coordinates);
-					} else {
-						console.warn("Start or End Point is not valid:", { startPoint, endPoint });
-						return null;
-					}
+						if (Array.isArray(startPoint.coordinates) && Array.isArray(endPoint.coordinates)) {
+							// Create a curved line between the two points
+							return drawArc(startPoint.coordinates, endPoint.coordinates);
+						} else {
+							console.warn("Start or End Point is not valid:", { startPoint, endPoint });
+							return null;
+						}
+					});
 				} else {
 					console.warn("Movement is not a GeometryCollection:", movement);
 					return null;
