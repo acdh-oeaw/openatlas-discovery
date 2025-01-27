@@ -2,9 +2,8 @@
 import { noop } from "@acdh-oeaw/lib";
 import { useQuery } from "@tanstack/vue-query";
 
+import { project } from "@/config/project.config";
 import type { SystemPage } from "@/types/content";
-
-import { project } from "../config/project.config";
 
 defineRouteRules({
 	prerender: true,
@@ -12,19 +11,29 @@ defineRouteRules({
 
 const locale = useLocale();
 const t = useTranslations();
+const route = useRoute();
+const router = useRouter();
+
+const env = useRuntimeConfig();
+
+onMounted(() => {
+	if (project.map.startPage) {
+		if (!route.query.mode) {
+			return router.push({ query: { mode: "map" } });
+		}
+		return null;
+	}
+	return null;
+});
 
 definePageMeta({
-	validate() {
-		const env = useRuntimeConfig();
-		return env.public.NUXT_PUBLIC_DATABASE !== "disabled";
-	},
+	layout: project.map.startPage ? "visualization" : "default",
+	middleware: project.map.startPage ? "database-check" : undefined,
 });
 
 usePageMetadata({
 	title: t("IndexPage.meta.title"),
 });
-
-const env = useRuntimeConfig();
 
 const {
 	data: content,
@@ -49,13 +58,17 @@ onServerPrefetch(async () => {
 	 */
 	await suspense().catch(noop);
 });
+
+const currentMode = computed(() => {
+	return route.query.mode;
+});
 </script>
 
 <template>
-	<MainContent class="container grid grid-rows-[auto_1fr] py-8">
+	<MainContent class="grid grid-rows-[auto_1fr]">
 		<div v-if="!project.map.startPage">
 			<template v-if="content != null && content.leadIn != null">
-				<div class="grid place-items-center gap-8 p-8 sm:py-16">
+				<div class="container grid place-items-center gap-8 p-8 sm:py-16">
 					<div>
 						<h1 class="sr-only">{{ content.title }}</h1>
 						<NuxtImg
@@ -86,12 +99,14 @@ onServerPrefetch(async () => {
 						<template #empty></template>
 					</ContentRenderer>
 
-					<div class="flex items-center gap-6">
-						<Button v-for="(link, key) of content.links" :key="key" as-child variant="default">
-							<NavLink :href="link.href">
-								{{ link.label }}
-							</NavLink>
-						</Button>
+					<div v-if="env.public.database === 'enabled'">
+						<div class="flex items-center gap-6">
+							<Button v-for="(link, key) of content.links" :key="key" as-child variant="default">
+								<NavLink :href="link.href">
+									{{ link.label }}
+								</NavLink>
+							</Button>
+						</div>
 					</div>
 				</div>
 			</template>
@@ -117,14 +132,11 @@ onServerPrefetch(async () => {
 			<div>
 				<PageTitle class="sr-only">{{ t("MapPage.title") }}</PageTitle>
 			</div>
-			<template v-if="env.public.NUXT_PUBLIC_DATABASE !== 'disabled'">
-				<ErrorBoundary>
-					<DataMapView />
-				</ErrorBoundary>
-			</template>
-			<template v-else>
-				<div>{{ t("DataPage.work-in-progress") }}</div>
-			</template>
+			<ErrorBoundary>
+				<DataMapView v-show="currentMode === 'map'" />
+				<DataNetworkView v-show="currentMode === 'network'" />
+				<DataView v-if="currentMode === 'table'" />
+			</ErrorBoundary>
 		</template>
 	</MainContent>
 </template>

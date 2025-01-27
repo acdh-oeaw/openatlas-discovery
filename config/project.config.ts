@@ -1,6 +1,6 @@
 import { log } from "@acdh-oeaw/lib";
 import { ColorSpace, getLuminance, HSL, OKLCH, parse, sRGB, to as convert } from "colorjs.io/fn";
-import { z } from "zod";
+import * as v from "valibot";
 
 import projectConfig from "../project.config.json" assert { type: "json" };
 
@@ -8,33 +8,15 @@ ColorSpace.register(sRGB);
 ColorSpace.register(HSL);
 ColorSpace.register(OKLCH);
 
-const schema = z.object({
-	colors: z
-		.object({
-			brand: z.string().min(1),
-			geojsonPoints: z.string().min(1),
-			geojsonAreaCenterPoints: z.string().min(1),
-			geojsonMovement: z.string().min(1),
-			entityColors: z.object({
-				place: z.string().min(1),
-				source: z.string().min(1),
-				person: z.string().min(1),
-				group: z.string().min(1),
-				move: z.string().min(1),
-				event: z.string().min(1),
-				activity: z.string().min(1),
-				acquisition: z.string().min(1),
-				feature: z.string().min(1),
-				artifact: z.string().min(1),
-				file: z.string().min(1),
-				human_remains: z.string().min(1),
-				stratigraphic_unit: z.string().min(1),
-				type: z.string().min(1),
-			}),
-			entityDefaultColor: z.string().min(1),
-			disabledNodeColor: z.string().min(1),
-		})
-		.transform((values) => {
+const schema = v.object({
+	colors: v.pipe(
+		v.object({
+			brand: v.pipe(v.string(), v.nonEmpty()),
+			geojsonPoints: v.pipe(v.string(), v.nonEmpty()),
+			geojsonAreaCenterPoints: v.pipe(v.string(), v.nonEmpty()),
+			geojsonMovement: v.pipe(v.string(), v.nonEmpty()),
+		}),
+		v.transform((values) => {
 			const color = parse(values.brand);
 			const luminance = getLuminance(convert(color, OKLCH));
 			const [h, s, l] = convert(color, HSL).coords;
@@ -45,29 +27,35 @@ const schema = z.object({
 				brandContrast: luminance > 0.5 ? "hsl(0deg 0% 0%)" : "hsl(0deg 0% 100%)",
 			};
 		}),
-	fullscreen: z.boolean(),
-	map: z.object({
-		startPage: z.boolean(),
+	),
+	network: v.object({
+		excludeSystemClasses: v.array(v.string()),
 	}),
-	defaultLocale: z.enum(["de", "en"]),
-	logos: z.object({
-		light: z.string(),
-		dark: z.string(),
-		withTextLight: z.string(),
-		withTextDark: z.string(),
+	defaultLocale: v.picklist(["de", "en"]),
+	fullscreen: v.boolean(),
+	imprint: v.picklist(["acdh-ch", "custom", "none"]),
+	logos: v.object({
+		light: v.string(),
+		dark: v.string(),
+		withTextLight: v.string(),
+		withTextDark: v.string(),
 	}),
-	imprint: z.enum(["acdh-ch", "custom", "none"]),
-	twitter: z.string().optional(),
+	map: v.object({
+		startPage: v.boolean(),
+		mapDisplayedSystemClasses: v.array(v.string()),
+	}),
+	twitter: v.optional(v.string()),
 });
 
-const result = schema.safeParse(projectConfig);
+const result = v.safeParse(schema, projectConfig);
 
 if (!result.success) {
 	const message = "Invalid project configuration.";
-	log.error(message, result.error.flatten().fieldErrors);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	log.error(message, v.flatten<any>(result.issues).nested);
 	const error = new Error(message);
 	delete error.stack;
 	throw error;
 }
 
-export const project = result.data;
+export const project = result.output;

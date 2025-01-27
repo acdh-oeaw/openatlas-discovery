@@ -19,7 +19,7 @@ const features = computed(() => {
 				:movements="features"
 				:height="height"
 				:width="width"
-				:polygons="true"
+				:has-polygons="true"
 				:show-movements="true"
 			/>
 		</VisualisationContainer>

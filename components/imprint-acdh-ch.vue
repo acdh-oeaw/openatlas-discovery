@@ -9,7 +9,7 @@ const env = useRuntimeConfig();
 const locale = useLocale();
 const t = useTranslations();
 
-const redmineId = env.public.NUXT_PUBLIC_REDMINE_ID;
+const redmineId = env.public.redmineId;
 
 const {
 	data: imprint,
@@ -19,7 +19,7 @@ const {
 	queryKey: ["imprint", redmineId, locale] as const,
 	queryFn({ queryKey: [, redmineId, locale] }) {
 		const url = createImprintUrl(locale, redmineId);
-		return $fetch(String(url), { responseType: "text" });
+		return $fetch<string>(String(url), { responseType: "text" });
 	},
 });
 useErrorMessage(error, {

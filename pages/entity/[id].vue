@@ -5,11 +5,14 @@ import { z } from "zod";
 import { useIdPrefix } from "@/composables/use-id-prefix";
 import { hasCoordinates } from "@/utils/has-geojson-coordinates";
 
-definePageMeta({
-	validate(route) {
-		const env = useRuntimeConfig();
-		if (env.public.NUXT_PUBLIC_DATABASE === "disabled") return false;
+// defineRouteRules({
+// 	prerender: true,
+// });
 
+definePageMeta({
+	title: "EntityPage.meta.title",
+	middleware: "database-check",
+	validate(route) {
 		const paramsSchema = z.object({
 			id: z.coerce.number().int().positive(),
 		});
@@ -18,11 +21,6 @@ definePageMeta({
 });
 
 const t = useTranslations();
-
-usePageMetadata({
-	title: t("EntityPage.meta.title"),
-});
-
 const { getUnprefixedId } = useIdPrefix();
 
 const route = useRoute();
@@ -69,12 +67,6 @@ const tabs = computed(() => {
 			label: t("EntityPage.images", { count: entity.value.depictions.length }),
 		});
 	}
-	if (entity.value?.relations != null) {
-		tabs.push({
-			id: "network",
-			label: t("EntityPage.network"),
-		});
-	}
 	return tabs;
 });
 
@@ -105,6 +97,14 @@ const typesById = computed(() => {
 					<div class="grid gap-4">
 						<EntityTimespans :timespans="entity.when?.timespans" />
 						<EntityDescriptions :descriptions="entity?.descriptions ?? []" />
+						<!-- Types -->
+						<div class="flex flex-row flex-wrap gap-1">
+							<TypesPopover
+								v-for="type in entity.types"
+								:key="type.identifier ?? type.label ?? 'missing'"
+								:type="type"
+							/>
+						</div>
 					</div>
 				</CardContent>
 			</Card>
@@ -118,8 +118,10 @@ const typesById = computed(() => {
 				<!-- TODO: keep map alive -->
 				<TabsContent v-for="tab of tabs" :key="tab.id" :value="tab.id">
 					<EntityGeoMap v-if="tab.id === 'geo-map'" :entities="entities" />
-					<EntityImages v-else-if="tab.id === 'images'" :images="entity.depictions" />
-					<EntityNetwork v-if="tab.id === 'network'" :id="id" :network-data="entity" />
+					<EntityImages
+						v-else-if="tab.id === 'images' && entity.depictions"
+						:images="entity.depictions"
+					/>
 				</TabsContent>
 			</Tabs>
 
@@ -139,8 +141,15 @@ const typesById = computed(() => {
 								<ul role="list">
 									<li v-for="(relation, index) of relations.slice(0, 10)" :key="index">
 										<NavLink
+											v-if="relation.relationTo"
 											class="underline decoration-dotted hover:no-underline"
-											:href="{ path: `/entities/${getUnprefixedId(relation.relationTo)}` }"
+											:href="{
+												path: `/visualization/`,
+												query: {
+													mode: 'table',
+													selection: getUnprefixedId(relation.relationTo),
+												},
+											}"
 										>
 											{{ relation.label }}
 										</NavLink>
@@ -156,13 +165,20 @@ const typesById = computed(() => {
 								</ul>
 								<details v-if="relations.length > 10">
 									<summary class="cursor-pointer py-1 text-sm text-muted-foreground">
-										Show more
+										{{ t("Global.ShowMore") }}
 									</summary>
 									<ul role="list">
 										<li v-for="(relation, index) of relations.slice(10)" :key="index">
 											<NavLink
+												v-if="relation.relationTo"
 												class="underline decoration-dotted hover:no-underline"
-												:href="{ path: `/entities/${getUnprefixedId(relation.relationTo)}` }"
+												:href="{
+													path: `/visualization/`,
+													query: {
+														mode: 'table',
+														selection: getUnprefixedId(relation.relationTo),
+													},
+												}"
 											>
 												{{ relation.label }}
 											</NavLink>

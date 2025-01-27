@@ -4,7 +4,6 @@ import { DotIcon } from "lucide-vue-next";
 
 import type { EntityFeature } from "@/composables/use-create-entity";
 import { networkConfig } from "@/config/network-visualisation.config";
-import { colors } from "@/project.config.json";
 
 const props = defineProps<{
 	networkData: EntityFeature;
@@ -15,9 +14,9 @@ const { getUnprefixedId } = useIdPrefix();
 
 const graph = new Graph();
 
-const { entityColors } = colors;
-const defaultColor = project.colors.entityDefaultColor;
-const legendEntities: [string | undefined] = [""];
+const { entityColors } = networkConfig.colors;
+const defaultColor = networkConfig.colors.entityDefaultColor;
+const legendEntities = [""];
 
 watch(
 	() => {

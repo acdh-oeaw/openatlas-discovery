@@ -1,4 +1,9 @@
 {
+	"Actor": {
+		"MemberOf": "Groups",
+		"Relations": "Relations",
+		"hasMember": "Affiliates"
+	},
 	"AppFooter": {
 		"links": {
 			"imprint": "Imprint"
@@ -35,11 +40,12 @@
 		}
 	},
 	"DataMapView": {
+		"centerpoint": "Areas",
 		"end-date": "End date",
-		"start-date": "Start date",
+		"point": "Locations",
 		"polygon": "Display Areas",
-		"centerpoint": "Area",
-		"point": "Location",
+		"centerpoint": "Areas",
+		"point": "Locations",
 		"movement": "Movement",
 		"showMovement": "Display Movement"
 	},
@@ -48,16 +54,20 @@
 	},
 	"DataPage": {
 		"meta": {
-			"title": "Data"
+			"title": "Datalist"
 		},
 		"search": "Search",
-		"title": "Data",
+		"title": "Datalist",
 		"work-in-progress": "The database is currently work in progress."
+	},
+	"DataView": {
+		"nothing-found": "No entries found for this search."
 	},
 	"DefaultLayout": {
 		"skip-to-main-content": "Skip to main content"
 	},
 	"EntityDescriptionsDisplay": {
+		"description": "No Description | Description | Descriptions",
 		"no-descriptions": "No descriptions available."
 	},
 	"EntityPage": {
@@ -65,10 +75,21 @@
 		"iiif": "IIIF-Viewer",
 		"images": "Images ({count})",
 		"map": "Map",
-		"network": "Network Visualization",
 		"meta": {
 			"title": "Entity"
-		}
+		},
+		"network": "Network Visualization",
+		"sidebar": {
+			"toggle": "Toggle details for {title}"
+		},
+		"no-map": "Not visible on the map.",
+		"no-network": "Not visible in the network."
+	},
+	"EntitySidebar": {
+		"NextFeature": "NextFeature",
+		"PreviousFeature": "Previous Feature",
+		"copy": "Permalink",
+		"copied": "Copied!"
 	},
 	"ErrorBoundary": {
 		"error": "Error"
@@ -80,6 +101,12 @@
 		"title": "Something went wrong!",
 		"try-again": "Try again"
 	},
+	"Global": {
+		"Next": "Next",
+		"Previous": "Previous",
+		"ShowMore": "show more",
+		"TitleMissing": "Title Missing"
+	},
 	"ImprintPage": {
 		"error": {
 			"not-found": "Imprint not found",
@@ -88,7 +115,8 @@
 		"meta": {
 			"title": "Imprint"
 		},
-		"title": "Imprint"
+		"title": "Imprint",
+		"contact": "Contact: {'alexander.watzinger@oeaw.ac.at'}"
 	},
 	"IndexPage": {
 		"error": {
@@ -122,6 +150,13 @@
 			"title": "Page not found"
 		},
 		"title": "Page not found"
+	},
+	"RelationType": {
+		"CurrentOrFormerResidency": "Residency"
+	},
+	"Relations": {
+		"Artifacts": "Artifacts",
+		"HumanRemains": "Human Remains"
 	},
 	"SearchForm": {
 		"filter": "Filter",

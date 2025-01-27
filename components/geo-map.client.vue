@@ -22,7 +22,7 @@ const props = defineProps<{
 	movements: Array<GeoJsonFeature>;
 	height: number;
 	width: number;
-	polygons: boolean;
+	hasPolygons?: boolean;
 	showMovements: boolean;
 }>();
 
@@ -43,9 +43,7 @@ const colors = {
 };
 
 const mapStyle = computed(() => {
-	return theme.value === "dark"
-		? env.public.NUXT_PUBLIC_MAP_BASELAYER_URL_DARK
-		: env.public.NUXT_PUBLIC_MAP_BASELAYER_URL_LIGHT;
+	return theme.value === "dark" ? env.public.mapBaselayerUrlDark : env.public.mapBaselayerUrlLight;
 });
 
 const elementRef = ref<HTMLElement | null>(null);
@@ -64,7 +62,7 @@ async function create() {
 	const map = new GeoMap({
 		center: [initialViewState.longitude, initialViewState.latitude],
 		container: elementRef.value,
-		maxZoom: 16,
+		maxZoom: 24,
 		minZoom: 1,
 		pitch: initialViewState.pitch,
 		style: mapStyle.value,
@@ -188,6 +186,7 @@ function init() {
 	//
 
 	updateScope();
+	updatePolygons();
 }
 
 function dispose() {
@@ -199,7 +198,7 @@ watch(() => {
 }, updateScope);
 
 watch(() => {
-	return props.polygons;
+	return props.hasPolygons;
 }, updatePolygons);
 
 watch(() => {
@@ -224,7 +223,7 @@ function updateScope() {
 	});
 
 	const polygons = props.features.filter((polygon) => {
-		return polygon.geometry.type === "GeometryCollection";
+		return polygon.geometry.type === "GeometryCollection" || polygon.geometry.type === "Polygon";
 	});
 
 	const centerpoints = props.features.filter((centerpoint) => {
@@ -244,7 +243,10 @@ function updateScope() {
 	sourceMovePoints?.setData(geojsonMovePoints);
 
 	if (geojsonPoints.features.length > 0) {
-		const bounds = turf.bbox(geojsonPoints);
+		const bounds = turf.bbox(geojsonPoints) as [number, number, number, number];
+		map.fitBounds(bounds, { padding: 50, maxZoom: 16 });
+	} else if (geojsonCenterPoints.features.length > 0) {
+		const bounds = turf.bbox(geojsonCenterPoints) as [number, number, number, number];
 		map.fitBounds(bounds, { padding: 50 });
 	}
 }
@@ -253,7 +255,7 @@ function updatePolygons() {
 	assert(context.map != null);
 	const sourcePolygonsId = "polygon-data";
 
-	if (props.polygons) {
+	if (props.hasPolygons) {
 		context.map.addLayer({
 			id: "polygons",
 			type: "fill",
@@ -264,7 +266,7 @@ function updatePolygons() {
 			},
 		});
 	}
-	if (!props.polygons && context.map.getLayer("polygons")) {
+	if (!props.hasPolygons && context.map.getLayer("polygons")) {
 		context.map.removeLayer("polygons");
 	}
 }

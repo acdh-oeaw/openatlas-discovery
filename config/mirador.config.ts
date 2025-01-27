@@ -1,5 +1,4 @@
-// Configuration for Mirador
-export const miradorConfig = ref({
+export const miradorConfig = {
 	layout: "1x1",
 	mainMenuSettings: {
 		show: false,
@@ -27,4 +26,4 @@ export const miradorConfig = ref({
 			thumbnailNavigationPosition: "off",
 		},
 	],
-});
+};

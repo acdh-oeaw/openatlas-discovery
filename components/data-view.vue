@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { SortingState } from "@tanstack/vue-table";
-import { z } from "zod";
+import * as v from "valibot";
 
 import type { SearchFormData } from "@/components/search-form.vue";
 import {
@@ -18,17 +18,32 @@ const router = useRouter();
 const route = useRoute();
 const t = useTranslations();
 
-const searchFiltersSchema = z.object({
-	category: z.enum(categories).catch("entityName"),
-	search: z.string().catch(""),
-	column: z.enum(columns).catch("name"),
-	sort: z.enum(["asc", "desc"]).catch("asc"),
-	page: z.coerce.number().int().positive().catch(1),
-	limit: z.coerce.number().int().positive().max(100).catch(20),
+const searchFiltersSchema = v.object({
+	category: v.fallback(v.picklist(categories), "entityName"),
+	search: v.fallback(v.string(), ""),
+	column: v.fallback(v.picklist(columns), "name"),
+	sort: v.fallback(v.picklist(["asc", "desc"]), "asc"),
+	page: v.fallback(
+		v.pipe(v.unknown(), v.transform(Number), v.number(), v.integer(), v.minValue(1)),
+		1,
+	),
+	limit: v.fallback(
+		v.pipe(
+			v.unknown(),
+			v.transform(Number),
+			v.number(),
+			v.integer(),
+			v.minValue(1),
+			v.maxValue(100),
+		),
+		20,
+	),
 });
 
+const idCategories = ["entityID", "typeID", "valueTypeID", "typeIDWithSubs"];
+
 const searchFilters = computed(() => {
-	return searchFiltersSchema.parse(route.query);
+	return v.parse(searchFiltersSchema, route.query);
 });
 
 const sortingState = computed(() => {
@@ -37,10 +52,12 @@ const sortingState = computed(() => {
 	] as SortingState;
 });
 
-type SearchFilters = z.infer<typeof searchFiltersSchema>;
+type SearchFilters = v.InferOutput<typeof searchFiltersSchema>;
 
 function setSearchFilters(query: Partial<SearchFilters>) {
-	void router.push({ query });
+	void router.push({
+		query: { mode: route.query.mode, selection: route.query.selection, ...query },
+	});
 	document.body.scrollTo(0, 0);
 }
 
@@ -67,18 +84,21 @@ const { data, isPending, isPlaceholderData } = useGetSearchResults(
 	computed(() => {
 		const { search, category, ...params } = searchFilters.value;
 
+		const operator = idCategories.includes(category) ? "equal" : "like";
+
+		const searchQuery =
+			search && search.length > 0
+				? [{ [category]: [{ operator, values: [search], logicalOperator: "and" }] }]
+				: [];
+
 		return {
 			...params,
-			search:
-				search.length > 0
-					? [{ [category]: [{ operator: "like", values: [search], logicalOperator: "and" }] }]
-					: [],
+			search: searchQuery,
 			show: ["description", "when"],
 			view_classes: ["actor", "event", "place", "reference", "source"],
 		};
 	}),
 );
-
 const isLoading = computed(() => {
 	return isPending.value || isPlaceholderData.value;
 });
@@ -93,9 +113,9 @@ const entities = computed(() => {
 </script>
 
 <template>
-	<div class="relative grid grid-rows-[auto_1fr] gap-4">
+	<div class="container relative grid grid-rows-[auto_1fr] gap-4 p-8">
 		<SearchForm
-			:filter="searchFilters.category"
+			:category="searchFilters.category"
 			:search="searchFilters.search"
 			@submit="onChangeSearchFilters"
 		/>
