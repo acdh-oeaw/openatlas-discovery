@@ -207,6 +207,7 @@ watch(() => {
 
 function updateScope() {
 	assert(context.map != null);
+
 	const map = context.map;
 
 	const sourcePointsId = "points-data";
@@ -273,26 +274,109 @@ function updatePolygons() {
 
 function updateMovements() {
 	assert(context.map != null);
-	const sourceMovePointsId = "move-points-data";
+	console.log("entered", props.movements);
 
-	if (props.showMovements) {
-		context.map.addLayer({
-			id: "movement-line",
-			type: "line",
-			source: sourceMovePointsId,
-			layout: {
-				"line-join": "round",
-				"line-cap": "round",
-			},
-			paint: {
-				"line-color": colors.movement,
-				"line-width": 8,
-			},
+	const sourceMoveLinesId = "move-lines-data";
+
+	if (!context.map.getSource(sourceMoveLinesId)) {
+		context.map.addSource(sourceMoveLinesId, {
+			type: "geojson",
+			data: createFeatureCollection([]),
 		});
 	}
-	if (!props.showMovements && context.map.getLayer("movement-line")) {
+
+	// Process the GeoJSON movements array to create curved lines
+	const curvedMovements: GeoJSON.FeatureCollection<GeoJSON.LineString> = {
+		type: "FeatureCollection",
+		features: props.movements
+			.map((movement) => {
+				if (movement.geometry.type === "GeometryCollection") {
+					const geometries = movement.geometry.geometries;
+
+					if (geometries.length < 2) {
+						console.warn("Invalid geometries or not enough points:", geometries);
+						return null;
+					}
+
+					const startPoint = geometries[0];
+					const endPoint = geometries[1];
+
+					if (
+						startPoint?.type === "Point" &&
+						endPoint?.type === "Point" &&
+						Array.isArray(startPoint.coordinates) &&
+						Array.isArray(endPoint.coordinates)
+					) {
+						// Create a curved line between the two points
+						const arc = drawArc(startPoint.coordinates, endPoint.coordinates);
+						console.log("ARC", arc);
+						return drawArc(startPoint.coordinates, endPoint.coordinates);
+					} else {
+						console.warn("Start or End Point is not valid:", { startPoint, endPoint });
+						return null;
+					}
+				} else {
+					console.warn("Movement is not a GeometryCollection:", movement);
+					return null;
+				}
+			})
+			.filter((feature): feature is GeoJSON.Feature<GeoJSON.LineString> => {
+				return feature !== null;
+			}),
+	};
+
+	console.log(curvedMovements);
+	const sourceMoveLines = context.map.getSource(sourceMoveLinesId) as GeoJSONSource | undefined;
+	sourceMoveLines?.setData(curvedMovements);
+
+	if (props.showMovements) {
+		if (!context.map.getLayer("movement-line")) {
+			context.map.addLayer({
+				id: "movement-line",
+				type: "line",
+				source: sourceMoveLinesId,
+				layout: {
+					"line-join": "round",
+					"line-cap": "round",
+				},
+				paint: {
+					"line-color": colors.movement,
+					"line-width": 5,
+					"line-opacity": 0.5,
+				},
+			});
+		}
+	} else if (context.map.getLayer("movement-line")) {
 		context.map.removeLayer("movement-line");
 	}
+}
+
+function drawArc(start: GeoJSON.Position, end: GeoJSON.Position) {
+	let route: GeoJSON.LineString = {
+		type: "LineString",
+		coordinates: [start, end],
+	};
+
+	route = turf.toWgs84(route);
+	const lineD = turf.distance(start, end);
+	const mp = turf.midpoint(route.coordinates[0] as turf.Coord, route.coordinates[1] as turf.Coord);
+	const center = turf.destination(
+		mp,
+		lineD,
+		turf.bearing(route.coordinates[0] as turf.Coord, route.coordinates[1] as turf.Coord) - 90,
+	);
+
+	console.log("distance", turf.distance(center, route.coordinates[0] as turf.Coord));
+	console.log(turf.bearing(center, route.coordinates[1] as turf.Coord));
+	console.log(turf.bearing(center, route.coordinates[0] as turf.Coord));
+	const lA = turf.lineArc(
+		center,
+		turf.distance(center, route.coordinates[0] as turf.Coord),
+		turf.bearing(center, route.coordinates[1] as turf.Coord),
+		turf.bearing(center, route.coordinates[0] as turf.Coord),
+	);
+
+	return turf.toMercator(lA);
 }
 
 defineExpose(context);
