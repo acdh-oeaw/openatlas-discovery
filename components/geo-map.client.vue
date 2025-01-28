@@ -81,6 +81,7 @@ async function create() {
 		pitch: initialViewState.pitch,
 		style: mapStyle.value,
 		zoom: initialViewState.zoom,
+		maxPitch: 85,
 	});
 
 	context.map = map;
@@ -152,7 +153,9 @@ function init() {
 		source: sourceMovePointsId,
 		filter: ["==", "$type", "Point"],
 		paint: {
-			"circle-color": colors.movement,
+			"circle-color": hoveredMovementId.value
+				? ["match", ["get", "id"], hoveredMovementId.value, colors.movement, "#808080"]
+				: colors.movement,
 			"circle-radius": 6,
 		},
 	});
@@ -224,8 +227,24 @@ watch(
 		return hoveredMovementId.value;
 	},
 	() => {
-		console.log("update!");
+		console.log("update hoveredMovementId: ", hoveredMovementId.value);
 		updateArcLayerColors(curvedMovements.value);
+		assert(context.map != null);
+
+		context.map.setPaintProperty(
+			"movements",
+			"circle-color", // The paint property
+			hoveredMovementId.value
+				? ["match", ["get", "_id"], hoveredMovementId.value, colors.movement, "#808080"]
+				: colors.movement, // If no movement is hovered, use the default color for all
+		);
+
+		console.log(
+			"Paint expression:",
+			hoveredMovementId.value
+				? ["match", ["get", "_id"], hoveredMovementId.value, colors.movement, "#808080"]
+				: colors.movement,
+		);
 	},
 );
 
@@ -297,18 +316,6 @@ function updatePolygons() {
 }
 
 function updateMovements() {
-	assert(context.map != null);
-	console.log("entered", props.movements);
-
-	const sourceMoveLinesId = "move-lines-data";
-
-	if (!context.map.getSource(sourceMoveLinesId)) {
-		context.map.addSource(sourceMoveLinesId, {
-			type: "geojson",
-			data: createFeatureCollection([]),
-		});
-	}
-
 	// Process the GeoJSON movements array to create curved lines
 	curvedMovements.value = props.movements
 		.flatMap((movement) => {
@@ -358,21 +365,22 @@ function updateMovements() {
 			return d.coordinates[1];
 		},
 		getSourceColor: (d) => {
-			console.log("update color!");
 			return d.color;
 		},
 		getTargetColor: (d) => {
-			console.log("update color!");
 			return d.color;
 		},
 		getWidth: 3,
 		pickable: true,
 		onHover: (d) => {
-			console.log("hover");
+			assert(context.map != null);
 			if (d.object != null) {
-				console.log(d.object.id || null);
 				hoveredMovementId.value = d.object.id || null;
-			} else hoveredMovementId.value = null;
+				context.map.getCanvas().style.cursor = "pointer";
+			} else {
+				context.map.getCanvas().style.cursor = "";
+				hoveredMovementId.value = null;
+			}
 		},
 		updateTriggers: {
 			getSourceColor: hoveredMovementId.value,
@@ -382,6 +390,7 @@ function updateMovements() {
 
 	movementLinesLayer.value = layer;
 
+	assert(context.map != null);
 	if (props.showMovements) {
 		overlay.value = new mapbox.MapboxOverlay({
 			layers: [movementLinesLayer.value] as deck.LayersList,
@@ -422,24 +431,27 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 				return hoveredMovementId.value
 					? d.id === hoveredMovementId.value
 						? d.color
-						: [128, 128, 128]
+						: [128, 128, 128, 128]
 					: d.color;
 			},
 			getTargetColor: (d) => {
 				return hoveredMovementId.value
 					? d.id === hoveredMovementId.value
 						? d.color
-						: [128, 128, 128]
+						: [128, 128, 128, 50]
 					: d.color;
 			},
 			getWidth: 2,
 			pickable: true,
 			onHover: (d) => {
-				console.log("hover");
+				assert(context.map != null);
 				if (d.object != null) {
-					console.log(d.object.id || null);
 					hoveredMovementId.value = d.object.id || null;
-				} else hoveredMovementId.value = null;
+					context.map.getCanvas().style.cursor = "pointer";
+				} else {
+					context.map.getCanvas().style.cursor = "";
+					hoveredMovementId.value = null;
+				}
 			},
 			updateTriggers: {
 				getSourceColor: hoveredMovementId.value,
@@ -447,12 +459,22 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 			},
 		});
 
-		console.log("Setting new layer on MapboxOverlay");
-
 		overlay.value.setProps({
 			layers: [updatedLayer],
 		});
 	}
+}
+
+function updateMovementPoints() {
+	assert(context.map != null);
+	const map = context.map;
+
+	const movements = props.movements;
+
+	const sourceMovePointsId = "move-points-data";
+	const sourcePoints = map.getSource(sourceMovePointsId) as GeoJSONSource | undefined;
+	const updatedMovePoints = createFeatureCollection(movements);
+	sourcePoints?.setData(updatedMovePoints);
 }
 
 defineExpose(context);
