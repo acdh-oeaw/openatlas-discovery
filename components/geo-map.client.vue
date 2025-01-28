@@ -2,7 +2,10 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { assert } from "@acdh-oeaw/lib";
+import { ArcLayer } from "@deck.gl/layers";
+import * as mapbox from "@deck.gl/mapbox";
 import * as turf from "@turf/turf";
+import type * as deck from "deck.gl";
 import {
 	FullscreenControl,
 	type GeoJSONSource,
@@ -17,6 +20,13 @@ import { initialViewState } from "@/config/geo-map.config";
 import { project } from "@/config/project.config";
 import type { GeoJsonFeature } from "@/utils/create-geojson-feature";
 
+interface CurvedMovementLine {
+	id: string;
+	coordinates: [deck.Position, deck.Position];
+	color: deck.Color;
+}
+
+const overlay = ref<mapbox.MapboxOverlay | null>(null);
 const props = defineProps<{
 	features: Array<GeoJsonFeature>;
 	movements: Array<GeoJsonFeature>;
@@ -35,6 +45,10 @@ const emit = defineEmits<{
 
 const env = useRuntimeConfig();
 const theme = useColorMode();
+
+const hoveredMovementId = ref<string | null>(null);
+const movementLinesLayer = ref<any>(new ArcLayer());
+const curvedMovements = ref<Array<CurvedMovementLine> | null>(null);
 
 const colors = {
 	points: project.colors.geojsonPoints,
@@ -205,6 +219,16 @@ watch(() => {
 	return props.showMovements;
 }, updateMovements);
 
+watch(
+	() => {
+		return hoveredMovementId.value;
+	},
+	() => {
+		console.log("update!");
+		updateArcLayerColors(curvedMovements.value);
+	},
+);
+
 function updateScope() {
 	assert(context.map != null);
 
@@ -286,94 +310,149 @@ function updateMovements() {
 	}
 
 	// Process the GeoJSON movements array to create curved lines
-	const curvedMovements: GeoJSON.FeatureCollection<GeoJSON.LineString> = {
-		type: "FeatureCollection",
-		features: props.movements
-			.flatMap((movement) => {
-				if (movement.geometry.type === "GeometryCollection") {
-					const geometries = movement.geometry.geometries;
-					const points = geometries.filter((geometry) => {
-						return geometry.type === "Point";
-					});
-					if (points.length < 2) {
-						console.warn("Invalid geometries or not enough points:", geometries);
-						return null;
-					}
-					return points.slice(1).map((point, index) => {
-						const startPoint = points[index];
-						const endPoint = point;
-
-						if (!startPoint) return null;
-
-						if (Array.isArray(startPoint.coordinates) && Array.isArray(endPoint.coordinates)) {
-							// Create a curved line between the two points
-							return drawArc(startPoint.coordinates, endPoint.coordinates);
-						} else {
-							console.warn("Start or End Point is not valid:", { startPoint, endPoint });
-							return null;
-						}
-					});
-				} else {
-					console.warn("Movement is not a GeometryCollection:", movement);
+	curvedMovements.value = props.movements
+		.flatMap((movement) => {
+			if (movement.geometry.type === "GeometryCollection") {
+				const geometries = movement.geometry.geometries;
+				const points = geometries.filter((geometry) => {
+					return geometry.type === "Point";
+				});
+				if (points.length < 2) {
+					console.warn("Invalid geometries or not enough points:", geometries);
 					return null;
 				}
-			})
-			.filter((feature): feature is GeoJSON.Feature<GeoJSON.LineString> => {
-				return feature !== null;
-			}),
-	};
+				return points.slice(1).map((point, index) => {
+					const startPoint = points[index];
+					const endPoint = point;
 
-	const sourceMoveLines = context.map.getSource(sourceMoveLinesId) as GeoJSONSource | undefined;
-	sourceMoveLines?.setData(curvedMovements);
+					if (!startPoint) return null;
+
+					if (Array.isArray(startPoint.coordinates) && Array.isArray(endPoint.coordinates)) {
+						// Create a curved line between the two points
+						return {
+							id: movement.properties._id,
+							coordinates: [startPoint.coordinates, endPoint.coordinates],
+							color: hexToRgb(colors.movement),
+						};
+					} else {
+						console.warn("Start or End Point is not valid:", { startPoint, endPoint });
+						return null;
+					}
+				});
+			} else {
+				console.warn("Movement is not a GeometryCollection:", movement);
+				return null;
+			}
+		})
+		.filter((feature) => {
+			return feature !== null;
+		});
+
+	const layer = new ArcLayer({
+		id: "arc",
+		data: curvedMovements.value,
+		getSourcePosition: (d) => {
+			return d.coordinates[0];
+		},
+		getTargetPosition: (d) => {
+			return d.coordinates[1];
+		},
+		getSourceColor: (d) => {
+			console.log("update color!");
+			return d.color;
+		},
+		getTargetColor: (d) => {
+			console.log("update color!");
+			return d.color;
+		},
+		getWidth: 3,
+		pickable: true,
+		onHover: (d) => {
+			console.log("hover");
+			if (d.object != null) {
+				console.log(d.object.id || null);
+				hoveredMovementId.value = d.object.id || null;
+			} else hoveredMovementId.value = null;
+		},
+		updateTriggers: {
+			getSourceColor: hoveredMovementId.value,
+			getTargetColor: hoveredMovementId.value,
+		},
+	});
+
+	movementLinesLayer.value = layer;
 
 	if (props.showMovements) {
-		if (!context.map.getLayer("movement-line")) {
-			context.map.addLayer({
-				id: "movement-line",
-				type: "line",
-				source: sourceMoveLinesId,
-				layout: {
-					"line-join": "round",
-					"line-cap": "round",
-				},
-				paint: {
-					"line-color": colors.movement,
-					"line-width": 5,
-					"line-opacity": 0.5,
-				},
-			});
+		overlay.value = new mapbox.MapboxOverlay({
+			layers: [movementLinesLayer.value] as deck.LayersList,
+		});
+
+		context.map.addControl(overlay.value);
+	} else {
+		if (overlay.value) {
+			overlay.value.finalize();
+			context.map.removeControl(overlay.value);
 		}
-	} else if (context.map.getLayer("movement-line")) {
-		context.map.removeLayer("movement-line");
 	}
 }
 
-function drawArc(start: GeoJSON.Position, end: GeoJSON.Position) {
-	let route: GeoJSON.LineString = {
-		type: "LineString",
-		coordinates: [start, end],
-	};
+function hexToRgb(hex: string) {
+	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	return result
+		? ([
+				parseInt(result[1] ?? "0", 16),
+				parseInt(result[2] ?? "0", 16),
+				parseInt(result[3] ?? "0", 16),
+			] as deck.Color)
+		: null;
+}
 
-	route = turf.projection.toWgs84(route);
-	const lineD = turf.distance(
-		route.coordinates[0] as turf.Coord,
-		route.coordinates[1] as turf.Coord,
-		{ units: "kilometers" },
-	);
-	const mp = turf.midpoint(route.coordinates[0] as turf.Coord, route.coordinates[1] as turf.Coord);
-	const center = turf.destination(
-		mp,
-		lineD,
-		turf.bearing(route.coordinates[0] as turf.Coord, route.coordinates[1] as turf.Coord) - 90,
-	);
-	const lA = turf.lineArc(
-		center,
-		turf.distance(center, route.coordinates[0] as turf.Coord),
-		turf.bearing(center, route.coordinates[1] as turf.Coord),
-		turf.bearing(center, route.coordinates[0] as turf.Coord),
-	);
+function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
+	if (overlay.value) {
+		const updatedLayer = new ArcLayer({
+			id: "arc", // Same ID to update the existing layer
+			data: movements ?? [],
+			getSourcePosition: (d) => {
+				return d.coordinates[0];
+			},
+			getTargetPosition: (d) => {
+				return d.coordinates[1];
+			},
+			getSourceColor: (d) => {
+				return hoveredMovementId.value
+					? d.id === hoveredMovementId.value
+						? d.color
+						: [128, 128, 128]
+					: d.color;
+			},
+			getTargetColor: (d) => {
+				return hoveredMovementId.value
+					? d.id === hoveredMovementId.value
+						? d.color
+						: [128, 128, 128]
+					: d.color;
+			},
+			getWidth: 2,
+			pickable: true,
+			onHover: (d) => {
+				console.log("hover");
+				if (d.object != null) {
+					console.log(d.object.id || null);
+					hoveredMovementId.value = d.object.id || null;
+				} else hoveredMovementId.value = null;
+			},
+			updateTriggers: {
+				getSourceColor: hoveredMovementId.value,
+				getTargetColor: hoveredMovementId.value,
+			},
+		});
 
-	return turf.projection.toMercator(lA);
+		console.log("Setting new layer on MapboxOverlay");
+
+		overlay.value.setProps({
+			layers: [updatedLayer],
+		});
+	}
 }
 
 defineExpose(context);
