@@ -238,13 +238,6 @@ watch(
 				? ["match", ["get", "_id"], hoveredMovementId.value, colors.movement, "#808080"]
 				: colors.movement, // If no movement is hovered, use the default color for all
 		);
-
-		console.log(
-			"Paint expression:",
-			hoveredMovementId.value
-				? ["match", ["get", "_id"], hoveredMovementId.value, colors.movement, "#808080"]
-				: colors.movement,
-		);
 	},
 );
 
@@ -382,6 +375,26 @@ function updateMovements() {
 				hoveredMovementId.value = null;
 			}
 		},
+		onClick: (info) => {
+			if (info.object != null) {
+				console.log("Clicked Arc:", info.object);
+
+				const clickedMovement = props.movements.find((movement) => {
+					return movement.properties._id === info.object.id;
+				});
+
+				if (clickedMovement) {
+					console.log("Found clicked movement:", clickedMovement);
+					emit("layer-click", [clickedMovement] as Array<
+						MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
+					>);
+				} else {
+					console.warn("Movement not found for clicked arc.");
+				}
+			} else {
+				console.warn("No object clicked.");
+			}
+		},
 		updateTriggers: {
 			getSourceColor: hoveredMovementId.value,
 			getTargetColor: hoveredMovementId.value,
@@ -441,7 +454,7 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 						: [128, 128, 128, 50]
 					: d.color;
 			},
-			getWidth: 2,
+			getWidth: 3,
 			pickable: true,
 			onHover: (d) => {
 				assert(context.map != null);
@@ -451,6 +464,26 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 				} else {
 					context.map.getCanvas().style.cursor = "";
 					hoveredMovementId.value = null;
+				}
+			},
+			onClick: (info) => {
+				if (info.object != null) {
+					console.log("Clicked Arc:", info.object);
+
+					const clickedMovement = props.movements.find((movement) => {
+						return movement.properties._id === info.object.id;
+					});
+
+					if (clickedMovement) {
+						console.log("Found clicked movement:", clickedMovement);
+						emit("layer-click", [clickedMovement] as Array<
+							MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
+						>);
+					} else {
+						console.warn("Movement not found for clicked arc.");
+					}
+				} else {
+					console.warn("No object clicked.");
 				}
 			},
 			updateTriggers: {
@@ -463,18 +496,6 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 			layers: [updatedLayer],
 		});
 	}
-}
-
-function updateMovementPoints() {
-	assert(context.map != null);
-	const map = context.map;
-
-	const movements = props.movements;
-
-	const sourceMovePointsId = "move-points-data";
-	const sourcePoints = map.getSource(sourceMovePointsId) as GeoJSONSource | undefined;
-	const updatedMovePoints = createFeatureCollection(movements);
-	sourcePoints?.setData(updatedMovePoints);
 }
 
 defineExpose(context);
