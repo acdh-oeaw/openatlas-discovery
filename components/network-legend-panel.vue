@@ -99,11 +99,11 @@ const systemClassColors = networkConfig.colors.entityColors;
 					type="checkbox"
 					:checked="checkedSystemClasses[el]"
 					name="systemClassCheckbox"
-					:style="`accent-color: ${systemClassColors[el] ? systemClassColors[el] : '#666'}`"
+					:style="`accent-color: ${systemClassColors[el as keyof typeof systemClassColors] ? systemClassColors[el as keyof typeof systemClassColors] : '#666'}`"
 					@change="onSubmit()"
 				/>
-				<span v-if="el in labels">{{ labels[el as keyof typeof labels] }}</span>
-				<span v-else> {{ el }}</span>
+				<span v-if="el in labels" class="self-center">{{ labels[el as keyof typeof labels] }}</span>
+				<span v-else class="self-center"> {{ el }}</span>
 			</div>
 		</div>
 	</aside>
