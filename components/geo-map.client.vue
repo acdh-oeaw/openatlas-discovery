@@ -39,7 +39,10 @@ const props = defineProps<{
 const emit = defineEmits<{
 	(
 		event: "layer-click",
-		features: Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">>,
+		args: {
+			features: Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">>;
+			targetCoordinates?: Array<[number, number]> | [number, number];
+		},
 	): void;
 }>();
 
@@ -163,17 +166,19 @@ function init() {
 	//
 
 	map.on("click", "points", (event) => {
-		emit(
-			"layer-click",
-			(event.features ?? []) as Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">>,
-		);
+		emit("layer-click", {
+			features: (event.features ?? []) as Array<
+				MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
+			>,
+		});
 	});
 
 	map.on("click", "centerpoints", (event) => {
-		emit(
-			"layer-click",
-			(event.features ?? []) as Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">>,
-		);
+		emit("layer-click", {
+			features: (event.features ?? []) as Array<
+				MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
+			>,
+		});
 	});
 
 	//
@@ -385,9 +390,14 @@ function updateMovements() {
 
 				if (clickedMovement) {
 					console.log("Found clicked movement:", clickedMovement);
-					emit("layer-click", [clickedMovement] as Array<
-						MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
-					>);
+					emit("layer-click", {
+						features: [clickedMovement] as Array<
+							MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
+						>,
+						targetCoordinates: info.object.coordinates.map((point: { 0: number; 1: number }) => {
+							return [point[0], point[1]];
+						}),
+					});
 				} else {
 					console.warn("Movement not found for clicked arc.");
 				}
@@ -476,9 +486,14 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 
 					if (clickedMovement) {
 						console.log("Found clicked movement:", clickedMovement);
-						emit("layer-click", [clickedMovement] as Array<
-							MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
-						>);
+						emit("layer-click", {
+							features: [clickedMovement] as Array<
+								MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
+							>,
+							targetCoordinates: info.object.coordinates.map((point: { 0: number; 1: number }) => {
+								return [point[0], point[1]];
+							}),
+						});
 					} else {
 						console.warn("Movement not found for clicked arc.");
 					}

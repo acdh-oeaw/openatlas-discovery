@@ -145,7 +145,12 @@ const points = computed(() => {
 
 const popover = ref<{ coordinates: [number, number]; entities: Array<EntityFeature> } | null>(null);
 
-function onLayerClick(features: Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">>) {
+interface onLayerClickParams {
+	features: Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">>;
+	targetCoordinates?: Array<[number, number]> | [number, number];
+}
+
+function onLayerClick({ features, targetCoordinates }: onLayerClickParams) {
 	const entitiesMap = new Map<string, EntityFeature>();
 
 	features.forEach((feature) => {
@@ -159,13 +164,22 @@ function onLayerClick(features: Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "
 
 	let coordinates = null;
 
-	for (const entity of entities) {
-		if (entity.geometry.type === "GeometryCollection") {
-			coordinates = entity.geometry.geometries.find((g) => {
-				return g.type === "Point";
-			})?.coordinates as [number, number] | undefined;
+	if (targetCoordinates != null) {
+		if (typeof targetCoordinates[0] === "number" && typeof targetCoordinates[1] === "number") {
+			coordinates = targetCoordinates as [number, number];
+		} else {
+			coordinates = turf.center(turf.points(targetCoordinates as Array<[number, number]>)).geometry
+				.coordinates as [number, number];
+		}
+	} else {
+		for (const entity of entities) {
+			if (entity.geometry.type === "GeometryCollection") {
+				coordinates = entity.geometry.geometries.find((g) => {
+					return g.type === "Point";
+				})?.coordinates as [number, number] | undefined;
 
-			if (coordinates != null) break;
+				if (coordinates != null) break;
+			}
 		}
 	}
 
