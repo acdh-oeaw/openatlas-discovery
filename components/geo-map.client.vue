@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import { assert } from "@acdh-oeaw/lib";
+import { assert, debounce } from "@acdh-oeaw/lib";
 import { ArcLayer } from "@deck.gl/layers";
 import * as mapbox from "@deck.gl/mapbox";
 import * as turf from "@turf/turf";
@@ -85,6 +85,7 @@ async function create() {
 		style: mapStyle.value,
 		zoom: initialViewState.zoom,
 		maxPitch: 85,
+		antialias: true,
 	});
 
 	context.map = map;
@@ -231,19 +232,21 @@ watch(
 	() => {
 		return hoveredMovementId.value;
 	},
-	() => {
+	(newId) => {
 		console.log("update hoveredMovementId: ", hoveredMovementId.value);
 		updateArcLayerColors(curvedMovements.value);
-		assert(context.map != null);
-
-		context.map.setPaintProperty(
-			"movements",
-			"circle-color", // The paint property
-			hoveredMovementId.value
-				? ["match", ["get", "_id"], hoveredMovementId.value, colors.movement, "#808080"]
-				: colors.movement, // If no movement is hovered, use the default color for all
-		);
+		if (context.map != null) {
+			context.map.getCanvas().style.cursor = newId ? "pointer" : "";
+			context.map.setPaintProperty(
+				"movements",
+				"circle-color", // The paint property
+				hoveredMovementId.value
+					? ["match", ["get", "_id"], hoveredMovementId.value, colors.movement, "#808080"]
+					: colors.movement, // If no movement is hovered, use the default color for all
+			);
+		}
 	},
+	{ immediate: true },
 );
 
 function updateScope() {
@@ -369,14 +372,28 @@ function updateMovements() {
 			return d.color;
 		},
 		getWidth: 3,
+		updateTriggers: {
+			getSourceColor: hoveredMovementId.value,
+			getTargetColor: hoveredMovementId.value,
+		},
+	});
+
+	const supportLayer = new ArcLayer({
+		id: "arc-support",
+		data: curvedMovements.value,
+		getSourcePosition: (d) => {
+			return d.coordinates[0];
+		},
+		getTargetPosition: (d) => {
+			return d.coordinates[1];
+		},
+		getWidth: 20,
 		pickable: true,
+		opacity: 0,
 		onHover: (d) => {
-			assert(context.map != null);
 			if (d.object != null) {
 				hoveredMovementId.value = d.object.id || null;
-				context.map.getCanvas().style.cursor = "pointer";
 			} else {
-				context.map.getCanvas().style.cursor = "";
 				hoveredMovementId.value = null;
 			}
 		},
@@ -417,9 +434,15 @@ function updateMovements() {
 	if (props.showMovements) {
 		overlay.value = new mapbox.MapboxOverlay({
 			layers: [movementLinesLayer.value] as deck.LayersList,
+			interleaved: true,
 		});
 
 		context.map.addControl(overlay.value);
+		const supportOverlay = new mapbox.MapboxOverlay({
+			layers: [supportLayer] as deck.LayersList,
+		});
+
+		context.map.addControl(supportOverlay);
 	} else {
 		if (overlay.value) {
 			overlay.value.finalize();
@@ -465,42 +488,6 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 					: d.color;
 			},
 			getWidth: 3,
-			pickable: true,
-			onHover: (d) => {
-				assert(context.map != null);
-				if (d.object != null) {
-					hoveredMovementId.value = d.object.id || null;
-					context.map.getCanvas().style.cursor = "pointer";
-				} else {
-					context.map.getCanvas().style.cursor = "";
-					hoveredMovementId.value = null;
-				}
-			},
-			onClick: (info) => {
-				if (info.object != null) {
-					console.log("Clicked Arc:", info.object);
-
-					const clickedMovement = props.movements.find((movement) => {
-						return movement.properties._id === info.object.id;
-					});
-
-					if (clickedMovement) {
-						console.log("Found clicked movement:", clickedMovement);
-						emit("layer-click", {
-							features: [clickedMovement] as Array<
-								MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
-							>,
-							targetCoordinates: info.object.coordinates.map((point: { 0: number; 1: number }) => {
-								return [point[0], point[1]];
-							}),
-						});
-					} else {
-						console.warn("Movement not found for clicked arc.");
-					}
-				} else {
-					console.warn("No object clicked.");
-				}
-			},
 			updateTriggers: {
 				getSourceColor: hoveredMovementId.value,
 				getTargetColor: hoveredMovementId.value,
@@ -509,6 +496,7 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 
 		overlay.value.setProps({
 			layers: [updatedLayer],
+			interleaved: true,
 		});
 	}
 }

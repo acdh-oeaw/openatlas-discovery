@@ -304,7 +304,7 @@ watchEffect(() => {
 				:show-movements="showMovements"
 				@layer-click="onLayerClick"
 			>
-				<ThreePopup
+				<GeoMapPopup
 					v-if="popover != null"
 					:coordinates="popover.coordinates"
 					@close="popover = null"
@@ -344,7 +344,7 @@ watchEffect(() => {
 							</template>
 						</dl>
 					</article>
-				</ThreePopup>
+				</GeoMapPopup>
 			</GeoMap>
 
 			<Centered v-if="isLoading" class="pointer-events-none">

@@ -25,6 +25,23 @@ const context: Context = {
 	popup: null,
 };
 
+watch(
+	(newVal, oldVal) => {
+		return props.coordinates;
+	},
+	() => {
+		if (!window.tb) return;
+
+		window.tb.clear();
+		const obj = window.tb.label({ htmlElement: elementRef.value, alwaysVisible: true });
+
+		obj.setCoords([props.coordinates[0], props.coordinates[1], 50]);
+
+		window.tb.add(obj);
+	},
+	{ immediate: true },
+);
+
 onMounted(async () => {
 	await nextTick();
 	const { map } = geoMapContext;
@@ -59,17 +76,13 @@ onMounted(async () => {
 			window.tb.add(obj);
 		},
 		render() {
-			if (!window.tb) {
-				console.warn("Threebox is not initialized yet, skipping render");
-				return;
-			}
-			console.log("Rendering Threebox scene...");
 			window.tb.update();
 		},
 	};
 
 	if (!map.getLayer("3d-popup")) {
 		map.addLayer(customLayer);
+		map.moveLayer("3d-popup", "points");
 	}
 });
 
@@ -81,7 +94,7 @@ onScopeDispose(() => {
 <template>
 	<div
 		ref="elementRef"
-		class="invisible grid max-h-80 gap-3 overflow-y-auto"
+		class="grid max-h-80 gap-3 overflow-y-auto bg-white"
 		data-geo-map-popup="true"
 	>
 		<slot />
