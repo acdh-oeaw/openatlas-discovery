@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import { assert, debounce } from "@acdh-oeaw/lib";
+import { assert } from "@acdh-oeaw/lib";
 import { ArcLayer } from "@deck.gl/layers";
 import * as mapbox from "@deck.gl/mapbox";
 import * as turf from "@turf/turf";
@@ -50,7 +50,7 @@ const env = useRuntimeConfig();
 const theme = useColorMode();
 
 const hoveredMovementId = ref<string | null>(null);
-const movementLinesLayer = ref<any>(new ArcLayer());
+const movementLinesLayer = ref<unknown>(new ArcLayer());
 const curvedMovements = ref<Array<CurvedMovementLine> | null>(null);
 
 const colors = {
@@ -185,25 +185,25 @@ function init() {
 	//
 
 	map.on("mouseenter", "points", () => {
-		map.getCanvas().style.cursor = "pointer";
+		map.getCanvas().classList.add("!cursor-pointer");
 	});
 
 	map.on("mouseenter", "centerpoints", () => {
-		map.getCanvas().style.cursor = "pointer";
+		map.getCanvas().classList.add("!cursor-pointer");
 	});
 
 	//
 
 	map.on("mouseleave", "points", () => {
-		map.getCanvas().style.cursor = "";
+		map.getCanvas().classList.remove("!cursor-pointer");
 	});
 
 	map.on("mouseleave", "centerpoints", () => {
-		map.getCanvas().style.cursor = "";
+		map.getCanvas().classList.remove("!cursor-pointer");
 	});
 
 	map.on("mouseleave", "polygons", () => {
-		map.getCanvas().style.cursor = "";
+		map.getCanvas().classList.remove("!cursor-pointer");
 	});
 
 	//
@@ -236,7 +236,7 @@ watch(
 		console.log("update hoveredMovementId: ", hoveredMovementId.value);
 		updateArcLayerColors(curvedMovements.value);
 		if (context.map != null) {
-			context.map.getCanvas().style.cursor = newId ? "pointer" : "";
+			context.map.getCanvas().classList.toggle("!cursor-pointer", newId != null);
 			context.map.setPaintProperty(
 				"movements",
 				"circle-color", // The paint property
@@ -354,7 +354,7 @@ function updateMovements() {
 		})
 		.filter((feature) => {
 			return feature !== null;
-		});
+		}) as Array<CurvedMovementLine>;
 
 	const layer = new ArcLayer({
 		id: "arc",
