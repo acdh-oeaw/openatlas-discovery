@@ -27,6 +27,7 @@ interface CurvedMovementLine {
 }
 
 const overlay = ref<mapbox.MapboxOverlay | null>(null);
+const supportOverlay = ref<mapbox.MapboxOverlay | null>(null);
 const props = defineProps<{
 	features: Array<GeoJsonFeature>;
 	movements: Array<GeoJsonFeature>;
@@ -431,6 +432,7 @@ function updateMovements() {
 	movementLinesLayer.value = layer;
 
 	assert(context.map != null);
+
 	if (props.showMovements) {
 		overlay.value = new mapbox.MapboxOverlay({
 			layers: [movementLinesLayer.value] as deck.LayersList,
@@ -438,15 +440,17 @@ function updateMovements() {
 		});
 
 		context.map.addControl(overlay.value);
-		const supportOverlay = new mapbox.MapboxOverlay({
+		supportOverlay.value = new mapbox.MapboxOverlay({
 			layers: [supportLayer] as deck.LayersList,
 		});
 
-		context.map.addControl(supportOverlay);
+		context.map.addControl(supportOverlay.value);
 	} else {
-		if (overlay.value) {
+		if (overlay.value && supportOverlay.value) {
 			overlay.value.finalize();
+			supportOverlay.value.finalize();
 			context.map.removeControl(overlay.value);
+			context.map.removeControl(supportOverlay.value);
 		}
 	}
 }
