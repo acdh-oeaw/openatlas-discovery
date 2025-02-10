@@ -2,7 +2,7 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { assert } from "@acdh-oeaw/lib";
-import { ArcLayer } from "@deck.gl/layers";
+import { ArcLayer, IconLayer } from "@deck.gl/layers";
 import * as mapbox from "@deck.gl/mapbox";
 import * as turf from "@turf/turf";
 import type * as deck from "deck.gl";
@@ -379,6 +379,48 @@ function updateMovements() {
 		},
 	});
 
+	const iconLayer = new IconLayer<CurvedMovementLine>({
+		id: "IconLayer",
+		data: curvedMovements.value,
+		getColor: () => {
+			return [128, 128, 128, 128];
+		},
+		getIcon: () => {
+			return {
+				url: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNoZXZyb24tcmlnaHQiPjxwYXRoIGQ9Im05IDE4IDYtNi02LTYiLz48L3N2Zz4=",
+				width: 40,
+				height: 40,
+			};
+		},
+		getPosition: (d: CurvedMovementLine) => {
+			return [
+				...turf.center(turf.points(d.coordinates as Array<[number, number]>)).geometry.coordinates,
+				turf.distance(d.coordinates[0], d.coordinates[1], { units: "meters" }) / 2,
+			];
+		},
+		getSize: 24,
+		// iconAtlas: "https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png",
+		// iconMapping: {
+		// 	marker: {
+		// 		x: 0,
+		// 		y: 0,
+		// 		width: 128,
+		// 		height: 128,
+		// 		anchorY: 128,
+		// 		mask: true,
+		// 	},
+		// 	"marker-warning": {
+		// 		x: 128,
+		// 		y: 0,
+		// 		width: 128,
+		// 		height: 128,
+		// 		anchorY: 128,
+		// 		mask: false,
+		// 	},
+		// },
+		pickable: true,
+	});
+
 	const supportLayer = new ArcLayer({
 		id: "arc-support",
 		data: curvedMovements.value,
@@ -435,7 +477,7 @@ function updateMovements() {
 
 	if (props.showMovements) {
 		overlay.value = new mapbox.MapboxOverlay({
-			layers: [movementLinesLayer.value] as deck.LayersList,
+			layers: [movementLinesLayer.value, iconLayer] as deck.LayersList,
 			interleaved: true,
 		});
 
