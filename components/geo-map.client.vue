@@ -2,10 +2,13 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { assert } from "@acdh-oeaw/lib";
-import { ArcLayer, IconLayer } from "@deck.gl/layers";
+import type * as deck from "@deck.gl/core";
+import { ArcLayer } from "@deck.gl/layers";
 import * as mapbox from "@deck.gl/mapbox";
+import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
+import { load } from "@loaders.gl/core";
+import { OBJLoader } from "@loaders.gl/obj";
 import * as turf from "@turf/turf";
-import type * as deck from "deck.gl";
 import {
 	FullscreenControl,
 	type GeoJSONSource,
@@ -53,7 +56,11 @@ const theme = useColorMode();
 const hoveredMovementId = ref<string | null>(null);
 const movementLinesLayer = ref<unknown>(new ArcLayer());
 const curvedMovements = ref<Array<CurvedMovementLine> | null>(null);
+const zoomFactor = computed(() => {
+	return context.map?.getZoom();
+});
 
+const chevronMesh = ref<unknown>(null);
 const colors = {
 	points: project.colors.geojsonPoints,
 	areaCenterPoints: project.colors.geojsonAreaCenterPoints,
@@ -92,6 +99,7 @@ async function create() {
 	context.map = map;
 
 	map.on("load", init);
+	chevronMesh.value = (await load("/assets/3d-objects/chevron.obj", OBJLoader)) as unknown;
 }
 
 function init() {
@@ -207,6 +215,10 @@ function init() {
 		map.getCanvas().classList.remove("!cursor-pointer");
 	});
 
+	map.on("zoom", () => {
+		updateArcLayerColors(curvedMovements.value);
+	});
+
 	//
 
 	updateScope();
@@ -216,6 +228,16 @@ function init() {
 function dispose() {
 	context.map?.remove();
 }
+
+watch(
+	() => {
+		return zoomFactor.value;
+	},
+	() => {
+		console.log(zoomFactor.value);
+		updateArcLayerColors(curvedMovements.value);
+	},
+);
 
 watch(() => {
 	return props.features;
@@ -327,7 +349,6 @@ function updateMovements() {
 					return geometry.type === "Point";
 				});
 				if (points.length < 2) {
-					console.warn("Invalid geometries or not enough points:", geometries);
 					return null;
 				}
 				return points.slice(1).map((point, index) => {
@@ -344,12 +365,10 @@ function updateMovements() {
 							color: hexToRgb(colors.movement),
 						};
 					} else {
-						console.warn("Start or End Point is not valid:", { startPoint, endPoint });
 						return null;
 					}
 				});
 			} else {
-				console.warn("Movement is not a GeometryCollection:", movement);
 				return null;
 			}
 		})
@@ -379,18 +398,26 @@ function updateMovements() {
 		},
 	});
 
-	const iconLayer = new IconLayer<CurvedMovementLine>({
-		id: "IconLayer",
+	const meshLayer = new SimpleMeshLayer<CurvedMovementLine>({
+		id: "meshLayer",
 		data: curvedMovements.value,
-		getColor: () => {
-			return [128, 128, 128, 128];
+		getColor: (d: CurvedMovementLine) => {
+			return hoveredMovementId.value
+				? d.id === hoveredMovementId.value
+					? d.color
+					: [128, 128, 128, 128]
+				: d.color;
 		},
-		getIcon: () => {
-			return {
-				url: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNoZXZyb24tcmlnaHQiPjxwYXRoIGQ9Im05IDE4IDYtNi02LTYiLz48L3N2Zz4=",
-				width: 40,
-				height: 40,
-			};
+		getOrientation: (d: CurvedMovementLine) => {
+			return [
+				45,
+				turf.angle(
+					[d.coordinates[0][0] + 1, d.coordinates[0][1]],
+					d.coordinates[0],
+					d.coordinates[1],
+				),
+				0,
+			];
 		},
 		getPosition: (d: CurvedMovementLine) => {
 			return [
@@ -398,26 +425,11 @@ function updateMovements() {
 				turf.distance(d.coordinates[0], d.coordinates[1], { units: "meters" }) / 2,
 			];
 		},
-		getSize: 24,
-		// iconAtlas: "https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png",
-		// iconMapping: {
-		// 	marker: {
-		// 		x: 0,
-		// 		y: 0,
-		// 		width: 128,
-		// 		height: 128,
-		// 		anchorY: 128,
-		// 		mask: true,
-		// 	},
-		// 	"marker-warning": {
-		// 		x: 128,
-		// 		y: 0,
-		// 		width: 128,
-		// 		height: 128,
-		// 		anchorY: 128,
-		// 		mask: false,
-		// 	},
-		// },
+		mesh: chevronMesh.value as string,
+		getScale: () => {
+			return zoomFactor.value <= 5 ? [5000, 5000, 5000] : [20, 20, 20];
+		},
+
 		pickable: true,
 	});
 
@@ -477,7 +489,7 @@ function updateMovements() {
 
 	if (props.showMovements) {
 		overlay.value = new mapbox.MapboxOverlay({
-			layers: [movementLinesLayer.value, iconLayer] as deck.LayersList,
+			layers: [movementLinesLayer.value, meshLayer] as deck.LayersList,
 			interleaved: true,
 		});
 
@@ -540,13 +552,48 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 			},
 		});
 
+		const meshLayer = new SimpleMeshLayer<CurvedMovementLine>({
+			id: "meshLayer",
+			data: curvedMovements.value,
+			getColor: (d: CurvedMovementLine) => {
+				return hoveredMovementId.value
+					? d.id === hoveredMovementId.value
+						? d.color
+						: [128, 128, 128, 128]
+					: d.color;
+			},
+			getOrientation: (d: CurvedMovementLine) => {
+				return [
+					45,
+					turf.angle(
+						[d.coordinates[0][0] + 1, d.coordinates[0][1]],
+						d.coordinates[0],
+						d.coordinates[1],
+					),
+					0,
+				];
+			},
+			getPosition: (d: CurvedMovementLine) => {
+				return [
+					...turf.center(turf.points(d.coordinates as Array<[number, number]>)).geometry
+						.coordinates,
+					turf.distance(d.coordinates[0], d.coordinates[1], { units: "meters" }) / 2,
+				];
+			},
+			mesh: chevronMesh.value as string,
+			getScale: () => {
+				return zoomFactor.value <= 5 ? [5000, 5000, 5000] : [20, 20, 20];
+			},
+
+			pickable: true,
+		});
+
 		overlay.value.setProps({
-			layers: [updatedLayer],
+			layers: [updatedLayer, meshLayer],
 			interleaved: true,
 		});
 	}
 }
-
 defineExpose(context);
 provide(geoMapContextKey, context);
 </script>
