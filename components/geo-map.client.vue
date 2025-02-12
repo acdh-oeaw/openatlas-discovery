@@ -56,10 +56,8 @@ const theme = useColorMode();
 const hoveredMovementId = ref<string | null>(null);
 const movementLinesLayer = ref<unknown>(new ArcLayer());
 const curvedMovements = ref<Array<CurvedMovementLine> | null>(null);
-const zoomFactor = computed(() => {
-	return context.map?.getZoom();
-});
-
+const zoomFactor = ref<number>(0);
+const currentScale = ref<[number, number, number]>([7000, 7000, 7000]);
 const chevronMesh = ref<unknown>(null);
 const colors = {
 	points: project.colors.geojsonPoints,
@@ -216,7 +214,7 @@ function init() {
 	});
 
 	map.on("zoom", () => {
-		updateArcLayerColors(curvedMovements.value);
+		zoomFactor.value = map.getZoom();
 	});
 
 	//
@@ -267,6 +265,19 @@ watch(
 					? ["match", ["get", "_id"], hoveredMovementId.value, colors.movement, "#808080"]
 					: colors.movement, // If no movement is hovered, use the default color for all
 			);
+		}
+	},
+	{ immediate: true },
+);
+
+watch(
+	() => {
+		return zoomFactor.value;
+	},
+	() => {
+		// Update the scale based on the zoom level
+		if (zoomFactor.value) {
+			updateArcLayerColors(curvedMovements.value);
 		}
 	},
 	{ immediate: true },
@@ -427,9 +438,8 @@ function updateMovements() {
 		},
 		mesh: chevronMesh.value as string,
 		getScale: () => {
-			return zoomFactor.value <= 5 ? [5000, 5000, 5000] : [20, 20, 20];
+			return currentScale.value;
 		},
-
 		pickable: true,
 	});
 
@@ -520,6 +530,31 @@ function hexToRgb(hex: string) {
 		: null;
 }
 
+// Lerp function for smooth transitions
+function lerp(start: number, end: number, t: number) {
+	return start + t * (end - start);
+}
+
+function updateScaleSmoothly() {
+	const smoothingFactor = 0.1;
+	// const targetScale = Math.max(
+	// 	20, // Minimum scale
+	// 	Math.pow(2, 14 - zoomFactor.value * 0.7), // Less aggressive exponential decay
+	// );
+
+	const targetScale = Math.max(
+		20, // Minimum scale
+		7000 - (zoomFactor.value / 11) * (7000 - 20), 
+	);
+
+	// Interpolate scale
+	currentScale.value = currentScale.value.map((scaleValue) => {
+		return lerp(scaleValue, targetScale, smoothingFactor);
+	}) as [number, number, number];
+
+	return currentScale.value;
+}
+
 function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 	if (overlay.value) {
 		const updatedLayer = new ArcLayer({
@@ -552,7 +587,7 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 			},
 		});
 
-		const meshLayer = new SimpleMeshLayer<CurvedMovementLine>({
+		const updatedMeshLayer = new SimpleMeshLayer<CurvedMovementLine>({
 			id: "meshLayer",
 			data: curvedMovements.value,
 			getColor: (d: CurvedMovementLine) => {
@@ -582,14 +617,18 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 			},
 			mesh: chevronMesh.value as string,
 			getScale: () => {
-				return zoomFactor.value <= 5 ? [5000, 5000, 5000] : [20, 20, 20];
+				return updateScaleSmoothly();
 			},
-
 			pickable: true,
+			updateTriggers: {
+				getColor: hoveredMovementId.value, // Ensure color update triggers
+				getScale: zoomFactor.value, // Ensure position update triggers
+			},
 		});
 
+		console.log(updatedMeshLayer);
 		overlay.value.setProps({
-			layers: [updatedLayer, meshLayer],
+			layers: [updatedLayer, updatedMeshLayer],
 			interleaved: true,
 		});
 	}
