@@ -43,11 +43,8 @@ const updateHandledRelations = (relations: Array<RelationType>) => {
 <template>
 	<div v-if="entity != null && props.id != null">
 		<details
-			:class="
-				props.noTableSidebar
-					? 'group z-10 mb-2 mr-2 h-full translate-x-[-25vw] transition-transform duration-300 open:translate-x-0 absolute w-1/4'
-					: 'group z-10 mb-2 mr-2 h-full translate-x-[-25vw] transition-transform duration-300 open:translate-x-0'
-			"
+			class="group z-10 mb-2 mr-2 flex h-full translate-x-[-25vw] transition-transform duration-300 open:translate-x-0"
+			:class="props.noTableSidebar ? 'absolute w-1/4' : ''"
 			:open="openState"
 		>
 			<Card class="relative h-full overflow-y-scroll">
