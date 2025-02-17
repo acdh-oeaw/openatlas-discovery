@@ -6,7 +6,6 @@ import type * as deck from "@deck.gl/core";
 import { LayerExtension } from "@deck.gl/core";
 import { ArcLayer } from "@deck.gl/layers";
 import * as mapbox from "@deck.gl/mapbox";
-import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { load } from "@loaders.gl/core";
 import { OBJLoader } from "@loaders.gl/obj";
 import * as turf from "@turf/turf";
@@ -58,9 +57,6 @@ const theme = useColorMode();
 const hoveredMovementId = ref<string | null>(null);
 const movementLinesLayer = ref<unknown>(new ArcLayer());
 const curvedMovements = ref<Array<CurvedMovementLine> | null>(null);
-const zoomFactor = ref<number>(0);
-const currentScale = ref<[number, number, number]>([7000, 7000, 7000]);
-const chevronMesh = ref<unknown>(null);
 const coefficient = ref(0);
 const colors = {
 	points: project.colors.geojsonPoints,
@@ -130,7 +126,6 @@ async function create() {
 	context.map = map;
 
 	map.on("load", init);
-	chevronMesh.value = (await load("/assets/3d-objects/chevron.obj", OBJLoader)) as unknown;
 }
 
 function init() {
@@ -246,10 +241,6 @@ function init() {
 		map.getCanvas().classList.remove("!cursor-pointer");
 	});
 
-	map.on("zoom", () => {
-		zoomFactor.value = map.getZoom();
-	});
-
 	//
 
 	updateScope();
@@ -259,16 +250,6 @@ function init() {
 function dispose() {
 	context.map?.remove();
 }
-
-// watch(
-// 	() => {
-// 		return zoomFactor.value;
-// 	},
-// 	() => {
-// 		console.log(zoomFactor.value);
-// 		updateArcLayerColors(curvedMovements.value);
-// 	},
-// );
 
 watch(() => {
 	return props.features;
@@ -302,19 +283,6 @@ watch(
 	},
 	{ immediate: true },
 );
-
-// watch(
-// 	() => {
-// 		return zoomFactor.value;
-// 	},
-// 	() => {
-// 		// Update the scale based on the zoom level
-// 		if (zoomFactor.value) {
-// 			updateArcLayerColors(curvedMovements.value);
-// 		}
-// 	},
-// 	{ immediate: true },
-// );
 
 function updateScope() {
 	assert(context.map != null);
@@ -421,9 +389,9 @@ function updateMovements() {
 		}) as Array<CurvedMovementLine>;
 
 	const currentTimeAnimation = animate({
-		from: 0, // currentTime min value
-		to: 1000, // currentTime max value
-		duration: 5000, // over the course of 5 seconds
+		from: 0,
+		to: 1000,
+		duration: 5000,
 		repeat: Infinity,
 		onUpdate: updateLayers,
 	});
@@ -460,40 +428,6 @@ function updateMovements() {
 		extensions: [new ArcBrushingLayer()],
 	});
 
-	// const meshLayer = new SimpleMeshLayer<CurvedMovementLine>({
-	// 	id: "meshLayer",
-	// 	data: curvedMovements.value,
-	// 	getColor: (d: CurvedMovementLine) => {
-	// 		return hoveredMovementId.value
-	// 			? d.id === hoveredMovementId.value
-	// 				? d.color
-	// 				: [128, 128, 128, 128]
-	// 			: d.color;
-	// 	},
-	// 	getOrientation: (d: CurvedMovementLine) => {
-	// 		return [
-	// 			45,
-	// 			turf.angle(
-	// 				[d.coordinates[0][0] + 1, d.coordinates[0][1]],
-	// 				d.coordinates[0],
-	// 				d.coordinates[1],
-	// 			),
-	// 			0,
-	// 		];
-	// 	},
-	// 	getPosition: (d: CurvedMovementLine) => {
-	// 		return [
-	// 			...turf.center(turf.points(d.coordinates as Array<[number, number]>)).geometry.coordinates,
-	// 			turf.distance(d.coordinates[0], d.coordinates[1], { units: "meters" }) / 2,
-	// 		];
-	// 	},
-	// 	mesh: chevronMesh.value as string,
-	// 	getScale: () => {
-	// 		return currentScale.value;
-	// 	},
-	// 	pickable: true,
-	// });
-
 	const supportLayer = new ArcLayer({
 		id: "arc-support",
 		data: curvedMovements.value,
@@ -522,7 +456,6 @@ function updateMovements() {
 				});
 
 				if (clickedMovement) {
-					console.log("Found clicked movement:", clickedMovement);
 					emit("layer-click", {
 						features: [clickedMovement] as Array<
 							MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
@@ -581,11 +514,6 @@ function hexToRgb(hex: string) {
 		: null;
 }
 
-// Lerp function for smooth transitions
-function lerp(start: number, end: number, t: number) {
-	return start + t * (end - start);
-}
-
 function updateLayers(currentTime: number) {
 	if (overlay.value) {
 		coefficient.value = currentTime / 1000;
@@ -623,28 +551,11 @@ function updateLayers(currentTime: number) {
 	}
 }
 
-function updateScaleSmoothly() {
-	const smoothingFactor = 0.1;
-	// const targetScale = Math.max(
-	// 	20, // Minimum scale
-	// 	Math.pow(2, 14 - zoomFactor.value * 0.7), // Less aggressive exponential decay
-	// );
-
-	const targetScale = Math.max(
-		20, // Minimum scale
-		7000 - (zoomFactor.value / 11) * (7000 - 20),
-	);
-
-	// Interpolate scale
-	currentScale.value = currentScale.value.map((scaleValue) => {
-		return lerp(scaleValue, targetScale, smoothingFactor);
-	}) as [number, number, number];
-
-	return currentScale.value;
-}
-
 function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 	if (overlay.value) {
+		console.log(movements?.find((move) => {
+			return move.id === hoveredMovementId.value;
+		}));
 		const updatedLayer = new ArcLayer({
 			id: "arc", // Same ID to update the existing layer
 			data: movements ?? [],
@@ -677,46 +588,6 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 			extensions: [new ArcBrushingLayer()],
 		});
 
-		// const updatedMeshLayer = new SimpleMeshLayer<CurvedMovementLine>({
-		// 	id: "meshLayer",
-		// 	data: curvedMovements.value,
-		// 	getColor: (d: CurvedMovementLine) => {
-		// 		return hoveredMovementId.value
-		// 			? d.id === hoveredMovementId.value
-		// 				? d.color
-		// 				: [128, 128, 128, 128]
-		// 			: d.color;
-		// 	},
-		// 	getOrientation: (d: CurvedMovementLine) => {
-		// 		return [
-		// 			45,
-		// 			turf.angle(
-		// 				[d.coordinates[0][0] + 1, d.coordinates[0][1]],
-		// 				d.coordinates[0],
-		// 				d.coordinates[1],
-		// 			),
-		// 			0,
-		// 		];
-		// 	},
-		// 	getPosition: (d: CurvedMovementLine) => {
-		// 		return [
-		// 			...turf.center(turf.points(d.coordinates as Array<[number, number]>)).geometry
-		// 				.coordinates,
-		// 			turf.distance(d.coordinates[0], d.coordinates[1], { units: "meters" }) / 2,
-		// 		];
-		// 	},
-		// 	mesh: chevronMesh.value as string,
-		// 	getScale: () => {
-		// 		return updateScaleSmoothly();
-		// 	},
-		// 	pickable: true,
-		// 	updateTriggers: {
-		// 		getColor: hoveredMovementId.value, // Ensure color update triggers
-		// 		getScale: zoomFactor.value, // Ensure position update triggers
-		// 	},
-		// });
-
-		// console.log(updatedMeshLayer);
 		overlay.value.setProps({
 			layers: [updatedLayer],
 			interleaved: true,
