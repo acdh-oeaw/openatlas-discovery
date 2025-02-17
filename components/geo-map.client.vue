@@ -438,15 +438,23 @@ function updateMovements() {
 			return d.coordinates[1];
 		},
 		getSourceColor: (d) => {
-			return [255, 165, 0];
+			return hoveredMovementId.value
+				? d.id === hoveredMovementId.value
+					? d.color
+					: [128, 128, 128, 128]
+				: d.color;
 		},
 		getTargetColor: (d) => {
-			return d.color;
+			return hoveredMovementId.value
+				? d.id === hoveredMovementId.value
+					? d.color
+					: [128, 128, 128, 50]
+				: d.color;
 		},
 		getWidth: 3,
 		updateTriggers: {
-			getSourceColor: hoveredMovementId.value,
-			getTargetColor: hoveredMovementId.value,
+			getSourceColor: coefficient.value,
+			getTargetColor: coefficient.value,
 		},
 		coef: coefficient.value,
 		extensions: [new ArcBrushingLayer()],
@@ -581,11 +589,37 @@ function lerp(start: number, end: number, t: number) {
 function updateLayers(currentTime: number) {
 	if (overlay.value) {
 		coefficient.value = currentTime / 1000;
-		overlay.value.setProps({
-			layers: overlay.value._props.layers.map((layer) => {
-				return layer.id === "arc" ? layer.clone({ coef: coefficient.value }) : layer;
-			}),
-		});
+		if (hoveredMovementId.value === null) {
+			overlay.value.setProps({
+				layers: overlay.value._props.layers.map((layer) => {
+					return layer.id === "arc" ? layer.clone({ coef: coefficient.value }) : layer;
+				}),
+			});
+		} else {
+			overlay.value.setProps({
+				layers: overlay.value._props.layers.map((layer) => {
+					return layer.id === "arc"
+						? layer.clone({
+								coef: coefficient.value,
+								getSourceColor: (d) => {
+									return hoveredMovementId.value
+										? d.id === hoveredMovementId.value
+											? d.color
+											: [128, 128, 128, 128]
+										: d.color;
+								},
+								getTargetColor: (d) => {
+									return hoveredMovementId.value
+										? d.id === hoveredMovementId.value
+											? d.color
+											: [128, 128, 128, 50]
+										: d.color;
+								},
+							})
+						: layer;
+				}),
+			});
+		}
 	}
 }
 
@@ -624,14 +658,14 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 				return hoveredMovementId.value
 					? d.id === hoveredMovementId.value
 						? d.color
-						: [128, 128, 128, 128]
+						: [128, 128, 128]
 					: d.color;
 			},
 			getTargetColor: (d) => {
 				return hoveredMovementId.value
 					? d.id === hoveredMovementId.value
 						? d.color
-						: [128, 128, 128, 50]
+						: [128, 128, 128]
 					: d.color;
 			},
 			getWidth: 3,
@@ -639,6 +673,8 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 				getSourceColor: hoveredMovementId.value,
 				getTargetColor: hoveredMovementId.value,
 			},
+			coef: coefficient.value / 1000,
+			extensions: [new ArcBrushingLayer()],
 		});
 
 		// const updatedMeshLayer = new SimpleMeshLayer<CurvedMovementLine>({
