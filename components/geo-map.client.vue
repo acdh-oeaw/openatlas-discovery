@@ -3,6 +3,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import { assert } from "@acdh-oeaw/lib";
 import type * as deck from "@deck.gl/core";
+import { LayerExtension } from "@deck.gl/core";
 import { ArcLayer } from "@deck.gl/layers";
 import * as mapbox from "@deck.gl/mapbox";
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
@@ -17,6 +18,7 @@ import {
 	NavigationControl,
 	ScaleControl,
 } from "maplibre-gl";
+import { animate } from "popmotion";
 
 import { type GeoMapContext, geoMapContextKey } from "@/components/geo-map.context";
 import { initialViewState } from "@/config/geo-map.config";
@@ -59,11 +61,42 @@ const curvedMovements = ref<Array<CurvedMovementLine> | null>(null);
 const zoomFactor = ref<number>(0);
 const currentScale = ref<[number, number, number]>([7000, 7000, 7000]);
 const chevronMesh = ref<unknown>(null);
+const coefficient = ref(0);
 const colors = {
 	points: project.colors.geojsonPoints,
 	areaCenterPoints: project.colors.geojsonAreaCenterPoints,
 	movement: project.colors.geojsonMovement,
 };
+
+const ArcBrushingShader = {
+	name: "brushing-shader",
+	inject: {
+		"vs:#decl": `
+         uniform float coef;
+        `,
+		"vs:#main-end": `
+        vec4 colorA = instanceTargetColors;
+    		vec4 colorB = vec4(colorA.rgb, 0.2);
+    		float pct = step(coef, segmentRatio);
+    		vColor = mix(colorA, colorB, pct);
+                    `,
+		"fs:#main-start": `
+        if (vColor.a == 0.0) discard;
+                    `,
+	},
+};
+class ArcBrushingLayer extends LayerExtension {
+	override getShaders() {
+		return ArcBrushingShader;
+	}
+
+	override updateState({ props, oldProps, context }) {
+		const model = this._getModel();
+		if (props.coef !== oldProps.coef) {
+			model.setUniforms({ coef: props.coef });
+		}
+	}
+}
 
 const mapStyle = computed(() => {
 	return theme.value === "dark" ? env.public.mapBaselayerUrlDark : env.public.mapBaselayerUrlLight;
@@ -227,15 +260,15 @@ function dispose() {
 	context.map?.remove();
 }
 
-watch(
-	() => {
-		return zoomFactor.value;
-	},
-	() => {
-		console.log(zoomFactor.value);
-		updateArcLayerColors(curvedMovements.value);
-	},
-);
+// watch(
+// 	() => {
+// 		return zoomFactor.value;
+// 	},
+// 	() => {
+// 		console.log(zoomFactor.value);
+// 		updateArcLayerColors(curvedMovements.value);
+// 	},
+// );
 
 watch(() => {
 	return props.features;
@@ -270,18 +303,18 @@ watch(
 	{ immediate: true },
 );
 
-watch(
-	() => {
-		return zoomFactor.value;
-	},
-	() => {
-		// Update the scale based on the zoom level
-		if (zoomFactor.value) {
-			updateArcLayerColors(curvedMovements.value);
-		}
-	},
-	{ immediate: true },
-);
+// watch(
+// 	() => {
+// 		return zoomFactor.value;
+// 	},
+// 	() => {
+// 		// Update the scale based on the zoom level
+// 		if (zoomFactor.value) {
+// 			updateArcLayerColors(curvedMovements.value);
+// 		}
+// 	},
+// 	{ immediate: true },
+// );
 
 function updateScope() {
 	assert(context.map != null);
@@ -387,6 +420,14 @@ function updateMovements() {
 			return feature !== null;
 		}) as Array<CurvedMovementLine>;
 
+	const currentTimeAnimation = animate({
+		from: 0, // currentTime min value
+		to: 1000, // currentTime max value
+		duration: 5000, // over the course of 5 seconds
+		repeat: Infinity,
+		onUpdate: updateLayers,
+	});
+
 	const layer = new ArcLayer({
 		id: "arc",
 		data: curvedMovements.value,
@@ -397,7 +438,7 @@ function updateMovements() {
 			return d.coordinates[1];
 		},
 		getSourceColor: (d) => {
-			return d.color;
+			return [255, 165, 0];
 		},
 		getTargetColor: (d) => {
 			return d.color;
@@ -407,41 +448,43 @@ function updateMovements() {
 			getSourceColor: hoveredMovementId.value,
 			getTargetColor: hoveredMovementId.value,
 		},
+		coef: coefficient.value,
+		extensions: [new ArcBrushingLayer()],
 	});
 
-	const meshLayer = new SimpleMeshLayer<CurvedMovementLine>({
-		id: "meshLayer",
-		data: curvedMovements.value,
-		getColor: (d: CurvedMovementLine) => {
-			return hoveredMovementId.value
-				? d.id === hoveredMovementId.value
-					? d.color
-					: [128, 128, 128, 128]
-				: d.color;
-		},
-		getOrientation: (d: CurvedMovementLine) => {
-			return [
-				45,
-				turf.angle(
-					[d.coordinates[0][0] + 1, d.coordinates[0][1]],
-					d.coordinates[0],
-					d.coordinates[1],
-				),
-				0,
-			];
-		},
-		getPosition: (d: CurvedMovementLine) => {
-			return [
-				...turf.center(turf.points(d.coordinates as Array<[number, number]>)).geometry.coordinates,
-				turf.distance(d.coordinates[0], d.coordinates[1], { units: "meters" }) / 2,
-			];
-		},
-		mesh: chevronMesh.value as string,
-		getScale: () => {
-			return currentScale.value;
-		},
-		pickable: true,
-	});
+	// const meshLayer = new SimpleMeshLayer<CurvedMovementLine>({
+	// 	id: "meshLayer",
+	// 	data: curvedMovements.value,
+	// 	getColor: (d: CurvedMovementLine) => {
+	// 		return hoveredMovementId.value
+	// 			? d.id === hoveredMovementId.value
+	// 				? d.color
+	// 				: [128, 128, 128, 128]
+	// 			: d.color;
+	// 	},
+	// 	getOrientation: (d: CurvedMovementLine) => {
+	// 		return [
+	// 			45,
+	// 			turf.angle(
+	// 				[d.coordinates[0][0] + 1, d.coordinates[0][1]],
+	// 				d.coordinates[0],
+	// 				d.coordinates[1],
+	// 			),
+	// 			0,
+	// 		];
+	// 	},
+	// 	getPosition: (d: CurvedMovementLine) => {
+	// 		return [
+	// 			...turf.center(turf.points(d.coordinates as Array<[number, number]>)).geometry.coordinates,
+	// 			turf.distance(d.coordinates[0], d.coordinates[1], { units: "meters" }) / 2,
+	// 		];
+	// 	},
+	// 	mesh: chevronMesh.value as string,
+	// 	getScale: () => {
+	// 		return currentScale.value;
+	// 	},
+	// 	pickable: true,
+	// });
 
 	const supportLayer = new ArcLayer({
 		id: "arc-support",
@@ -499,7 +542,7 @@ function updateMovements() {
 
 	if (props.showMovements) {
 		overlay.value = new mapbox.MapboxOverlay({
-			layers: [movementLinesLayer.value, meshLayer] as deck.LayersList,
+			layers: [movementLinesLayer.value] as deck.LayersList,
 			interleaved: true,
 		});
 
@@ -535,6 +578,17 @@ function lerp(start: number, end: number, t: number) {
 	return start + t * (end - start);
 }
 
+function updateLayers(currentTime: number) {
+	if (overlay.value) {
+		coefficient.value = currentTime / 1000;
+		overlay.value.setProps({
+			layers: overlay.value._props.layers.map((layer) => {
+				return layer.id === "arc" ? layer.clone({ coef: coefficient.value }) : layer;
+			}),
+		});
+	}
+}
+
 function updateScaleSmoothly() {
 	const smoothingFactor = 0.1;
 	// const targetScale = Math.max(
@@ -544,7 +598,7 @@ function updateScaleSmoothly() {
 
 	const targetScale = Math.max(
 		20, // Minimum scale
-		7000 - (zoomFactor.value / 11) * (7000 - 20), 
+		7000 - (zoomFactor.value / 11) * (7000 - 20),
 	);
 
 	// Interpolate scale
@@ -587,48 +641,48 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 			},
 		});
 
-		const updatedMeshLayer = new SimpleMeshLayer<CurvedMovementLine>({
-			id: "meshLayer",
-			data: curvedMovements.value,
-			getColor: (d: CurvedMovementLine) => {
-				return hoveredMovementId.value
-					? d.id === hoveredMovementId.value
-						? d.color
-						: [128, 128, 128, 128]
-					: d.color;
-			},
-			getOrientation: (d: CurvedMovementLine) => {
-				return [
-					45,
-					turf.angle(
-						[d.coordinates[0][0] + 1, d.coordinates[0][1]],
-						d.coordinates[0],
-						d.coordinates[1],
-					),
-					0,
-				];
-			},
-			getPosition: (d: CurvedMovementLine) => {
-				return [
-					...turf.center(turf.points(d.coordinates as Array<[number, number]>)).geometry
-						.coordinates,
-					turf.distance(d.coordinates[0], d.coordinates[1], { units: "meters" }) / 2,
-				];
-			},
-			mesh: chevronMesh.value as string,
-			getScale: () => {
-				return updateScaleSmoothly();
-			},
-			pickable: true,
-			updateTriggers: {
-				getColor: hoveredMovementId.value, // Ensure color update triggers
-				getScale: zoomFactor.value, // Ensure position update triggers
-			},
-		});
+		// const updatedMeshLayer = new SimpleMeshLayer<CurvedMovementLine>({
+		// 	id: "meshLayer",
+		// 	data: curvedMovements.value,
+		// 	getColor: (d: CurvedMovementLine) => {
+		// 		return hoveredMovementId.value
+		// 			? d.id === hoveredMovementId.value
+		// 				? d.color
+		// 				: [128, 128, 128, 128]
+		// 			: d.color;
+		// 	},
+		// 	getOrientation: (d: CurvedMovementLine) => {
+		// 		return [
+		// 			45,
+		// 			turf.angle(
+		// 				[d.coordinates[0][0] + 1, d.coordinates[0][1]],
+		// 				d.coordinates[0],
+		// 				d.coordinates[1],
+		// 			),
+		// 			0,
+		// 		];
+		// 	},
+		// 	getPosition: (d: CurvedMovementLine) => {
+		// 		return [
+		// 			...turf.center(turf.points(d.coordinates as Array<[number, number]>)).geometry
+		// 				.coordinates,
+		// 			turf.distance(d.coordinates[0], d.coordinates[1], { units: "meters" }) / 2,
+		// 		];
+		// 	},
+		// 	mesh: chevronMesh.value as string,
+		// 	getScale: () => {
+		// 		return updateScaleSmoothly();
+		// 	},
+		// 	pickable: true,
+		// 	updateTriggers: {
+		// 		getColor: hoveredMovementId.value, // Ensure color update triggers
+		// 		getScale: zoomFactor.value, // Ensure position update triggers
+		// 	},
+		// });
 
-		console.log(updatedMeshLayer);
+		// console.log(updatedMeshLayer);
 		overlay.value.setProps({
-			layers: [updatedLayer, updatedMeshLayer],
+			layers: [updatedLayer],
 			interleaved: true,
 		});
 	}
