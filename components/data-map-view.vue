@@ -95,6 +95,8 @@ const entitiesById = computed(() => {
 let show = ref(false);
 let showMovements = ref(false);
 
+const movementId = ref<number | null>(null);
+
 function togglePolygons() {
 	show.value = !show.value;
 }
@@ -231,6 +233,40 @@ watchEffect(() => {
 		}
 	}
 });
+
+const movementDetails = computed(() => {
+	if (multipleMovements.data?.value) {
+		return multipleMovements.data?.value;
+	} else return null;
+});
+
+const movementIds = computed(() => {
+	if (movementDetails.value === null) {
+		return [];
+	}
+
+	const features = Object.values(movementDetails.value).flatMap((entity) => {
+		if (entity && typeof entity === "object" && Array.isArray(entity.features)) {
+			return entity.features as Array<EntityFeature>;
+		}
+		return [];
+	});
+	
+	// Now map through the features to get the IDs
+	return features.map((movement) => {
+		return getUnprefixedId(movement["@id"]);
+	});
+});
+
+const multipleMovements = useGetLinkedEntitiesRecursive(
+	computed(() => {
+		return { entityId: movementId.value };
+	}),
+);
+
+function setMovementId({ id }) {
+	return (movementId.value = id);
+}
 </script>
 
 <template>
@@ -305,7 +341,9 @@ watchEffect(() => {
 				:width="width"
 				:has-polygons="show"
 				:show-movements="showMovements"
+				:multiple-movement-ids="movementIds"
 				@layer-click="onLayerClick"
+				@movement-hovered="setMovementId"
 			>
 				<GeoMapPopup
 					v-if="popover != null"

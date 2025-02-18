@@ -6,8 +6,6 @@ import type * as deck from "@deck.gl/core";
 import { LayerExtension } from "@deck.gl/core";
 import { ArcLayer } from "@deck.gl/layers";
 import * as mapbox from "@deck.gl/mapbox";
-import { load } from "@loaders.gl/core";
-import { OBJLoader } from "@loaders.gl/obj";
 import * as turf from "@turf/turf";
 import {
 	FullscreenControl,
@@ -39,6 +37,7 @@ const props = defineProps<{
 	width: number;
 	hasPolygons?: boolean;
 	showMovements: boolean;
+	multipleMovementIds: Array<string> | null;
 }>();
 
 const emit = defineEmits<{
@@ -47,6 +46,12 @@ const emit = defineEmits<{
 		args: {
 			features: Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">>;
 			targetCoordinates?: Array<[number, number]> | [number, number];
+		},
+	): void;
+	(
+		event: "movement-hovered",
+		args: {
+			id: string | null;
 		},
 	): void;
 }>();
@@ -265,6 +270,16 @@ watch(() => {
 
 watch(
 	() => {
+		return props.multipleMovementIds;
+	},
+	() => {
+		console.log(props.multipleMovementIds);
+	},
+	{ immediate: true },
+);
+
+watch(
+	() => {
 		return hoveredMovementId.value;
 	},
 	(newId) => {
@@ -440,11 +455,13 @@ function updateMovements() {
 		getWidth: 20,
 		pickable: true,
 		opacity: 0,
-		onHover: (d) => {
-			if (d.object != null) {
-				hoveredMovementId.value = d.object.id || null;
+		onHover: (info) => {
+			if (info.object != null) {
+				hoveredMovementId.value = info.object.id || null;
+				emit("movement-hovered", { id: hoveredMovementId.value });
 			} else {
 				hoveredMovementId.value = null;
+				emit("movement-hovered", { id: null });
 			}
 		},
 		onClick: (info) => {
@@ -530,18 +547,28 @@ function updateLayers(currentTime: number) {
 						? layer.clone({
 								coef: coefficient.value,
 								getSourceColor: (d) => {
-									return hoveredMovementId.value
-										? d.id === hoveredMovementId.value
-											? d.color
-											: [128, 128, 128, 128]
-										: d.color;
+									if (props.multipleMovementIds != null && hoveredMovementId.value != null) {
+										const isHovered: boolean = d.id === hoveredMovementId.value;
+										const moves: boolean = props.multipleMovementIds.includes(d.id);
+
+										if (isHovered || moves) {
+											return d.color;
+										} else {
+											return [128, 128, 128];
+										}
+									} else return d.color;
 								},
 								getTargetColor: (d) => {
-									return hoveredMovementId.value
-										? d.id === hoveredMovementId.value
-											? d.color
-											: [128, 128, 128, 50]
-										: d.color;
+									if (props.multipleMovementIds != null && hoveredMovementId.value != null) {
+										const isHovered: boolean = d.id === hoveredMovementId.value;
+										const moves: boolean = props.multipleMovementIds.includes(d.id);
+
+										if (isHovered || moves) {
+											return d.color;
+										} else {
+											return [128, 128, 128];
+										}
+									} else return d.color;
 								},
 							})
 						: layer;
@@ -553,9 +580,6 @@ function updateLayers(currentTime: number) {
 
 function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 	if (overlay.value) {
-		console.log(movements?.find((move) => {
-			return move.id === hoveredMovementId.value;
-		}));
 		const updatedLayer = new ArcLayer({
 			id: "arc", // Same ID to update the existing layer
 			data: movements ?? [],
@@ -566,23 +590,33 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 				return d.coordinates[1];
 			},
 			getSourceColor: (d) => {
-				return hoveredMovementId.value
-					? d.id === hoveredMovementId.value
-						? d.color
-						: [128, 128, 128]
-					: d.color;
+				if (props.multipleMovementIds != null && hoveredMovementId.value != null) {
+					const isHovered: boolean = d.id === hoveredMovementId.value;
+					const moves: boolean = props.multipleMovementIds.includes(d.id);
+
+					if (isHovered || moves) {
+						return d.color;
+					} else {
+						return [128, 128, 128];
+					}
+				} else return d.color;
 			},
 			getTargetColor: (d) => {
-				return hoveredMovementId.value
-					? d.id === hoveredMovementId.value
-						? d.color
-						: [128, 128, 128]
-					: d.color;
+				if (props.multipleMovementIds != null && hoveredMovementId.value != null) {
+					const isHovered: boolean = d.id === hoveredMovementId.value;
+					const moves: boolean = props.multipleMovementIds.includes(d.id);
+
+					if (isHovered || moves) {
+						return d.color;
+					} else {
+						return [128, 128, 128];
+					}
+				} else return d.color;
 			},
 			getWidth: 3,
 			updateTriggers: {
-				getSourceColor: hoveredMovementId.value,
-				getTargetColor: hoveredMovementId.value,
+				getSourceColor: [hoveredMovementId.value, props.multipleMovementIds],
+				getTargetColor: [hoveredMovementId.value, props.multipleMovementIds],
 			},
 			coef: coefficient.value / 1000,
 			extensions: [new ArcBrushingLayer()],
