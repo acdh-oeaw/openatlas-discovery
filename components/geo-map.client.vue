@@ -37,7 +37,7 @@ const props = defineProps<{
 	width: number;
 	hasPolygons?: boolean;
 	showMovements: boolean;
-	multipleMovementIds: Array<string> | null;
+	multipleMovementIds: Array<{ id: string; systemClass: string }> | null;
 }>();
 
 const emit = defineEmits<{
@@ -62,6 +62,11 @@ const theme = useColorMode();
 const hoveredMovementId = ref<string | null>(null);
 const movementLinesLayer = ref<unknown>(new ArcLayer());
 const curvedMovements = ref<Array<CurvedMovementLine> | null>(null);
+
+const updatedCurvedMovements = computed(() => {
+	return applyTiltToMatchingArcs(curvedMovements.value ?? []);
+});
+
 const coefficient = ref(0);
 const colors = {
 	points: project.colors.geojsonPoints,
@@ -272,8 +277,10 @@ watch(
 	() => {
 		return props.multipleMovementIds;
 	},
-	() => {
-		console.log(props.multipleMovementIds);
+	(newVal, oldVal) => {
+		if (newVal !== oldVal) {
+			console.log(props.multipleMovementIds);
+		}
 	},
 	{ immediate: true },
 );
@@ -284,7 +291,7 @@ watch(
 	},
 	(newId) => {
 		console.log("update hoveredMovementId: ", hoveredMovementId.value);
-		updateArcLayerColors(curvedMovements.value);
+		updateArcLayerColors(updatedCurvedMovements.value);
 		if (context.map != null) {
 			context.map.getCanvas().classList.toggle("!cursor-pointer", newId != null);
 			context.map.setPaintProperty(
@@ -413,7 +420,7 @@ function updateMovements() {
 
 	const layer = new ArcLayer({
 		id: "arc",
-		data: curvedMovements.value,
+		data: updatedCurvedMovements.value,
 		getSourcePosition: (d) => {
 			return d.coordinates[0];
 		},
@@ -434,6 +441,9 @@ function updateMovements() {
 					: [128, 128, 128, 50]
 				: d.color;
 		},
+		getTilt: (d) => {
+			return d.tilt || 0;
+		},
 		getWidth: 3,
 		updateTriggers: {
 			getSourceColor: coefficient.value,
@@ -445,7 +455,7 @@ function updateMovements() {
 
 	const supportLayer = new ArcLayer({
 		id: "arc-support",
-		data: curvedMovements.value,
+		data: updatedCurvedMovements.value,
 		getSourcePosition: (d) => {
 			return d.coordinates[0];
 		},
@@ -488,6 +498,9 @@ function updateMovements() {
 				console.warn("No object clicked.");
 			}
 		},
+		getTilt: (d) => {
+			return d.tilt || 0;
+		},
 		updateTriggers: {
 			getSourceColor: hoveredMovementId.value,
 			getTargetColor: hoveredMovementId.value,
@@ -519,6 +532,35 @@ function updateMovements() {
 		}
 	}
 }
+function isSameCoordinates(arc1: CurvedMovementLine, arc2: CurvedMovementLine): boolean {
+	return (
+		arc1.coordinates[0][0] === arc2.coordinates[0][0] &&
+		arc1.coordinates[0][1] === arc2.coordinates[0][1] &&
+		arc1.coordinates[1][0] === arc2.coordinates[1][0] &&
+		arc1.coordinates[1][1] === arc2.coordinates[1][1]
+	);
+}
+
+function applyTiltToMatchingArcs(
+	curvedMovements: Array<CurvedMovementLine>,
+): Array<CurvedMovementLine> {
+	return curvedMovements.map((arc, index, array) => {
+		let tiltValue = 0;
+
+		const matchingArcs = array.filter((otherArc, otherIndex) => {
+			return index !== otherIndex && isSameCoordinates(arc, otherArc);
+		});
+
+		if (matchingArcs.length > 0) {
+			tiltValue = (index % 2 === 0 ? 1 : -1) * 5;
+		}
+
+		return {
+			...arc,
+			tilt: tiltValue, // Store the tilt value on the arc
+		};
+	});
+}
 
 function hexToRgb(hex: string) {
 	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -549,7 +591,9 @@ function updateLayers(currentTime: number) {
 								getSourceColor: (d) => {
 									if (props.multipleMovementIds != null && hoveredMovementId.value != null) {
 										const isHovered: boolean = d.id === hoveredMovementId.value;
-										const moves: boolean = props.multipleMovementIds.includes(d.id);
+										const moves = props.multipleMovementIds.some((move) => {
+											return move.id === d.id;
+										});
 
 										if (isHovered || moves) {
 											return d.color;
@@ -561,7 +605,9 @@ function updateLayers(currentTime: number) {
 								getTargetColor: (d) => {
 									if (props.multipleMovementIds != null && hoveredMovementId.value != null) {
 										const isHovered: boolean = d.id === hoveredMovementId.value;
-										const moves: boolean = props.multipleMovementIds.includes(d.id);
+										const moves: boolean = props.multipleMovementIds.some((move) => {
+											return move.id === d.id;
+										});
 
 										if (isHovered || moves) {
 											return d.color;
@@ -592,8 +638,9 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 			getSourceColor: (d) => {
 				if (props.multipleMovementIds != null && hoveredMovementId.value != null) {
 					const isHovered: boolean = d.id === hoveredMovementId.value;
-					const moves: boolean = props.multipleMovementIds.includes(d.id);
-
+					const moves: boolean = props.multipleMovementIds.some((move) => {
+						return move.id === d.id;
+					});
 					if (isHovered || moves) {
 						return d.color;
 					} else {
@@ -604,7 +651,9 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 			getTargetColor: (d) => {
 				if (props.multipleMovementIds != null && hoveredMovementId.value != null) {
 					const isHovered: boolean = d.id === hoveredMovementId.value;
-					const moves: boolean = props.multipleMovementIds.includes(d.id);
+					const moves: boolean = props.multipleMovementIds.some((move) => {
+						return move.id === d.id;
+					});
 
 					if (isHovered || moves) {
 						return d.color;
@@ -612,6 +661,9 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 						return [128, 128, 128];
 					}
 				} else return d.color;
+			},
+			getTilt: (d) => {
+				return d.tilt || 0;
 			},
 			getWidth: 3,
 			updateTriggers: {

@@ -240,9 +240,9 @@ const movementDetails = computed(() => {
 	} else return null;
 });
 
-const movementIds = computed(() => {
+const linkedMovements= computed(() => {
 	if (movementDetails.value === null) {
-		return [];
+		return null;
 	}
 
 	const features = Object.values(movementDetails.value).flatMap((entity) => {
@@ -251,10 +251,13 @@ const movementIds = computed(() => {
 		}
 		return [];
 	});
-	
+
 	// Now map through the features to get the IDs
 	return features.map((movement) => {
-		return getUnprefixedId(movement["@id"]);
+		return {
+			id: getUnprefixedId(movement["@id"]),
+			systemClass: movement.systemClass,
+		};
 	});
 });
 
@@ -341,7 +344,7 @@ function setMovementId({ id }) {
 				:width="width"
 				:has-polygons="show"
 				:show-movements="showMovements"
-				:multiple-movement-ids="movementIds"
+				:multiple-movement-ids="linkedMovements"
 				@layer-click="onLayerClick"
 				@movement-hovered="setMovementId"
 			>
