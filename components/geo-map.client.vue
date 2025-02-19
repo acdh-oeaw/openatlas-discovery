@@ -427,9 +427,6 @@ function updateMovements() {
 			};
 		},
 	);
-	// .filter((feature) => {
-	// 	return feature !== null;
-	// }) as Array<CurvedMovementLine>;
 
 	console.log(updatedCurvedMovements.value);
 
@@ -499,13 +496,17 @@ function updateMovements() {
 			if (info.object != null) {
 				console.log("Clicked Arc:", info.object);
 
-				const clickedMovement = props.movements.find((movement) => {
-					return movement.properties._id === info.object.id;
+				const clickedIds = info.object.id.flat();
+
+				const clickedMovements = props.movements.filter((movement) => {
+					return clickedIds.includes(movement.properties._id);
 				});
 
-				if (clickedMovement) {
+				console.log(clickedMovements);
+
+				if (clickedMovements.length > 0) {
 					emit("layer-click", {
-						features: [clickedMovement] as Array<
+						features: clickedMovements as Array<
 							MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
 						>,
 						targetCoordinates: info.object.coordinates.map((point: { 0: number; 1: number }) => {
