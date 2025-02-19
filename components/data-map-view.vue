@@ -289,8 +289,8 @@ const multipleMovements = useGetLinkedEntitiesRecursive(
 	}),
 );
 
-function setMovementId({ id }) {
-	return (movementId.value = id);
+function setMovementId({ id }: { id: string | null }) {
+	return (movementId.value = id ? parseInt(id) : null);
 }
 </script>
 
