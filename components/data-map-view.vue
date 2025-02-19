@@ -235,12 +235,12 @@ watchEffect(() => {
 });
 
 const movementDetails = computed(() => {
-	if (multipleMovements.data?.value) {
-		return multipleMovements.data?.value;
+	if (multipleMovements.data.value) {
+		return multipleMovements.data.value;
 	} else return null;
 });
 
-const linkedMovements= computed(() => {
+const linkedMovements = computed(() => {
 	if (movementDetails.value === null) {
 		return null;
 	}
@@ -267,8 +267,8 @@ const multipleMovements = useGetLinkedEntitiesRecursive(
 	}),
 );
 
-function setMovementId({ id }) {
-	return (movementId.value = id);
+function setMovementId({ id }: { id: string | null }) {
+	return (movementId.value = id ? parseInt(id) : null);
 }
 </script>
 

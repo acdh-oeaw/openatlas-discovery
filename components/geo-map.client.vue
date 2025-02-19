@@ -96,7 +96,14 @@ class ArcBrushingLayer extends LayerExtension {
 		return ArcBrushingShader;
 	}
 
-	override updateState({ props, oldProps, context }) {
+	override updateState({
+		props,
+		oldProps,
+	}: {
+		props: Record<string, unknown>;
+		oldProps: Record<string, unknown>;
+	}) {
+		// @ts-expect-error - _getModel() is a private method
 		const model = this._getModel();
 		if (props.coef !== oldProps.coef) {
 			model.setUniforms({ coef: props.coef });
@@ -410,7 +417,7 @@ function updateMovements() {
 			return feature !== null;
 		}) as Array<CurvedMovementLine>;
 
-	const currentTimeAnimation = animate({
+	const _currentTimeAnimation = animate({
 		from: 0,
 		to: 1000,
 		duration: 5000,
@@ -572,23 +579,29 @@ function hexToRgb(hex: string) {
 			] as deck.Color)
 		: null;
 }
-
+interface PatchedLayerProps extends deck.LayerProps {
+	coef: number;
+}
 function updateLayers(currentTime: number) {
 	if (overlay.value) {
 		coefficient.value = currentTime / 1000;
 		if (hoveredMovementId.value === null) {
 			overlay.value.setProps({
-				layers: overlay.value._props.layers.map((layer) => {
-					return layer.id === "arc" ? layer.clone({ coef: coefficient.value }) : layer;
+				// @ts-expect-error - _props is a private property
+				layers: overlay.value._props.layers.map((layer: deck.Layer) => {
+					return layer.id === "arc"
+						? layer.clone({ coef: coefficient.value } as Partial<PatchedLayerProps>)
+						: layer;
 				}),
 			});
 		} else {
 			overlay.value.setProps({
-				layers: overlay.value._props.layers.map((layer) => {
+				// @ts-expect-error - _props is a private property
+				layers: overlay.value._props.layers.map((layer: deck.Layer) => {
 					return layer.id === "arc"
 						? layer.clone({
 								coef: coefficient.value,
-								getSourceColor: (d) => {
+								getSourceColor: (d: CurvedMovementLine) => {
 									if (props.multipleMovementIds != null && hoveredMovementId.value != null) {
 										const isHovered: boolean = d.id === hoveredMovementId.value;
 										const moves = props.multipleMovementIds.some((move) => {
@@ -602,7 +615,7 @@ function updateLayers(currentTime: number) {
 										}
 									} else return d.color;
 								},
-								getTargetColor: (d) => {
+								getTargetColor: (d: CurvedMovementLine) => {
 									if (props.multipleMovementIds != null && hoveredMovementId.value != null) {
 										const isHovered: boolean = d.id === hoveredMovementId.value;
 										const moves: boolean = props.multipleMovementIds.some((move) => {
@@ -616,7 +629,7 @@ function updateLayers(currentTime: number) {
 										}
 									} else return d.color;
 								},
-							})
+							} as Partial<PatchedLayerProps>)
 						: layer;
 				}),
 			});
