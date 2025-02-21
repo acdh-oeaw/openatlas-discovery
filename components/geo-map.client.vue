@@ -11,6 +11,7 @@ import type { Point } from "geojson";
 import {
 	FullscreenControl,
 	type GeoJSONSource,
+	type LngLatLike,
 	Map as GeoMap,
 	type MapGeoJSONFeature,
 	NavigationControl,
@@ -506,13 +507,23 @@ function updateMovements() {
 				console.log(clickedMovements);
 
 				if (clickedMovements.length > 0) {
+					const targetCoordinates = info.object.coordinates.map(
+						(point: { 0: number; 1: number }) => {
+							return [point[0], point[1]];
+						},
+					);
+					// Check if the popup will be displayed outside the visible area
+					const pointInBounds = context.map
+						?.getBounds()
+						.contains(
+							turf.center(turf.points(targetCoordinates as Array<[number, number]>)).geometry
+								.coordinates as LngLatLike,
+						);
 					emit("layer-click", {
 						features: clickedMovements as Array<
 							MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
 						>,
-						targetCoordinates: info.object.coordinates.map((point: { 0: number; 1: number }) => {
-							return [point[0], point[1]];
-						}),
+						targetCoordinates: pointInBounds ? targetCoordinates : info.coordinate,
 					});
 				} else {
 					console.warn("Movement not found for clicked arc.");

@@ -119,7 +119,6 @@ const mode = computed(() => {
 const features = computed(() => {
 	return entities.value
 		.filter((entity) => {
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- `geometry` is not always present since OA Version 8.10.0
 			return entity.geometry;
 		})
 		.map((entity) => {
@@ -216,6 +215,7 @@ function onLayerClick({ features, targetCoordinates }: onLayerClickParams) {
 			(turf.center(createFeatureCollection(entities)).geometry.coordinates as [number, number]),
 		entities,
 	};
+	console.log("Popup: ", popover.value);
 }
 
 watch(data, () => {
