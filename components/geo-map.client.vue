@@ -7,6 +7,7 @@ import { LayerExtension } from "@deck.gl/core";
 import { ArcLayer } from "@deck.gl/layers";
 import * as mapbox from "@deck.gl/mapbox";
 import * as turf from "@turf/turf";
+import type { Point } from "geojson";
 import {
 	FullscreenControl,
 	type GeoJSONSource,
@@ -273,17 +274,17 @@ watch(() => {
 	return props.showMovements;
 }, updateMovements);
 
-watch(
-	() => {
-		return props.multipleMovementIds;
-	},
-	(newVal, oldVal) => {
-		if (newVal !== oldVal) {
-			console.log(props.multipleMovementIds);
-		}
-	},
-	{ immediate: true },
-);
+// watch(
+// 	() => {
+// 		return props.multipleMovementIds;
+// 	},
+// 	(newVal, oldVal) => {
+// 		if (newVal !== oldVal) {
+// 			console.log(props.multipleMovementIds);
+// 		}
+// 	},
+// 	{ immediate: true },
+// );
 
 watch(
 	() => {
@@ -374,7 +375,7 @@ function updatePolygons() {
 }
 
 function pointsToMapKey(startPoint: Point, endPoint: Point) {
-	return `${startPoint.coordinates[0]}-${startPoint.coordinates[1]}-${endPoint.coordinates[0]}-${endPoint.coordinates[1]}`;
+	return `${String(startPoint.coordinates[0])}-${String(startPoint.coordinates[1])}-${String(endPoint.coordinates[0])}-${String(endPoint.coordinates[1])}`;
 }
 
 function updateMovements() {
@@ -398,7 +399,7 @@ function updateMovements() {
 			points.slice(1).forEach((point, index) => {
 				const startPoint = points[index];
 				const endPoint = point;
-				if (!startPoint) return null;
+				if (!startPoint) return;
 
 				if (Array.isArray(startPoint.coordinates) && Array.isArray(endPoint.coordinates)) {
 					if (!groupedMovements.has(pointsToMapKey(startPoint, endPoint))) {
@@ -554,16 +555,46 @@ function updateMovements() {
 		}
 	}
 }
-function isSameCoordinates(arc1: CurvedMovementLine, arc2: CurvedMovementLine): boolean {
+
+function isSimilarCoordinates(arc1: CurvedMovementLine, arc2: CurvedMovementLine): boolean {
+	const distanceOptions = { units: "kilometers" as turf.Units };
+
+	// Compupute arc length to reduce maxDistance for small arcs and prevent many tilted
+	// small arcs in the same area
+	const arc1Length = turf.distance(
+		arc1.coordinates[0] as turf.Coord,
+		arc1.coordinates[1] as turf.Coord,
+		distanceOptions,
+	);
+	const arc2Length = turf.distance(
+		arc2.coordinates[0] as turf.Coord,
+		arc2.coordinates[1] as turf.Coord,
+		distanceOptions,
+	);
+	const minimumArcLength = Math.min(arc1Length, arc2Length);
+	const maxDistance = Math.min(50, minimumArcLength / 10);
+
 	return (
-		(arc1.coordinates[0][0] === arc2.coordinates[0][0] &&
-			arc1.coordinates[0][1] === arc2.coordinates[0][1] &&
-			arc1.coordinates[1][0] === arc2.coordinates[1][0] &&
-			arc1.coordinates[1][1] === arc2.coordinates[1][1]) ||
-		(arc1.coordinates[1][0] === arc2.coordinates[0][0] &&
-			arc1.coordinates[1][1] === arc2.coordinates[0][1] &&
-			arc1.coordinates[0][0] === arc2.coordinates[1][0] &&
-			arc1.coordinates[0][1] === arc2.coordinates[1][1])
+		(turf.distance(
+			arc1.coordinates[0] as turf.Coord,
+			arc2.coordinates[0] as turf.Coord,
+			distanceOptions,
+		) < maxDistance &&
+			turf.distance(
+				arc1.coordinates[1] as turf.Coord,
+				arc2.coordinates[1] as turf.Coord,
+				distanceOptions,
+			) < maxDistance) ||
+		(turf.distance(
+			arc1.coordinates[0] as turf.Coord,
+			arc2.coordinates[1] as turf.Coord,
+			distanceOptions,
+		) < maxDistance &&
+			turf.distance(
+				arc1.coordinates[1] as turf.Coord,
+				arc2.coordinates[0] as turf.Coord,
+				distanceOptions,
+			) < maxDistance)
 	);
 }
 
@@ -574,9 +605,8 @@ function applyTiltToMatchingArcs(
 		let tiltValue = 0;
 
 		const matchingArcs = array.filter((otherArc) => {
-			return isSameCoordinates(arc, otherArc);
+			return isSimilarCoordinates(arc, otherArc);
 		});
-
 		if (matchingArcs.length > 1) {
 			const idx = matchingArcs.findIndex((matchingArc) => {
 				return arc.id === matchingArc.id;
