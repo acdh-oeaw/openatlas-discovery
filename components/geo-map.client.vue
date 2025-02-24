@@ -40,6 +40,7 @@ const supportOverlay = ref<mapbox.MapboxOverlay | null>(null);
 const props = defineProps<{
 	features: Array<GeoJsonFeature>;
 	movements: Array<GeoJsonFeature>;
+	events: Array<GeoJsonFeature>;
 	height: number;
 	width: number;
 	hasPolygons?: boolean;
@@ -170,11 +171,11 @@ function init() {
 	const sourcePointsId = "points-data";
 	const sourcePolygonsId = "polygon-data";
 	const sourceCenterPointsId = "centerpoints-data";
-	const sourceMovePointsId = "move-points-data";
+	const sourceEventPointsId = "event-points-data";
 	map.addSource(sourcePointsId, { type: "geojson", data: createFeatureCollection([]) });
 	map.addSource(sourcePolygonsId, { type: "geojson", data: createFeatureCollection([]) });
 	map.addSource(sourceCenterPointsId, { type: "geojson", data: createFeatureCollection([]) });
-	map.addSource(sourceMovePointsId, { type: "geojson", data: createFeatureCollection([]) });
+	map.addSource(sourceEventPointsId, { type: "geojson", data: createFeatureCollection([]) });
 
 	//
 
@@ -205,9 +206,9 @@ function init() {
 	//
 
 	map.addLayer({
-		id: "movements",
+		id: "events",
 		type: "circle",
-		source: sourceMovePointsId,
+		source: sourceEventPointsId,
 		filter: ["==", "$type", "Point"],
 		paint: {
 			"circle-color": hoveredMovementId.value
@@ -289,6 +290,38 @@ watch(
 		if (newVal !== oldVal) {
 			console.log(props.multipleMovements);
 			updateArcLayerColors(updatedCurvedMovements.value);
+			if (context.map?.getLayer("events") != null) {
+				colorEvents(
+					(hoveredMovementId.value ?? []).concat(
+						props.multipleMovements?.map((move) => {
+							return move.id;
+						}) ?? [],
+					),
+				);
+			}
+
+			if (context.map?.getLayer("highlightedEvents") != null) {
+				context.map.removeLayer("highlightedEvents");
+				context.map.removeSource("highlightedEvents");
+			}
+
+			if (props.multipleMovements != null) {
+				const source = props.events.filter((ev) => {
+					return props.multipleMovements?.find((move) => {
+						return move.id === ev.properties._id;
+					});
+				});
+
+				context.map?.addLayer({
+					id: "highlightedEvents",
+					type: "circle",
+					source: { type: "geojson", data: createFeatureCollection(source) },
+					paint: {
+						"circle-color": colors.movement,
+						"circle-radius": 6,
+					},
+				});
+			}
 		}
 	},
 	{ immediate: true },
@@ -301,13 +334,14 @@ watch(
 	(newId) => {
 		updateArcLayerColors(updatedCurvedMovements.value);
 		if (context.map != null) {
+			console.log("hovered: ", hoveredMovementId.value);
 			context.map.getCanvas().classList.toggle("!cursor-pointer", newId != null);
-			context.map.setPaintProperty(
-				"movements",
-				"circle-color", // The paint property
-				hoveredMovementId.value
-					? ["match", ["get", "_id"], hoveredMovementId.value[0], colors.movement, "#808080"]
-					: colors.movement, // If no movement is hovered, use the default color for all
+			colorEvents(
+				(hoveredMovementId.value ?? []).concat(
+					props.multipleMovements?.map((move) => {
+						return move.id;
+					}) ?? [],
+				),
 			);
 		}
 	},
@@ -322,11 +356,11 @@ function updateScope() {
 	const sourcePointsId = "points-data";
 	const sourcePolygonsId = "polygon-data";
 	const sourceCenterPointsId = "centerpoints-data";
-	const sourceMovePointsId = "move-points-data";
+	const sourceEventPointsId = "event-points-data";
 	const sourcePoints = map.getSource(sourcePointsId) as GeoJSONSource | undefined;
 	const sourcePolygons = map.getSource(sourcePolygonsId) as GeoJSONSource | undefined;
 	const sourceCenterpoints = map.getSource(sourceCenterPointsId) as GeoJSONSource | undefined;
-	const sourceMovePoints = map.getSource(sourceMovePointsId) as GeoJSONSource | undefined;
+	const sourceEventPoints = map.getSource(sourceEventPointsId) as GeoJSONSource | undefined;
 
 	const points = props.features.filter((point) => {
 		return point.geometry.type === "Point";
@@ -340,17 +374,17 @@ function updateScope() {
 		return centerpoint.geometry.type === "GeometryCollection";
 	});
 
-	const movements = props.movements;
+	const events = props.events;
 
 	const geojsonPoints = createFeatureCollection(points);
 	const geojsonPolygons = createFeatureCollection(polygons);
 	const geojsonCenterPoints = createFeatureCollection(centerpoints);
-	const geojsonMovePoints = createFeatureCollection(movements);
+	const geojsonEventPoints = createFeatureCollection(events);
 
 	sourcePoints?.setData(geojsonPoints);
 	sourcePolygons?.setData(geojsonPolygons);
 	sourceCenterpoints?.setData(geojsonCenterPoints);
-	sourceMovePoints?.setData(geojsonMovePoints);
+	sourceEventPoints?.setData(geojsonEventPoints);
 
 	if (geojsonPoints.features.length > 0) {
 		const bounds = turf.bbox(geojsonPoints) as [number, number, number, number];
@@ -386,6 +420,9 @@ function pointsToMapKey(startPoint: Point, endPoint: Point) {
 }
 
 function checkHighlight(d: CurvedMovementLine) {
+	if (hoveredMovementId.value === null && props.multipleMovements === null) {
+		return d.color as [number, number, number];
+	}
 	const isMultipleMovement: boolean =
 		props.multipleMovements?.some((movement) => {
 			return d.id.includes(movement.id);
@@ -398,7 +435,20 @@ function checkHighlight(d: CurvedMovementLine) {
 	}
 }
 
+function colorEvents(movements: Array<string> | null | undefined) {
+	assert(context.map);
+
+	context.map.setPaintProperty(
+		"events",
+		"circle-color", // The paint property
+		movements != null && movements.length > 0
+			? ["case", ["in", ["get", "_id"], ["literal", movements]], colors.movement, "#808080"]
+			: colors.movement, // If no movement is hovered, use the default color for all
+	);
+}
+
 function updateMovements() {
+	console.log("multipleMovements: ", props.multipleMovements);
 	const groupedMovements = new Map<string, Array<unknown>>();
 	// Process the GeoJSON movements array to create curved lines
 
@@ -565,6 +615,13 @@ function updateMovements() {
 		});
 
 		context.map.addControl(supportOverlay.value);
+		colorEvents(
+			(hoveredMovementId.value ?? []).concat(
+				props.multipleMovements?.map((move) => {
+					return move.id;
+				}) ?? [],
+			),
+		);
 	} else {
 		if (overlay.value && supportOverlay.value) {
 			overlay.value.finalize();
@@ -719,6 +776,8 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 			layers: [updatedLayer],
 			interleaved: true,
 		});
+
+		assert(context.map);
 	}
 }
 defineExpose(context);

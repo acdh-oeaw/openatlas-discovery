@@ -21,7 +21,7 @@
 	},
 	"map": {
 		"startPage": false,
-		"mapDisplayedSystemClasses": ["place", "feature", "move"]
+		"mapDisplayedSystemClasses": ["place", "feature"]
 	},
 	"fullscreen": true,
 	"defaultLocale": "en",
