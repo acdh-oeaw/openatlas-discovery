@@ -25,9 +25,14 @@ import { project } from "@/config/project.config";
 import type { GeoJsonFeature } from "@/utils/create-geojson-feature";
 
 interface CurvedMovementLine {
-	id: string;
+	id: Array<string>;
 	coordinates: [deck.Position, deck.Position];
 	color: deck.Color;
+}
+
+interface MultipleMovementType {
+	id: string;
+	systemClass: string;
 }
 
 const overlay = ref<mapbox.MapboxOverlay | null>(null);
@@ -39,6 +44,7 @@ const props = defineProps<{
 	width: number;
 	hasPolygons?: boolean;
 	showMovements: boolean;
+	multipleMovements: Array<MultipleMovementType> | null;
 }>();
 
 const emit = defineEmits<{
@@ -54,7 +60,7 @@ const emit = defineEmits<{
 const env = useRuntimeConfig();
 const theme = useColorMode();
 
-const hoveredMovementId = ref<string | null>(null);
+const hoveredMovementId = ref<Array<string> | null>(null);
 const movementLinesLayer = ref<unknown>(new ArcLayer());
 const curvedMovements = ref<Array<CurvedMovementLine> | null>(null);
 
@@ -275,24 +281,24 @@ watch(() => {
 	return props.showMovements;
 }, updateMovements);
 
-// watch(
-// 	() => {
-// 		return props.multipleMovementIds;
-// 	},
-// 	(newVal, oldVal) => {
-// 		if (newVal !== oldVal) {
-// 			console.log(props.multipleMovementIds);
-// 		}
-// 	},
-// 	{ immediate: true },
-// );
+watch(
+	() => {
+		return props.multipleMovements;
+	},
+	(newVal, oldVal) => {
+		if (newVal !== oldVal) {
+			console.log(props.multipleMovements);
+			updateArcLayerColors(updatedCurvedMovements.value);
+		}
+	},
+	{ immediate: true },
+);
 
 watch(
 	() => {
 		return hoveredMovementId.value;
 	},
 	(newId) => {
-		console.log("update hoveredMovementId: ", hoveredMovementId.value);
 		updateArcLayerColors(updatedCurvedMovements.value);
 		if (context.map != null) {
 			context.map.getCanvas().classList.toggle("!cursor-pointer", newId != null);
@@ -379,8 +385,21 @@ function pointsToMapKey(startPoint: Point, endPoint: Point) {
 	return `${String(startPoint.coordinates[0])}-${String(startPoint.coordinates[1])}-${String(endPoint.coordinates[0])}-${String(endPoint.coordinates[1])}`;
 }
 
+function checkHighlight(d: CurvedMovementLine) {
+	const isMultipleMovement: boolean =
+		props.multipleMovements?.some((movement) => {
+			return d.id.includes(movement.id);
+		}) ?? false;
+	const isHovered: boolean = d.id === hoveredMovementId.value;
+	if (isHovered || isMultipleMovement) {
+		return d.color as [number, number, number];
+	} else {
+		return [128, 128, 128] as [number, number, number];
+	}
+}
+
 function updateMovements() {
-	const groupedMovements = new Map<string, Array<CurvedMovementLine>>();
+	const groupedMovements = new Map<string, Array<unknown>>();
 	// Process the GeoJSON movements array to create curved lines
 
 	//curvedMovements.value =
@@ -416,19 +435,16 @@ function updateMovements() {
 		}
 	});
 	console.log(groupedMovements);
-	curvedMovements.value = [...groupedMovements.values()].map(
-		(group: Array<CurvedMovementLines>) => {
-			return {
-				id: [
-					group.map((g) => {
-						return g.id;
-					}),
-				],
-				coordinates: group[0].coordinates,
-				color: group[0].color,
-			};
-		},
-	);
+	curvedMovements.value = [...groupedMovements.values()].map((group: Array<CurvedMovementLine>) => {
+		return {
+			id: group.map((g) => {
+				return g.id;
+			}),
+
+			coordinates: group[0].coordinates,
+			color: group[0].color,
+		};
+	});
 
 	console.log(updatedCurvedMovements.value);
 
@@ -449,19 +465,11 @@ function updateMovements() {
 		getTargetPosition: (d) => {
 			return d.coordinates[1];
 		},
-		getSourceColor: (d) => {
-			return hoveredMovementId.value
-				? d.id === hoveredMovementId.value
-					? d.color
-					: [128, 128, 128, 128]
-				: d.color;
+		getSourceColor: (d: CurvedMovementLine) => {
+			return checkHighlight(d);
 		},
 		getTargetColor: (d) => {
-			return hoveredMovementId.value
-				? d.id === hoveredMovementId.value
-					? d.color
-					: [128, 128, 128, 50]
-				: d.color;
+			return checkHighlight(d);
 		},
 		getTilt: (d) => {
 			return d.tilt || 0;
@@ -664,27 +672,11 @@ function updateLayers(currentTime: number) {
 					return layer.id === "arc"
 						? layer.clone({
 								coef: coefficient.value,
-								getSourceColor: (d) => {
-									if (hoveredMovementId.value != null) {
-										const isHovered: boolean = d.id[0] === hoveredMovementId.value[0];
-
-										if (isHovered) {
-											return d.color;
-										} else {
-											return [128, 128, 128];
-										}
-									} else return d.color;
+								getSourceColor: (d: CurvedMovementLine) => {
+									return checkHighlight(d);
 								},
-								getTargetColor: (d) => {
-									if (hoveredMovementId.value != null) {
-										const isHovered: boolean = d.id[0] === hoveredMovementId.value[0];
-
-										if (isHovered) {
-											return d.color;
-										} else {
-											return [128, 128, 128];
-										}
-									} else return d.color;
+								getTargetColor: (d: CurvedMovementLine) => {
+									return checkHighlight(d);
 								},
 							} as Partial<PatchedLayerProps>)
 						: layer;
@@ -706,33 +698,18 @@ function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
 				return d.coordinates[1];
 			},
 			getSourceColor: (d) => {
-				if (hoveredMovementId.value != null) {
-					const isHovered: boolean = d.id[0] === hoveredMovementId.value[0];
-					if (isHovered) {
-						return d.color;
-					} else {
-						return [128, 128, 128];
-					}
-				} else return d.color;
+				return checkHighlight(d);
 			},
 			getTargetColor: (d) => {
-				if (hoveredMovementId.value != null) {
-					const isHovered: boolean = d.id[0] === hoveredMovementId.value[0];
-
-					if (isHovered) {
-						return d.color;
-					} else {
-						return [128, 128, 128];
-					}
-				} else return d.color;
+				return checkHighlight(d);
 			},
 			getTilt: (d) => {
 				return d.tilt || 0;
 			},
 			getWidth: 3,
 			updateTriggers: {
-				getSourceColor: [hoveredMovementId.value, props.multipleMovementIds],
-				getTargetColor: [hoveredMovementId.value, props.multipleMovementIds],
+				getSourceColor: [hoveredMovementId.value, props.multipleMovements],
+				getTargetColor: [hoveredMovementId.value, props.multipleMovements],
 			},
 			coef: coefficient.value / 1000,
 			extensions: [new ArcBrushingLayer()],

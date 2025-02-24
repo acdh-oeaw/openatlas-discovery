@@ -256,6 +256,16 @@ watchEffect(() => {
 	}
 });
 
+watch(
+	() => {
+		return selection.value;
+	},
+	() => {
+		console.log("Watch selection");
+		setMovementId({ id: selection.value as unknown as string });
+	},
+);
+
 const movementDetails = computed(() => {
 	if (multipleMovements.data.value) {
 		return multipleMovements.data.value;
@@ -366,7 +376,7 @@ function setMovementId({ id }: { id: string | null }) {
 				:width="width"
 				:has-polygons="show"
 				:show-movements="showMovements"
-				:multiple-movement-ids="linkedMovements"
+				:multiple-movements="linkedMovements"
 				@layer-click="onLayerClick"
 				@movement-hovered="setMovementId"
 			>
