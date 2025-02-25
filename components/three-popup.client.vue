@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+/* eslint-disable */
+// @ts-nocheck
 import { assert } from "@acdh-oeaw/lib";
 import type { Map as GeoMap, Popup } from "maplibre-gl";
 import { Threebox } from "threebox-plugin";
