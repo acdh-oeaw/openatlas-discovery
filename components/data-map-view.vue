@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { keyByToMap } from "@acdh-oeaw/lib";
 import * as turf from "@turf/turf";
+import type { Feature } from "geojson";
 import type { MapGeoJSONFeature } from "maplibre-gl";
 import * as v from "valibot";
 
@@ -218,7 +219,9 @@ function onLayerClick({ features, targetCoordinates }: onLayerClickParams) {
 		}
 	});
 
-	const entities = Array.from(entitiesMap.values());
+	const entities = Array.from(entitiesMap.values()).filter((e) => {
+		return e.geometry != null;
+	});
 
 	let coordinates = null;
 
@@ -244,7 +247,10 @@ function onLayerClick({ features, targetCoordinates }: onLayerClickParams) {
 	popover.value = {
 		coordinates:
 			coordinates ??
-			(turf.center(createFeatureCollection(entities)).geometry.coordinates as [number, number]),
+			(turf.center(createFeatureCollection(entities as Array<Feature>)).geometry.coordinates as [
+				number,
+				number,
+			]),
 		entities,
 	};
 	console.log("Popup: ", popover.value);
@@ -268,20 +274,23 @@ watchEffect(() => {
 		if (entity) {
 			let coordinates = null;
 
-			if (entity.geometry.type === "GeometryCollection") {
+			if (entity.geometry?.type === "GeometryCollection") {
 				coordinates = entity.geometry.geometries.find((g) => {
 					return g.type === "Point";
 				})?.coordinates as [number, number] | undefined;
 			}
 
-			if (entity.geometry.type === "Point") {
+			if (entity.geometry?.type === "Point") {
 				coordinates = entity.geometry.coordinates as unknown as [number, number];
 			}
 
 			popover.value = {
 				coordinates:
 					coordinates ??
-					(turf.center(createFeatureCollection([entity])).geometry.coordinates as [number, number]),
+					(turf.center(createFeatureCollection([entity as Feature])).geometry.coordinates as [
+						number,
+						number,
+					]),
 				entities: [entity],
 			};
 		}
