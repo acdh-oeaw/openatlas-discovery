@@ -3,7 +3,6 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import { assert } from "@acdh-oeaw/lib";
 import type * as deck from "@deck.gl/core";
-import { LayerExtension } from "@deck.gl/core";
 import { ArcLayer } from "@deck.gl/layers";
 import * as mapbox from "@deck.gl/mapbox";
 import * as turf from "@turf/turf";
@@ -25,6 +24,41 @@ import { project } from "@/config/project.config";
 import type { components } from "@/lib/api-client/api";
 import type { GeoJsonFeature } from "@/utils/create-geojson-feature";
 
+const vsDeclaration = `
+	in float instanceCoefficient;
+`;
+const vsMainEnd = `
+        vec4 colorA = instanceTargetColors;
+    		vec4 colorB = vec4(colorA.rgb, 0.2);
+    		float pct = step(instanceCoefficient, segmentRatio);
+    		vColor = mix(colorA, colorB, pct);
+                    `;
+
+class CustomArcLayer extends ArcLayer {
+	override initializeState(): void {
+		super.initializeState();
+
+		this.getAttributeManager()?.addInstanced({
+			instanceCoefficient: { size: 1, accessor: "getCoefficient" },
+		});
+	}
+	override getShaders() {
+		const shaders = super.getShaders();
+		shaders.inject = {
+			"vs:#decl": vsDeclaration,
+			"vs:#main-end": vsMainEnd,
+		};
+		return shaders;
+	}
+}
+CustomArcLayer.layerName = "CustomArcLayer";
+CustomArcLayer.defaultProps = {
+	// @ts-expect-error - "getCoefficient" does not exist in superclass ArcLayer
+	getCoefficient: {
+		type: "accessor",
+		value: 0.5,
+	},
+};
 interface CurvedMovementLine {
 	id: Array<string> | string;
 	coordinates: [deck.Position, deck.Position];
@@ -63,56 +97,28 @@ const env = useRuntimeConfig();
 const theme = useColorMode();
 
 const hoveredMovementId = ref<Array<string> | null>(null);
-const movementLinesLayer = ref<unknown>(new ArcLayer());
 const curvedMovements = ref<Array<CurvedMovementLine> | null>(null);
 
 const updatedCurvedMovements = computed(() => {
 	return applyTiltToMatchingArcs(curvedMovements.value ?? []);
 });
+const multipleMovementArcs = computed(() => {
+	return updatedCurvedMovements.value.filter((arc) => {
+		return (arc.id as Array<string>).some((id) => {
+			return props.multipleMovements?.find((move) => {
+				return move.id === id;
+			});
+		});
+	});
+});
 
 const coefficient = ref(0);
+const stepWithinMultipleMovements = ref(0);
 const colors = {
 	points: project.colors.geojsonPoints,
 	areaCenterPoints: project.colors.geojsonAreaCenterPoints,
 	movement: project.colors.geojsonMovement,
 };
-
-const ArcBrushingShader = {
-	name: "brushing-shader",
-	inject: {
-		"vs:#decl": `
-         uniform float coef;
-        `,
-		"vs:#main-end": `
-        vec4 colorA = instanceTargetColors;
-    		vec4 colorB = vec4(colorA.rgb, 0.2);
-    		float pct = step(coef, segmentRatio);
-    		vColor = mix(colorA, colorB, pct);
-                    `,
-		"fs:#main-start": `
-        if (vColor.a == 0.0) discard;
-                    `,
-	},
-};
-class ArcBrushingLayer extends LayerExtension {
-	override getShaders() {
-		return ArcBrushingShader;
-	}
-
-	override updateState({
-		props,
-		oldProps,
-	}: {
-		props: Record<string, unknown>;
-		oldProps: Record<string, unknown>;
-	}) {
-		// @ts-expect-error - _getModel() is a private method
-		const model = this._getModel();
-		if (props.coef !== oldProps.coef) {
-			model.setUniforms({ coef: props.coef });
-		}
-	}
-}
 
 const mapStyle = computed(() => {
 	return theme.value === "dark" ? env.public.mapBaselayerUrlDark : env.public.mapBaselayerUrlLight;
@@ -289,8 +295,7 @@ watch(
 	},
 	(newVal, oldVal) => {
 		if (newVal !== oldVal) {
-			console.log(props.multipleMovements);
-			updateArcLayerColors(updatedCurvedMovements.value);
+			renderArcs();
 			if (context.map?.getLayer("events") != null) {
 				colorEvents(
 					(hoveredMovementId.value ?? []).concat(
@@ -333,7 +338,7 @@ watch(
 		return hoveredMovementId.value;
 	},
 	(newId) => {
-		updateArcLayerColors(updatedCurvedMovements.value);
+		renderArcs();
 		if (context.map != null) {
 			console.log("hovered: ", hoveredMovementId.value);
 			context.map.getCanvas().classList.toggle("!cursor-pointer", newId != null);
@@ -448,6 +453,18 @@ function colorEvents(movements: Array<string> | null | undefined) {
 	);
 }
 
+function getCoef(d: CurvedMovementLine) {
+	if (!props.multipleMovements || props.multipleMovements.length === 0) return coefficient.value;
+	const currentIdx = multipleMovementArcs.value.findIndex((arc) => {
+		return d.id === arc.id;
+	});
+	if (currentIdx === -1 || currentIdx === stepWithinMultipleMovements.value) {
+		return coefficient.value;
+	} else {
+		return currentIdx < stepWithinMultipleMovements.value ? 1 : 0;
+	}
+}
+
 function updateMovements() {
 	console.log("multipleMovements: ", props.multipleMovements);
 	const groupedMovements = new Map<string, Array<CurvedMovementLine>>();
@@ -503,125 +520,30 @@ function updateMovements() {
 		};
 	});
 
-	console.log(updatedCurvedMovements.value);
-
 	const _currentTimeAnimation = animate({
 		from: 0,
 		to: 1000,
 		duration: 5000,
 		repeat: Infinity,
 		onUpdate: updateLayers,
-	});
-
-	const layer = new ArcLayer({
-		id: "arc",
-		data: updatedCurvedMovements.value,
-		getSourcePosition: (d) => {
-			return d.coordinates[0];
-		},
-		getTargetPosition: (d) => {
-			return d.coordinates[1];
-		},
-		getSourceColor: (d: CurvedMovementLine) => {
-			return checkHighlight(d);
-		},
-		getTargetColor: (d) => {
-			return checkHighlight(d);
-		},
-		getTilt: (d) => {
-			return d.tilt || 0;
-		},
-		getWidth: 3,
-		updateTriggers: {
-			getSourceColor: coefficient.value,
-			getTargetColor: coefficient.value,
-		},
-		coef: coefficient.value,
-		extensions: [new ArcBrushingLayer()],
-	});
-
-	const supportLayer = new ArcLayer({
-		id: "arc-support",
-		data: updatedCurvedMovements.value,
-		getSourcePosition: (d) => {
-			return d.coordinates[0];
-		},
-		getTargetPosition: (d) => {
-			return d.coordinates[1];
-		},
-		getWidth: 20,
-		pickable: true,
-		opacity: 0,
-		onHover: (info) => {
-			if (info.object != null) {
-				hoveredMovementId.value = info.object.id || null;
-			} else {
-				hoveredMovementId.value = null;
-			}
-		},
-		onClick: (info) => {
-			if (info.object != null) {
-				console.log("Clicked Arc:", info.object);
-
-				const clickedIds = info.object.id.flat();
-
-				const clickedMovements = props.movements.filter((movement) => {
-					return clickedIds.includes(movement.properties._id);
-				});
-
-				console.log(clickedMovements);
-
-				if (clickedMovements.length > 0) {
-					const targetCoordinates = info.object.coordinates.map(
-						(point: { 0: number; 1: number }) => {
-							return [point[0], point[1]];
-						},
-					);
-					// Check if the popup will be displayed outside the visible area
-					const pointInBounds = context.map
-						?.getBounds()
-						.contains(
-							turf.center(turf.points(targetCoordinates as Array<[number, number]>)).geometry
-								.coordinates as LngLatLike,
-						);
-					emit("layer-click", {
-						features: clickedMovements as Array<
-							MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
-						>,
-						targetCoordinates: pointInBounds ? targetCoordinates : info.coordinate,
-					});
-				} else {
-					console.warn("Movement not found for clicked arc.");
-				}
-			} else {
-				console.warn("No object clicked.");
-			}
-		},
-		getTilt: (d) => {
-			return d.tilt || 0;
-		},
-		updateTriggers: {
-			getSourceColor: hoveredMovementId.value,
-			getTargetColor: hoveredMovementId.value,
+		onRepeat: () => {
+			stepWithinMultipleMovements.value += 1;
+			if (stepWithinMultipleMovements.value >= multipleMovementArcs.value.length)
+				stepWithinMultipleMovements.value = 0;
 		},
 	});
-
-	movementLinesLayer.value = layer;
 
 	assert(context.map != null);
 
 	if (props.showMovements) {
 		overlay.value = new mapbox.MapboxOverlay({
-			layers: [movementLinesLayer.value] as deck.LayersList,
 			interleaved: true,
 		});
-
 		context.map.addControl(overlay.value);
-		supportOverlay.value = new mapbox.MapboxOverlay({
-			layers: [supportLayer] as deck.LayersList,
-		});
 
+		supportOverlay.value = new mapbox.MapboxOverlay({});
 		context.map.addControl(supportOverlay.value);
+		renderArcs();
 		colorEvents(
 			(hoveredMovementId.value ?? []).concat(
 				props.multipleMovements?.map((move) => {
@@ -714,78 +636,114 @@ function hexToRgb(hex: string) {
 			] as deck.Color)
 		: null;
 }
-interface PatchedLayerProps extends deck.LayerProps {
-	coef: number;
-}
+
 function updateLayers(currentTime: number) {
 	if (overlay.value) {
 		coefficient.value = currentTime / 1000;
-		if (hoveredMovementId.value === null) {
-			overlay.value.setProps({
-				// @ts-expect-error - _props is a private property
-				layers: overlay.value._props.layers.map((layer: deck.Layer) => {
-					return layer.id === "arc"
-						? layer.clone({ coef: coefficient.value } as Partial<PatchedLayerProps>)
-						: layer;
-				}),
-			});
-		} else {
-			overlay.value.setProps({
-				// @ts-expect-error - _props is a private property
-				layers: overlay.value._props.layers.map((layer: deck.Layer) => {
-					return layer.id === "arc"
-						? layer.clone({
-								coef: coefficient.value,
-								getSourceColor: (d: CurvedMovementLine) => {
-									return checkHighlight(d);
-								},
-								getTargetColor: (d: CurvedMovementLine) => {
-									return checkHighlight(d);
-								},
-							} as Partial<PatchedLayerProps>)
-						: layer;
-				}),
-			});
-		}
+		renderArcs();
 	}
 }
 
-function updateArcLayerColors(movements: Array<CurvedMovementLine> | null) {
-	if (overlay.value) {
-		const updatedLayer = new ArcLayer({
-			id: "arc", // Same ID to update the existing layer
-			data: movements ?? [],
-			getSourcePosition: (d) => {
-				return d.coordinates[0];
-			},
-			getTargetPosition: (d) => {
-				return d.coordinates[1];
-			},
-			getSourceColor: (d) => {
-				return checkHighlight(d);
-			},
-			getTargetColor: (d) => {
-				return checkHighlight(d);
-			},
-			getTilt: (d) => {
-				return d.tilt || 0;
-			},
-			getWidth: 3,
-			updateTriggers: {
-				getSourceColor: [hoveredMovementId.value, props.multipleMovements],
-				getTargetColor: [hoveredMovementId.value, props.multipleMovements],
-			},
-			coef: coefficient.value / 1000,
-			extensions: [new ArcBrushingLayer()],
-		});
+function renderArcs() {
+	const layer = new CustomArcLayer({
+		id: "arc",
+		data: updatedCurvedMovements.value,
+		getSourcePosition: (d) => {
+			return d.coordinates[0];
+		},
+		getTargetPosition: (d) => {
+			return d.coordinates[1];
+		},
+		getSourceColor: (d: CurvedMovementLine) => {
+			return checkHighlight(d);
+		},
+		getTargetColor: (d) => {
+			return checkHighlight(d);
+		},
+		getTilt: (d) => {
+			return d.tilt || 0;
+		},
+		getWidth: 3,
+		updateTriggers: {
+			getSourceColor: coefficient.value,
+			getTargetColor: coefficient.value,
+			getCoefficient: coefficient.value,
+		},
+		// @ts-expect-error - getCoefficient does not exist on superclass ArcLayer
+		getCoefficient: (d) => {
+			return getCoef(d);
+		},
+	});
 
-		overlay.value.setProps({
-			layers: [updatedLayer],
-			interleaved: true,
-		});
+	const supportLayer = new ArcLayer({
+		id: "arc-support",
+		data: updatedCurvedMovements.value,
+		getSourcePosition: (d) => {
+			return d.coordinates[0];
+		},
+		getTargetPosition: (d) => {
+			return d.coordinates[1];
+		},
+		getWidth: 20,
+		pickable: true,
+		opacity: 0,
+		onHover: (info) => {
+			if (info.object != null) {
+				hoveredMovementId.value = info.object.id || null;
+			} else {
+				hoveredMovementId.value = null;
+			}
+		},
+		onClick: (info) => {
+			if (info.object != null) {
+				console.log("Clicked Arc:", info.object);
 
-		assert(context.map);
-	}
+				const clickedIds = info.object.id.flat();
+
+				const clickedMovements = props.movements.filter((movement) => {
+					return clickedIds.includes(movement.properties._id);
+				});
+
+				console.log(clickedMovements);
+
+				if (clickedMovements.length > 0) {
+					const targetCoordinates = info.object.coordinates.map(
+						(point: { 0: number; 1: number }) => {
+							return [point[0], point[1]];
+						},
+					);
+					// Check if the popup will be displayed outside the visible area
+					const pointInBounds = context.map
+						?.getBounds()
+						.contains(
+							turf.center(turf.points(targetCoordinates as Array<[number, number]>)).geometry
+								.coordinates as LngLatLike,
+						);
+					emit("layer-click", {
+						features: clickedMovements as Array<
+							MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
+						>,
+						targetCoordinates: pointInBounds ? targetCoordinates : info.coordinate,
+					});
+				} else {
+					console.warn("Movement not found for clicked arc.");
+				}
+			} else {
+				console.warn("No object clicked.");
+			}
+		},
+		getTilt: (d) => {
+			return d.tilt || 0;
+		},
+	});
+
+	overlay.value?.setProps({
+		layers: [layer],
+	});
+
+	supportOverlay.value?.setProps({
+		layers: [supportLayer],
+	});
 }
 defineExpose(context);
 provide(geoMapContextKey, context);

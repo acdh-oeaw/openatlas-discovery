@@ -152,42 +152,41 @@ const movements = computed(() => {
 				);
 			});
 
-			const from = feature.relations.find((rel) => {
-				return rel.relationType.startsWith("crm:P27");
+			const from = feature.relations?.find((rel) => {
+				return rel.relationType?.startsWith("crm:P27");
 			});
 
-			const to = feature.relations.find((rel) => {
-				return rel.relationType.startsWith("crm:P26");
+			const to = feature.relations?.find((rel) => {
+				return rel.relationType?.startsWith("crm:P26");
 			});
 
 			const fromGeometry = filteredGeometries.find((geo) => {
-				return from.relationTo.endsWith(geo.locationId);
+				return geo.locationId && from?.relationTo?.endsWith(geo.locationId);
 			});
 
 			const toGeometry = filteredGeometries.find((geo) => {
-				return to.relationTo.endsWith(geo.locationId);
+				return geo.locationId && to?.relationTo?.endsWith(geo.locationId);
 			});
-
-			console.log("from", from, fromGeometry, "to", to, toGeometry);
 
 			let featureClone = {
 				...feature,
 				geometry: {
 					...feature.geometry,
-					geometries: [fromGeometry, toGeometry],
+					geometries: [fromGeometry, toGeometry].filter((move) => {
+						return move != null;
+					}),
 				},
 			};
 
 			return featureClone;
 		})
 		.filter((move) => {
-			return (
-				move.geometry.geometries.filter((geo) => {
-					console.log(geo ? "" : move);
-					return geo != null;
-				}).length === 2
-			);
+			return move.geometry.geometries.length === 2;
 		});
+
+	move.forEach((move) => {
+		assert(move.geometry.geometries);
+	});
 
 	return move.map((entity) => {
 		let feature = createGeoJsonFeature(entity);
