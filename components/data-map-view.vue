@@ -302,6 +302,40 @@ watch(data, () => {
 	popover.value = null;
 });
 
+const selectionCoordinates = ref<[number, number] | undefined>(undefined);
+const selectionBounds = ref<Array<[number, number]> | undefined>(undefined);
+
+function setCoordinates(entity: EntityFeature, coordinates: Ref<[number, number] | undefined>) {
+	if (entity.geometry?.type === "GeometryCollection") {
+		if (entity.systemClass === "move") {
+			const selectedMove = movements.value.find((move) => {
+				return move.properties._id === entity.properties._id;
+			});
+			if (selectedMove?.geometry && "geometries" in selectedMove.geometry) {
+				selectionBounds.value = selectedMove.geometry.geometries.map((geo) => {
+					assert("coordinates" in geo);
+					return geo.coordinates as [number, number];
+				});
+				assert(selectionBounds.value);
+
+				const points = turf.points(selectionBounds.value);
+				coordinates.value = turf.center(points).geometry.coordinates as [number, number];
+
+				return;
+			}
+		}
+		coordinates.value = entity.geometry.geometries.find((g) => {
+			return g.type === "Point";
+		})?.coordinates as [number, number] | undefined;
+		selectionBounds.value = undefined;
+	}
+
+	if (entity.geometry?.type === "Point") {
+		coordinates.value = entity.geometry.coordinates as unknown as [number, number];
+		selectionBounds.value = undefined;
+	}
+}
+
 watchEffect(() => {
 	if (mode.value && selection.value) {
 		const entity = entities.value.find((feature) => {
@@ -310,21 +344,12 @@ watchEffect(() => {
 		});
 
 		if (entity) {
-			let coordinates = null;
+			setCoordinates(entity, selectionCoordinates);
 
-			if (entity.geometry?.type === "GeometryCollection") {
-				coordinates = entity.geometry.geometries.find((g) => {
-					return g.type === "Point";
-				})?.coordinates as [number, number] | undefined;
-			}
-
-			if (entity.geometry?.type === "Point") {
-				coordinates = entity.geometry.coordinates as unknown as [number, number];
-			}
-
+			if (entity.geometry == null) return;
 			popover.value = {
 				coordinates:
-					coordinates ??
+					selectionCoordinates.value ??
 					(turf.center(createFeatureCollection([entity as Feature])).geometry.coordinates as [
 						number,
 						number,
@@ -456,6 +481,9 @@ function setMovementId({ id }: { id: string | null }) {
 				:has-polygons="show"
 				:show-movements="showMovements"
 				:multiple-movements="linkedMovements"
+				:current-selection-coordinates="selectionCoordinates"
+				:selection-bounds="selectionBounds"
+				:current-selection-id="String(selection)"
 				@layer-click="onLayerClick"
 				@movement-hovered="setMovementId"
 			>

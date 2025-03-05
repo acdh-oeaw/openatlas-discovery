@@ -10,6 +10,7 @@ import type { Point } from "geojson";
 import {
 	FullscreenControl,
 	type GeoJSONSource,
+	LngLatBounds,
 	type LngLatLike,
 	Map as GeoMap,
 	type MapGeoJSONFeature,
@@ -26,10 +27,12 @@ import type { GeoJsonFeature } from "@/utils/create-geojson-feature";
 
 const vsDeclaration = `
 	in float instanceCoefficient;
+	in float instanceOpacity;
 `;
 const vsMainEnd = `
-        vec4 colorA = instanceTargetColors;
-    		vec4 colorB = vec4(colorA.rgb, 0.2);
+        vec4 tempColor = instanceTargetColors;
+        vec4 colorA = vec4(tempColor.rgb, instanceOpacity);
+    		vec4 colorB = vec4(tempColor.rgb, 0.2);
     		float pct = step(instanceCoefficient, segmentRatio);
     		vColor = mix(colorA, colorB, pct);
                     `;
@@ -40,6 +43,7 @@ class CustomArcLayer extends ArcLayer {
 
 		this.getAttributeManager()?.addInstanced({
 			instanceCoefficient: { size: 1, accessor: "getCoefficient" },
+			instanceOpacity: { size: 1, accessor: "getOpacity" },
 		});
 	}
 	override getShaders() {
@@ -55,6 +59,10 @@ CustomArcLayer.layerName = "CustomArcLayer";
 CustomArcLayer.defaultProps = {
 	// @ts-expect-error - "getCoefficient" does not exist in superclass ArcLayer
 	getCoefficient: {
+		type: "accessor",
+		value: 0.5,
+	},
+	getOpacity: {
 		type: "accessor",
 		value: 0.5,
 	},
@@ -81,6 +89,9 @@ const props = defineProps<{
 	hasPolygons?: boolean;
 	showMovements: boolean;
 	multipleMovements: Array<MultipleMovementType> | null;
+	currentSelectionCoordinates?: [number, number];
+	selectionBounds?: Array<[number, number]>;
+	currentSelectionId?: string;
 }>();
 
 const emit = defineEmits<{
@@ -152,6 +163,7 @@ async function create() {
 	context.map = map;
 
 	map.on("load", init);
+	console.log("created", props);
 }
 
 function init() {
@@ -277,6 +289,42 @@ function dispose() {
 	context.map?.remove();
 }
 
+watch(
+	() => {
+		return props.currentSelectionCoordinates;
+	},
+	() => {
+		console.log("selection changed: ", props.currentSelectionCoordinates, props.selectionBounds);
+		if (!props.selectionBounds && props.currentSelectionCoordinates)
+			flyToSelection(props.currentSelectionCoordinates);
+	},
+
+	{ immediate: true },
+);
+watch(
+	() => {
+		return props.selectionBounds;
+	},
+	() => {
+		zoomToSelection(props.selectionBounds);
+	},
+
+	{ immediate: true },
+);
+
+// watch(
+// 	() => {
+// 		return props.currentSelectionId;
+// 	},
+// 	() => {
+// 		if (props.currentSelectionId == null || multipleMovementArcs.value.length === 0) return;
+// 		const indexWithinArcs = multipleMovementArcs.value.findIndex((arc) => {
+// 			return arc.id.includes(props.currentSelectionId ?? "");
+// 		});
+// 		if (indexWithinArcs > -1) stepWithinMultipleMovements.value = indexWithinArcs;
+// 	},
+// );
+
 watch(() => {
 	return props.features;
 }, updateScope);
@@ -340,7 +388,6 @@ watch(
 	(newId) => {
 		renderArcs();
 		if (context.map != null) {
-			console.log("hovered: ", hoveredMovementId.value);
 			context.map.getCanvas().classList.toggle("!cursor-pointer", newId != null);
 			colorEvents(
 				(hoveredMovementId.value ?? []).concat(
@@ -421,6 +468,27 @@ function updatePolygons() {
 	}
 }
 
+function zoomToSelection(bounds: Array<[number, number]> | undefined) {
+	if (bounds) {
+		const lngLatBounds = bounds.reduce(
+			(reducedBounds, coord) => {
+				return reducedBounds.extend(coord);
+			},
+			new LngLatBounds(bounds[0], bounds[1]),
+		);
+		const mapWidth = elementRef.value?.clientWidth;
+		context.map?.fitBounds(lngLatBounds, {
+			padding: 200,
+			offset: [(mapWidth ?? 0) / 16, 0],
+		});
+	}
+}
+function flyToSelection(selection: [number, number] | undefined) {
+	if (selection) {
+		context.map?.flyTo({ center: selection, zoom: 10 });
+	}
+}
+
 function pointsToMapKey(startPoint: Point, endPoint: Point) {
 	return `${String(startPoint.coordinates[0])}-${String(startPoint.coordinates[1])}-${String(endPoint.coordinates[0])}-${String(endPoint.coordinates[1])}`;
 }
@@ -459,6 +527,7 @@ function getCoef(d: CurvedMovementLine) {
 		return d.id === arc.id;
 	});
 	if (currentIdx === -1 || currentIdx === stepWithinMultipleMovements.value) {
+		if (currentIdx === stepWithinMultipleMovements.value && coefficient.value === 1) return 0;
 		return coefficient.value;
 	} else {
 		return currentIdx < stepWithinMultipleMovements.value ? 1 : 0;
@@ -505,7 +574,6 @@ function updateMovements() {
 			});
 		}
 	});
-	console.log(groupedMovements);
 	curvedMovements.value = [...groupedMovements.values()].map((group: Array<CurvedMovementLine>) => {
 		assert(group[0], "Every group should have at least one element.");
 		return {
@@ -528,8 +596,9 @@ function updateMovements() {
 		onUpdate: updateLayers,
 		onRepeat: () => {
 			stepWithinMultipleMovements.value += 1;
-			if (stepWithinMultipleMovements.value >= multipleMovementArcs.value.length)
+			if (stepWithinMultipleMovements.value >= multipleMovementArcs.value.length) {
 				stepWithinMultipleMovements.value = 0;
+			}
 		},
 	});
 
@@ -616,7 +685,7 @@ function applyTiltToMatchingArcs(
 			const idx = matchingArcs.findIndex((matchingArc) => {
 				return arc.id === matchingArc.id;
 			});
-			tiltValue = (-5 * (matchingArcs.length - 1)) / 2 + 5 * idx;
+			tiltValue = (-8 * (matchingArcs.length - 1)) / 2 + 5 * idx;
 		}
 
 		return {
@@ -663,11 +732,27 @@ function renderArcs() {
 		getTilt: (d) => {
 			return d.tilt || 0;
 		},
+		// @ts-expect-error - getCoefficient does not exist on superclass ArcLayer
+		getOpacity: (d: CurvedMovementLine) => {
+			const isHovered: boolean = d.id === hoveredMovementId.value;
+			const opacity =
+				multipleMovementArcs.value.length === 0 ||
+				isHovered ||
+				multipleMovementArcs.value.find((arc) => {
+					if (Array.isArray(arc.id) && Array.isArray(d.id))
+						return arc.id.join("") === d.id.join("");
+					return arc.id === d.id;
+				})
+					? 1
+					: 0.3;
+			return opacity;
+		},
 		getWidth: 3,
 		updateTriggers: {
 			getSourceColor: coefficient.value,
 			getTargetColor: coefficient.value,
 			getCoefficient: coefficient.value,
+			getOpacity: coefficient.value,
 		},
 		// @ts-expect-error - getCoefficient does not exist on superclass ArcLayer
 		getCoefficient: (d) => {
