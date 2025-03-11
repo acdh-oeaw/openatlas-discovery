@@ -2,7 +2,6 @@
 import * as v from "valibot";
 import { useTemplateRef } from "vue";
 import type { LocationQueryValue } from "vue-router";
-import { z } from "zod";
 
 import { project } from "../config/project.config";
 import NetworkControls from "./network-controls.vue";
@@ -11,8 +10,8 @@ const router = useRouter();
 const route = useRoute();
 
 export interface NetworkSearchData {
-	search: string;
-	systemClasses: Array<string>;
+	search?: string;
+	excludeSystemClasses?: Array<string>;
 }
 
 const detailEntityId = computed(() => {
@@ -22,6 +21,15 @@ const detailEntityId = computed(() => {
 const searchFiltersSchema = v.object({
 	search: v.fallback(v.string(), ""),
 	systemClasses: v.fallback(v.array(v.string()), []),
+	excludeSystemClasses: v.fallback(
+		v.pipe(
+			v.union([v.array(v.string()), v.string()]), // Accept both array and single string
+			v.transform((value) => {
+				return Array.isArray(value) ? value : [value];
+			}), // Convert single value to array
+		),
+		[],
+	),
 });
 
 const searchFilters = computed(() => {
@@ -56,10 +64,24 @@ const { data, isPending, isPlaceholderData } = useGetNetworkData(
 	computed(() => {
 		return {
 			// TO-DO: Currently there is an issue: filtering by case study and system_class type will return no results
-			exclude_system_classes: project.network.excludeSystemClasses,
+			exclude_system_classes: project.network.excludeSystemClasses.concat(
+				searchFilters.value.excludeSystemClasses,
+			),
 		};
 	}),
 );
+
+const { data: allSystemClasses } = useGetSystemClassCount();
+const relevantSystemClasses = computed(() => {
+	if (!allSystemClasses.value) return [];
+	return Object.entries(allSystemClasses.value)
+		.filter(([key, value]) => {
+			return value > 0 && !project.network.excludeSystemClasses.includes(key);
+		})
+		.map(([key, _]) => {
+			return key;
+		});
+});
 
 const dataGraph = useTemplateRef("dataGraph");
 
@@ -68,21 +90,11 @@ const isLoading = computed(() => {
 });
 
 const entities = computed(() => {
-	return data.value?.results.flatMap((result) => {
-		return result;
-	}) ?? [];
-});
-
-const systemClasses = computed(() => {
-	const systemClasses: Array<string> = [];
-
-	entities.value.forEach((entity) => {
-		if (!systemClasses.includes(entity.systemClass)) {
-			systemClasses.push(entity.systemClass);
-		}
-	});
-
-	return systemClasses;
+	return (
+		data.value?.results.flatMap((result) => {
+			return result;
+		}) ?? []
+	);
 });
 
 function emitControls(args: string) {
@@ -141,7 +153,7 @@ const isFullscreen = ref(false);
 				<NetworkLegendPanel
 					v-if="height && width"
 					class="m-3 bg-white/90"
-					:system-classes="systemClasses"
+					:system-classes="relevantSystemClasses"
 					:search-filters="searchFilters.systemClasses"
 					@submit="onChangeSearchFilters"
 				/>

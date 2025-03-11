@@ -220,7 +220,7 @@ onMounted(async () => {
 	}
 
 	context.renderer.on("clickNode", ({ node }) => {
-		void router.push({ query: { mode: route.query.mode, selection: node } });
+		void router.push({ query: { ...route.query, selection: node } });
 	});
 
 	context.renderer.on("enterNode", ({ node }) => {

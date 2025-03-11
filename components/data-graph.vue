@@ -16,6 +16,20 @@ const graph = new Graph();
 const { entityColors } = networkConfig.colors;
 const defaultColor = networkConfig.colors.entityDefaultColor;
 
+const networkRef = useTemplateRef("networkClient");
+function emitNetworkControls(args: string) {
+	if (networkRef.value) networkRef.value.handleNetworkControls(args);
+}
+
+const layoutIsRunning = computed(() => {
+	return networkRef.value?.isRunning;
+});
+
+defineExpose({
+	emitNetworkControls,
+	layoutIsRunning,
+});
+
 watch(
 	() => {
 		return props.networkData;
@@ -33,6 +47,9 @@ watch(
 					label: entity.label,
 					color: getNodeColor(entity.systemClass),
 					size: networkConfig.sourceNodeSize,
+					//set random value to prevent sigma error related to undefined x,y values
+					x: Math.random(),
+					y: Math.random(),
 				});
 			}
 		});
@@ -51,6 +68,10 @@ watch(
 				}
 			});
 		});
+
+		if (!layoutIsRunning.value) {
+			networkRef.value?.handleNetworkControls("toggleRenderer");
+		}
 	},
 	{ immediate: true },
 );
@@ -59,20 +80,6 @@ function getNodeColor(nodeClass: string) {
 	//@ts-expect-error: no error occurs
 	return entityColors[nodeClass] ?? defaultColor;
 }
-
-const networkRef = useTemplateRef("networkClient");
-function emitNetworkControls(args: string) {
-	if (networkRef.value) networkRef.value.handleNetworkControls(args);
-}
-
-const layoutIsRunning = computed(() => {
-	return networkRef.value?.isRunning;
-});
-
-defineExpose({
-	emitNetworkControls,
-	layoutIsRunning,
-});
 </script>
 
 <template>

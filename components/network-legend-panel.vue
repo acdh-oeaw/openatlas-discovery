@@ -46,9 +46,9 @@ watch(
 
 function onSubmit() {
 	emit("submit", {
-		systemClasses: Object.entries(checkedSystemClasses.value)
+		excludeSystemClasses: Object.entries(checkedSystemClasses.value)
 			.filter((entry) => {
-				return entry[1];
+				return !entry[1];
 			})
 			.map((entry) => {
 				return entry[0];
@@ -62,6 +62,9 @@ const labels = {
 	person: t("SystemClassNames.person"),
 	group: t("SystemClassNames.group"),
 	move: t("SystemClassNames.move"),
+	creation: t("SystemClassNames.creation"),
+	production: t("SystemClassNames.production"),
+	modification: t("SystemClassNames.modification"),
 	event: t("SystemClassNames.event"),
 	activity: t("SystemClassNames.activity"),
 	acquisition: t("SystemClassNames.acquisition"),
