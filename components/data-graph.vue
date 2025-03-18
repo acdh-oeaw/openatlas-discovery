@@ -9,6 +9,7 @@ const props = defineProps<{
 	networkData: NetworkEntity;
 	searchNode: string;
 	detailNode?: string;
+	showOrphans: boolean;
 }>();
 
 const graph = new Graph();
@@ -90,5 +91,6 @@ function getNodeColor(nodeClass: string) {
 		:graph="graph"
 		:search-node="props.searchNode"
 		:detail-node="props.detailNode"
+		:show-orphans="props.showOrphans"
 	/>
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+	BlocksIcon,
 	CircleMinusIcon,
 	CirclePauseIcon,
 	CirclePlayIcon,
@@ -15,12 +16,20 @@ const t = useTranslations();
 const props = defineProps<{
 	layoutRunning: boolean | undefined;
 	isFullscreen: boolean;
+	showOrphans: boolean;
 }>();
 
 const emit = defineEmits(["networkControlEvent"]);
 
 function onClickControls(
-	element: "download" | "fullscreen" | "resetZoom" | "toggleRenderer" | "zoomIn" | "zoomOut",
+	element:
+		| "download"
+		| "fullscreen"
+		| "resetZoom"
+		| "toggleOrphans"
+		| "toggleRenderer"
+		| "zoomIn"
+		| "zoomOut",
 ) {
 	emit("networkControlEvent", element);
 }
@@ -63,6 +72,37 @@ function onClickControls(
 					class="opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100"
 				/>
 			</Button>
+		</div>
+		<div class="border-separate border" />
+		<div class="self-center">
+			<TooltipProvider>
+				<Tooltip>
+					<TooltipTrigger>
+						<Button
+							variant="transparent"
+							size="icon"
+							:class="{ 'text-brand': props.showOrphans }"
+							@click="onClickControls('toggleOrphans')"
+						>
+							<BlocksIcon
+								:size="20"
+								class="transition-opacity hover:opacity-100 focus-visible:opacity-100"
+								:class="{ 'opacity-70': !props.showOrphans }"
+							/>
+							<span class="sr-only">{{
+								showOrphans
+									? t("NetworkPage.controls.hide-orphans")
+									: t("NetworkPage.controls.show-orphans")
+							}}</span>
+						</Button>
+					</TooltipTrigger>
+					<TooltipContent>{{
+						showOrphans
+							? t("NetworkPage.controls.hide-orphans")
+							: t("NetworkPage.controls.show-orphans")
+					}}</TooltipContent></Tooltip
+				>
+			</TooltipProvider>
 		</div>
 		<div class="border-separate border" />
 		<Button variant="transparent" size="icon" @click="onClickControls('fullscreen')">

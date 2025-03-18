@@ -97,6 +97,7 @@ const entities = computed(() => {
 	);
 });
 
+const showOrphans = ref(false);
 function emitControls(args: string) {
 	if (args === "fullscreen") {
 		let elem = document.getElementById("network-container");
@@ -112,6 +113,9 @@ function emitControls(args: string) {
 			elem?.classList.remove("bg-white", "dark:bg-black");
 			isFullscreen.value = false;
 		}
+	}
+	if (args === "toggleOrphans") {
+		showOrphans.value = !showOrphans.value;
 	}
 	if (dataGraph.value != null) {
 		dataGraph.value.emitNetworkControls(args);
@@ -148,6 +152,7 @@ const isFullscreen = ref(false);
 					class="right-0 m-3 ml-auto bg-white/90"
 					:layout-running="dataGraph?.layoutIsRunning"
 					:is-fullscreen="isFullscreen"
+					:show-orphans="showOrphans"
 					@network-control-event="(args) => emitControls(args)"
 				/>
 				<NetworkLegendPanel
@@ -163,6 +168,7 @@ const isFullscreen = ref(false);
 				:network-data="entities"
 				:search-node="searchFilters.search"
 				:detail-node="detailEntityId"
+				:show-orphans="showOrphans"
 			/>
 			<Centered v-if="isLoading" class="pointer-events-none">
 				<LoadingIndicator class="text-neutral-950" size="lg" />

@@ -148,7 +148,9 @@
 			"reset-zoom": "Reset zoom",
 			"fullscreen": "Fullscreen",
 			"reset-fullscreen": "Exit fullscreen",
-			"download": "Download network-graph"
+			"download": "Download network-graph",
+			"show-orphans": "Show single nodes",
+			"hide-orphans": "Hide single nodes"
 		}
 	},
 	"NotFoundPage": {

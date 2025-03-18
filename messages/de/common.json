@@ -148,7 +148,9 @@
 			"reset-zoom": "Zoom zurücksetzen",
 			"fullscreen": "Vollbildmodus",
 			"reset-fullscreen": "Vollbildmodus beenden",
-			"download": "Netzwerk-Graph herunterladen"
+			"download": "Netzwerk-Graph herunterladen",
+			"show-orphans": "Einzelne Knoten anzeigen",
+			"hide-orphans": "Einzelne Knoten verbergen"
 		}
 	},
 	"NotFoundPage": {

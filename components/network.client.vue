@@ -25,6 +25,7 @@ const props = defineProps<{
 	graph: Graph;
 	searchNode?: string;
 	detailNode?: string;
+	showOrphans: boolean;
 }>();
 
 interface NetworkContext {
@@ -143,6 +144,15 @@ function setSearchHighlight(searchNode: string) {
 
 watch(
 	() => {
+		return props.showOrphans;
+	},
+	() => {
+		nodeReducer();
+	},
+);
+
+watch(
+	() => {
 		return props.detailNode;
 	},
 	(detailNode) => {
@@ -238,6 +248,9 @@ onMounted(async () => {
 		clearTimeout(hoverTimeOut);
 		setHoveredNode(undefined);
 	});
+
+	nodeReducer();
+	edgeReducer();
 });
 
 function setHoveredNode(node?: string) {
@@ -268,6 +281,16 @@ function nodeReducer() {
 		) {
 			res.label = "";
 			res.color = disabledNodeColor;
+		}
+
+		if (props.showOrphans) {
+			res.hidden = false;
+		} else if (
+			context.graph.neighbors(node).filter((n) => {
+				return n !== node;
+			}).length === 0
+		) {
+			res.hidden = true;
 		}
 		return res;
 	});
