@@ -15,7 +15,8 @@
 			"administrative_unit",
 			"edition",
 			"type_tools",
-			"file"
+			"file",
+			"appellation"
 		]
 	},
 	"map": {
