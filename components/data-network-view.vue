@@ -23,12 +23,13 @@ const searchFiltersSchema = v.object({
 	systemClasses: v.fallback(v.array(v.string()), []),
 	excludeSystemClasses: v.fallback(
 		v.pipe(
-			v.union([v.array(v.string()), v.string()]), // Accept both array and single string
-			v.transform((value) => {
+			v.any(),
+			v.transform((value: Array<string> | string) => {
 				return Array.isArray(value) ? value : [value];
-			}), // Convert single value to array
+			}), // Single transform to array
+			v.array(v.string()), // Validate as string array
 		),
-		[],
+		[], // Default value
 	),
 });
 
@@ -159,7 +160,7 @@ const isFullscreen = ref(false);
 					v-if="height && width"
 					class="m-3 bg-white/90"
 					:system-classes="relevantSystemClasses"
-					:search-filters="searchFilters.systemClasses"
+					:excluded-classes="searchFilters.excludeSystemClasses"
 					@submit="onChangeSearchFilters"
 				/>
 			</div>

@@ -8,7 +8,7 @@ type SystemClassData = Omit<NetworkSearchData, "search">;
 
 const props = defineProps<{
 	systemClasses: Array<string>;
-	searchFilters: Array<string>;
+	excludedClasses: Array<string>;
 }>();
 
 const emit = defineEmits<{
@@ -22,23 +22,26 @@ watch(
 		return props.systemClasses;
 	},
 	() => {
-		if (props.searchFilters.length > 0) return;
+		// if (props.excludedClasses.length > 0) return;
 		checkedSystemClasses.value = Object.fromEntries(
 			props.systemClasses.map((label) => {
 				return [label, true];
 			}),
 		);
+		props.excludedClasses.forEach((element) => {
+			checkedSystemClasses.value[element] = false;
+		});
 	},
 	{ immediate: true },
 );
 
 watch(
 	() => {
-		return props.searchFilters;
+		return props.excludedClasses;
 	},
 	() => {
-		props.searchFilters.forEach((element) => {
-			checkedSystemClasses.value[element] = true;
+		props.excludedClasses.forEach((element) => {
+			checkedSystemClasses.value[element] = false;
 		});
 	},
 	{ immediate: true },
