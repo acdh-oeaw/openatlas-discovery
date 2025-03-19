@@ -161,7 +161,6 @@ const movements = computed(() => {
 			});
 
 			const to = feature.relations.find((rel) => {
-
 				return rel.relationType?.startsWith("crm:P26");
 			});
 
@@ -308,6 +307,7 @@ watch(data, () => {
 });
 
 const selectionCoordinates = ref<[number, number] | undefined>(undefined);
+const detailSelectionCoordinates = ref<[number, number] | undefined>(undefined);
 const selectionBounds = ref<Array<[number, number]> | undefined>(undefined);
 
 function setCoordinates(entity: EntityFeature, coordinates: Ref<[number, number] | undefined>) {
