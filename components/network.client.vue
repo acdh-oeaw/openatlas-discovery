@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { downloadAsImage } from "@sigma/export-image";
 import type Graph from "graphology";
 import circular from "graphology-layout/circular";
 import FA2LayoutSupervisor from "graphology-layout-forceatlas2/worker";
@@ -24,6 +25,7 @@ const props = defineProps<{
 	graph: Graph;
 	searchNode?: string;
 	detailNode?: string;
+	showOrphans: boolean;
 }>();
 
 interface NetworkContext {
@@ -42,6 +44,59 @@ circular.assign(context.graph);
 
 const router = useRouter();
 const route = useRoute();
+
+function handleNetworkControls(eventType: string) {
+	switch (eventType) {
+		case "toggleRenderer":
+			toggleRenderer();
+			break;
+		case "zoomIn":
+			context.camera?.animatedZoom();
+			break;
+		case "zoomOut":
+			context.camera?.animatedUnzoom();
+			break;
+		case "resetZoom":
+			context.camera?.animatedReset();
+			break;
+		case "download":
+			downloadCanvas();
+			break;
+		default:
+			break;
+	}
+}
+
+const isRunning = ref(true);
+
+defineExpose({ handleNetworkControls, isRunning });
+
+function toggleRenderer() {
+	if (layout.isRunning()) {
+		layout.stop();
+		isRunning.value = false;
+	} else {
+		layout.start();
+		isRunning.value = true;
+	}
+}
+
+function downloadCanvas() {
+	// WIP: add copyyright label to downloaded image
+
+	/* const canvas = document.createElement("canvas");
+	const ctx = canvas.getContext("2d");
+	if (ctx) {
+		ctx.font = "16px Arial";
+		ctx.fillText("© " + t("Metadata.name"), 10, 80);
+	}
+	canvas.id = "copyright-canvas";
+	document.body.append(canvas); */
+
+	if (context.renderer != null) {
+		void downloadAsImage(context.renderer, { backgroundColor: "#ffff" });
+	}
+}
 
 let hoverTimeOut: ReturnType<typeof setTimeout>;
 
@@ -86,6 +141,15 @@ function setSearchHighlight(searchNode: string) {
 		skipIndexation: true,
 	});
 }
+
+watch(
+	() => {
+		return props.showOrphans;
+	},
+	() => {
+		nodeReducer();
+	},
+);
 
 watch(
 	() => {
@@ -166,7 +230,7 @@ onMounted(async () => {
 	}
 
 	context.renderer.on("clickNode", ({ node }) => {
-		void router.push({ query: { mode: route.query.mode, selection: node } });
+		void router.push({ query: { ...route.query, selection: node } });
 	});
 
 	context.renderer.on("enterNode", ({ node }) => {
@@ -184,6 +248,9 @@ onMounted(async () => {
 		clearTimeout(hoverTimeOut);
 		setHoveredNode(undefined);
 	});
+
+	nodeReducer();
+	edgeReducer();
 });
 
 function setHoveredNode(node?: string) {
@@ -214,6 +281,16 @@ function nodeReducer() {
 		) {
 			res.label = "";
 			res.color = disabledNodeColor;
+		}
+
+		if (props.showOrphans) {
+			res.hidden = false;
+		} else if (
+			context.graph.neighbors(node).filter((n) => {
+				return n !== node;
+			}).length === 0
+		) {
+			res.hidden = true;
 		}
 		return res;
 	});

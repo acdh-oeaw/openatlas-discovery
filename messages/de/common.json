@@ -69,7 +69,9 @@
 		"no-descriptions": "Keine Beschreibungen verfügbar."
 	},
 	"EntityPage": {
-		"details": "Details",
+		"showOnMap": "Auf Karte anzeigen",
+		"details": "Weitere Informationen",
+		"noType": "Kein Typ",
 		"iiif": "IIIF-Ansicht",
 		"images": "Bilder ({count})",
 		"map": "Karte",
@@ -141,7 +143,19 @@
 			"title": "Netzwerk-Visualisierung"
 		},
 		"title": "Netzwerk-Visualisierung",
-		"work-in-progress": "Die Datenbank ist derzeit im Aufbau."
+		"work-in-progress": "Die Datenbank ist derzeit im Aufbau.",
+		"controls": {
+			"start": "Pausieren",
+			"pause": "Abspielen",
+			"zoomIn": "Vergrößeren",
+			"zoomOut": "Verkleinern",
+			"reset-zoom": "Zoom zurücksetzen",
+			"fullscreen": "Vollbildmodus",
+			"reset-fullscreen": "Vollbildmodus beenden",
+			"download": "Netzwerk-Graph herunterladen",
+			"show-orphans": "Einzelne Knoten anzeigen",
+			"hide-orphans": "Einzelne Knoten verbergen"
+		}
 	},
 	"NotFoundPage": {
 		"meta": {
@@ -153,8 +167,10 @@
 		"CurrentOrFormerResidency": "Residenz"
 	},
 	"Relations": {
+		"Features": "Features",
 		"Artifacts": "Artefakte",
-		"HumanRemains": "Menschliche Überreste"
+		"HumanRemains": "Menschliche Überreste",
+		"Sources": "Quellen"
 	},
 	"SearchForm": {
 		"filter": "Filter",

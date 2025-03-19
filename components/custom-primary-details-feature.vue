@@ -128,5 +128,6 @@ const currentMode = computed(() => {
 		:relations="entity.relations"
 		:system-class="rel.systemClass"
 		:relation-type="rel.relationType"
+		:show-on-map="false"
 	/>
 </template>

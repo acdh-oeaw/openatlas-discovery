@@ -73,8 +73,8 @@ const tabs = computed(() => {
 const relationsByType = computed(() => {
 	return groupByToMap(entity.value?.relations ?? [], (relation) => {
 		// FIXME: This used to use `relationType` (without the prefix)
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		return relation.relationSystemClass!;
+
+		return relation.relationSystemClass;
 	});
 });
 

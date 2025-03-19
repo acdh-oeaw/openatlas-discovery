@@ -71,7 +71,9 @@
 		"no-descriptions": "No descriptions available."
 	},
 	"EntityPage": {
-		"details": "Details",
+		"showOnMap": "Show on Map",
+		"details": "Further Information",
+		"noType": "No Type",
 		"iiif": "IIIF-Viewer",
 		"images": "Images ({count})",
 		"map": "Map",
@@ -143,7 +145,19 @@
 			"title": "Network Visualization"
 		},
 		"title": "Network Visualization",
-		"work-in-progress": "The database is currently work in progress."
+		"work-in-progress": "The database is currently work in progress.",
+		"controls": {
+			"start": "Pause",
+			"pause": "Play",
+			"zoomIn": "Zoom in",
+			"zoomOut": "Zoom out",
+			"reset-zoom": "Reset zoom",
+			"fullscreen": "Fullscreen",
+			"reset-fullscreen": "Exit fullscreen",
+			"download": "Download network-graph",
+			"show-orphans": "Show single nodes",
+			"hide-orphans": "Hide single nodes"
+		}
 	},
 	"NotFoundPage": {
 		"meta": {
@@ -155,8 +169,10 @@
 		"CurrentOrFormerResidency": "Residency"
 	},
 	"Relations": {
+		"Features": "Features",
 		"Artifacts": "Artifacts",
-		"HumanRemains": "Human Remains"
+		"HumanRemains": "Human Remains",
+		"Sources": "Sources"
 	},
 	"SearchForm": {
 		"filter": "Filter",

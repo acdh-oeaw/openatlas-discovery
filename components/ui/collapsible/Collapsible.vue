@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-	type CollapsibleRoot,
+	CollapsibleRoot,
 	type CollapsibleRootEmits,
 	type CollapsibleRootProps,
 	useForwardPropsEmits,

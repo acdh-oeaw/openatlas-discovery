@@ -116,6 +116,10 @@ const selection = computed(() => {
 	return route.query.selection;
 });
 
+const detailOnMap = computed(() => {
+	return route.query.detail;
+});
+
 const mode = computed(() => {
 	return route.query.mode;
 });
@@ -152,11 +156,11 @@ const movements = computed(() => {
 				);
 			});
 
-			const from = feature.relations?.find((rel) => {
+			const from = feature.relations.find((rel) => {
 				return rel.relationType?.startsWith("crm:P27");
 			});
 
-			const to = feature.relations?.find((rel) => {
+			const to = feature.relations.find((rel) => {
 				return rel.relationType?.startsWith("crm:P26");
 			});
 
@@ -303,6 +307,7 @@ watch(data, () => {
 });
 
 const selectionCoordinates = ref<[number, number] | undefined>(undefined);
+const detailSelectionCoordinates = ref<[number, number] | undefined>(undefined);
 const selectionBounds = ref<Array<[number, number]> | undefined>(undefined);
 
 function setCoordinates(entity: EntityFeature, coordinates: Ref<[number, number] | undefined>) {
@@ -356,6 +361,24 @@ watchEffect(() => {
 					]),
 				entities: [entity],
 			};
+
+			if (detailOnMap.value) {
+				const detailEntity = entities.value.find((feature) => {
+					const id = getUnprefixedId(feature["@id"]);
+					return id === detailOnMap.value;
+				});
+
+				// should there be two popups? --> make popups array / more rendered components??
+				if (detailEntity) {
+					setCoordinates(detailEntity, detailSelectionCoordinates);
+					if (detailSelectionCoordinates.value === undefined) return;
+
+					popover.value = {
+						coordinates: detailSelectionCoordinates.value,
+						entities: [detailEntity],
+					};
+				}
+			}
 		}
 	}
 });
