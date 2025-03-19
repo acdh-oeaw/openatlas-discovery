@@ -161,6 +161,7 @@ const movements = computed(() => {
 			});
 
 			const to = feature.relations.find((rel) => {
+
 				return rel.relationType?.startsWith("crm:P26");
 			});
 
@@ -295,6 +296,7 @@ function onLayerClick({ features, targetCoordinates }: onLayerClickParams) {
 			]),
 		entities,
 	};
+	console.log("Popup: ", popover.value);
 }
 
 watch(data, () => {
