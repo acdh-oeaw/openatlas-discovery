@@ -5,7 +5,7 @@ const props = defineProps<{
 	showIcon: boolean;
 }>();
 
-const sortedRelations = computed(() => {
+const _sortedRelations = computed(() => {
 	function hasCenter(geometry: EntityFeature["relations"][0]["geometry"]) {
 		if (geometry.type === "GeometryCollection") {
 			return Boolean(

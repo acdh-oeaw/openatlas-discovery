@@ -5,7 +5,8 @@ image:
   light: /assets/images/hero-light.svg
   dark: /assets/images/hero-dark.svg
 leadIn: >-
-  This is a prototype for [OpenAtlas](https://openatlas.eu) projects. Demo data kindly provided by:
+  This is a demo site for [OpenAtlas Discovery](https://github.com/craws/OpenAtlas-Discovery), a
+  presentation website for [OpenAtlas](https://openatlas.eu) projects. Demo data kindly provided by:
   [THANADOS](https://thanados.net/) - The Anthropological and Archaeological Database of Sepultures
 links:
   - label: View data

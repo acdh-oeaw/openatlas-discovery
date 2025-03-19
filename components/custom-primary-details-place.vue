@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { TRUE } from "openapi-typescript";
-
 const t = useTranslations();
 
 const _props = defineProps<{ entity: EntityFeature }>();

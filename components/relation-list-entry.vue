@@ -27,7 +27,7 @@ const currentMode = computed(() => {
 	return route.query.mode;
 });
 
-function hasValidTimespans(timespans: Array<any> | null | undefined): boolean {
+function hasValidTimespans(timespans: Array<unknown> | null | undefined): boolean {
 	if (!timespans || timespans.length === 0) {
 		return false;
 	}

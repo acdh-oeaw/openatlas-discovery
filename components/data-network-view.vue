@@ -106,7 +106,7 @@ function emitControls(args: string) {
 		if (!document.fullscreenElement && elem != null) {
 			elem.classList.add("bg-white", "dark:bg-black");
 			elem.requestFullscreen().catch(() => {
-				console.log(`Error attempting to enable fullscreen mode`);
+				console.warn(`Error attempting to enable fullscreen mode`);
 			});
 			isFullscreen.value = true;
 		} else {
