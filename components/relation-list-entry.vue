@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import type { ExtendedEntities } from "@/types/api";
+
 const { getUnprefixedId } = useIdPrefix();
 
 const t = useTranslations();
@@ -27,8 +29,10 @@ const currentMode = computed(() => {
 	return route.query.mode;
 });
 
-function hasValidTimespans(timespans: Array<unknown> | null | undefined): boolean {
-	if (!timespans || timespans.length === 0) {
+function hasValidTimespans(
+	timespans: NonNullable<ExtendedEntities["when"]>["timespans"] | null | undefined,
+): boolean {
+	if (!timespans) {
 		return false;
 	}
 
@@ -46,7 +50,7 @@ function hasValidTimespans(timespans: Array<unknown> | null | undefined): boolea
 }
 
 const centroid = computed(() => {
-	if (props.relation.geometry.type === "GeometryCollection") {
+	if (props.relation.geometry?.type === "GeometryCollection") {
 		return props.relation.geometry.geometries.find((a) => {
 			return a.shapeType === "centerpoint";
 		});
@@ -71,7 +75,7 @@ const centroid = computed(() => {
 						query: { mode: currentMode, selection: getUnprefixedId(relation.relationTo ?? '') },
 					}"
 				>
-					{{ relation.properties.title }}
+					{{ relation.properties?.title }}
 				</NavLink>
 				<template v-if="type != null">
 					<span class="text-xs text-muted-foreground">{{ type }}</span>

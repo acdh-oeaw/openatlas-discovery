@@ -89,5 +89,5 @@ function getNodeColor(nodeClass: string) {
 			</span>
 		</Card>
 	</div>
-	<Network v-if="graph.size > 0" :graph="graph" />
+	<Network v-if="graph.size > 0" :graph="graph" :show-orphans="false" />
 </template>

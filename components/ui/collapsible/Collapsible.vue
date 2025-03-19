@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type {
+import {
 	CollapsibleRoot,
-	CollapsibleRootEmits,
-	CollapsibleRootProps,
+	type CollapsibleRootEmits,
+	type CollapsibleRootProps,
 	useForwardPropsEmits,
 } from "radix-vue";
 

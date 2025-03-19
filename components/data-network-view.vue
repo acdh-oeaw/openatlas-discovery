@@ -4,6 +4,7 @@ import { useTemplateRef } from "vue";
 import type { LocationQueryValue } from "vue-router";
 
 import { project } from "../config/project.config";
+import type DataGraph from "./data-graph.vue";
 import NetworkControls from "./network-controls.vue";
 
 const router = useRouter();
@@ -84,7 +85,7 @@ const relevantSystemClasses = computed(() => {
 		});
 });
 
-const dataGraph = useTemplateRef("dataGraph");
+const dataGraph = useTemplateRef<typeof DataGraph>("dataGraph");
 
 const isLoading = computed(() => {
 	return isPending.value || isPlaceholderData.value;
@@ -119,9 +120,17 @@ function emitControls(args: string) {
 		showOrphans.value = !showOrphans.value;
 	}
 	if (dataGraph.value != null) {
+		//eslint-disable-next-line
+		//@ts-ignore
 		dataGraph.value.emitNetworkControls(args);
 	}
 }
+
+const isRunning = computed(() => {
+	//eslint-disable-next-line
+	//@ts-ignore
+	return dataGraph.value?.layoutIsRunning;
+});
 
 const isFullscreen = ref(false);
 </script>
@@ -151,7 +160,7 @@ const isFullscreen = ref(false);
 			<div class="absolute bottom-0 right-0 z-10">
 				<NetworkControls
 					class="right-0 m-3 ml-auto bg-white/90"
-					:layout-running="dataGraph?.layoutIsRunning"
+					:layout-running="isRunning"
 					:is-fullscreen="isFullscreen"
 					:show-orphans="showOrphans"
 					@network-control-event="(args) => emitControls(args)"

@@ -7,14 +7,14 @@ const props = defineProps<{
 
 const _sortedRelations = computed(() => {
 	function hasCenter(geometry: EntityFeature["relations"][0]["geometry"]) {
-		if (geometry.type === "GeometryCollection") {
+		if (geometry?.type === "GeometryCollection") {
 			return Boolean(
 				geometry.geometries.find((g) => {
 					return g.shapeType === "centerpoint";
 				}),
 			);
 		}
-		if (geometry.type === "Point") return geometry.shapeType === "centerpoint";
+		if (geometry?.type === "Point") return geometry.shapeType === "centerpoint";
 		return false;
 	}
 	return props.relations.toSorted((b, a) => {

@@ -24,6 +24,7 @@ export type GetLinkedEntitiesResponse = components["schemas"]["EntitiesOutputMod
 
 export type RelationLinkedEntity = LinkedPlacesModel["features"][0];
 export interface ExtendedEntities extends RelationLinkedEntity {
+	label?: string;
 	relationType?: string;
 	relationTo?: string;
 	relationSystemClass: string;

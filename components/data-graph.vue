@@ -17,12 +17,20 @@ const graph = new Graph();
 const { entityColors } = networkConfig.colors;
 const defaultColor = networkConfig.colors.entityDefaultColor;
 
-const networkRef = useTemplateRef("networkClient");
+interface NetworkTemplateRef {
+	handleNetworkControls: (args: string) => void;
+	isRunning: boolean;
+}
+const networkRef = useTemplateRef<NetworkTemplateRef>("networkClient");
 function emitNetworkControls(args: string) {
+	//eslint-disable-next-line
+	//@ts-ignore
 	if (networkRef.value) networkRef.value.handleNetworkControls(args);
 }
 
 const layoutIsRunning = computed(() => {
+	//eslint-disable-next-line
+	//@ts-ignore
 	return networkRef.value?.isRunning;
 });
 
@@ -71,6 +79,8 @@ watch(
 		});
 
 		if (!layoutIsRunning.value) {
+			//eslint-disable-next-line
+			//@ts-ignore
 			networkRef.value?.handleNetworkControls("toggleRenderer");
 		}
 	},

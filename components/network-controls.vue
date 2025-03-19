@@ -22,7 +22,7 @@ const props = defineProps<{
 
 const emit = defineEmits(["networkControlEvent"]);
 
-const containerRef = useTemplateRef("container");
+const containerRef = useTemplateRef<HTMLElement>("container");
 
 function onClickControls(
 	element:
