@@ -1,24 +1,61 @@
 <script setup lang="ts">
+import type { NetworkSearchData } from "@/components/data-network-view.vue";
 import { networkConfig } from "@/config/network-visualisation.config";
 
 const t = useTranslations();
 
-export interface SearchFormData {
-	category: string; // TODO: stricter typings
-}
+type SystemClassData = Omit<NetworkSearchData, "search">;
 
 const props = defineProps<{
 	systemClasses: Array<string>;
+	excludedClasses: Array<string>;
 }>();
 
 const emit = defineEmits<{
-	(event: "submit", values: SearchFormData): void;
+	(event: "submit", values: SystemClassData): void;
 }>();
 
-// TODO: Fix me! Implement filtering by system classes
-function _onSubmit(element: string) {
+const checkedSystemClasses = ref<Record<string, boolean>>({});
+
+watch(
+	() => {
+		return props.systemClasses;
+	},
+	() => {
+		// if (props.excludedClasses.length > 0) return;
+		checkedSystemClasses.value = Object.fromEntries(
+			props.systemClasses.map((label) => {
+				return [label, true];
+			}),
+		);
+		props.excludedClasses.forEach((element) => {
+			checkedSystemClasses.value[element] = false;
+		});
+	},
+	{ immediate: true },
+);
+
+watch(
+	() => {
+		return props.excludedClasses;
+	},
+	() => {
+		props.excludedClasses.forEach((element) => {
+			checkedSystemClasses.value[element] = false;
+		});
+	},
+	{ immediate: true },
+);
+
+function onSubmit() {
 	emit("submit", {
-		category: element, //Array, checkbox-group html + how do i get teh values in the submit event handler
+		excludeSystemClasses: Object.entries(checkedSystemClasses.value)
+			.filter((entry) => {
+				return !entry[1];
+			})
+			.map((entry) => {
+				return entry[0];
+			}),
 	});
 }
 
@@ -28,6 +65,9 @@ const labels = {
 	person: t("SystemClassNames.person"),
 	group: t("SystemClassNames.group"),
 	move: t("SystemClassNames.move"),
+	creation: t("SystemClassNames.creation"),
+	production: t("SystemClassNames.production"),
+	modification: t("SystemClassNames.modification"),
 	event: t("SystemClassNames.event"),
 	activity: t("SystemClassNames.activity"),
 	acquisition: t("SystemClassNames.acquisition"),
@@ -59,20 +99,17 @@ const systemClassColors = networkConfig.colors.entityColors;
 			:style="`color: ${el in systemClassColors ? systemClassColors[el as keyof typeof systemClassColors] : '#666'}`"
 		>
 			<div class="grid grid-cols-[auto_1fr] gap-2">
-				<!-- <input
+				<input
 					:id="el"
+					v-model="checkedSystemClasses[el]"
 					type="checkbox"
+					:checked="checkedSystemClasses[el]"
 					name="systemClassCheckbox"
-					:style="`accent-color: ${systemClassColors[el] ? systemClassColors[el] : '#666'}`"
-					checked
-					@change="onSubmit(el)"
-				/> -->
-				<span
-					class="m-1.5 size-2 rounded-full"
-					:style="`background-color: ${el in systemClassColors ? systemClassColors[el as keyof typeof systemClassColors] : '#666'}`"
+					:style="`accent-color: ${systemClassColors[el as keyof typeof systemClassColors] ? systemClassColors[el as keyof typeof systemClassColors] : '#666'}`"
+					@change="onSubmit()"
 				/>
-				<span v-if="el in labels">{{ labels[el as keyof typeof labels] }}</span>
-				<span v-else> {{ el }}</span>
+				<span v-if="el in labels" class="self-center">{{ labels[el as keyof typeof labels] }}</span>
+				<span v-else class="self-center"> {{ el }}</span>
 			</div>
 		</div>
 	</aside>

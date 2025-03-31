@@ -9,7 +9,11 @@ import {
 
 import { cn } from "@/utils/styles";
 
-const props = withDefaults(defineProps<TooltipContentProps>(), {
+interface extendedTooltipContentProps extends TooltipContentProps {
+	container?: HTMLElement;
+}
+
+const props = withDefaults(defineProps<extendedTooltipContentProps>(), {
 	sideOffset: 4,
 });
 const emits = defineEmits<TooltipContentEmits>();
@@ -18,7 +22,7 @@ const forwarded = useForwardPropsEmits(props, emits);
 </script>
 
 <template>
-	<TooltipPortal>
+	<TooltipPortal :to="container">
 		<TooltipContent
 			v-bind="{ ...forwarded, ...$attrs }"
 			:class="

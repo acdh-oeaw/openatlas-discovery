@@ -2,6 +2,7 @@
 import { CheckIcon, CopyIcon } from "lucide-vue-next";
 
 import CustomPrimaryDetailsActor from "@/components/custom-primary-details-actor.vue";
+import CustomPrimaryDetailsEvent from "@/components/custom-primary-details-event.vue";
 import CustomPrimaryDetailsFeature from "@/components/custom-primary-details-feature.vue";
 import CustomPrimaryDetailsPlace from "@/components/custom-primary-details-place.vue";
 
@@ -42,8 +43,14 @@ const images = computed(() => {
 });
 
 const customPrimaryDetails = computed(() => {
+	if (props.entity.viewClass in entityPrimaryDetailsDictByViewClass)
+		return entityPrimaryDetailsDictByViewClass[props.entity.viewClass];
 	return entityPrimaryDetailsDict[props.entity.systemClass];
 });
+
+const entityPrimaryDetailsDictByViewClass: Record<string, Component> = {
+	event: CustomPrimaryDetailsEvent,
+};
 
 const entityPrimaryDetailsDict: Record<string, Component> = {
 	person: CustomPrimaryDetailsActor,
@@ -90,7 +97,7 @@ const isCopied = ref(false);
 
 // TODO: For instances where there is no location set (at least for actors), make use of first and last event if no places are available
 const places = computed(() => {
-	return props.entity.relations?.reduce((acc: Array<Place>, relation) => {
+	return props.entity.relations.reduce((acc: Array<Place>, relation) => {
 		if (relation.relationSystemClass !== "object_location") return acc;
 		if (!relation.label || !relation.relationTo || !relation.relationType) return acc;
 		const id = getUnprefixedId(relation.relationTo);
@@ -112,6 +119,7 @@ watchEffect(() => {
 	if (route.query.selection) {
 		isCopied.value = false;
 	}
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 	if (!places.value || places.value.length === 0) return;
 	const relTypes = places.value.map((place) => {
 		return place.relationType;

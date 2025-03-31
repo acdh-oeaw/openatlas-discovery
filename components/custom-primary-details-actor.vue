@@ -71,5 +71,6 @@ onMounted(() => {
 		:title="rel.title"
 		:relations="entity.relations"
 		:relation-type="rel.relationType"
+		:show-on-map="false"
 	/>
 </template>

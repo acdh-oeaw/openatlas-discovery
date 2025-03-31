@@ -16,7 +16,7 @@ console.log(props.handledRelations);
 const redundantSystemClasses = ["source"];
 
 const filteredRelations = computed(() => {
-	return props.relations?.filter((relation) => {
+	return props.relations.filter((relation) => {
 		if (props.handledRelations.length === 0) return true;
 		if (redundantSystemClasses.includes(relation.systemClass)) return false;
 		return !props.handledRelations.some((handledRelation) => {
@@ -29,11 +29,12 @@ const filteredRelations = computed(() => {
 
 const relationsByType = computed(() => {
 	return groupByToMap(
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		filteredRelations.value ?? [],
 		(relation: NonNullable<EntityFeature["relations"]>[0]) => {
 			// FIXME: This used to use `relationType` (without the prefix)
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			return relation.relationSystemClass!;
+
+			return relation.relationSystemClass;
 		},
 	);
 });

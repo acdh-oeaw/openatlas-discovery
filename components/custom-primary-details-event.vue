@@ -8,41 +8,65 @@ const { getUnprefixedId } = useIdPrefix();
 const props = defineProps<{ entity: EntityFeature }>();
 const route = useRoute();
 
-const { data } = useGetBySystemClass(
+const multipleMovements = useGetLinkedEntitiesRecursive(
 	computed(() => {
-		return { system_class: "feature" };
-	}),
-	computed(() => {
-		return { show: ["none"], limit: 0 };
+		return { entityId: Number.parseInt(getUnprefixedId(props.entity["@id"])) };
 	}),
 );
 
-const features = computed(() => {
-	return (
-		data.value?.enities.map((feat) => {
-			return feat.features[0];
-		}) ?? []
-	);
+const movementDetails = computed(() => {
+	if (multipleMovements.data.value) {
+		return multipleMovements.data.value;
+	} else return null;
+});
+
+const linkedMovements = computed(() => {
+	if (movementDetails.value === null) {
+		return null;
+	}
+
+	const features = Object.values(movementDetails.value).flatMap((entity) => {
+		if (entity && typeof entity === "object" && Array.isArray(entity.features)) {
+			return entity.features as Array<EntityFeature>;
+		}
+		return [];
+	});
+
+	// Now map through the features to get the IDs
+	return features.map((movement) => {
+		return {
+			id: getUnprefixedId(movement["@id"]),
+			"@id": movement["@id"],
+			title: movement.properties.title,
+			systemClass: movement.systemClass,
+		};
+	});
 });
 
 const currentFeatureIndex = computed(() => {
-	return features.value.findIndex((feature) => {
-		return feature?.["@id"] === props.entity["@id"];
+	if (linkedMovements.value == null) {
+		return -1;
+	}
+	return linkedMovements.value.findIndex((feature) => {
+		return feature["@id"] === props.entity["@id"];
 	});
 });
 
 const previousFeature = computed(() => {
-	if (currentFeatureIndex.value === 0) {
+	if (currentFeatureIndex.value <= 0 || linkedMovements.value == null) {
 		return null;
 	}
-	return features.value[currentFeatureIndex.value - 1];
+	return linkedMovements.value[currentFeatureIndex.value - 1];
 });
 
 const nextFeature = computed(() => {
-	if (currentFeatureIndex.value === features.value.length - 1) {
+	if (
+		linkedMovements.value == null ||
+		currentFeatureIndex.value === linkedMovements.value.length - 1
+	) {
 		return null;
 	}
-	return features.value[currentFeatureIndex.value + 1];
+	return linkedMovements.value[currentFeatureIndex.value + 1];
 });
 
 const collapsibleRelations: Array<{
@@ -105,7 +129,7 @@ const currentMode = computed(() => {
 			class="flex items-center underline decoration-dotted transition hover:no-underline focus-visible:no-underline"
 		>
 			<ChevronLeftIcon class="size-4" />
-			<span>{{ previousFeature.properties.title }}</span>
+			<span>{{ previousFeature.title }}</span>
 			<span class="sr-only">{{ t("EntitySidebar.PreviousFeature") }}</span>
 		</NavLink>
 		<NavLink
@@ -116,7 +140,7 @@ const currentMode = computed(() => {
 			}"
 			class="flex items-center underline decoration-dotted transition hover:no-underline focus-visible:no-underline"
 		>
-			<span>{{ nextFeature.properties.title }}</span>
+			<span>{{ nextFeature.title }}</span>
 			<span class="sr-only">{{ t("EntitySidebar.NextFeature") }}</span>
 			<ChevronRightIcon class="size-4" />
 		</NavLink>

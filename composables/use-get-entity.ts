@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/vue-query";
 import { useCreateEntity } from "@/composables/use-create-entity";
 import { useCreateLinkedEntities } from "@/composables/use-create-linked-entities";
 import type { operations } from "@/lib/api-client/api";
-import type { ExtendedEntities, LinkedPlace } from "@/types/api";
+import type { LinkedPlace } from "@/types/api";
 
 export interface GetEntityParams
 	extends NonNullable<operations["GetEntity"]["parameters"]["path"]> {}
@@ -63,7 +63,7 @@ export function useGetEntity(params: MaybeRef<GetEntityParams>) {
 			);
 
 			if (entity.features[0] != null) {
-				const mergedRelations = entity.features[0].relations?.map((feature) => {
+				const mergedRelations = entity.features[0].relations.map((feature) => {
 					return {
 						...feature,
 						...linkedEntities.find((entity) => {
@@ -71,6 +71,7 @@ export function useGetEntity(params: MaybeRef<GetEntityParams>) {
 						}),
 					};
 				});
+				// @ts-expect-error - type mismatch (fix later)
 				entity.features[0].relations = mergedRelations;
 			}
 			console.log("Entity with relations:", entity.features);

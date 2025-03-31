@@ -38,12 +38,13 @@ watch(
 		legendEntities.push(networkData.systemClass);
 
 		/** Add relations to target nodes. */
-		networkData.relations?.forEach((element) => {
+		networkData.relations.forEach((element) => {
 			if (element.relationTo == null) return;
 
 			const relationId = getUnprefixedId(element.relationTo);
 			const nodeClass = element.relationSystemClass;
 
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 			if (nodeClass == null) return;
 
 			if (!legendEntities.includes(nodeClass)) {
@@ -88,5 +89,5 @@ function getNodeColor(nodeClass: string) {
 			</span>
 		</Card>
 	</div>
-	<Network v-if="graph.size > 0" :graph="graph" />
+	<Network v-if="graph.size > 0" :graph="graph" :show-orphans="false" />
 </template>

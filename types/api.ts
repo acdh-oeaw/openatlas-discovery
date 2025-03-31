@@ -6,7 +6,7 @@ type LinkedPlacesModelFeature = LinkedPlacesModel["features"][number];
 
 export interface LinkedPlaceFeature extends LinkedPlacesModelFeature {
 	type: "Feature";
-	geometry:
+	geometry?:
 		| components["schemas"]["GeometryCollection"]
 		| components["schemas"]["LineString"]
 		| components["schemas"]["Point"]
@@ -24,6 +24,7 @@ export type GetLinkedEntitiesResponse = components["schemas"]["EntitiesOutputMod
 
 export type RelationLinkedEntity = LinkedPlacesModel["features"][0];
 export interface ExtendedEntities extends RelationLinkedEntity {
+	label?: string;
 	relationType?: string;
 	relationTo?: string;
 	relationSystemClass: string;
