@@ -42,16 +42,17 @@ const updateHandledRelations = (relations: Array<RelationType>) => {
 
 <template>
 	<div v-if="entity != null && props.id != null">
-		<details
-			:class="
-				props.noTableSidebar
-					? 'group grid h-full z-10 mb-2 mr-2 translate-x-[-25vw] transition-transform duration-300 open:translate-x-0 absolute w-1/4'
-					: 'group grid h-full z-10 mb-2 mr-2 translate-x-[-25vw] transition-transform duration-300 open:translate-x-0'
-			"
+		<div
+			class="group z-10 mb-2 mr-2 flex h-full transition-transform duration-300"
+			:class="{
+				'absolute w-1/4': props.noTableSidebar,
+				'translate-x-0': openState,
+				'translate-x-[-25vw]': !openState,
+			}"
 			:open="openState"
 		>
 			<div
-				class="relative h-full max-h-full overflow-y-auto rounded-lg border bg-card px-6 py-4 text-card-foreground shadow"
+				class="relative size-full max-h-full grow basis-full overflow-y-auto rounded-lg border bg-card px-6 py-4 text-card-foreground shadow"
 			>
 				<EntityPrimaryDetails :entity="entity" @handled-relations="updateHandledRelations" />
 
@@ -65,16 +66,20 @@ const updateHandledRelations = (relations: Array<RelationType>) => {
 					class="rounded-md border px-4 py-3 text-sm"
 				/>
 			</div>
-			<summary
-				class="absolute left-full top-1/2 block -translate-x-2 rounded-md bg-[hsl(var(--card))] py-2 pl-1 shadow-md"
+			<button
+				class="absolute left-full top-1/2 -z-10 block -translate-x-2 rounded-md bg-[hsl(var(--card))] py-2 pl-1 shadow-md"
 				style="top: calc(50% - 40px)"
+				@click="openState = !openState"
 			>
-				<ChevronLeftIcon class="ml-auto hidden size-8 group-open:block" />
-				<ChevronRightIcon class="ml-auto size-8 group-open:hidden" />
+				<ChevronLeftIcon class="ml-auto size-8" :class="{ block: openState, hidden: !openState }" />
+				<ChevronRightIcon
+					class="ml-auto size-8"
+					:class="{ hidden: openState, block: !openState }"
+				/>
 				<span class="sr-only">{{
 					t("EntityPage.sidebar.toggle", { title: entity.properties.title })
 				}}</span>
-			</summary>
-		</details>
+			</button>
+		</div>
 	</div>
 </template>
