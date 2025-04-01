@@ -41,11 +41,10 @@
 	},
 	"DataMapView": {
 		"centerpoint": "Areas",
+		"start-date": "Start date",
 		"end-date": "End date",
 		"point": "Locations",
 		"polygon": "Display Areas",
-		"centerpoint": "Areas",
-		"point": "Locations",
 		"movement": "Movement",
 		"showMovement": "Display Movement"
 	},
@@ -59,9 +58,6 @@
 		"search": "Search",
 		"title": "Datalist",
 		"work-in-progress": "The database is currently work in progress."
-	},
-	"DataView": {
-		"nothing-found": "No entries found for this search."
 	},
 	"DefaultLayout": {
 		"skip-to-main-content": "Skip to main content"
