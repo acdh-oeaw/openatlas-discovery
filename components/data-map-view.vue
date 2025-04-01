@@ -295,7 +295,6 @@ function onLayerClick({ features, targetCoordinates }: onLayerClickParams) {
 			]),
 		entities,
 	};
-	console.log("Popup: ", popover.value);
 }
 
 watch(data, () => {
@@ -403,23 +402,25 @@ const linkedMovements = computed(() => {
 		return null;
 	}
 
-	const features = Object.values(movementDetails.value).flatMap((entity) => {
-		if (entity && typeof entity === "object" && Array.isArray(entity.features)) {
-			return entity.features as Array<EntityFeature>;
-		}
-		return [];
-	});
+	let currentMovement = movementDetails.value;
+	let features = [currentMovement];
+
+	while (currentMovement.children && currentMovement.children.length > 0) {
+		assert(currentMovement.children[0]);
+		features = features.concat(currentMovement.children);
+		currentMovement = currentMovement.children[0];
+	}
 
 	// Now map through the features to get the IDs
 	return features.map((movement) => {
 		return {
-			id: getUnprefixedId(movement["@id"]),
-			systemClass: movement.systemClass,
+			id: String(movement.id),
+			systemClass: movement.system_class ?? "",
 		};
 	});
 });
 
-const multipleMovements = useGetLinkedEntitiesRecursive(
+const multipleMovements = useGetChainedEvents(
 	computed(() => {
 		return { entityId: movementId.value };
 	}),

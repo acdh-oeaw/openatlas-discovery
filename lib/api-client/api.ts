@@ -525,7 +525,7 @@ export interface components {
             version: string;
         };
         ChainEventModel: {
-            children: components["schemas"]["ChainEventModel"];
+            children: Array<components["schemas"]["ChainEventModel"]> | null;
             geometry: (components["schemas"]["GeometryCollection"] | components["schemas"]["LineString"] | components["schemas"]["Point"] | components["schemas"]["Polygon"]) | null;
             id: number;
             name: string;
