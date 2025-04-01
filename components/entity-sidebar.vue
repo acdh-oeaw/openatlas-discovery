@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-vue-next";
+import { ChevronLeftIcon, ChevronRightIcon, XIcon } from "lucide-vue-next";
 
 const t = useTranslations();
+const router = useRouter();
+const route = useRoute();
 
 const props = defineProps<{
 	id: number;
@@ -38,6 +40,10 @@ const handledRelations = ref<Array<RelationType>>([]);
 const updateHandledRelations = (relations: Array<RelationType>) => {
 	handledRelations.value = [...relations];
 };
+
+function clearSelection() {
+	void router.push({ query: { ...route.query, selection: null } });
+}
 </script>
 
 <template>
@@ -54,6 +60,12 @@ const updateHandledRelations = (relations: Array<RelationType>) => {
 			<div
 				class="relative size-full max-h-full grow basis-full overflow-y-auto rounded-lg border bg-card px-6 py-4 text-card-foreground shadow"
 			>
+				<Button
+					variant="transparent"
+					class="float-right -mr-6 -mt-4 p-2 text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white"
+					@click="clearSelection"
+					><XIcon class="size-4"></XIcon
+				></Button>
 				<EntityPrimaryDetails :entity="entity" @handled-relations="updateHandledRelations" />
 
 				<slot name="custom-details" />
