@@ -44,6 +44,7 @@ const updateHandledRelations = (relations: Array<RelationType>) => {
 function clearSelection() {
 	void router.push({ query: { ...route.query, selection: null } });
 }
+defineExpose({ openState });
 </script>
 
 <template>
@@ -53,7 +54,7 @@ function clearSelection() {
 			:class="{
 				'absolute w-1/4': props.noTableSidebar,
 				'translate-x-0': openState,
-				'translate-x-[-25vw]': !openState,
+				'-translate-x-full': !openState,
 			}"
 			:open="openState"
 		>

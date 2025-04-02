@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { MapPinIcon, RadiusIcon, TablePropertiesIcon } from "lucide-vue-next";
+import { useTemplateRef } from "vue";
 
+import EntitySidebar from "@/components/entity-sidebar.vue";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const t = useTranslations();
@@ -27,6 +29,11 @@ function getPath() {
 	}
 	return "";
 }
+
+const sidebar = useTemplateRef<typeof EntitySidebar>("sidebar");
+const sidebarOpen = computed(() => {
+	return sidebar.value?.openState;
+});
 </script>
 
 <template>
@@ -130,14 +137,22 @@ function getPath() {
 				class="relative grid h-full grid-cols-[0px_1fr] transition-all delay-150 ease-in-out data-[sidepanel]:grid-cols-[25vw_1fr]"
 				:data-sidepanel="id != null && currentMode === 'table' ? 'true' : undefined"
 			>
-				<div class="grid h-full">
+				<div class="grid h-full" :class="{ 'z-10': sidebarOpen }">
 					<EntitySidebar
 						v-if="id != null && currentMode === 'table'"
 						:id="id"
+						ref="sidebar"
 						:no-table-sidebar="false"
 					/>
 				</div>
-				<slot />
+				<slot v-if="currentMode != 'table'" />
+				<div
+					v-else
+					class="transition-all delay-0"
+					:class="{ 'ml-[calc(-25vw+1.5rem)]': id != null && !sidebarOpen }"
+				>
+					<slot></slot>
+				</div>
 			</div>
 		</MainContent>
 	</NuxtLayout>

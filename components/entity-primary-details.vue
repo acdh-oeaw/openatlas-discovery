@@ -142,7 +142,7 @@ function copyEntity() {
 </script>
 
 <template>
-	<div class="grid grid-cols-[auto_auto]">
+	<div class="grid grid-cols-1 md:grid-cols-[auto_auto]">
 		<EntitySystemClass :system-class="entity.systemClass" />
 		<div v-if="!isCopied" class="ml-auto">
 			<Button variant="outline" @click="copyEntity">
