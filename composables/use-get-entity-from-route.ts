@@ -5,14 +5,18 @@ export const useGetEntityFromRoute = () => {
 		return Number(route.params.id as string);
 	});
 
-	const { data, isPending, isPlaceholderData } = useGetEntity(
+	const {
+		data: queryData,
+		isPending,
+		isPlaceholderData,
+	} = useGetEntity(
 		computed(() => {
 			return { entityId: id.value };
 		}),
 	);
 
 	const entity = computed(() => {
-		return queryData.value?.entity?.features[0];
+		return queryData.value?.features[0];
 	});
 
 	const isLoading = computed(() => {
