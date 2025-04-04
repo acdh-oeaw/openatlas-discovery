@@ -50,7 +50,7 @@ defineExpose({ openState });
 <template>
 	<div v-if="entity != null && props.id != null">
 		<div
-			class="group z-10 mb-2 mr-2 flex h-full transition-transform duration-300"
+			class="group z-20 mb-2 mr-2 flex h-full transition-transform duration-300"
 			:class="{
 				'absolute w-1/4': props.noTableSidebar,
 				'translate-x-0': openState,

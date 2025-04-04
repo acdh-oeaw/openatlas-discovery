@@ -441,7 +441,7 @@ function setMovementId({ id }: { id: string | null }) {
 			<SearchForm
 				:class="
 					project.fullscreen
-						? 'bg-white/90 dark:bg-neutral-900 max-w-[800px] w-full mt-2 rounded-md p-6 shadow-md pointer-events-auto'
+						? 'bg-white/90 dark:bg-neutral-900 max-w-[min(800px,49%)] min-w-fit w-full mt-2 rounded-md p-6 shadow-md pointer-events-auto'
 						: ''
 				"
 				:category="searchFilters.category"
