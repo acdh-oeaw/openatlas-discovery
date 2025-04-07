@@ -5,6 +5,9 @@
 		"geojsonAreaCenterPoints": "#b8cf5b",
 		"geojsonMovement": "#D0031E"
 	},
+	"detailView": {
+		"excludeTypeIds": []
+	},
 	"network": {
 		"excludeSystemClasses": [
 			"type",
