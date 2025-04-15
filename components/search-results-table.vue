@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { EntityFeature } from "@/composables/use-create-entity";
 import { isColumn } from "@/composables/use-get-search-results";
+import { normalizeIsoYear } from "@/utils/create-date-span";
 
 const emit = defineEmits({
 	"update:sorting"(sorting: SortingState) {
@@ -59,8 +60,14 @@ function dateCellToDateString(info: CellContext<EntityFeature, string>): string 
 	const date: string | null | undefined = info.getValue();
 
 	if (!date || date.includes("null")) return "";
-
-	return d(date);
+	let dateValue: Date | string = date;
+	let isBC = false;
+	if (date.startsWith("-")) {
+		dateValue = new Date(Date.parse(normalizeIsoYear(date)));
+		dateValue.setFullYear(dateValue.getFullYear() * -1);
+		isBC = true;
+	}
+	return d(dateValue) + (isBC ? " BC" : "");
 }
 
 /**

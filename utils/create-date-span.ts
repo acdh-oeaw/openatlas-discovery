@@ -1,14 +1,14 @@
-function normalizeIsoYear(dateString: string) {
-	return dateString.replace(/^-(\d{1,4})/, (_, year: string) => {
-		return year.padStart(4, "0");
-	});
+export function normalizeIsoYear(dateString: string) {
+	return dateString
+		.replace(/^-(\d{1,4})/, (_, year: string) => {
+			return year.padStart(4, "0");
+		})
+		.trimEnd();
 }
 
 export function createDateSpan(date: { earliest?: string | null; latest?: string | null }) {
 	const { d } = useI18n();
-
 	const segments: Array<string> = [];
-
 	if (date.earliest != null) {
 		let dateValue: Date | string = date.earliest;
 		let isBC = false;
