@@ -102,7 +102,7 @@ collections:
                     "place",
                     "feature",
                     "move",
-                    "statigraphic_unit",
+                    "stratigraphic_unit",
                     "artifact",
                     "person",
                     "group",
