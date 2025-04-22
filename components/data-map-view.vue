@@ -295,7 +295,6 @@ function onLayerClick({ features, targetCoordinates }: onLayerClickParams) {
 			]),
 		entities,
 	};
-	console.log("Popup: ", popover.value);
 }
 
 watch(data, () => {
@@ -361,7 +360,7 @@ watchEffect(() => {
 					]),
 				entities: [entity],
 			};
-
+			detailSelectionCoordinates.value = undefined;
 			if (detailOnMap.value) {
 				const detailEntity = entities.value.find((feature) => {
 					const id = getUnprefixedId(feature["@id"]);
@@ -371,6 +370,7 @@ watchEffect(() => {
 				// should there be two popups? --> make popups array / more rendered components??
 				if (detailEntity) {
 					setCoordinates(detailEntity, detailSelectionCoordinates);
+					// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 					if (detailSelectionCoordinates.value === undefined) return;
 
 					popover.value = {
@@ -399,27 +399,29 @@ const movementDetails = computed(() => {
 });
 
 const linkedMovements = computed(() => {
-	if (movementDetails.value === null) {
+	if (movementDetails.value?.id == null) {
 		return null;
 	}
 
-	const features = Object.values(movementDetails.value).flatMap((entity) => {
-		if (entity && typeof entity === "object" && Array.isArray(entity.features)) {
-			return entity.features as Array<EntityFeature>;
-		}
-		return [];
-	});
+	let currentMovement = movementDetails.value;
+	let features = [currentMovement];
+
+	while (currentMovement.children && currentMovement.children.length > 0) {
+		assert(currentMovement.children[0]);
+		features = features.concat(currentMovement.children);
+		currentMovement = currentMovement.children[0];
+	}
 
 	// Now map through the features to get the IDs
 	return features.map((movement) => {
 		return {
-			id: getUnprefixedId(movement["@id"]),
-			systemClass: movement.systemClass,
+			id: String(movement.id),
+			systemClass: movement.system_class ?? "",
 		};
 	});
 });
 
-const multipleMovements = useGetLinkedEntitiesRecursive(
+const multipleMovements = useGetChainedEvents(
 	computed(() => {
 		return { entityId: movementId.value };
 	}),
@@ -440,7 +442,7 @@ function setMovementId({ id }: { id: string | null }) {
 			<SearchForm
 				:class="
 					project.fullscreen
-						? 'bg-white/90 dark:bg-neutral-900 max-w-[800px] w-full mt-2 rounded-md p-6 shadow-md pointer-events-auto'
+						? 'bg-white/90 dark:bg-neutral-900 max-w-[min(800px,49%)] min-w-fit w-full mt-2 rounded-md p-6 shadow-md pointer-events-auto'
 						: ''
 				"
 				:category="searchFilters.category"
@@ -504,7 +506,7 @@ function setMovementId({ id }: { id: string | null }) {
 				:has-polygons="show"
 				:show-movements="showMovements"
 				:multiple-movements="linkedMovements"
-				:current-selection-coordinates="selectionCoordinates"
+				:current-selection-coordinates="detailSelectionCoordinates || selectionCoordinates"
 				:selection-bounds="selectionBounds"
 				:current-selection-id="String(selection)"
 				@layer-click="onLayerClick"

@@ -299,6 +299,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/openapi_schema/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Retrieves OpenApi3 schema for this instance. Formats are `json` or `yaml`. */
+        get: operations["openapi_schema"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/properties/": {
         parameters: {
             query?: never;
@@ -508,7 +525,7 @@ export interface components {
             version: string;
         };
         ChainEventModel: {
-            children: components["schemas"]["ChainEventModel"];
+            children: Array<components["schemas"]["ChainEventModel"]> | null;
             geometry: (components["schemas"]["GeometryCollection"] | components["schemas"]["LineString"] | components["schemas"]["Point"] | components["schemas"]["Polygon"]) | null;
             id: number;
             name: string;
@@ -2155,6 +2172,33 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["NetworkVisualisationModel"];
                 };
+            };
+            /** @description Something went wrong. Please consult the error message. */
+            404: {
+                headers: Record<string, unknown>;
+                content?: never;
+            };
+        };
+    };
+    openapi_schema: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Choose the format for the results.
+                 * @example json
+                 */
+                format?: "json" | "yaml";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: Record<string, unknown>;
+                content?: never;
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {

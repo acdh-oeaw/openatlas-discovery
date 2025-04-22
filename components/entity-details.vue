@@ -52,10 +52,10 @@ const currentMode = computed(() => {
 </script>
 
 <template>
-	<div>
+	<div v-if="relationsByType.size > 0">
 		<h1 class="pb-2 font-semibold leading-none tracking-tight">{{ t("EntityPage.details") }}</h1>
 		<dl
-			class="grid gap-x-8 gap-y-4 sm:grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] sm:justify-start"
+			class="grid gap-x-8 gap-y-4 sm:grid-cols-[repeat(auto-fill,minmax(min(20rem,100%),1fr))] sm:justify-start"
 		>
 			<div v-for="[relationType, relations] of relationsByType" :key="relationType">
 				<dt class="text-xs font-medium uppercase tracking-wider text-muted-foreground">

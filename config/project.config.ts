@@ -28,6 +28,9 @@ const schema = v.object({
 			};
 		}),
 	),
+	detailView: v.object({
+		excludeTypeIds: v.array(v.number()),
+	}),
 	network: v.object({
 		excludeSystemClasses: v.array(v.string()),
 	}),

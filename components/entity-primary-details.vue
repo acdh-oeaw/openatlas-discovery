@@ -5,7 +5,7 @@ import CustomPrimaryDetailsActor from "@/components/custom-primary-details-actor
 import CustomPrimaryDetailsEvent from "@/components/custom-primary-details-event.vue";
 import CustomPrimaryDetailsFeature from "@/components/custom-primary-details-feature.vue";
 import CustomPrimaryDetailsPlace from "@/components/custom-primary-details-place.vue";
-
+import { project } from "@/config/project.config";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getRelationTitle = (relation: RelationType) => {
 	return useRelationTitle(relation, props.entity.systemClass);
@@ -139,10 +139,28 @@ function copyEntity() {
 	}
 	return null;
 }
+
+const filteredTypes = computed(() => {
+	return props.entity.types?.filter((type) => {
+		if (!type.identifier) return true;
+		const unprefixedId = getUnprefixedId(type.identifier);
+		return (
+			!project.detailView.excludeTypeIds.includes(Number(unprefixedId)) &&
+			type.typeHierarchy?.every((hierarchyType) => {
+				return (
+					!hierarchyType.identifier ||
+					!project.detailView.excludeTypeIds.includes(
+						Number(getUnprefixedId(hierarchyType.identifier)),
+					)
+				);
+			})
+		);
+	});
+});
 </script>
 
 <template>
-	<div class="grid grid-cols-[auto_auto]">
+	<div class="grid grid-cols-1 md:grid-cols-[auto_auto]">
 		<EntitySystemClass :system-class="entity.systemClass" />
 		<div v-if="!isCopied" class="ml-auto">
 			<Button variant="outline" @click="copyEntity">
@@ -170,7 +188,7 @@ function copyEntity() {
 		<!-- Types -->
 		<div class="flex flex-row flex-wrap gap-1">
 			<TypesPopover
-				v-for="type in entity.types"
+				v-for="type in filteredTypes"
 				:key="type.identifier ?? type.label ?? 'missing'"
 				:type="type"
 			/>

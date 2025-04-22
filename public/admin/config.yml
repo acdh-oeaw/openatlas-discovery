@@ -81,6 +81,15 @@ collections:
             widget: boolean
             default: false
 
+          - name: detailView
+            label: Detail view configuration
+            # hint: Detail view configuration
+            widget: object
+            fields:
+              - name: excludeTypeIds
+                label: Configure which type ids should be excluded from the detail view
+                widget: list
+
           - name: map
             label: Map Configuration
             # hint: Map Configuration

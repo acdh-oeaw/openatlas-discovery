@@ -8,65 +8,32 @@ const { getUnprefixedId } = useIdPrefix();
 const props = defineProps<{ entity: EntityFeature }>();
 const route = useRoute();
 
-const multipleMovements = useGetLinkedEntitiesRecursive(
-	computed(() => {
-		return { entityId: Number.parseInt(getUnprefixedId(props.entity["@id"])) };
-	}),
-);
-
-const movementDetails = computed(() => {
-	if (multipleMovements.data.value) {
-		return multipleMovements.data.value;
-	} else return null;
-});
-
-const linkedMovements = computed(() => {
-	if (movementDetails.value === null) {
-		return null;
-	}
-
-	const features = Object.values(movementDetails.value).flatMap((entity) => {
-		if (entity && typeof entity === "object" && Array.isArray(entity.features)) {
-			return entity.features as Array<EntityFeature>;
-		}
-		return [];
+const previousFeature = computed(() => {
+	const movement = props.entity.relations.find((rel) => {
+		return rel.relationType === "crm:P134_continued";
 	});
-
-	// Now map through the features to get the IDs
-	return features.map((movement) => {
+	if (movement)
 		return {
 			id: getUnprefixedId(movement["@id"]),
 			"@id": movement["@id"],
-			title: movement.properties.title,
+			title: movement.label,
 			systemClass: movement.systemClass,
 		};
-	});
-});
-
-const currentFeatureIndex = computed(() => {
-	if (linkedMovements.value == null) {
-		return -1;
-	}
-	return linkedMovements.value.findIndex((feature) => {
-		return feature["@id"] === props.entity["@id"];
-	});
-});
-
-const previousFeature = computed(() => {
-	if (currentFeatureIndex.value <= 0 || linkedMovements.value == null) {
-		return null;
-	}
-	return linkedMovements.value[currentFeatureIndex.value - 1];
+	return null;
 });
 
 const nextFeature = computed(() => {
-	if (
-		linkedMovements.value == null ||
-		currentFeatureIndex.value === linkedMovements.value.length - 1
-	) {
-		return null;
-	}
-	return linkedMovements.value[currentFeatureIndex.value + 1];
+	const movement = props.entity.relations.find((rel) => {
+		return rel.relationType === "crm:P134i_was_continued_by";
+	});
+	if (movement)
+		return {
+			id: getUnprefixedId(movement["@id"]),
+			"@id": movement["@id"],
+			title: movement.label,
+			systemClass: movement.systemClass,
+		};
+	return null;
 });
 
 const collapsibleRelations: Array<{
