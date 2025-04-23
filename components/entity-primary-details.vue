@@ -25,11 +25,12 @@ interface Image {
 	mimetype?: string | undefined;
 	title?: string | undefined;
 	url?: string | undefined;
+	publicShareable?: boolean | undefined;
 }
 
 const images = computed(() => {
 	return props.entity.depictions?.reduce((acc: Array<Image>, depiction) => {
-		if (depiction.url && depiction.license) {
+		if (depiction.url && depiction.license && depiction.publicShareable) {
 			acc.push({
 				url: depiction.url,
 				license: depiction.license,
