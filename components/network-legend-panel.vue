@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { DotIcon } from "lucide-vue-next";
+
 import type { NetworkSearchData } from "@/components/data-network-view.vue";
 import { networkConfig } from "@/config/network-visualisation.config";
 
@@ -9,6 +11,7 @@ type SystemClassData = Omit<NetworkSearchData, "search">;
 const props = defineProps<{
 	systemClasses: Array<string>;
 	excludedClasses: Array<string>;
+	allowFiltering: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -100,6 +103,7 @@ const systemClassColors = networkConfig.colors.entityColors;
 		>
 			<div class="grid grid-cols-[auto_1fr] gap-2">
 				<input
+					v-if="allowFiltering"
 					:id="el"
 					v-model="checkedSystemClasses[el]"
 					type="checkbox"
@@ -108,6 +112,7 @@ const systemClassColors = networkConfig.colors.entityColors;
 					:style="`accent-color: ${systemClassColors[el as keyof typeof systemClassColors] ? systemClassColors[el as keyof typeof systemClassColors] : '#666'}`"
 					@change="onSubmit()"
 				/>
+				<DotIcon v-else :size="50" class="inline-block" />
 				<span v-if="el in labels" class="self-center">{{ labels[el as keyof typeof labels] }}</span>
 				<span v-else class="self-center"> {{ el }}</span>
 			</div>

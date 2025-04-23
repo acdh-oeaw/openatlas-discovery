@@ -170,6 +170,7 @@ const isFullscreen = ref(false);
 					class="m-3 bg-white/90"
 					:system-classes="relevantSystemClasses"
 					:excluded-classes="searchFilters.excludeSystemClasses"
+					:allow-filtering="true"
 					@submit="onChangeSearchFilters"
 				/>
 			</div>

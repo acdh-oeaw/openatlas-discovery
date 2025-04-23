@@ -70,24 +70,12 @@ function getNodeColor(nodeClass: string) {
 </script>
 
 <template>
-	<div class="absolute z-10 m-3 flex w-full">
-		<Card class="w-max">
-			<span v-for="(color, entity) in entityColors" :key="entity">
-				<span v-if="legendEntities.includes(entity)" class="pr-4">
-					<DotIcon :size="50" :color="color" class="inline-block" />
-					<span>{{ entity }}</span>
-				</span>
-			</span>
-			<span v-for="entry in legendEntities" :key="entry">
-				<span
-					v-if="entry != null && entry !== '' && !Object.keys(entityColors).includes(entry)"
-					class="pr-4"
-				>
-					<DotIcon :size="50" :color="defaultColor" class="inline-block" />
-					<span>{{ entry }}</span>
-				</span>
-			</span>
-		</Card>
+	<div class="absolute z-10 flex w-full max-w-full">
+		<NetworkLegendPanel
+			:excluded-classes="[]"
+			:system-classes="legendEntities"
+			:allow-filtering="false"
+		></NetworkLegendPanel>
 	</div>
 	<Network v-if="graph.size > 0" :graph="graph" :show-orphans="false" />
 </template>

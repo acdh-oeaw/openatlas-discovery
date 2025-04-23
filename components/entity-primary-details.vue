@@ -141,6 +141,23 @@ function copyEntity() {
 	return null;
 }
 
+const tabs = computed(() => {
+	const tabs = [];
+	if (images.value != null) {
+		tabs.push({
+			id: "images",
+			label: t("EntityPage.images", { count: images.value.length }),
+		});
+	}
+	if (props.entity.relations.length > 0) {
+		tabs.push({
+			id: "ego-network",
+			label: t("EntityPage.network"),
+		});
+	}
+	return tabs;
+});
+
 const filteredTypes = computed(() => {
 	return props.entity.types?.filter((type) => {
 		if (!type.identifier) return true;
@@ -195,7 +212,29 @@ const filteredTypes = computed(() => {
 			/>
 		</div>
 
-		<EntityImages v-if="images" :images="images" class="overflow-hidden" />
+		<Tabs v-if="tabs.length > 0" :default-value="tabs[0]?.id">
+			<TabsList>
+				<TabsTrigger v-for="tab of tabs" :key="tab.id" :value="tab.id">
+					{{ tab.label }}
+				</TabsTrigger>
+			</TabsList>
+			<!-- TODO: keep map alive -->
+			<TabsContent v-for="tab of tabs" :key="tab.id" :value="tab.id">
+				<VisualisationContainer v-slot="{ height, width }" class="aspect-video w-full border">
+					<EntityDataGraph
+						v-if="tab.id === 'ego-network' && height && width"
+						:id="parseInt(entity.properties._id)"
+						:network-data="entity"
+					/>
+
+					<EntityImages
+						v-if="tab.id === 'images' && images"
+						class="overflow-hidden"
+						:images="images"
+					/>
+				</VisualisationContainer>
+			</TabsContent>
+		</Tabs>
 
 		<component
 			:is="customPrimaryDetails"
