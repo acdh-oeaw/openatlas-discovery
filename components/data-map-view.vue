@@ -24,7 +24,7 @@ const searchFiltersSchema = v.object({
 });
 
 const entitySelectionSchema = v.object({
-	selection: v.fallback(v.array(v.string()), []),
+	selection: v.fallback(v.string(), ""),
 });
 
 const searchFilters = computed(() => {
@@ -41,7 +41,7 @@ function setEntitySelection(query: Partial<EntitySelection>) {
 
 function onChangeEntitySelection(values: EntityFeature) {
 	const temp: EntitySelection = {
-		selection: [getUnprefixedId(values["@id"])],
+		selection: getUnprefixedId(values["@id"]),
 	};
 	setEntitySelection(temp);
 }
@@ -117,7 +117,7 @@ const selection = computed(() => {
 });
 
 const detailOnMap = computed(() => {
-	return route.query.detail;
+	return route.query.showOnMap;
 });
 
 const mode = computed(() => {
@@ -342,24 +342,29 @@ function setCoordinates(entity: EntityFeature, coordinates: Ref<[number, number]
 
 watchEffect(() => {
 	if (mode.value && selection.value) {
+		console.log("mode & selection set", selection.value);
 		const entity = entities.value.find((feature) => {
 			const id = getUnprefixedId(feature["@id"]);
 			return id === selection.value;
 		});
+		console.log("Entity: ", entity, entities.value);
 
 		if (entity) {
 			setCoordinates(entity, selectionCoordinates);
 
-			if (entity.geometry == null) return;
-			popover.value = {
-				coordinates:
-					selectionCoordinates.value ??
-					(turf.center(createFeatureCollection([entity as Feature])).geometry.coordinates as [
-						number,
-						number,
-					]),
-				entities: [entity],
-			};
+			if (entity.geometry != null) {
+				popover.value = {
+					coordinates:
+						selectionCoordinates.value ??
+						(turf.center(createFeatureCollection([entity as Feature])).geometry.coordinates as [
+							number,
+							number,
+						]),
+					entities: [entity],
+				};
+			}
+
+			console.log(detailOnMap.value);
 			detailSelectionCoordinates.value = undefined;
 			if (detailOnMap.value) {
 				const detailEntity = entities.value.find((feature) => {
@@ -373,6 +378,12 @@ watchEffect(() => {
 					// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 					if (detailSelectionCoordinates.value === undefined) return;
 
+					console.log(
+						"Detail Coordinates: ",
+						detailSelectionCoordinates,
+						popover.value,
+						detailEntity,
+					);
 					popover.value = {
 						coordinates: detailSelectionCoordinates.value,
 						entities: [detailEntity],

@@ -23,7 +23,7 @@ function getPath() {
 
 function setShowOnMap() {
 	void router.push({
-		query: { ...route.query, mode: "map", detail: getUnprefixedId(props.relation["@id"]) },
+		query: { ...route.query, mode: "map", showOnMap: getUnprefixedId(props.relation["@id"]) },
 	});
 }
 
