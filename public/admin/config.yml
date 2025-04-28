@@ -65,6 +65,31 @@ collections:
                 widget: color
                 allowInput: true
 
+          - name: logos
+            label: Logos
+            # hint: Logos
+            widget: object
+            fields:
+              - name: light
+                label: Logo (light mode)
+                hint: Logo in light mode
+                widget: image
+
+              - name: dark
+                label: Logo (dark mode)
+                hint: Logo in dark mode
+                widget: image
+
+              - name: withTextLight
+                label: Logo with text (light mode)
+                hint: Logo with text in light mode
+                widget: image
+
+              - name: withTextDark
+                label: Logo with text (dark mode)
+                hint: Logo with text in dark mode
+                widget: image
+
           - name: defaultLocale
             label: Default locale
             # hint: Default locale
