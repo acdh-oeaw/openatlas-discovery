@@ -62,6 +62,18 @@ watch(
 	},
 	{ immediate: true },
 );
+const { data: allSystemClasses } = useGetSystemClassCount();
+
+const relevantSystemClasses = computed(() => {
+	if (!allSystemClasses.value) return [];
+	return Object.entries(allSystemClasses.value)
+		.filter(([key, value]) => {
+			return value > 0 && !project.network.excludeSystemClasses.includes(key);
+		})
+		.map(([key, _]) => {
+			return key;
+		});
+});
 
 function getNodeColor(nodeClass: string) {
 	//@ts-expect-error: no error occurs
@@ -70,10 +82,10 @@ function getNodeColor(nodeClass: string) {
 </script>
 
 <template>
-	<div class="absolute z-10 flex w-full max-w-full">
+	<div class="absolute bottom-0 z-10 flex w-full max-w-full justify-end">
 		<NetworkLegendPanel
 			:excluded-classes="[]"
-			:system-classes="legendEntities"
+			:system-classes="relevantSystemClasses"
 			:allow-filtering="false"
 		></NetworkLegendPanel>
 	</div>

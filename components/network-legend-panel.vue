@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DotIcon } from "lucide-vue-next";
+import { DotIcon, EllipsisIcon } from "lucide-vue-next";
 
 import type { NetworkSearchData } from "@/components/data-network-view.vue";
 import { networkConfig } from "@/config/network-visualisation.config";
@@ -19,6 +19,7 @@ const emit = defineEmits<{
 }>();
 
 const checkedSystemClasses = ref<Record<string, boolean>>({});
+let showLegend = ref(false);
 
 watch(
 	() => {
@@ -89,33 +90,71 @@ const labels = {
 };
 
 const systemClassColors = networkConfig.colors.entityColors;
+function toggleShowLegend() {
+	showLegend.value = !showLegend.value;
+}
 </script>
 
 <template>
 	<aside
-		class="flex max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent bg-white px-4 py-2 text-sm shadow-md"
+		:class="
+			props.allowFiltering
+				? `flex max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent bg-white px-4 py-2 text-sm shadow-md`
+				: `flex gap-2 overflow-x-auto rounded-md border-2 border-transparent bg-white m-2 text-sm shadow-md`
+		"
 	>
-		<div
-			v-for="el in props.systemClasses"
-			:key="el"
-			class="grid grid-cols-[auto_1fr] gap-3"
-			:style="`color: ${el in systemClassColors ? systemClassColors[el as keyof typeof systemClassColors] : '#666'}`"
-		>
-			<div class="grid grid-cols-[auto_1fr] gap-2">
-				<input
-					v-if="allowFiltering"
-					:id="el"
-					v-model="checkedSystemClasses[el]"
-					type="checkbox"
-					:checked="checkedSystemClasses[el]"
-					name="systemClassCheckbox"
-					:style="`accent-color: ${systemClassColors[el as keyof typeof systemClassColors] ? systemClassColors[el as keyof typeof systemClassColors] : '#666'}`"
-					@change="onSubmit()"
-				/>
-				<DotIcon v-else :size="50" class="inline-block" />
-				<span v-if="el in labels" class="self-center">{{ labels[el as keyof typeof labels] }}</span>
-				<span v-else class="self-center"> {{ el }}</span>
+		<div v-if="props.allowFiltering" class="inline-flex">
+			<div
+				v-for="el in props.systemClasses"
+				:key="el"
+				class="grid grid-cols-[auto_1fr] gap-3"
+				:style="`color: ${el in systemClassColors ? systemClassColors[el as keyof typeof systemClassColors] : '#666'}`"
+			>
+				<div class="grid grid-cols-[auto_1fr] gap-2">
+					<input
+						:id="el"
+						v-model="checkedSystemClasses[el]"
+						type="checkbox"
+						:checked="checkedSystemClasses[el]"
+						name="systemClassCheckbox"
+						:style="`accent-color: ${systemClassColors[el as keyof typeof systemClassColors] ? systemClassColors[el as keyof typeof systemClassColors] : '#666'}`"
+						@change="onSubmit()"
+					/>
+					<span v-if="el in labels" class="self-center">{{
+						labels[el as keyof typeof labels]
+					}}</span>
+					<span v-else class="self-center"> {{ el }}</span>
+				</div>
 			</div>
 		</div>
+		<div v-else>
+			<Button
+				variant="transparent"
+				size="icon"
+				:class="{ 'text-brand': showLegend }"
+				@click="toggleShowLegend()"
+			>
+				<EllipsisIcon class="p-0" />
+			</Button>
+		</div>
 	</aside>
+
+	<div v-if="showLegend" class="absolute z-50 flex">
+		<Card>
+			<CardContent>
+				<div
+					v-for="el in props.systemClasses"
+					:key="el"
+					class="grid grid-cols-[auto_1fr]"
+					:style="`color: ${el in systemClassColors ? systemClassColors[el as keyof typeof systemClassColors] : '#666'}`"
+				>
+					<DotIcon :size="50" class="m-0 inline-block p-0" />
+					<span v-if="el in labels" class="self-center">
+						{{ labels[el as keyof typeof labels] }}
+					</span>
+					<span v-else class="self-center"> {{ el }}</span>
+				</div>
+			</CardContent>
+		</Card>
+	</div>
 </template>
