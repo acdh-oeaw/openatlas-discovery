@@ -19,12 +19,18 @@ or json), and can also be edited directly with your favourite text editor.
   [`content/system-pages/*.md`](content/system-pages).
 - "Team" collection: Team members. Saves to [`content/team/*.md`](content/team).
 
-When developing locally, you can run a development CMS server with:
+### Initial setup for deployment via github workflow:
+
+Change in the `/public/admin/config.yml` the corresponding project URL and repository name. (site_url, repo & base_url)
+And don't forget to set variables of the OAuth client id, OAuth client secret, redirect-url, allowed-origin and OAuth provider (github) in the projects github cli.
+
+### Local developing
+
+When you just want to use the cms for local development, you can run a development CMS server with:
 
 ```bash
 pnpm run dev:cms
 ```
-
 This server will _not_ commit content changes to GitHub, but write to the local filesystem instead.
 
 ## Development
