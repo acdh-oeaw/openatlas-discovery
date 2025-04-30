@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-vue-next";
 
+import type { PresentationViewModel } from "@/types/api";
+
 const t = useTranslations();
 
 const { getUnprefixedId } = useIdPrefix();
 
-const props = defineProps<{ entity: EntityFeature }>();
+const props = defineProps<{ entity: PresentationViewModel }>();
 const route = useRoute();
 
 const { data } = useGetBySystemClass(
@@ -27,7 +29,7 @@ const features = computed(() => {
 
 const currentFeatureIndex = computed(() => {
 	return features.value.findIndex((feature) => {
-		return feature?.["@id"] === props.entity["@id"];
+		return feature?.properties._id === String(props.entity.id);
 	});
 });
 

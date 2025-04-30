@@ -1,12 +1,13 @@
 <script setup lang="ts">
+import type { PresentationViewModel } from "@/types/api";
+
 const route = useRoute();
-const props = defineProps<{ id: number; entity?: EntityFeature; label?: string }>();
+const props = defineProps<{ id: number; entity?: PresentationViewModel; label?: string }>();
 
 const previewEntity = computed(() => {
 	if (props.entity) return props.entity;
 	if (!props.id) return null;
-
-	if (data?.value) return data.value.features[0];
+	if (data?.value) return data.value;
 
 	return null;
 });

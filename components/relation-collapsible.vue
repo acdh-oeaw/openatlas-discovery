@@ -1,12 +1,14 @@
 <script lang="ts" setup>
+import type { RelatedEntityModel } from "@/types/api";
+
 const props = defineProps<{
 	title: string;
-	relations: Array<NonNullable<EntityFeature["relations"]>[0]>;
+	relations: Array<NonNullable<RelatedEntityModel>>;
 	showIcon: boolean;
 }>();
 
 const _sortedRelations = computed(() => {
-	function hasCenter(geometry: EntityFeature["relations"][0]["geometry"]) {
+	function hasCenter(geometry: NonNullable<RelatedEntityModel>["geometries"]) {
 		if (geometry?.type === "GeometryCollection") {
 			return Boolean(
 				geometry.geometries.find((g) => {
@@ -18,17 +20,16 @@ const _sortedRelations = computed(() => {
 		return false;
 	}
 	return props.relations.toSorted((b, a) => {
-		return Number(hasCenter(a.geometry)) - Number(hasCenter(b.geometry));
+		return Number(hasCenter(a.geometries)) - Number(hasCenter(b.geometries));
 	});
 });
-const { getUnprefixedId } = useIdPrefix();
 </script>
 
 <template v-if="relations?.length">
 	<div class="space-x-4 px-4"></div>
 	<RelationListEntry
 		v-for="relation in relations"
-		:key="getUnprefixedId(relation.relationTo ? relation.relationTo : '')"
+		:key="relation.id ?? ''"
 		:relation="relation"
 		:type="title"
 		:show-icon="showIcon"

@@ -9,6 +9,7 @@ import {
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { project } from "@/config/project.config";
+import type { PresentationViewModel } from "@/types/api";
 
 const props = defineProps<{
 	currentMode: string;
@@ -40,7 +41,7 @@ watch(
 		return data;
 	},
 	() => {
-		const entity = data.value?.features[0];
+		const entity = data.value;
 		if (entity) {
 			entityHasCoordinates(entity);
 			entityInNetwork(entity);
@@ -49,26 +50,28 @@ watch(
 	{ immediate: true, deep: true },
 );
 
-function entityHasCoordinates(entity: EntityFeature) {
+function entityHasCoordinates(entity: PresentationViewModel) {
 	if (!project.map.mapDisplayedSystemClasses.includes(entity.systemClass)) {
 		hasPlace.value = false;
 	}
 	if (project.map.mapDisplayedSystemClasses.includes(entity.systemClass)) {
 		if (
-			entity.geometry == null ||
-			(entity.geometry.type === "GeometryCollection" && entity.geometry.geometries.length === 0)
+			entity.geometries == null ||
+			entity.geometries.type ===
+				"GeometryCollection" /* && entity.geometries.geometries.length === 0 */
 		) {
 			hasPlace.value = false;
 		} else if (
-			entity.geometry.type !== "GeometryCollection" &&
-			entity.geometry.coordinates.length === 0
+			//@ts-expect-error TODO: check after #2477
+			entity.geometries.type !== "GeometryCollection" &&
+			entity.geometries.coordinates.length === 0
 		) {
 			hasPlace.value = false;
 		} else hasPlace.value = true;
 	}
 }
 
-function entityInNetwork(entity: EntityFeature) {
+function entityInNetwork(entity: PresentationViewModel) {
 	if (project.network.excludeSystemClasses.includes(entity.systemClass)) {
 		inNetwork.value = false;
 	} else inNetwork.value = true;

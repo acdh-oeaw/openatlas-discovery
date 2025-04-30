@@ -1,23 +1,21 @@
 <script lang="ts" setup>
-import { isNonEmptyString } from "@acdh-oeaw/lib";
-
-const props = defineProps<{
-	descriptions: Array<{ value?: string }>;
+const _props = defineProps<{
+	descriptions: Array<string>;
 }>();
 
 const t = useTranslations();
 
-const descriptions = computed(() => {
-	const descriptions: Array<string> = [];
+// const descriptions = computed(() => {
+// 	const descriptions: Array<string> = [];
 
-	props.descriptions.forEach((description) => {
-		if (isNonEmptyString(description.value)) {
-			descriptions.push(description.value);
-		}
-	});
+// 	props.descriptions.forEach((description) => {
+// 		if (isNonEmptyString(description.value)) {
+// 			descriptions.push(description.value);
+// 		}
+// 	});
 
-	return descriptions;
-});
+// 	return descriptions;
+// });
 </script>
 
 <template>

@@ -6,6 +6,7 @@ import CustomPrimaryDetailsEvent from "@/components/custom-primary-details-event
 import CustomPrimaryDetailsFeature from "@/components/custom-primary-details-feature.vue";
 import CustomPrimaryDetailsPlace from "@/components/custom-primary-details-place.vue";
 import { project } from "@/config/project.config";
+import type { PresentationViewModel } from "@/types/api";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getRelationTitle = (relation: RelationType) => {
 	return useRelationTitle(relation, props.entity.systemClass);
@@ -16,7 +17,7 @@ const route = useRoute();
 const t = useTranslations();
 
 const props = defineProps<{
-	entity: EntityFeature;
+	entity: PresentationViewModel;
 }>();
 
 interface Image {
@@ -28,11 +29,12 @@ interface Image {
 }
 
 const images = computed(() => {
-	return props.entity.depictions?.reduce((acc: Array<Image>, depiction) => {
+	return props.entity.files?.reduce((acc: Array<Image>, depiction) => {
 		if (depiction.url && depiction.license) {
 			acc.push({
 				url: depiction.url,
 				license: depiction.license,
+				//@ts-expect-error IIIFManifest missing (TODO: check after #2477)
 				IIIFManifest: depiction.IIIFManifest,
 				mimetype: depiction.mimetype,
 				title: depiction.title,
@@ -43,7 +45,9 @@ const images = computed(() => {
 });
 
 const customPrimaryDetails = computed(() => {
+	//@ts-expect-error viewClass missing (TODO: check after #2477)
 	if (props.entity.viewClass in entityPrimaryDetailsDictByViewClass)
+		//@ts-expect-error viewClass missing (TODO: check after #2477)
 		return entityPrimaryDetailsDictByViewClass[props.entity.viewClass];
 	return entityPrimaryDetailsDict[props.entity.systemClass];
 });
@@ -97,21 +101,22 @@ const isCopied = ref(false);
 
 // TODO: For instances where there is no location set (at least for actors), make use of first and last event if no places are available
 const places = computed(() => {
-	return props.entity.relations.reduce((acc: Array<Place>, relation) => {
-		if (relation.relationSystemClass !== "object_location") return acc;
-		if (!relation.label || !relation.relationTo || !relation.relationType) return acc;
-		const id = getUnprefixedId(relation.relationTo);
-		const relationType = extractRelationTypeFromRelationString(relation.relationType);
-		const label = relation.label;
-		if (!id) return acc;
-		return [
-			...acc,
-			{
+	return props.entity.relations?.place?.reduce((acc: Array<Place>, relatedPlace) => {
+		if (relatedPlace?.systemClass !== "object_location") return acc;
+		if (!relatedPlace.title || !relatedPlace.id || !relatedPlace.relationTypes) return acc;
+		if (!relatedPlace.id) return acc;
+		const id = String(relatedPlace.id);
+
+		const label = relatedPlace.title;
+		const arrayOfRelations = relatedPlace.relationTypes.map((type) => {
+			const relationType = extractRelationTypeFromRelationString(type?.property);
+			return {
 				label,
 				id,
 				relationType,
-			},
-		];
+			};
+		});
+		return [...acc, ...arrayOfRelations];
 	}, []);
 });
 
@@ -119,7 +124,7 @@ watchEffect(() => {
 	if (route.query.selection) {
 		isCopied.value = false;
 	}
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
 	if (!places.value || places.value.length === 0) return;
 	const relTypes = places.value.map((place) => {
 		return place.relationType;
@@ -141,21 +146,26 @@ function copyEntity() {
 }
 
 const filteredTypes = computed(() => {
-	return props.entity.types?.filter((type) => {
-		if (!type.identifier) return true;
-		const unprefixedId = getUnprefixedId(type.identifier);
-		return (
-			!project.detailView.excludeTypeIds.includes(Number(unprefixedId)) &&
-			type.typeHierarchy?.every((hierarchyType) => {
-				return (
-					!hierarchyType.identifier ||
-					!project.detailView.excludeTypeIds.includes(
-						Number(getUnprefixedId(hierarchyType.identifier)),
-					)
-				);
-			})
-		);
-	});
+	return props.entity.types
+		?.filter((type) => {
+			if (type == null) return false;
+			if (!type.id) return true;
+			const unprefixedId = type.id;
+			return (
+				!project.detailView.excludeTypeIds.includes(Number(unprefixedId)) &&
+				type.typeHierarchy?.every((hierarchyType) => {
+					return (
+						!hierarchyType.identifier ||
+						!project.detailView.excludeTypeIds.includes(
+							Number(getUnprefixedId(hierarchyType.identifier)),
+						)
+					);
+				})
+			);
+		})
+		.filter((type) => {
+			return type != null;
+		});
 });
 </script>
 
@@ -175,21 +185,18 @@ const filteredTypes = computed(() => {
 			</Button>
 		</div>
 	</div>
-	<PageTitle>{{ entity.properties.title }}</PageTitle>
+	<PageTitle>{{ entity.title }}</PageTitle>
 	<!-- @ts-expect FIXME: Incorrect information provided by openapi document. -->
-	<EntityAliases
-		v-if="entity.names"
-		:aliases="entity.names as unknown as Array<{ alias: string }>"
-	/>
-	<EntityTimespans :timespans="entity.when?.timespans" />
+	<EntityAliases v-if="entity.aliases" :aliases="entity.aliases as unknown as Array<string>" />
+	<EntityTimespans v-if="entity.when" :timespans="[entity.when]" />
 	<div class="grid gap-4">
-		<EntityDescriptions :descriptions="entity?.descriptions ?? []" />
+		<EntityDescriptions :descriptions="[entity?.description ?? '']" />
 
 		<!-- Types -->
 		<div class="flex flex-row flex-wrap gap-1">
 			<TypesPopover
 				v-for="type in filteredTypes"
-				:key="type.identifier ?? type.label ?? 'missing'"
+				:key="type.id ?? type.title ?? 'missing'"
 				:type="type"
 			/>
 		</div>

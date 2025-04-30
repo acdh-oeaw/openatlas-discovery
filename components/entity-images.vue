@@ -5,7 +5,7 @@ import { Toggle } from "@/components/ui/toggle";
 const props = defineProps<{
 	images: Array<{
 		IIIFManifest?: string;
-		license?: string;
+		license?: string | null;
 		mimetype?: string;
 		title?: string;
 		url?: string;

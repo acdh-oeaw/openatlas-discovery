@@ -1,43 +1,50 @@
 <script lang="ts" setup>
-import { groupByToMap } from "@acdh-oeaw/lib";
-
-import { useIdPrefix } from "@/composables/use-id-prefix";
-
-const { getUnprefixedId } = useIdPrefix();
+import type { PresentationViewModel, RelatedEntityModel } from "@/types/api";
 
 const t = useTranslations();
 const route = useRoute();
 
 const props = defineProps<{
-	relations: EntityFeature["relations"];
+	relations: NonNullable<PresentationViewModel["relations"]>;
 	handledRelations: Array<RelationType>;
 }>();
 console.log(props.handledRelations);
 const redundantSystemClasses = ["source"];
 
-const filteredRelations = computed(() => {
-	return props.relations.filter((relation) => {
-		if (props.handledRelations.length === 0) return true;
-		if (redundantSystemClasses.includes(relation.systemClass)) return false;
-		return !props.handledRelations.some((handledRelation) => {
-			const relationType = extractRelationTypeFromRelationString(relation.relationType);
-			if (!relationType) return false;
-			return handledRelation.crmCode === relationType.crmCode;
-		});
-	});
-});
+type RelationKey = keyof NonNullable<PresentationViewModel["relations"]>;
 
 const relationsByType = computed(() => {
-	return groupByToMap(
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		filteredRelations.value ?? [],
-		(relation: NonNullable<EntityFeature["relations"]>[0]) => {
-			// FIXME: This used to use `relationType` (without the prefix)
-
-			return relation.relationSystemClass;
-		},
-	);
+	// if (props.handledRelations.length === 0) return props.relations;
+	const filteredRelations = new Map<string, Array<RelatedEntityModel>>();
+	for (const key in props.relations) {
+		filteredRelations.set(
+			key,
+			props.relations[key as RelationKey]?.filter((relation) => {
+				if (!relation || redundantSystemClasses.includes(relation.systemClass)) return false;
+				return !relation.relationTypes?.every((relType) => {
+					return !props.handledRelations.some((handledRelation) => {
+						const relationType = extractRelationTypeFromRelationString(relType?.property);
+						if (!relationType) return false;
+						return handledRelation.crmCode === relationType.crmCode;
+					});
+				});
+			}) ?? [],
+		);
+	}
+	console.log("filteredRelations", filteredRelations);
+	return filteredRelations;
 });
+
+// const relationsByType = computed(() => {
+// 	return groupByToMap(
+// 		filteredRelations.value ?? [],
+// 		(relation: NonNullable<EntityFeature["relations"]>[0]) => {
+// 			// FIXME: This used to use `relationType` (without the prefix)
+
+// 			return relation.relationSystemClass;
+// 		},
+// 	);
+// });
 
 function getPath() {
 	if (route.path.includes("visualization")) {
@@ -65,19 +72,19 @@ const currentMode = computed(() => {
 					<ul role="list">
 						<li v-for="(relation, index) of relations.slice(0, 10)" :key="index">
 							<NavLink
-								v-if="relation.relationTo"
+								v-if="relation?.id"
 								class="underline decoration-dotted hover:no-underline"
 								:href="{
 									path: `/${getPath()}`,
 									query: {
 										mode: currentMode,
-										selection: getUnprefixedId(relation.relationTo),
+										selection: relation.id,
 									},
 								}"
 							>
-								{{ relation.label }}
+								{{ relation.title }}
 							</NavLink>
-							<span v-else> {{ relation.label }} </span>
+							<span v-else> {{ relation?.title }} </span>
 						</li>
 					</ul>
 					<details v-if="relations.length > 10">
@@ -85,19 +92,19 @@ const currentMode = computed(() => {
 						<ul role="list">
 							<li v-for="(relation, index) of relations.slice(10)" :key="index">
 								<NavLink
-									v-if="relation.relationTo"
+									v-if="relation?.id"
 									class="underline decoration-dotted hover:no-underline"
 									:href="{
 										path: `/${getPath()}`,
 										query: {
 											mode: currentMode,
-											selection: getUnprefixedId(relation.relationTo),
+											selection: relation.id,
 										},
 									}"
 								>
-									{{ relation.label }}
+									{{ relation.title }}
 								</NavLink>
-								<span v-else> {{ relation.label }} </span>
+								<span v-else> {{ relation?.title }} </span>
 							</li>
 						</ul>
 					</details>

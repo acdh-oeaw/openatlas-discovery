@@ -1,36 +1,40 @@
 <script setup lang="ts">
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-vue-next";
 
+import type { PresentationViewModel } from "@/types/api";
+
 const t = useTranslations();
 
-const { getUnprefixedId } = useIdPrefix();
-
-const props = defineProps<{ entity: EntityFeature }>();
+const props = defineProps<{ entity: PresentationViewModel }>();
 const route = useRoute();
 
 const previousFeature = computed(() => {
-	const movement = props.entity.relations.find((rel) => {
-		return rel.relationType === "crm:P134_continued";
+	const movement = props.entity.relations?.activity?.find((rel) => {
+		return rel?.relationTypes?.find((type) => {
+			return type?.property === "crm:P134_continued";
+		});
 	});
 	if (movement)
 		return {
-			id: getUnprefixedId(movement["@id"]),
-			"@id": movement["@id"],
-			title: movement.label,
+			id: movement.id,
+			"@id": movement.id,
+			title: movement.title,
 			systemClass: movement.systemClass,
 		};
 	return null;
 });
 
 const nextFeature = computed(() => {
-	const movement = props.entity.relations.find((rel) => {
-		return rel.relationType === "crm:P134i_was_continued_by";
+	const movement = props.entity.relations?.activity?.find((rel) => {
+		return rel?.relationTypes?.find((type) => {
+			return type?.property === "crm:P134i_was_continued_by";
+		});
 	});
 	if (movement)
 		return {
-			id: getUnprefixedId(movement["@id"]),
-			"@id": movement["@id"],
-			title: movement.label,
+			id: movement.id,
+			"@id": movement.id,
+			title: movement.title,
 			systemClass: movement.systemClass,
 		};
 	return null;
@@ -91,7 +95,7 @@ const currentMode = computed(() => {
 			v-if="previousFeature"
 			:href="{
 				path: `/${getPath()}`,
-				query: { mode: currentMode, selection: getUnprefixedId(previousFeature['@id']) },
+				query: { mode: currentMode, selection: previousFeature.id },
 			}"
 			class="flex items-center underline decoration-dotted transition hover:no-underline focus-visible:no-underline"
 		>
@@ -103,7 +107,7 @@ const currentMode = computed(() => {
 			v-if="nextFeature"
 			:href="{
 				path: `/${getPath()}`,
-				query: { mode: currentMode, selection: getUnprefixedId(nextFeature['@id']) },
+				query: { mode: currentMode, selection: nextFeature.id },
 			}"
 			class="flex items-center underline decoration-dotted transition hover:no-underline focus-visible:no-underline"
 		>

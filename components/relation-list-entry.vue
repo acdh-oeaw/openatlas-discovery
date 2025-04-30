@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import type { ExtendedEntities } from "@/types/api";
-
-const { getUnprefixedId } = useIdPrefix();
+import type { PresentationViewModel, RelatedEntityModel } from "@/types/api";
 
 const t = useTranslations();
 
@@ -11,7 +9,7 @@ const router = useRouter();
 const props = defineProps<{
 	showIcon: boolean;
 	type?: string;
-	relation: NonNullable<EntityFeature["relations"]>[0];
+	relation: NonNullable<RelatedEntityModel>;
 }>();
 
 function getPath() {
@@ -23,7 +21,7 @@ function getPath() {
 
 function setShowOnMap() {
 	void router.push({
-		query: { ...route.query, mode: "map", detail: getUnprefixedId(props.relation["@id"]) },
+		query: { ...route.query, mode: "map", detail: props.relation.id },
 	});
 }
 
@@ -32,28 +30,26 @@ const currentMode = computed(() => {
 });
 
 function hasValidTimespans(
-	timespans: NonNullable<ExtendedEntities["when"]>["timespans"] | null | undefined,
+	timespan: NonNullable<PresentationViewModel["when"]> | null | undefined,
 ): boolean {
-	if (!timespans) {
+	if (!timespan) {
 		return false;
 	}
 
-	return timespans.some((timespan) => {
-		const { start, end } = timespan;
-		return (
-			start?.earliest != null ||
-			start?.latest != null ||
-			start?.comment != null ||
-			end?.earliest != null ||
-			end?.latest != null ||
-			end?.comment != null
-		);
-	});
+	const { start, end } = timespan;
+	return (
+		start.earliest != null ||
+		start.latest != null ||
+		start.comment != null ||
+		end.earliest != null ||
+		end.latest != null ||
+		end.comment != null
+	);
 }
 
 const centroid = computed(() => {
-	if (props.relation.geometry?.type === "GeometryCollection") {
-		return props.relation.geometry.geometries.find((a) => {
+	if (props.relation.geometries?.type === "GeometryCollection") {
+		return props.relation.geometries.geometries.find((a) => {
 			return a.shapeType === "centerpoint";
 		});
 	}
@@ -65,8 +61,8 @@ const centroid = computed(() => {
 	<div class="my-2 flex grow basis-2 items-center justify-between gap-4">
 		<div class="grid grid-cols-[auto_1fr] items-center gap-2">
 			<Component
-				:is="getEntityIcon(relation.relationSystemClass)"
-				v-if="relation.relationSystemClass"
+				:is="getEntityIcon(relation.systemClass)"
+				v-if="relation.systemClass"
 				class="mr-1 inline size-5 pb-1"
 			/>
 			<span class="grid grid-rows-2 data-[oneRow]:grid-rows-1" :data-oneRow="type === null">
@@ -74,10 +70,10 @@ const centroid = computed(() => {
 					class="underline decoration-dotted hover:no-underline"
 					:href="{
 						path: `/${getPath()}`,
-						query: { mode: currentMode, selection: getUnprefixedId(relation.relationTo ?? '') },
+						query: { mode: currentMode, selection: relation.id },
 					}"
 				>
-					{{ relation.properties?.title }}
+					{{ relation.title }}
 				</NavLink>
 				<template v-if="type != null">
 					<span class="text-xs text-muted-foreground">{{ type }}</span>
@@ -85,8 +81,8 @@ const centroid = computed(() => {
 			</span>
 		</div>
 
-		<template v-if="hasValidTimespans(relation.when?.timespans)">
-			<SimpleTimespan class="text-xs" :timespans="relation.when?.timespans" />
+		<template v-if="hasValidTimespans(relation.when)">
+			<SimpleTimespan class="text-xs" :timespans="[relation.when]" />
 		</template>
 		<template v-if="showIcon">
 			<Button :disabled="centroid === undefined" variant="outline" @click="setShowOnMap()">

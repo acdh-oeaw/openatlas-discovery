@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { PresentationViewModel } from "@/types/api";
+
 const t = useTranslations();
 
-const _props = defineProps<{ entity: EntityFeature }>();
+const _props = defineProps<{ entity: PresentationViewModel }>();
 
 const collapsibleRelations: Array<{
 	relationType: RelationType;

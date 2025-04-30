@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { PresentationViewModel } from "@/types/api";
+
 const t = useTranslations();
 
-const props = defineProps<{ entity: EntityFeature }>();
+const props = defineProps<{ entity: PresentationViewModel }>();
 
 const getRelationGroupTitle = (relation: RelationType) => {
 	if (props.entity.systemClass === "person") {
