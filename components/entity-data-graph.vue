@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Graph from "graphology";
-import { DotIcon } from "lucide-vue-next";
 
 import type { EntityFeature } from "@/composables/use-create-entity";
 import { networkConfig } from "@/config/network-visualisation.config";
@@ -16,7 +15,26 @@ const graph = new Graph();
 
 const { entityColors } = networkConfig.colors;
 const defaultColor = networkConfig.colors.entityDefaultColor;
-const legendEntities = [""];
+
+const { data: allSystemClasses } = useGetSystemClassCount();
+
+const relevantSystemClasses = computed(() => {
+	if (!allSystemClasses.value) return [];
+	return Object.entries(allSystemClasses.value)
+		.filter(([key, value]) => {
+			return value > 0 && !project.network.excludeSystemClasses.includes(key);
+		})
+		.map(([key, _]) => {
+			return key;
+		})
+		.filter((key) => {
+			return (
+				props.networkData.relations.find((rel) => {
+					return rel.systemClass === key;
+				}) ?? props.networkData.systemClass === key
+			);
+		});
+});
 
 watch(
 	() => {
@@ -33,10 +51,6 @@ watch(
 			size: networkConfig.sourceNodeSize,
 		});
 
-		/** Add source node to agenda of nodes */
-
-		legendEntities.push(networkData.systemClass);
-
 		/** Add relations to target nodes. */
 		networkData.relations.forEach((element) => {
 			if (element.relationTo == null) return;
@@ -44,12 +58,8 @@ watch(
 			const relationId = getUnprefixedId(element.relationTo);
 			const nodeClass = element.relationSystemClass;
 
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-			if (nodeClass == null) return;
-
-			if (!legendEntities.includes(nodeClass)) {
-				legendEntities.push(nodeClass);
-			}
+			if (!relevantSystemClasses.value.includes(nodeClass) || nodeClass === "object_location")
+				return;
 			graph.addNode(relationId, {
 				label: element.label,
 				color: getNodeColor(nodeClass),
@@ -62,18 +72,6 @@ watch(
 	},
 	{ immediate: true },
 );
-const { data: allSystemClasses } = useGetSystemClassCount();
-
-const relevantSystemClasses = computed(() => {
-	if (!allSystemClasses.value) return [];
-	return Object.entries(allSystemClasses.value)
-		.filter(([key, value]) => {
-			return value > 0 && !project.network.excludeSystemClasses.includes(key);
-		})
-		.map(([key, _]) => {
-			return key;
-		});
-});
 
 function getNodeColor(nodeClass: string) {
 	//@ts-expect-error: no error occurs
@@ -89,5 +87,10 @@ function getNodeColor(nodeClass: string) {
 			:allow-filtering="false"
 		></NetworkLegendPanel>
 	</div>
-	<Network v-if="graph.size > 0" :graph="graph" :show-orphans="false" />
+	<Network
+		v-if="graph.size > 0"
+		:graph="graph"
+		:show-orphans="false"
+		network-container-id="ego-network"
+	/>
 </template>

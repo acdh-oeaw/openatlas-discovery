@@ -153,6 +153,7 @@ const isFullscreen = ref(false);
 		</div>
 
 		<VisualisationContainer
+			id="network-view"
 			v-slot="{ height, width }"
 			class="border"
 			:class="{ 'opacity-50 grayscale': isLoading }"

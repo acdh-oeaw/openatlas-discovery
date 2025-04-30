@@ -102,5 +102,6 @@ function getNodeColor(nodeClass: string) {
 		:search-node="props.searchNode"
 		:detail-node="props.detailNode"
 		:show-orphans="props.showOrphans"
+		network-container-id="network-view"
 	/>
 </template>

@@ -220,25 +220,35 @@ const filteredTypes = computed(() => {
 			</TabsList>
 			<!-- TODO: keep map alive -->
 			<TabsContent v-for="tab of tabs" :key="tab.id" :value="tab.id">
-				<VisualisationContainer v-slot="{ height, width }" class="aspect-video w-full border">
-					<EntityDataGraph
-						v-if="tab.id === 'ego-network' && height && width"
-						:id="parseInt(entity.properties._id)"
-						:network-data="entity"
-					/>
+				<div class="relative max-w-full">
+					<VisualisationContainer
+						id="ego-network"
+						v-slot="{ height, width }"
+						class="aspect-video w-full border"
+					>
+						<EntityDataGraph
+							v-if="tab.id === 'ego-network' && height && width"
+							:id="parseInt(entity.properties._id)"
+							:network-data="entity"
+						/>
 
-					<EntityImages
-						v-if="tab.id === 'images' && images"
-						class="overflow-hidden"
-						:images="images"
-					/>
-				</VisualisationContainer>
+						<EntityImages
+							v-if="tab.id === 'images' && images"
+							class="overflow-hidden"
+							:images="images"
+						/>
+					</VisualisationContainer>
+					<div class="relative max-w-full">
+						<div id="ego-network-legend" class="absolute right-0 p-2"></div>
+					</div>
+				</div>
 			</TabsContent>
 		</Tabs>
 
 		<component
 			:is="customPrimaryDetails"
 			v-if="customPrimaryDetails"
+			class="pt-2"
 			:entity="entity"
 			@handled-relations="emitHandledRelations"
 		/>

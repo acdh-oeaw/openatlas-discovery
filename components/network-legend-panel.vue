@@ -139,22 +139,31 @@ function toggleShowLegend() {
 		</div>
 	</aside>
 
-	<div v-if="showLegend" class="absolute z-50 flex">
-		<Card>
-			<CardContent>
-				<div
-					v-for="el in props.systemClasses"
-					:key="el"
-					class="grid grid-cols-[auto_1fr]"
-					:style="`color: ${el in systemClassColors ? systemClassColors[el as keyof typeof systemClassColors] : '#666'}`"
-				>
-					<DotIcon :size="50" class="m-0 inline-block p-0" />
-					<span v-if="el in labels" class="self-center">
-						{{ labels[el as keyof typeof labels] }}
-					</span>
-					<span v-else class="self-center"> {{ el }}</span>
-				</div>
-			</CardContent>
-		</Card>
-	</div>
+	<Teleport to="#ego-network-legend">
+		<div v-if="showLegend" class="absolute right-0">
+			<Card class="min-w-max">
+				<CardContent class="p-4 text-sm">
+					<div
+						v-for="el in props.systemClasses"
+						:key="el"
+						class="mb-2 grid grid-cols-[auto_1fr]"
+						:style="`color: ${el in systemClassColors ? systemClassColors[el as keyof typeof systemClassColors] : '#666'}`"
+					>
+						<svg height="24" width="24" xmlns="http://www.w3.org/2000/svg">
+							<circle
+								r="3"
+								cx="12"
+								cy="12"
+								:fill="systemClassColors[el as keyof typeof systemClassColors]"
+							/>
+						</svg>
+						<span v-if="el in labels" class="self-center">
+							{{ labels[el as keyof typeof labels] }}
+						</span>
+						<span v-else class="self-center"> {{ el }}</span>
+					</div>
+				</CardContent>
+			</Card>
+		</div>
+	</Teleport>
 </template>
