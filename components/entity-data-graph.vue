@@ -49,6 +49,8 @@ watch(
 			label: networkData.properties.title,
 			color: getNodeColor(networkData.systemClass),
 			size: networkConfig.sourceNodeSize,
+			x: Math.random(),
+			y: Math.random(),
 		});
 
 		/** Add relations to target nodes. */
@@ -65,6 +67,8 @@ watch(
 				color: getNodeColor(nodeClass),
 				size: networkConfig.relationNodeSize,
 				url: element.relationTo,
+				x: Math.random(),
+				y: Math.random(),
 			});
 
 			graph.addEdge(props.id, relationId);
