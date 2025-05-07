@@ -8,8 +8,7 @@ const props = defineProps<{
 	relations: NonNullable<PresentationViewModel["relations"]>;
 	handledRelations: Array<RelationType>;
 }>();
-console.log(props.handledRelations);
-const redundantSystemClasses = ["source"];
+const redundantSystemClasses: Array<string> = []; // ["source"];
 
 type RelationKey = keyof NonNullable<PresentationViewModel["relations"]>;
 
@@ -17,21 +16,19 @@ const relationsByType = computed(() => {
 	// if (props.handledRelations.length === 0) return props.relations;
 	const filteredRelations = new Map<string, Array<RelatedEntityModel>>();
 	for (const key in props.relations) {
-		filteredRelations.set(
-			key,
+		const rels =
 			props.relations[key as RelationKey]?.filter((relation) => {
 				if (!relation || redundantSystemClasses.includes(relation.systemClass)) return false;
 				return !relation.relationTypes?.every((relType) => {
-					return !props.handledRelations.some((handledRelation) => {
+					return props.handledRelations.some((handledRelation) => {
 						const relationType = extractRelationTypeFromRelationString(relType?.property);
 						if (!relationType) return false;
 						return handledRelation.crmCode === relationType.crmCode;
 					});
 				});
-			}) ?? [],
-		);
+			}) ?? [];
+		if (rels.length > 0) filteredRelations.set(key, rels);
 	}
-	console.log("filteredRelations", filteredRelations);
 	return filteredRelations;
 });
 
