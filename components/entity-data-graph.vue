@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Graph from "graphology";
-import { LayersIcon } from "lucide-vue-next";
 import { useTemplateRef } from "vue";
 
 import type { NetworkTemplateRef } from "@/components/data-graph.vue";
@@ -9,6 +8,11 @@ import type { NetworkEntity } from "@/types/api";
 
 const props = defineProps<{
 	networkData: NetworkEntity;
+	currentDepth: number;
+}>();
+
+const emit = defineEmits<{
+	(event: "changeDepth", values: number): void;
 }>();
 
 const graph = new Graph();
@@ -85,9 +89,10 @@ const network = useTemplateRef<NetworkTemplateRef>("networkClient");
 			:system-classes="relevantSystemClasses"
 			:allow-filtering="false"
 			:is-ego-network="true"
-			:depth="1"
+			:depth="currentDepth"
 			:is-running="network?.isRunning"
 			@network-control-event="network?.handleNetworkControls('toggleRenderer')"
+			@change-depth="(val) => emit('changeDepth', val)"
 		></NetworkLegendPanel>
 	</div>
 	<Network

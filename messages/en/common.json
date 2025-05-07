@@ -76,7 +76,9 @@
 		"meta": {
 			"title": "Entity"
 		},
-		"network": "Network Visualization",
+		"network": "Ego-Network",
+		"networkDepth": "Network-Depth",
+		"networkLegend": "Network-Legend",
 		"sidebar": {
 			"toggle": "Toggle details for {title}"
 		},

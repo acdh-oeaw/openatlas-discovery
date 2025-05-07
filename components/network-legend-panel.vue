@@ -23,6 +23,7 @@ const props = withDefaults(
 const emit = defineEmits<{
 	(event: "submit", values: SystemClassData): void;
 	(event: "networkControlEvent"): void;
+	(event: "changeDepth", values: number): void;
 }>();
 
 const checkedSystemClasses = ref<Record<string, boolean>>({});
@@ -103,6 +104,10 @@ function toggleShowLegend() {
 	showLegend.value = !showLegend.value;
 }
 
+function toggleShowDepth() {
+	showDepth.value = !showDepth.value;
+}
+
 function onClickControls() {
 	emit("networkControlEvent");
 }
@@ -175,23 +180,34 @@ watch(
 			<div class="border-separate border" />
 			<DropdownMenu v-model:open="showDepth">
 				<DropdownMenuTrigger as-child>
-					<Button
-						variant="transparent"
-						size="icon"
-						:class="{ 'text-brand': showDepth }"
-						class="opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100"
-					>
-						{{ props.depth }}
-						<LayersIcon class="p-0" :size="20" />
-					</Button>
+					<TooltipProvider as-child>
+						<Tooltip>
+							<TooltipTrigger>
+								<Button
+									variant="transparent"
+									size="icon"
+									:class="{ 'text-brand': showDepth }"
+									class="opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100"
+									@click="toggleShowDepth()"
+								>
+									{{ props.depth }}
+									<LayersIcon class="p-0" :size="20" />
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent>
+								{{ t("EntityPage.networkDepth") }}
+							</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
 				</DropdownMenuTrigger>
+
 				<DropdownMenuContent
 					align="end"
-					class="absolute left-auto right-0 top-auto -mr-2 mt-2.5 min-w-fit transform-none"
+					class="absolute left-auto right-0 top-auto -mr-1 mt-12 min-w-fit transform-none"
 					portal-to="#ego-network-legend"
 				>
 					<DropdownMenuItem v-for="(x, index) in 5" :key="index">
-						<Button variant="transparent" size="icon">
+						<Button variant="transparent" size="icon" @click="emit('changeDepth', x)">
 							<span :class="{ 'font-bold': x == props.depth }">{{ x }}</span>
 						</Button>
 					</DropdownMenuItem>
@@ -199,15 +215,24 @@ watch(
 			</DropdownMenu>
 
 			<div class="border-separate border" />
-			<Button
-				variant="transparent"
-				size="icon"
-				:class="{ 'text-brand': showLegend }"
-				class="opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100"
-				@click="toggleShowLegend()"
-			>
-				<EllipsisIcon class="p-0" :size="20" />
-			</Button>
+			<TooltipProvider>
+				<Tooltip>
+					<TooltipTrigger>
+						<Button
+							variant="transparent"
+							size="icon"
+							:class="{ 'text-brand': showLegend }"
+							class="opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100"
+							@click="toggleShowLegend()"
+						>
+							<EllipsisIcon class="p-0" :size="20" />
+						</Button>
+					</TooltipTrigger>
+					<TooltipContent>
+						{{ t("EntityPage.networkLegend") }}
+					</TooltipContent>
+				</Tooltip>
+			</TooltipProvider>
 		</div>
 	</aside>
 

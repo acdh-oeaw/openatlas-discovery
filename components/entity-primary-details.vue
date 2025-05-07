@@ -28,6 +28,8 @@ interface Image {
 	publicShareable?: boolean | undefined;
 }
 
+const depth = ref<number>(1);
+
 const images = computed(() => {
 	return props.entity.depictions?.reduce((acc: Array<Image>, depiction) => {
 		if (depiction.url && depiction.license && depiction.publicShareable) {
@@ -81,6 +83,7 @@ const { data: egoNetworkData } = useGetEgoNetworkData(
 	computed(() => {
 		return {
 			id: parseInt(props.entity.properties._id),
+			depth: depth.value,
 			exclude_system_classes: project.network.excludeSystemClasses,
 		};
 	}),
@@ -185,6 +188,10 @@ const filteredTypes = computed(() => {
 		);
 	});
 });
+
+function updateDepth(newDepth: number) {
+	depth.value = newDepth;
+}
 </script>
 
 <template>
@@ -239,6 +246,8 @@ const filteredTypes = computed(() => {
 						<EntityDataGraph
 							v-if="tab.id === 'ego-network' && height && width && egoNetworkData"
 							:network-data="egoNetworkData ?? []"
+							:current-depth="depth"
+							@change-depth="(val) => updateDepth(val)"
 						/>
 
 						<EntityImages

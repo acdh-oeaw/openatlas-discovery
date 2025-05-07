@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/vue-query";
 
 import type { operations } from "@/lib/api-client/api";
-import type { GetEgoNetworkVisualisationResponse } from "@/types/api";
 
 export interface GetEgoNetworkDataParams
 	extends NonNullable<operations["GetEgoNetworkVisualisation"]["parameters"]["query"]> {
