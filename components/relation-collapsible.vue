@@ -9,14 +9,14 @@ const props = defineProps<{
 
 const _sortedRelations = computed(() => {
 	function hasCenter(geometry: NonNullable<RelatedEntityModel>["geometries"]) {
-		if (geometry?.type === "GeometryCollection") {
+		if (geometry?.type === "FeatureCollection") {
 			return Boolean(
-				geometry.geometries.find((g) => {
-					return g.shapeType === "centerpoint";
+				geometry.features.find((g) => {
+					return g.geometry?.shapeType === "centerpoint";
 				}),
 			);
 		}
-		if (geometry?.type === "Point") return geometry.shapeType === "centerpoint";
+		if (geometry?.type === "Point") return true; //geometry.shapeType === "centerpoint";
 		return false;
 	}
 	return props.relations.toSorted((b, a) => {

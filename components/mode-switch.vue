@@ -58,12 +58,12 @@ function entityHasCoordinates(entity: PresentationViewModel) {
 		if (
 			entity.geometries == null ||
 			entity.geometries.type ===
-				"GeometryCollection" /* && entity.geometries.geometries.length === 0 */
+				"FeatureCollection" /* && entity.geometries.geometries.length === 0 */
 		) {
 			hasPlace.value = false;
 		} else if (
 			//@ts-expect-error TODO: check after #2477
-			entity.geometries.type !== "GeometryCollection" &&
+			entity.geometries.type !== "FeatureCollection" &&
 			entity.geometries.coordinates.length === 0
 		) {
 			hasPlace.value = false;

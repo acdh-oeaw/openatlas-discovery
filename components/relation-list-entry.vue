@@ -48,9 +48,9 @@ function hasValidTimespans(
 }
 
 const centroid = computed(() => {
-	if (props.relation.geometries?.type === "GeometryCollection") {
-		return props.relation.geometries.geometries.find((a) => {
-			return a.shapeType === "centerpoint";
+	if (props.relation.geometries?.type === "FeatureCollection") {
+		return props.relation.geometries.features.find((a) => {
+			return a.geometry?.shapeType === "centerpoint";
 		});
 	}
 	return undefined;

@@ -39,7 +39,11 @@ const currentMode = computed(() => {
 					<!-- @vue-expect-error value types missing (TODO: check after #2477) -->
 					<span v-if="type?.value && type?.unit" class="ml-1 text-muted-foreground">
 						<!-- @vue-expect-error value types missing (TODO: check after #2477) -->
-						{{ type.value }} <span> {{ type.unit }}</span>
+						{{ type.value }}
+						<span>
+							<!-- @vue-expect-error value types missing (TODO: check after #2477) -->
+							{{ type.unit }}</span
+						>
 					</span>
 					<span class="sr-only">{{ t("Global.ShowMore") }}</span>
 				</span>

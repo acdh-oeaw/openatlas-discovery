@@ -21,39 +21,41 @@ export const useFilterRelations = (
 				const test = rels.reduce((acc: Relations, relation): Relations => {
 					if (
 						!relation?.relationTypes ||
-						(relation.relationTypes as unknown as RelationTypesModel).length === 0
+						(relation.relationTypes as unknown as RelationTypesModel)?.length === 0
 					)
 						return acc;
 
-					const mappedRelation = (relation.relationTypes as unknown as RelationTypesModel)
-						.filter((type) => {
-							if (!type) return false;
-							const { crmCode, inverse } =
-								extractRelationTypeFromRelationString(type.property) ?? {};
-							if (
-								relationType &&
-								!systemClass &&
-								crmCode === relationType.crmCode &&
-								inverse === !relationType.inverse
-							)
-								return true;
-							if (systemClass && !relationType && systemClass === relation.systemClass) return true;
-							if (
-								relationType &&
-								systemClass &&
-								crmCode === relationType.crmCode &&
-								inverse === !relationType.inverse &&
-								systemClass === relation.systemClass
-							)
-								return true;
-							return false;
-						})
-						.map((relationType) => {
-							return {
-								...relation,
-								relationTypes: [relationType],
-							};
-						});
+					const mappedRelation =
+						(relation.relationTypes as unknown as RelationTypesModel)
+							?.filter((type) => {
+								if (!type) return false;
+								const { crmCode, inverse } =
+									extractRelationTypeFromRelationString(type.property) ?? {};
+								if (
+									relationType &&
+									!systemClass &&
+									crmCode === relationType.crmCode &&
+									inverse === !relationType.inverse
+								)
+									return true;
+								if (systemClass && !relationType && systemClass === relation.systemClass)
+									return true;
+								if (
+									relationType &&
+									systemClass &&
+									crmCode === relationType.crmCode &&
+									inverse === !relationType.inverse &&
+									systemClass === relation.systemClass
+								)
+									return true;
+								return false;
+							})
+							.map((relationType) => {
+								return {
+									...relation,
+									relationTypes: [relationType],
+								};
+							}) ?? [];
 					console.log("Mapped: ", mappedRelation, relation);
 					return [...acc, ...mappedRelation];
 				}, []);
