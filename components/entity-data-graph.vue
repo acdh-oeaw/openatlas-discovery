@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import Graph from "graphology";
+import { LayersIcon } from "lucide-vue-next";
+import { useTemplateRef } from "vue";
 
-import type { EntityFeature } from "@/composables/use-create-entity";
+import type { NetworkTemplateRef } from "@/components/data-graph.vue";
 import { networkConfig } from "@/config/network-visualisation.config";
+import type { NetworkEntity } from "@/types/api";
 
 const props = defineProps<{
-	networkData: EntityFeature;
-	id: number;
+	networkData: NetworkEntity;
 }>();
-
-const { getUnprefixedId } = useIdPrefix();
 
 const graph = new Graph();
 
@@ -21,18 +21,13 @@ const { data: allSystemClasses } = useGetSystemClassCount();
 const relevantSystemClasses = computed(() => {
 	if (!allSystemClasses.value) return [];
 	return Object.entries(allSystemClasses.value)
-		.filter(([key, value]) => {
-			return value > 0 && !project.network.excludeSystemClasses.includes(key);
-		})
 		.map(([key, _]) => {
 			return key;
 		})
 		.filter((key) => {
-			return (
-				props.networkData.relations.find((rel) => {
-					return rel.systemClass === key;
-				}) ?? props.networkData.systemClass === key
-			);
+			return props.networkData.find((rel) => {
+				return rel.systemClass === key;
+			});
 		});
 });
 
@@ -40,38 +35,36 @@ watch(
 	() => {
 		return props.networkData;
 	},
-	(networkData) => {
+	() => {
 		/** Clear previous graph data. */
 		graph.clear();
 
-		/** Add source node. */
-		graph.addNode(props.id, {
-			label: networkData.properties.title,
-			color: getNodeColor(networkData.systemClass),
-			size: networkConfig.sourceNodeSize,
-			x: Math.random(),
-			y: Math.random(),
-		});
+		console.log("entity ego network data: ", props.networkData);
 
-		/** Add relations to target nodes. */
-		networkData.relations.forEach((element) => {
-			if (element.relationTo == null) return;
+		if (props.networkData.length <= 0) return;
 
-			const relationId = getUnprefixedId(element.relationTo);
-			const nodeClass = element.relationSystemClass;
-
-			if (!relevantSystemClasses.value.includes(nodeClass) || nodeClass === "object_location")
-				return;
-			graph.addNode(relationId, {
+		props.networkData.forEach((element) => {
+			graph.addNode(element.id, {
 				label: element.label,
-				color: getNodeColor(nodeClass),
+				color: getNodeColor(element.systemClass),
 				size: networkConfig.relationNodeSize,
-				url: element.relationTo,
 				x: Math.random(),
 				y: Math.random(),
 			});
+		});
 
-			graph.addEdge(props.id, relationId);
+		props.networkData.forEach((entity) => {
+			entity.relations.forEach((element) => {
+				if (!graph.hasEdge(entity.id, element) && graph.hasNode(element)) {
+					graph.addEdge(entity.id, element);
+				} else if (!graph.hasNode(element)) {
+					console.error(
+						"graph does not have the node",
+						element,
+						"for the wanted relation in it's set.",
+					);
+				}
+			});
 		});
 	},
 	{ immediate: true },
@@ -81,6 +74,8 @@ function getNodeColor(nodeClass: string) {
 	//@ts-expect-error: no error occurs
 	return entityColors[nodeClass] ?? defaultColor;
 }
+
+const network = useTemplateRef<NetworkTemplateRef>("networkClient");
 </script>
 
 <template>
@@ -89,10 +84,15 @@ function getNodeColor(nodeClass: string) {
 			:excluded-classes="[]"
 			:system-classes="relevantSystemClasses"
 			:allow-filtering="false"
+			:is-ego-network="true"
+			:depth="1"
+			:is-running="network?.isRunning"
+			@network-control-event="network?.handleNetworkControls('toggleRenderer')"
 		></NetworkLegendPanel>
 	</div>
 	<Network
 		v-if="graph.size > 0"
+		ref="networkClient"
 		:graph="graph"
 		:show-orphans="false"
 		network-container-id="ego-network"

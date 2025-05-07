@@ -17,7 +17,7 @@ const graph = new Graph();
 const { entityColors } = networkConfig.colors;
 const defaultColor = networkConfig.colors.entityDefaultColor;
 
-interface NetworkTemplateRef {
+export interface NetworkTemplateRef {
 	handleNetworkControls: (args: string) => void;
 	isRunning: boolean;
 }

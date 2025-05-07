@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DotIcon, EllipsisIcon } from "lucide-vue-next";
+import { CirclePauseIcon, CirclePlayIcon, EllipsisIcon, LayersIcon } from "lucide-vue-next";
 
 import type { NetworkSearchData } from "@/components/data-network-view.vue";
 import { networkConfig } from "@/config/network-visualisation.config";
@@ -8,18 +8,26 @@ const t = useTranslations();
 
 type SystemClassData = Omit<NetworkSearchData, "search">;
 
-const props = defineProps<{
-	systemClasses: Array<string>;
-	excludedClasses: Array<string>;
-	allowFiltering: boolean;
-}>();
+const props = withDefaults(
+	defineProps<{
+		systemClasses: Array<string>;
+		excludedClasses: Array<string>;
+		allowFiltering: boolean;
+		isEgoNetwork?: boolean;
+		depth?: number;
+		isRunning?: boolean;
+	}>(),
+	{ isEgoNetwork: false },
+);
 
 const emit = defineEmits<{
 	(event: "submit", values: SystemClassData): void;
+	(event: "networkControlEvent"): void;
 }>();
 
 const checkedSystemClasses = ref<Record<string, boolean>>({});
 let showLegend = ref(false);
+let showDepth = ref(false);
 
 watch(
 	() => {
@@ -91,19 +99,33 @@ const labels = {
 
 const systemClassColors = networkConfig.colors.entityColors;
 function toggleShowLegend() {
+	showDepth.value = false;
 	showLegend.value = !showLegend.value;
 }
+
+function onClickControls() {
+	emit("networkControlEvent");
+}
+
+watch(
+	() => {
+		return showDepth.value;
+	},
+	() => {
+		showLegend.value = false;
+	},
+);
 </script>
 
 <template>
 	<aside
 		:class="
-			props.allowFiltering
+			!props.isEgoNetwork
 				? `flex max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent bg-white px-4 py-2 text-sm shadow-md`
 				: `flex gap-2 overflow-x-auto rounded-md border-2 border-transparent bg-white m-2 text-sm shadow-md`
 		"
 	>
-		<div v-if="props.allowFiltering" class="inline-flex">
+		<div v-if="!props.isEgoNetwork" class="inline-flex">
 			<div
 				v-for="el in props.systemClasses"
 				:key="el"
@@ -127,20 +149,70 @@ function toggleShowLegend() {
 				</div>
 			</div>
 		</div>
-		<div v-else>
+		<div v-else class="p-1">
+			<TooltipProvider>
+				<Tooltip>
+					<TooltipTrigger>
+						<Button variant="transparent" size="icon" @click="onClickControls()">
+							<span class="sr-only">{{
+								props.isRunning ? t("NetworkPage.controls.pause") : t("NetworkPage.controls.start")
+							}}</span>
+							<component
+								:is="props.isRunning ? CirclePauseIcon : CirclePlayIcon"
+								:size="20"
+								class="opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100"
+							></component>
+						</Button>
+					</TooltipTrigger>
+					<TooltipContent>
+						{{
+							props.isRunning ? t("NetworkPage.controls.pause") : t("NetworkPage.controls.start")
+						}}
+					</TooltipContent>
+				</Tooltip>
+			</TooltipProvider>
+
+			<div class="border-separate border" />
+			<DropdownMenu v-model:open="showDepth">
+				<DropdownMenuTrigger as-child>
+					<Button
+						variant="transparent"
+						size="icon"
+						:class="{ 'text-brand': showDepth }"
+						class="opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100"
+					>
+						{{ props.depth }}
+						<LayersIcon class="p-0" :size="20" />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent
+					align="end"
+					class="absolute left-auto right-0 top-auto -mr-2 mt-2.5 min-w-fit transform-none"
+					portal-to="#ego-network-legend"
+				>
+					<DropdownMenuItem v-for="(x, index) in 5" :key="index">
+						<Button variant="transparent" size="icon">
+							<span :class="{ 'font-bold': x == props.depth }">{{ x }}</span>
+						</Button>
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+
+			<div class="border-separate border" />
 			<Button
 				variant="transparent"
 				size="icon"
 				:class="{ 'text-brand': showLegend }"
+				class="opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100"
 				@click="toggleShowLegend()"
 			>
-				<EllipsisIcon class="p-0" />
+				<EllipsisIcon class="p-0" :size="20" />
 			</Button>
 		</div>
 	</aside>
 
 	<Teleport to="#ego-network-legend">
-		<div v-if="showLegend" class="absolute right-0">
+		<div v-if="showLegend" class="absolute right-0 mr-2">
 			<Card class="min-w-max">
 				<CardContent class="p-4 text-sm">
 					<div

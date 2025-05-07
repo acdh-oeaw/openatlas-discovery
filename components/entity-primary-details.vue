@@ -76,6 +76,16 @@ const emit = defineEmits({
 	},
 });
 
+const { data: egoNetworkData } = useGetEgoNetworkData(
+	// @ts-expect-error Includes custom, per-instance system classes.
+	computed(() => {
+		return {
+			id: parseInt(props.entity.properties._id),
+			exclude_system_classes: project.network.excludeSystemClasses,
+		};
+	}),
+);
+
 let alreadyEmitted = false;
 
 onMounted(() => {
@@ -227,9 +237,8 @@ const filteredTypes = computed(() => {
 						class="aspect-video w-full border"
 					>
 						<EntityDataGraph
-							v-if="tab.id === 'ego-network' && height && width"
-							:id="parseInt(entity.properties._id)"
-							:network-data="entity"
+							v-if="tab.id === 'ego-network' && height && width && egoNetworkData"
+							:network-data="egoNetworkData ?? []"
 						/>
 
 						<EntityImages
@@ -239,7 +248,10 @@ const filteredTypes = computed(() => {
 						/>
 					</VisualisationContainer>
 					<div class="relative max-w-full">
-						<div id="ego-network-legend" class="absolute right-0 p-2"></div>
+						<div
+							id="ego-network-legend"
+							class="absolute left-auto right-0 top-auto transform-none"
+						></div>
 					</div>
 				</div>
 			</TabsContent>

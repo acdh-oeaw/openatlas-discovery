@@ -143,8 +143,8 @@
 		"title": "Netzwerk-Visualisierung",
 		"work-in-progress": "Die Datenbank ist derzeit im Aufbau.",
 		"controls": {
-			"start": "Pausieren",
-			"pause": "Abspielen",
+			"start": "Abspielen",
+			"pause": "Pausieren",
 			"zoomIn": "Vergrößeren",
 			"zoomOut": "Verkleinern",
 			"reset-zoom": "Zoom zurücksetzen",

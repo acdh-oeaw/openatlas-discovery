@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ChevronLeftIcon, ChevronRightIcon, XIcon } from "lucide-vue-next";
 
+import { useGetEgoNetworkData } from "@/composables/use-get-ego-network-data";
+
 const t = useTranslations();
 const router = useRouter();
 const route = useRoute();

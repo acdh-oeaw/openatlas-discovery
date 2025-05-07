@@ -9,16 +9,21 @@ import {
 
 import { cn } from "@/utils/styles";
 
-const props = withDefaults(defineProps<DropdownMenuContentProps & { class?: string }>(), {
-	sideOffset: 4,
-});
+const props = withDefaults(
+	defineProps<DropdownMenuContentProps & { class?: string; portalTo?: string }>(),
+	{
+		sideOffset: 4,
+	},
+);
 const emits = defineEmits<DropdownMenuContentEmits>();
+
+console.log(props.portalTo);
 
 const forwarded = useForwardPropsEmits(props, emits);
 </script>
 
 <template>
-	<DropdownMenuPortal>
+	<DropdownMenuPortal :to="props.portalTo">
 		<DropdownMenuContent
 			:class="[
 				cn(
