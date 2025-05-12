@@ -70,6 +70,11 @@ watch(
 				}
 			});
 		});
+
+		void nextTick(() => {
+			if (network.value && !network.value.isRunning)
+				network.value?.handleNetworkControls("toggleRenderer");
+		});
 	},
 	{ immediate: true },
 );
