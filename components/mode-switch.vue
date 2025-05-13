@@ -62,8 +62,8 @@ function entityHasCoordinates(entity: PresentationViewModel) {
 		) {
 			hasPlace.value = false;
 		} else if (
-			//@ts-expect-error TODO: check after #2477
-			entity.geometries.type !== "FeatureCollection" &&
+			// TODO: check after #2477
+			!["FeatureCollection", "Feature"].includes(entity.geometries.type) &&
 			entity.geometries.coordinates.length === 0
 		) {
 			hasPlace.value = false;
