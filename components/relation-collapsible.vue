@@ -5,6 +5,7 @@ const props = defineProps<{
 	title: string;
 	relations: Array<NonNullable<RelatedEntityModel>>;
 	showIcon: boolean;
+	entityId: number;
 }>();
 
 const _sortedRelations = computed(() => {
@@ -27,11 +28,13 @@ const _sortedRelations = computed(() => {
 
 <template v-if="relations?.length">
 	<div class="space-x-4 px-4"></div>
-	<RelationListEntry
-		v-for="relation in relations"
-		:key="relation.id ?? ''"
-		:relation="relation"
-		:type="title"
-		:show-icon="showIcon"
-	/>
+	<template v-for="(relation, idx) in props.relations" :key="relation.id ?? ''">
+		<RelationListEntry
+			:relation="relation"
+			:type="title"
+			:show-icon="showIcon"
+			:entity-id="entityId"
+		/>
+		<div v-if="idx < props.relations.length - 1" class="border-separate border-[0.5px]" />
+	</template>
 </template>

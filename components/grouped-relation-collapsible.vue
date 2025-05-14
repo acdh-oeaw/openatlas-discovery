@@ -16,10 +16,20 @@ const props = defineProps<{
 	// relationType: RelationType;
 	systemClass?: string;
 	showOnMap: boolean;
+	entityId: number;
 }>();
 
-const filteredRelationCount = computed(() => {
-	return props.relations.length;
+const filteredRelations = computed(() => {
+	return props.relations.filter((rel, idx) => {
+		const indexIsFine =
+			props.relations.findIndex((r) => {
+				return r.id === rel.id;
+			}) === idx;
+		const relationTypesAreFine = rel.relationTypes?.some((type) => {
+			return type?.relationTo === props.entityId;
+		});
+		return indexIsFine && relationTypesAreFine;
+	});
 });
 </script>
 
@@ -31,7 +41,7 @@ const filteredRelationCount = computed(() => {
 					<AccordionTrigger class="grid grid-cols-[auto_1fr] place-items-end">
 						<h4 class="text-sm font-semibold">
 							{{ t(`SystemClassNames.${title}`) }}
-							{{ filteredRelationCount ? `(${filteredRelationCount})` : "" }}
+							{{ filteredRelations.length ? `(${filteredRelations.length})` : "" }}
 						</h4>
 					</AccordionTrigger>
 					<AccordionContent>
@@ -39,8 +49,9 @@ const filteredRelationCount = computed(() => {
 						<RelationCollapsible
 							class="mb-8"
 							:title="title ?? ''"
-							:relations="props.relations"
+							:relations="filteredRelations"
 							:show-icon="props.showOnMap"
+							:entity-id="entityId"
 						/>
 						<!-- </template> -->
 					</AccordionContent>

@@ -82,6 +82,7 @@ onMounted(() => {
 			:title="key"
 			:relations="(rels ?? []).filter((r) => r != null).filter((r) => r.id != entity.id)"
 			:show-on-map="collapsibleRelations[key]?.showOnMap ?? false"
+			:entity-id="entity.id"
 		/>
 	</div>
 	<div v-if="entity.relations != null" class="flex w-full gap-4">
@@ -93,6 +94,7 @@ onMounted(() => {
 			:title="key"
 			:relations="(rels ?? []).filter((r) => r != null).filter((r) => r.id != entity.id)"
 			:show-on-map="collapsibleRelations[key]?.showOnMap ?? false"
+			:entity-id="entity.id"
 		/>
 	</div>
 </template>

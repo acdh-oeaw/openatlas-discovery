@@ -11,6 +11,7 @@ const props = defineProps<{
 	showIcon: boolean;
 	type?: string;
 	relation: NonNullable<RelatedEntityModel>;
+	entityId: number;
 }>();
 
 function getPath() {
@@ -30,7 +31,7 @@ const currentMode = computed(() => {
 	return route.query.mode;
 });
 
-function hasValidTimespans(
+function _hasValidTimespans(
 	timespan: NonNullable<PresentationViewModel["when"]> | null | undefined,
 ): boolean {
 	if (!timespan) {
@@ -68,6 +69,25 @@ const _relationTitle = computed(() => {
 		),
 	].join(", ");
 });
+
+const related = computed(() => {
+	console.log(props.relation, props.entityId);
+	return (
+		props.relation.relationTypes
+			?.filter((rel) => {
+				return rel?.relationTo === props.entityId;
+			})
+			.filter((rel) => {
+				return rel != null;
+			}) ?? []
+	);
+});
+
+function getPropertyTranslation(property: string) {
+	const code = extractRelationTypeFromRelationString(property);
+
+	return code ? useRelationTitle({ ...code, inverse: !code.inverse }) : "";
+}
 </script>
 
 <template>
@@ -77,6 +97,7 @@ const _relationTitle = computed(() => {
 				:is="getEntityIcon(relation.systemClass)"
 				v-if="relation.systemClass"
 				class="mr-1 inline size-5 pb-1"
+				:class="related.length > 1 ? 'mt-2 self-start' : ''"
 			/>
 			<span class="grid grid-rows-2 data-[oneRow]:grid-rows-1" :data-oneRow="type === null">
 				<NavLink
@@ -89,14 +110,22 @@ const _relationTitle = computed(() => {
 					{{ relation.title }}
 				</NavLink>
 				<template v-if="relation.standardType != null">
-					<span class="text-xs text-muted-foreground">{{ relation.standardType.title }}</span>
+					<span class="text-xs text-muted-foreground"
+						>{{ relation.standardType.title }}
+						{{ relation.standardType.title && related.length > 0 ? "|" : "" }}
+						<span v-for="(rel, idx) in related" :key="`${relation.id}-${idx}`">
+							{{ getPropertyTranslation(rel.property) }}
+							{{ rel.type ? `| ${rel.type}` : "" }}
+							<br v-if="idx < related.length - 1" />
+						</span>
+					</span>
 				</template>
 			</span>
 		</div>
 
-		<template v-if="hasValidTimespans(relation.when)">
+		<!-- <template v-if="hasValidTimespans(relation.when)">
 			<SimpleTimespan class="text-xs" :timespans="[relation.when]" />
-		</template>
+		</template> -->
 		<template v-if="showIcon">
 			<Button :disabled="centroid === undefined" variant="outline" @click="setShowOnMap()">
 				<span class="text-xs font-normal">{{ t("EntityPage.showOnMap") }}</span>

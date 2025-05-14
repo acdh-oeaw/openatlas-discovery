@@ -130,5 +130,6 @@ const currentMode = computed(() => {
 		:title="key"
 		:relations="(rels ?? []).filter((r) => r != null).filter((r) => r.id != entity.id)"
 		:show-on-map="collapsibleRelations[key]?.showOnMap ?? false"
+		:entity-id="entity.id"
 	/>
 </template>
