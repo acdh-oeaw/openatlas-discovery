@@ -7,7 +7,7 @@ export function normalizeIsoYear(dateString: string) {
 }
 
 export function createDateSpan(date: { earliest?: string | null; latest?: string | null }) {
-	const { d } = useI18n();
+	const { d } = useNuxtApp().$i18n;
 	const segments: Array<string> = [];
 	if (date.earliest != null) {
 		let dateValue: Date | string = date.earliest;

@@ -84,6 +84,7 @@ const nonEmptyRelations = computed(() => {
 					v-if="nonEmptyRelations"
 					:handled-relations="handledRelations"
 					:relations="nonEmptyRelations"
+					:entity="entity"
 					class="rounded-md border px-4 py-3 text-sm"
 				/>
 			</div>

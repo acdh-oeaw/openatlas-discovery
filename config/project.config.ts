@@ -30,6 +30,8 @@ const schema = v.object({
 	),
 	detailView: v.object({
 		excludeTypeIds: v.array(v.number()),
+		primarySystemClasses: v.array(v.string()),
+		furtherSystemClasses: v.array(v.string()),
 	}),
 	network: v.object({
 		excludeSystemClasses: v.array(v.string()),

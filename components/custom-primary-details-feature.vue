@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-vue-next";
 
-import type { PresentationViewModel } from "@/types/api";
+import { project } from "@/config/project.config";
+import type { PresentationViewModel, RelatedEntityModel } from "@/types/api";
 
 const t = useTranslations();
 
@@ -98,6 +99,24 @@ function getPath() {
 const currentMode = computed(() => {
 	return route.query.mode;
 });
+
+const systemClasses = project.detailView.primarySystemClasses;
+
+const filteredRelations = computed(() => {
+	const res: Record<string, Array<RelatedEntityModel>> = {};
+	for (const relation in props.entity.relations) {
+		if (systemClasses.includes(relation))
+			res[relation] = props.entity.relations[relation as keyof PresentationViewModel["relations"]];
+	}
+	for (const otherKey in props.entity) {
+		if (systemClasses.includes(otherKey))
+			res[otherKey] = props.entity[
+				otherKey as keyof PresentationViewModel
+			] as Array<RelatedEntityModel>;
+	}
+	console.log("I found these: ", res);
+	return res;
+});
 </script>
 
 <template>
@@ -128,7 +147,7 @@ const currentMode = computed(() => {
 		</NavLink>
 	</div>
 	<GroupedRelationCollapsible
-		v-for="(rels, key) in entity.relations"
+		v-for="(rels, key) in filteredRelations"
 		:key="`${entity.id} - ${key}`"
 		:title="key"
 		:relations="(rels ?? []).filter((r) => r != null).filter((r) => r.id != entity.id)"

@@ -25,9 +25,10 @@ const filteredRelations = computed(() => {
 			props.relations.findIndex((r) => {
 				return r.id === rel.id;
 			}) === idx;
-		const relationTypesAreFine = rel.relationTypes?.some((type) => {
-			return type?.relationTo === props.entityId;
-		});
+		const relationTypesAreFine =
+			rel.relationTypes?.some((type) => {
+				return type?.relationTo === props.entityId;
+			}) ?? true;
 		return indexIsFine && relationTypesAreFine;
 	});
 });

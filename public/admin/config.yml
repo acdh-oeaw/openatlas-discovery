@@ -90,6 +90,89 @@ collections:
                 label: Configure which type ids should be excluded from the detail view
                 widget: list
 
+              - name: primarySystemClasses
+                label: Configure which system classes should be highlighted in the detail view
+                widget: select
+                multiple: true
+                options:
+                  [
+                    "acquisition",
+                    "activity",
+                    "actor_function",
+                    "actor_relation",
+                    "appellation",
+                    "artifact",
+                    "creation",
+                    "event",
+                    "feature",
+                    "files",
+                    "group",
+                    "human_remains",
+                    "involvement",
+                    "modification",
+                    "move",
+                    "person",
+                    "place",
+                    "production",
+                    "references",
+                    "source",
+                    "source_translation",
+                    "stratigraphic_unit",
+                  ]
+                default:
+                  [
+                    "acquisition",
+                    "activity",
+                    "actor_function",
+                    "actor_relation",
+                    "appellation",
+                    "artifact",
+                    "creation",
+                    "event",
+                    "feature",
+                    "group",
+                    "human_remains",
+                    "involvement",
+                    "modification",
+                    "move",
+                    "person",
+                    "place",
+                    "production",
+                    "source",
+                    "source_translation",
+                    "stratigraphic_unit",
+                  ]
+              - name: furtherSystemClasses
+                label: Configure which system classes should be displayed in a simple list
+                widget: select
+                multiple: true
+                options:
+                  [
+                    "acquisition",
+                    "activity",
+                    "actor_function",
+                    "actor_relation",
+                    "appellation",
+                    "artifact",
+                    "creation",
+                    "event",
+                    "feature",
+                    "files",
+                    "group",
+                    "human_remains",
+                    "involvement",
+                    "modification",
+                    "move",
+                    "person",
+                    "place",
+                    "production",
+                    "references",
+                    "source",
+                    "source_translation",
+                    "stratigraphic_unit",
+                  ]
+                default: ["files", "references"]
+
           - name: map
             label: Map Configuration
             # hint: Map Configuration
