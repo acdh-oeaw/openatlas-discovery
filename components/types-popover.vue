@@ -34,7 +34,7 @@ const currentMode = computed(() => {
 	<Popover>
 		<PopoverTrigger>
 			<Button variant="outline" class="max-w-48">
-				<span>
+				<span class="max-w-full overflow-hidden text-ellipsis">
 					{{ type?.title }}
 					<span v-if="type?.value && type?.unit" class="ml-1 text-muted-foreground">
 						{{ type.value }}
