@@ -12,11 +12,11 @@ const _sortedRelations = computed(() => {
 		if (geometry?.type === "FeatureCollection") {
 			return Boolean(
 				geometry.features.find((g) => {
-					return g.geometry?.shapeType === "centerpoint";
+					return g.geometry?.type === "Point";
 				}),
 			);
 		}
-		if (geometry?.type === "Point") return true; //geometry.shapeType === "centerpoint";
+		if (geometry?.geometry?.type === "Point") return true; //geometry.shapeType === "centerpoint";
 		return false;
 	}
 	return props.relations.toSorted((b, a) => {

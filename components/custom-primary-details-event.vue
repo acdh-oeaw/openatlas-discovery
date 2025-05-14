@@ -44,26 +44,30 @@ const nextFeature = computed(() => {
 	return null;
 });
 
-const collapsibleRelations: Array<{
-	relationType: RelationType;
-	systemClass?: string;
-	title: string;
-}> = [
+const collapsibleRelations: Record<
+	string,
 	{
+		relationType: RelationType;
+		systemClass?: string;
+		title: string;
+		showOnMap?: boolean;
+	}
+> = {
+	artifact: {
 		relationType: {
 			crmCode: "P46",
 		},
 		systemClass: "artifact",
 		title: t("Relations.Artifacts"),
 	},
-	{
+	human_remains: {
 		relationType: {
 			crmCode: "P46",
 		},
 		systemClass: "human_remains",
 		title: t("Relations.HumanRemains"),
 	},
-];
+};
 
 const emit = defineEmits({
 	handledRelations(payload: Array<RelationType>) {
@@ -121,12 +125,10 @@ const currentMode = computed(() => {
 		</NavLink>
 	</div>
 	<GroupedRelationCollapsible
-		v-for="rel in collapsibleRelations"
-		:key="rel.relationType.crmCode + rel.relationType.inverse"
-		:title="rel.title"
-		:relations="entity.relations"
-		:system-class="rel.systemClass"
-		:relation-type="rel.relationType"
-		:show-on-map="false"
+		v-for="(rels, key) in entity.relations"
+		:key="`${entity.id} - ${key}`"
+		:title="key"
+		:relations="(rels ?? []).filter((r) => r != null).filter((r) => r.id != entity.id)"
+		:show-on-map="collapsibleRelations[key]?.showOnMap ?? false"
 	/>
 </template>

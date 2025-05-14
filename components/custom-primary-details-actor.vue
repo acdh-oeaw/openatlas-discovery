@@ -12,7 +12,7 @@ const getRelationGroupTitle = (relation: RelationType) => {
 	return useRelationGroupTitle(relation);
 };
 
-const collapsibleRelations: Array<{
+const _collapsibleRelations: Array<{
 	relationType: RelationType;
 	title: string;
 }> = [
@@ -68,11 +68,10 @@ onMounted(() => {
 
 <template>
 	<GroupedRelationCollapsible
-		v-for="rel in collapsibleRelations"
-		:key="rel.relationType.crmCode + rel.relationType.inverse"
-		:title="rel.title"
-		:relations="entity.relations"
-		:relation-type="rel.relationType"
+		v-for="(rels, key) in entity.relations"
+		:key="`${entity.id} - ${key}`"
+		:title="key"
+		:relations="(rels ?? []).filter((r) => r != null)"
 		:show-on-map="false"
 	/>
 </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { CheckIcon, CopyIcon } from "lucide-vue-next";
 
+import CustomPrimaryDetails from "@/components/custom-primary-details.vue";
 import CustomPrimaryDetailsActor from "@/components/custom-primary-details-actor.vue";
 import CustomPrimaryDetailsEvent from "@/components/custom-primary-details-event.vue";
 import CustomPrimaryDetailsFeature from "@/components/custom-primary-details-feature.vue";
@@ -34,7 +35,6 @@ const images = computed(() => {
 			acc.push({
 				url: depiction.url,
 				license: depiction.license,
-				//@ts-expect-error IIIFManifest missing (TODO: check after #2477)
 				IIIFManifest: depiction.IIIFManifest,
 				mimetype: depiction.mimetype,
 				title: depiction.title,
@@ -45,11 +45,9 @@ const images = computed(() => {
 });
 
 const customPrimaryDetails = computed(() => {
-	//@ts-expect-error viewClass missing (TODO: check after #2477)
 	if (props.entity.viewClass in entityPrimaryDetailsDictByViewClass)
-		//@ts-expect-error viewClass missing (TODO: check after #2477)
 		return entityPrimaryDetailsDictByViewClass[props.entity.viewClass];
-	return entityPrimaryDetailsDict[props.entity.systemClass];
+	return entityPrimaryDetailsDict[props.entity.systemClass] ?? CustomPrimaryDetails;
 });
 
 const entityPrimaryDetailsDictByViewClass: Record<string, Component> = {
@@ -101,6 +99,7 @@ const isCopied = ref(false);
 
 // TODO: For instances where there is no location set (at least for actors), make use of first and last event if no places are available
 const places = computed(() => {
+	console.log(props.entity);
 	return props.entity.relations?.place?.reduce((acc: Array<Place>, relatedPlace) => {
 		if (relatedPlace?.systemClass !== "object_location") return acc;
 		if (!relatedPlace.title || !relatedPlace.id || !relatedPlace.relationTypes) return acc;

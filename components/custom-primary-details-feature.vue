@@ -47,26 +47,30 @@ const nextFeature = computed(() => {
 	return features.value[currentFeatureIndex.value + 1];
 });
 
-const collapsibleRelations: Array<{
-	relationType: RelationType;
-	systemClass?: string;
-	title: string;
-}> = [
+const collapsibleRelations: Record<
+	string,
 	{
+		relationType: RelationType;
+		systemClass?: string;
+		title: string;
+		showOnMap?: boolean;
+	}
+> = {
+	artifact: {
 		relationType: {
 			crmCode: "P46",
 		},
 		systemClass: "artifact",
 		title: t("Relations.Artifacts"),
 	},
-	{
+	human_remains: {
 		relationType: {
 			crmCode: "P46",
 		},
 		systemClass: "human_remains",
 		title: t("Relations.HumanRemains"),
 	},
-];
+};
 
 const emit = defineEmits({
 	handledRelations(payload: Array<RelationType>) {
@@ -106,7 +110,7 @@ const currentMode = computed(() => {
 			}"
 			class="flex items-center underline decoration-dotted transition hover:no-underline focus-visible:no-underline"
 		>
-			<ChevronLeftIcon class="size-4" />
+			<ChevronLeftIcon class="size-4 shrink-0" />
 			<span>{{ previousFeature.properties.title }}</span>
 			<span class="sr-only">{{ t("EntitySidebar.PreviousFeature") }}</span>
 		</NavLink>
@@ -120,16 +124,14 @@ const currentMode = computed(() => {
 		>
 			<span>{{ nextFeature.properties.title }}</span>
 			<span class="sr-only">{{ t("EntitySidebar.NextFeature") }}</span>
-			<ChevronRightIcon class="size-4" />
+			<ChevronRightIcon class="size-4 shrink-0" />
 		</NavLink>
 	</div>
 	<GroupedRelationCollapsible
-		v-for="rel in collapsibleRelations"
-		:key="rel.relationType.crmCode + rel.relationType.inverse"
-		:title="rel.title"
-		:relations="entity.relations"
-		:system-class="rel.systemClass"
-		:relation-type="rel.relationType"
-		:show-on-map="false"
+		v-for="(rels, key) in entity.relations"
+		:key="`${entity.id} - ${key}`"
+		:title="key"
+		:relations="(rels ?? []).filter((r) => r != null).filter((r) => r.id != entity.id)"
+		:show-on-map="collapsibleRelations[key]?.showOnMap ?? false"
 	/>
 </template>
