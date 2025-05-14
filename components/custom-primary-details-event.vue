@@ -9,11 +9,13 @@ const props = defineProps<{ entity: PresentationViewModel }>();
 const route = useRoute();
 
 const previousFeature = computed(() => {
-	const movement = props.entity.relations?.activity?.find((rel) => {
-		return rel?.relationTypes?.find((type) => {
-			return type?.property === "crm:P134_continued";
+	const movement = props.entity.relations?.activity
+		?.concat(props.entity.relations.move ?? [])
+		.find((rel) => {
+			return rel?.relationTypes?.find((type) => {
+				return type?.property === "crm:P134_continued";
+			});
 		});
-	});
 	if (movement)
 		return {
 			id: movement.id,
@@ -25,11 +27,13 @@ const previousFeature = computed(() => {
 });
 
 const nextFeature = computed(() => {
-	const movement = props.entity.relations?.activity?.find((rel) => {
-		return rel?.relationTypes?.find((type) => {
-			return type?.property === "crm:P134i_was_continued_by";
+	const movement = props.entity.relations?.activity
+		?.concat(props.entity.relations.move ?? [])
+		.find((rel) => {
+			return rel?.relationTypes?.find((type) => {
+				return type?.property === "crm:P134i_was_continued_by";
+			});
 		});
-	});
 	if (movement)
 		return {
 			id: movement.id,
@@ -99,7 +103,7 @@ const currentMode = computed(() => {
 			}"
 			class="flex items-center underline decoration-dotted transition hover:no-underline focus-visible:no-underline"
 		>
-			<ChevronLeftIcon class="size-4" />
+			<ChevronLeftIcon class="size-4 shrink-0" />
 			<span>{{ previousFeature.title }}</span>
 			<span class="sr-only">{{ t("EntitySidebar.PreviousFeature") }}</span>
 		</NavLink>
@@ -113,7 +117,7 @@ const currentMode = computed(() => {
 		>
 			<span>{{ nextFeature.title }}</span>
 			<span class="sr-only">{{ t("EntitySidebar.NextFeature") }}</span>
-			<ChevronRightIcon class="size-4" />
+			<ChevronRightIcon class="size-4 shrink-0" />
 		</NavLink>
 	</div>
 	<GroupedRelationCollapsible
