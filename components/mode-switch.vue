@@ -61,11 +61,7 @@ function entityHasCoordinates(entity: PresentationViewModel) {
 				"FeatureCollection" /* && entity.geometries.geometries.length === 0 */
 		) {
 			hasPlace.value = false;
-		} else if (
-			// TODO: check after #2477
-			!["FeatureCollection", "Feature"].includes(entity.geometries.type) &&
-			entity.geometries.coordinates.length === 0
-		) {
+		} else if (entity.geometries.geometry?.coordinates.length === 0) {
 			hasPlace.value = false;
 		} else hasPlace.value = true;
 	}

@@ -54,7 +54,10 @@ useHead({
 
 const tabs = computed(() => {
 	const tabs = [];
-	if (entity.value?.geometries != null && hasCoordinates(entity.value.geometries as Geometry)) {
+	if (
+		entity.value?.geometries != null &&
+		hasCoordinates(entity.value.geometries as unknown as Geometry)
+	) {
 		tabs.push({
 			id: "geo-map",
 			label: t("EntityPage.map"),

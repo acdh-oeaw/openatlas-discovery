@@ -593,6 +593,8 @@ export interface components {
             isStandard: boolean;
             title: string;
             typeHierarchy?: Array<components["schemas"]["TypeHierarchyEntryModel"]> | null;
+            unit?: string;
+            value?: string;
         } | null;
         ExternalReferenceModel: {
             id: string;
@@ -604,7 +606,7 @@ export interface components {
         } | null;
         /** @description A GeoJSON Feature object, linking a geometry to properties. */
         Feature: {
-            geometry: components["schemas"]["GeoJsonGeometry"] | null;
+            geometry: (components["schemas"]["GeoJSONLineString"] | components["schemas"]["GeoJSONPoint"] | components["schemas"]["GeoJSONPolygon"]) | null;
             properties: components["schemas"]["FeatureProperties"];
             /**
              * @description The GeoJSON object type.
@@ -714,7 +716,7 @@ export interface components {
         /** @description Represents geographic data associated with an entity.
          *     Can be explicitly null, a single GeoJSON geometry (Point, Polygon, or LineString),
          *     or a GeoJSON FeatureCollection containing Features with specific properties. */
-        Geometries: (components["schemas"]["FeatureCollection"] | components["schemas"]["GeoJSONLineString"] | components["schemas"]["GeoJSONPoint"] | components["schemas"]["GeoJSONPolygon"]) | null;
+        Geometries: (components["schemas"]["Feature"] | components["schemas"]["FeatureCollection"]) | null;
         GeometryCollection: {
             geometries: Array<components["schemas"]["LineString"] | components["schemas"]["Point"] | components["schemas"]["Polygon"]>;
             /** @enum {string} */
@@ -902,6 +904,8 @@ export interface components {
             description: string;
             externalReferenceSystems?: Array<components["schemas"]["ExternalReferenceModel"]> | null;
             files?: Array<{
+                IIIFBasePath?: string;
+                IIIFManifest?: string;
                 creator?: string | null;
                 id: number;
                 license: string | null;
@@ -951,6 +955,7 @@ export interface components {
             systemClass: string;
             title: string;
             types?: Array<components["schemas"]["EntityTypeModel"]> | null;
+            viewClass: string;
             when?: components["schemas"]["TimeRangeModel"];
         };
         PropertiesDetailModel: {
@@ -1133,6 +1138,7 @@ export interface components {
             };
             systemClass: string;
             title: string;
+            viewClass: string;
             when: components["schemas"]["TimeRangeModel"];
         } | null;
         RelationTypeModel: {
