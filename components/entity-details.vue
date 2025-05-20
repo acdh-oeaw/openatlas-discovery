@@ -1,6 +1,8 @@
 <script lang="ts" setup>
+import { DownloadIcon } from "lucide-vue-next";
+
 import { project } from "@/config/project.config";
-import type { PresentationViewModel } from "@/types/api";
+import type { File, PresentationViewModel } from "@/types/api";
 
 const t = useTranslations();
 const route = useRoute();
@@ -51,6 +53,48 @@ function getPath() {
 const currentMode = computed(() => {
 	return route.query.mode;
 });
+
+//see https://stackoverflow.com/a/49500465
+function forceDownload(blob: string, filename: string) {
+	var a = document.createElement("a");
+	a.download = filename;
+	a.href = blob;
+	// For Firefox https://stackoverflow.com/a/32226068
+	document.body.appendChild(a);
+	a.click();
+	a.remove();
+}
+// Current blob size limit is around 500MB for browsers
+function download(file: AdditionalInfoType) {
+	const filename = file.title;
+	fetch((file as unknown as AdditionalInfoType & { url: string }).url, {
+		headers: new Headers({
+			Origin: location.origin,
+		}),
+		mode: "cors",
+	})
+		.then((response) => {
+			return response.blob();
+		})
+		.then((blob) => {
+			let blobUrl = window.URL.createObjectURL(blob);
+			forceDownload(blobUrl, filename);
+		})
+		.catch((e: unknown) => {
+			console.error(e);
+		});
+}
+
+function isFile(file: unknown): file is File {
+	return typeof (file as File).url === "string" && typeof (file as File).mimetype === "string";
+}
+
+function getFilename(file: unknown) {
+	if (isFile(file)) {
+		const filetype = file.mimetype.split("/").pop() ?? "";
+		return `${file.title}.${filetype}`;
+	} else return (file as AdditionalInfoType).title;
+}
 </script>
 
 <template>
@@ -65,7 +109,11 @@ const currentMode = computed(() => {
 				</dt>
 				<dd>
 					<ul role="list">
-						<li v-for="(relation, index) of relations" :key="index">
+						<li
+							v-for="(relation, index) of relations"
+							:key="index"
+							class="grid grid-cols-[1fr_auto] items-center py-1"
+						>
 							<NavLink
 								v-if="relation?.id"
 								class="underline decoration-dotted hover:no-underline"
@@ -77,9 +125,16 @@ const currentMode = computed(() => {
 									},
 								}"
 							>
-								{{ relation.title }}
+								{{ getFilename(relation) }}
 							</NavLink>
-							<span v-else> {{ relation?.title }} </span>
+							<span v-else> {{ getFilename(relation) }} </span>
+							<Button
+								v-if="relationType === 'files'"
+								variant="transparent"
+								class="h-auto p-0 opacity-70 hover:opacity-100"
+								@click="download(relation)"
+								><DownloadIcon :size="16" /><span class="sr-only">Download</span></Button
+							>
 						</li>
 					</ul>
 				</dd>

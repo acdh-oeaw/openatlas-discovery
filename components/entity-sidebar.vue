@@ -81,9 +81,8 @@ const nonEmptyRelations = computed(() => {
 				<!-- <component v-if="hasCustomDetails" v-bind:is="entityDetailsDict" bind:entity-data /> -->
 
 				<EntityDetails
-					v-if="nonEmptyRelations"
 					:handled-relations="handledRelations"
-					:relations="nonEmptyRelations"
+					:relations="nonEmptyRelations ?? {}"
 					:entity="entity"
 					class="rounded-md border px-4 py-3 text-sm"
 				/>
