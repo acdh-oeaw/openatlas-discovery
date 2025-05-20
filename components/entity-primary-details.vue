@@ -160,13 +160,17 @@ function copyEntity() {
 
 const tabs = computed(() => {
 	const tabs = [];
-	if (images.value != null) {
+	if (images.value != null && images.value.length > 0) {
 		tabs.push({
 			id: "images",
 			label: t("EntityPage.images", { count: images.value.length }),
 		});
 	}
-	if (Object.values(props.entity.relations ?? {}).length > 0) {
+	if (
+		Object.values(props.entity.relations ?? {}).filter((rel) => {
+			return rel.length > 0;
+		}).length > 0
+	) {
 		tabs.push({
 			id: "ego-network",
 			label: t("EntityPage.network"),
@@ -201,6 +205,17 @@ const filteredTypes = computed(() => {
 function updateDepth(newDepth: number) {
 	depth.value = newDepth;
 }
+
+const isEmptyEntity = computed(() => {
+	return (
+		(images.value?.length ?? 0) === 0 &&
+		(props.entity.types?.length ?? 0) === 0 &&
+		!props.entity.description &&
+		Object.values(props.entity.relations ?? {}).every((rel) => {
+			return rel.length === 0;
+		})
+	);
+});
 </script>
 
 <template>
@@ -223,6 +238,8 @@ function updateDepth(newDepth: number) {
 	<!-- @ts-expect FIXME: Incorrect information provided by openapi document. -->
 	<EntityAliases v-if="entity.aliases" :aliases="entity.aliases as unknown as Array<string>" />
 	<EntityTimespans v-if="entity.when" :timespans="[entity.when]" />
+
+	<div v-if="isEmptyEntity" class="italic text-neutral-400">{{ t("EntityPage.no-details") }}</div>
 	<div class="grid gap-4">
 		<EntityDescriptions :descriptions="[entity?.description ?? '']" />
 
@@ -257,7 +274,7 @@ function updateDepth(newDepth: number) {
 						/>
 
 						<EntityImages
-							v-if="tab.id === 'images' && images"
+							v-if="tab.id === 'images' && images && images.length > 0"
 							class="overflow-hidden"
 							:images="images"
 						/>

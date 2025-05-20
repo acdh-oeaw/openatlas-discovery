@@ -83,7 +83,8 @@
 			"toggle": "Details für {title} umschalten"
 		},
 		"no-map": "Nicht auf der Karte vorhanden.",
-		"no-network": "Nicht im Netzwerk vorhanden."
+		"no-network": "Nicht im Netzwerk vorhanden.",
+		"no-details": "Keine weiteren Details vorhanden."
 	},
 	"EntitySidebar": {
 		"NextFeature": "Nächste Funktion",

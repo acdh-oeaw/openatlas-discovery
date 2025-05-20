@@ -82,6 +82,7 @@
 		"sidebar": {
 			"toggle": "Toggle details for {title}"
 		},
+		"no-details": "There are no further details for this entry.",
 		"no-map": "Not visible on the map.",
 		"no-network": "Not visible in the network."
 	},
