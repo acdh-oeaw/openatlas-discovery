@@ -34,7 +34,8 @@ const depth = ref<number>(1);
 
 const images = computed(() => {
 	return props.entity.files?.reduce((acc: Array<Image>, depiction) => {
-		if (depiction.url && depiction.license) {
+		//@ts-expect-error - string instead of boolean
+		if (depiction.url && depiction.license && depiction.publicShareable !== "False") {
 			acc.push({
 				url: depiction.url,
 				license: depiction.license,
