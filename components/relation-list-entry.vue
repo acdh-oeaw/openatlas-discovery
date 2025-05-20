@@ -88,17 +88,18 @@ function getPropertyTranslation(property: string) {
 
 	return code ? useRelationTitle({ ...code, inverse: !code.inverse }) : "";
 }
+const sourceAccordionOpen = ref(false);
 </script>
 
 <template>
-	<div class="my-2 flex grow basis-2 items-center justify-between gap-4">
+	<div class="my-2 flex grow basis-2 items-center justify-between gap-3">
+		<Component
+			:is="getEntityIcon(relation.systemClass)"
+			v-if="relation.systemClass"
+			class="mr-1 inline size-5 pb-1"
+			:class="related.length > 1 ? 'mt-2 self-start' : ''"
+		/>
 		<div class="grid flex-[2] grid-cols-[auto_1fr] items-center gap-2">
-			<Component
-				:is="getEntityIcon(relation.systemClass)"
-				v-if="relation.systemClass"
-				class="mr-1 inline size-5 pb-1"
-				:class="related.length > 1 ? 'mt-2 self-start' : ''"
-			/>
 			<span class="grid grid-rows-2 data-[oneRow]:grid-rows-1" :data-oneRow="type === null">
 				<NavLink
 					class="underline decoration-dotted hover:no-underline"
@@ -126,10 +127,29 @@ function getPropertyTranslation(property: string) {
 		<!-- <template v-if="hasValidTimespans(relation.when)">
 			<SimpleTimespan class="text-xs" :timespans="[relation.when]" />
 		</template> -->
+		<Button
+			v-if="relation.systemClass === 'source_translation'"
+			variant="outline"
+			@click="sourceAccordionOpen = !sourceAccordionOpen"
+		>
+			<span class="text-xs font-normal">Show text</span>
+		</Button>
 		<template v-if="showIcon">
 			<Button :disabled="centroid === undefined" variant="outline" @click="setShowOnMap()">
 				<span class="text-xs font-normal">{{ t("EntityPage.showOnMap") }}</span>
 			</Button>
 		</template>
 	</div>
+	<Accordion
+		v-if="relation.systemClass === 'source_translation'"
+		type="single"
+		collapsible
+		class="max-w-full"
+	>
+		<AccordionItem :open="sourceAccordionOpen" :value="String(relation.id)">
+			<AccordionContent>
+				<SourceContent :id="relation.id"></SourceContent>
+			</AccordionContent>
+		</AccordionItem>
+	</Accordion>
 </template>
