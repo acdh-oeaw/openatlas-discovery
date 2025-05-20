@@ -49,7 +49,7 @@ const currentImage = computed(() => {
 			<CarouselContent>
 				<CarouselItem v-for="(image, index) of props.images" :key="index" class="h-full">
 					<Card class="pb-3">
-						<figure class="grid h-96 grid-rows-[1fr_auto] gap-y-1.5 overflow-hidden">
+						<figure class="grid aspect-video h-full grid-rows-[1fr_auto] gap-y-1.5 overflow-hidden">
 							<div class="relative">
 								<img alt="" class="absolute size-full object-contain" :src="image.url" />
 							</div>

@@ -54,7 +54,7 @@ const currentMode = computed(() => {
 </script>
 
 <template>
-	<div v-if="Object.keys(combinedSystemClasses).length > 0">
+	<div v-if="Object.keys(combinedSystemClasses).length > 0" class="mt-4">
 		<h1 class="pb-2 font-semibold leading-none tracking-tight">{{ t("EntityPage.details") }}</h1>
 		<dl
 			class="grid gap-x-8 gap-y-4 sm:grid-cols-[repeat(auto-fill,minmax(min(20rem,100%),1fr))] sm:justify-start"
