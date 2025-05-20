@@ -168,6 +168,7 @@ const tabs = computed(() => {
 		});
 	}
 	if (
+		!project.network.excludeSystemClasses.includes(props.entity.systemClass) &&
 		Object.values(props.entity.relations ?? {}).filter((rel) => {
 			return rel.length > 0;
 		}).length > 0
