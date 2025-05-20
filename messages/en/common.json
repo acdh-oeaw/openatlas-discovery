@@ -76,7 +76,9 @@
 		"meta": {
 			"title": "Entity"
 		},
-		"network": "Network Visualization",
+		"network": "Ego-Network",
+		"networkDepth": "Network-Depth",
+		"networkLegend": "Network-Legend",
 		"sidebar": {
 			"toggle": "Toggle details for {title}"
 		},
@@ -143,8 +145,8 @@
 		"title": "Network Visualization",
 		"work-in-progress": "The database is currently work in progress.",
 		"controls": {
-			"start": "Pause",
-			"pause": "Play",
+			"start": "Play",
+			"pause": "Pause",
 			"zoomIn": "Zoom in",
 			"zoomOut": "Zoom out",
 			"reset-zoom": "Reset zoom",

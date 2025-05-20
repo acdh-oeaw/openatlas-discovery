@@ -17,7 +17,7 @@ const graph = new Graph();
 const { entityColors } = networkConfig.colors;
 const defaultColor = networkConfig.colors.entityDefaultColor;
 
-interface NetworkTemplateRef {
+export interface NetworkTemplateRef {
 	handleNetworkControls: (args: string) => void;
 	isRunning: boolean;
 }
@@ -102,5 +102,6 @@ function getNodeColor(nodeClass: string) {
 		:search-node="props.searchNode"
 		:detail-node="props.detailNode"
 		:show-orphans="props.showOrphans"
+		network-container-id="network-view"
 	/>
 </template>

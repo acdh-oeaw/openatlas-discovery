@@ -76,7 +76,9 @@
 		"meta": {
 			"title": "Entität"
 		},
-		"network": "Netzwerk-Visualisierung",
+		"network": "Ego-Netzwerk",
+		"networkDepth": "Netzwerk-Tiefe",
+		"networkLegend": "Netzwerk-Legende",
 		"sidebar": {
 			"toggle": "Details für {title} umschalten"
 		},
@@ -143,8 +145,8 @@
 		"title": "Netzwerk-Visualisierung",
 		"work-in-progress": "Die Datenbank ist derzeit im Aufbau.",
 		"controls": {
-			"start": "Pausieren",
-			"pause": "Abspielen",
+			"start": "Abspielen",
+			"pause": "Pausieren",
 			"zoomIn": "Vergrößeren",
 			"zoomOut": "Verkleinern",
 			"reset-zoom": "Zoom zurücksetzen",
