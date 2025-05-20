@@ -32,7 +32,6 @@ When you just want to use the cms for local development, you can run a developme
 ```bash
 pnpm run dev:cms
 ```
-
 This server will _not_ commit content changes to GitHub, but write to the local filesystem instead.
 
 ## Development
