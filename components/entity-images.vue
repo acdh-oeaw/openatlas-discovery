@@ -45,7 +45,10 @@ const currentImage = computed(() => {
 <template>
 	<div class="relative">
 		<Carousel v-if="!show" @init-api="setApi">
-			<CarouselPrevious v-if="props.images.length > 2" />
+			<CarouselPrevious
+				v-if="props.images.length > 1"
+				class="z-20 ml-14 bg-white opacity-90 dark:bg-black"
+			/>
 			<CarouselContent>
 				<CarouselItem v-for="(image, index) of props.images" :key="index" class="h-full">
 					<Card class="pb-3">
@@ -58,7 +61,10 @@ const currentImage = computed(() => {
 					</Card>
 				</CarouselItem>
 			</CarouselContent>
-			<CarouselNext v-if="props.images.length > 2" />
+			<CarouselNext
+				v-if="props.images.length > 1"
+				class="z-20 mr-14 bg-white opacity-90 dark:bg-black"
+			/>
 		</Carousel>
 		<EntityMiradorViewer v-if="show && currentImage" :images="[currentImage]" />
 		<Toggle variant="iiif" class="absolute bottom-0 right-0 z-10 m-4" @click="toggleIIIF">
