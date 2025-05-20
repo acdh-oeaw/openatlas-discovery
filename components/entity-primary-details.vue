@@ -217,6 +217,17 @@ const isEmptyEntity = computed(() => {
 		})
 	);
 });
+
+const defaultTab = ref();
+watch(
+	() => {
+		return tabs.value;
+	},
+	() => {
+		defaultTab.value = tabs.value[0]?.id;
+	},
+	{ immediate: true },
+);
 </script>
 
 <template>
@@ -253,7 +264,7 @@ const isEmptyEntity = computed(() => {
 			/>
 		</div>
 
-		<Tabs v-if="tabs.length > 0" :default-value="tabs[0]?.id">
+		<Tabs v-if="tabs.length > 0" v-model="defaultTab" :default-value="defaultTab">
 			<TabsList>
 				<TabsTrigger v-for="tab of tabs" :key="tab.id" :value="tab.id">
 					{{ tab.label }}
