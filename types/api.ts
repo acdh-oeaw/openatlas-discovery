@@ -22,6 +22,9 @@ export type NetworkEntity = components["schemas"]["NetworkVisualisationModel"]["
 
 export type GetLinkedEntitiesResponse = components["schemas"]["EntitiesOutputModel"]["results"];
 
+export type GetEgoNetworkVisualisationResponse =
+	components["schemas"]["NetworkVisualisationModel"]["results"];
+
 export type RelationLinkedEntity = LinkedPlacesModel["features"][0];
 export interface ExtendedEntities extends RelationLinkedEntity {
 	label?: string;

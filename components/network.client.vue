@@ -26,6 +26,7 @@ const props = defineProps<{
 	searchNode?: string;
 	detailNode?: string;
 	showOrphans: boolean;
+	networkContainerId: string;
 }>();
 
 interface NetworkContext {
@@ -215,7 +216,7 @@ onMounted(async () => {
 		return setTimeout(r, 100);
 	});
 
-	const container = document.getElementById("sigma-container");
+	const container = document.getElementById(props.networkContainerId);
 	if (container == null) return;
 
 	context.renderer = new Sigma(context.graph, container, {
@@ -327,5 +328,5 @@ onScopeDispose(() => {
 </script>
 
 <template>
-	<div id="sigma-container" class="relative m-0 size-full overflow-hidden p-0"></div>
+	<div :id="`${props.networkContainerId}`" class="relative m-0 size-full overflow-hidden p-0"></div>
 </template>

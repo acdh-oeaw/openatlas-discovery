@@ -153,6 +153,7 @@ const isFullscreen = ref(false);
 		</div>
 
 		<VisualisationContainer
+			id="network-view"
 			v-slot="{ height, width }"
 			class="border"
 			:class="{ 'opacity-50 grayscale': isLoading }"
@@ -170,6 +171,7 @@ const isFullscreen = ref(false);
 					class="m-3 bg-white/90"
 					:system-classes="relevantSystemClasses"
 					:excluded-classes="searchFilters.excludeSystemClasses"
+					:allow-filtering="true"
 					@submit="onChangeSearchFilters"
 				/>
 			</div>

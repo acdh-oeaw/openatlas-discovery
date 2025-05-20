@@ -28,6 +28,8 @@ interface Image {
 	publicShareable?: boolean | undefined;
 }
 
+const depth = ref<number>(1);
+
 const images = computed(() => {
 	return props.entity.depictions?.reduce((acc: Array<Image>, depiction) => {
 		if (depiction.url && depiction.license && depiction.publicShareable) {
@@ -75,6 +77,17 @@ const emit = defineEmits({
 		return payload;
 	},
 });
+
+const { data: egoNetworkData } = useGetEgoNetworkData(
+	// @ts-expect-error Includes custom, per-instance system classes.
+	computed(() => {
+		return {
+			id: parseInt(props.entity.properties._id),
+			depth: depth.value,
+			exclude_system_classes: project.network.excludeSystemClasses,
+		};
+	}),
+);
 
 let alreadyEmitted = false;
 
@@ -141,6 +154,23 @@ function copyEntity() {
 	return null;
 }
 
+const tabs = computed(() => {
+	const tabs = [];
+	if (images.value != null) {
+		tabs.push({
+			id: "images",
+			label: t("EntityPage.images", { count: images.value.length }),
+		});
+	}
+	if (props.entity.relations.length > 0) {
+		tabs.push({
+			id: "ego-network",
+			label: t("EntityPage.network"),
+		});
+	}
+	return tabs;
+});
+
 const filteredTypes = computed(() => {
 	return props.entity.types?.filter((type) => {
 		if (!type.identifier) return true;
@@ -158,6 +188,10 @@ const filteredTypes = computed(() => {
 		);
 	});
 });
+
+function updateDepth(newDepth: number) {
+	depth.value = newDepth;
+}
 </script>
 
 <template>
@@ -195,11 +229,47 @@ const filteredTypes = computed(() => {
 			/>
 		</div>
 
-		<EntityImages v-if="images" :images="images" class="overflow-hidden" />
+		<Tabs v-if="tabs.length > 0" :default-value="tabs[0]?.id">
+			<TabsList>
+				<TabsTrigger v-for="tab of tabs" :key="tab.id" :value="tab.id">
+					{{ tab.label }}
+				</TabsTrigger>
+			</TabsList>
+			<!-- TODO: keep map alive -->
+			<TabsContent v-for="tab of tabs" :key="tab.id" :value="tab.id">
+				<div class="relative max-w-full">
+					<VisualisationContainer
+						id="ego-network"
+						v-slot="{ height, width }"
+						class="aspect-video w-full border"
+					>
+						<EntityDataGraph
+							v-if="tab.id === 'ego-network' && height && width && egoNetworkData"
+							:network-data="egoNetworkData ?? []"
+							:current-depth="depth"
+							@change-depth="(val) => updateDepth(val)"
+						/>
+
+						<EntityImages
+							v-if="tab.id === 'images' && images"
+							class="overflow-hidden"
+							:images="images"
+						/>
+					</VisualisationContainer>
+					<div class="relative max-w-full">
+						<div
+							id="ego-network-legend"
+							class="absolute left-auto right-0 top-auto transform-none"
+						></div>
+					</div>
+				</div>
+			</TabsContent>
+		</Tabs>
 
 		<component
 			:is="customPrimaryDetails"
 			v-if="customPrimaryDetails"
+			class="pt-2"
 			:entity="entity"
 			@handled-relations="emitHandledRelations"
 		/>
