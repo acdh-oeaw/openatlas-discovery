@@ -71,11 +71,13 @@ const _relationTitle = computed(() => {
 });
 
 const related = computed(() => {
-	console.log(props.relation, props.entityId);
 	return (
 		props.relation.relationTypes
 			?.filter((rel) => {
 				return rel?.relationTo === props.entityId;
+			})
+			.filter((rel) => {
+				return !rel?.property.startsWith("crm:P73");
 			})
 			.filter((rel) => {
 				return rel != null;
@@ -95,9 +97,9 @@ function getPropertyTranslation(property: string) {
 
 	if (code?.crmCode === "P73") {
 		if (code.inverse) {
-			return t("EntityPage.hasTranslationText");
+			return null;
 		}
-		return t("EntityPage.isOriginalText");
+		return null;
 	}
 	return code ? useRelationTitle({ ...code, inverse: !code.inverse }) : "";
 }
