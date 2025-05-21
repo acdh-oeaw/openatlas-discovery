@@ -177,14 +177,18 @@ export interface paths {
             responses: {
                 /** @description Successful response */
                 200: {
-                    headers: Record<string, unknown>;
+                    headers: {
+                        [name: string]: unknown;
+                    };
                     content: {
                         "application/json": components["schemas"]["PresentationViewModel"];
                     };
                 };
                 /** @description Something went wrong. Please consult the error message. */
                 404: {
-                    headers: Record<string, unknown>;
+                    headers: {
+                        [name: string]: unknown;
+                    };
                     content?: never;
                 };
             };
@@ -560,39 +564,39 @@ export interface components {
             version: string;
         };
         ChainEventModel: {
-            children: Array<components["schemas"]["ChainEventModel"]> | null;
-            geometry: (components["schemas"]["GeometryCollection"] | components["schemas"]["LineString"] | components["schemas"]["Point"] | components["schemas"]["Polygon"]) | null;
+            children: components["schemas"]["ChainEventModel"][] | null;
+            geometry: (components["schemas"]["Polygon"] | components["schemas"]["Point"] | components["schemas"]["LineString"] | components["schemas"]["GeometryCollection"]) | null;
             id: number;
             name: string;
             system_class: string;
         };
         ClassMappingModel: {
             locale?: string;
-            results?: Array<{
+            results?: {
                 crmClass: string;
                 icon: string;
                 label: string;
                 systemClass: string;
                 view: string;
-            }>;
+            }[];
         };
-        ClassesModel: Array<{
+        ClassesModel: {
             crmClass: string;
             en: string;
             icon: string;
             systemClass: string;
             view: string;
-        }>;
+        }[];
         EntitiesOutputModel: {
             pagination: components["schemas"]["PaginationModel"];
-            results: Array<components["schemas"]["GeoJSONModel"] | components["schemas"]["LinkedPlacesModel"] | components["schemas"]["SearchModel"]>;
+            results: (components["schemas"]["LinkedPlacesModel"] | components["schemas"]["GeoJSONModel"] | components["schemas"]["SearchModel"])[];
         };
         EntityTypeModel: {
             descriptions?: string | null;
             id: number;
             isStandard: boolean;
             title: string;
-            typeHierarchy?: Array<components["schemas"]["TypeHierarchyEntryModel"]> | null;
+            typeHierarchy?: components["schemas"]["TypeHierarchyEntryModel"][] | null;
             unit?: string;
             value?: string;
         } | null;
@@ -606,7 +610,7 @@ export interface components {
         } | null;
         /** @description A GeoJSON Feature object, linking a geometry to properties. */
         Feature: {
-            geometry: (components["schemas"]["GeoJSONLineString"] | components["schemas"]["GeoJSONPoint"] | components["schemas"]["GeoJSONPolygon"]) | null;
+            geometry: (components["schemas"]["GeoJSONPoint"] | components["schemas"]["GeoJSONPolygon"] | components["schemas"]["GeoJSONLineString"]) | null;
             properties: components["schemas"]["FeatureProperties"];
             /**
              * @description The GeoJSON object type.
@@ -616,7 +620,7 @@ export interface components {
         };
         /** @description A collection of GeoJSON Feature objects. */
         FeatureCollection: {
-            features: Array<components["schemas"]["Feature"]>;
+            features: components["schemas"]["Feature"][];
             /**
              * @description The GeoJSON object type.
              * @enum {string}
@@ -646,8 +650,8 @@ export interface components {
             type: "LineString";
         };
         GeoJSONModel: {
-            features: Array<{
-                geometry: components["schemas"]["GeometryCollection"] | components["schemas"]["LineString"] | components["schemas"]["Point"] | components["schemas"]["Polygon"];
+            features: {
+                geometry: components["schemas"]["Polygon"] | components["schemas"]["Point"] | components["schemas"]["LineString"] | components["schemas"]["GeometryCollection"];
                 properties: {
                     "@id": number;
                     begin_comment: string | null;
@@ -659,14 +663,14 @@ export interface components {
                     end_latest: string | null;
                     name: string;
                     systemClass: string;
-                    types: Array<{
+                    types: {
                         typeId?: number;
                         typeName?: string;
-                    }>;
+                    }[];
                     viewClass: string;
                 };
                 type?: string;
-            }>;
+            }[];
             /** @enum {string} */
             type: "FeatureCollection";
         };
@@ -688,11 +692,11 @@ export interface components {
              */
             type: "Polygon";
         };
-        GeoJsonGeometry: components["schemas"]["LineString"] | components["schemas"]["Point"] | components["schemas"]["Polygon"];
+        GeoJsonGeometry: components["schemas"]["Point"] | components["schemas"]["LineString"] | components["schemas"]["Polygon"];
         GeometricEntitiesModel: {
-            features?: Array<{
+            features?: {
                 geometry?: {
-                    coordinates?: Array<number>;
+                    coordinates?: number[];
                     type?: string;
                 };
                 properties?: {
@@ -710,15 +714,15 @@ export interface components {
                     shapeType?: string;
                 };
                 type?: string;
-            }>;
+            }[];
             type?: string;
         };
         /** @description Represents geographic data associated with an entity.
          *     Can be explicitly null, a single GeoJSON geometry (Point, Polygon, or LineString),
          *     or a GeoJSON FeatureCollection containing Features with specific properties. */
-        Geometries: (components["schemas"]["Feature"] | components["schemas"]["FeatureCollection"]) | null;
+        Geometries: (components["schemas"]["FeatureCollection"] | components["schemas"]["Feature"]) | null;
         GeometryCollection: {
-            geometries: Array<components["schemas"]["LineString"] | components["schemas"]["Point"] | components["schemas"]["Polygon"]>;
+            geometries: (components["schemas"]["Polygon"] | components["schemas"]["Point"] | components["schemas"]["LineString"])[];
             /** @enum {string} */
             type: "GeometryCollection";
         };
@@ -747,7 +751,7 @@ export interface components {
         LineStringCoordinates: [
             components["schemas"]["Position"],
             components["schemas"]["Position"],
-            ...Array<components["schemas"]["Position"]>
+            ...components["schemas"]["Position"][]
         ];
         /** @description An array of four or more positions where the first and last positions are equivalent (they represent closed loops).
          *     Used for defining polygon boundaries. */
@@ -756,14 +760,14 @@ export interface components {
             components["schemas"]["Position"],
             components["schemas"]["Position"],
             components["schemas"]["Position"],
-            ...Array<components["schemas"]["Position"]>
+            ...components["schemas"]["Position"][]
         ];
         LinkedPlacesModel: {
             "@context": string;
-            features: Array<{
+            features: {
                 "@id": string;
                 crmClass: string;
-                depictions?: Array<{
+                depictions?: {
                     "@id"?: string;
                     IIIFBasePath?: string;
                     IIIFManifest?: string;
@@ -774,17 +778,17 @@ export interface components {
                     publicShareable?: boolean;
                     title?: string;
                     url?: string;
-                }> | null;
-                descriptions?: Array<{
+                }[] | null;
+                descriptions?: {
                     value?: string;
-                }>;
-                geometry?: (components["schemas"]["GeometryCollection"] | components["schemas"]["LineString"] | components["schemas"]["Point"] | components["schemas"]["Polygon"]) | null;
+                }[];
+                geometry?: (components["schemas"]["Polygon"] | components["schemas"]["Point"] | components["schemas"]["LineString"] | components["schemas"]["GeometryCollection"]) | null;
                 links?: string | null;
                 names?: string | null;
                 properties?: {
                     title: string;
                 };
-                relations?: Array<{
+                relations?: {
                     label?: string;
                     relationDescription?: string | null;
                     relationSystemClass?: string;
@@ -792,7 +796,7 @@ export interface components {
                     relationType?: string;
                     type?: string | null;
                     when?: {
-                        timespans?: Array<{
+                        timespans?: {
                             end?: {
                                 comment?: string | null;
                                 earliest?: string | null;
@@ -803,28 +807,28 @@ export interface components {
                                 earliest?: string | null;
                                 latest?: string | null;
                             };
-                        }>;
+                        }[];
                     } | null;
-                }> | null;
+                }[] | null;
                 systemClass: string;
                 type: string;
-                types?: Array<{
+                types?: {
                     descriptions?: string | null;
                     hierarchy?: string;
                     identifier?: string;
                     label?: string;
-                    typeHierarchy?: Array<{
+                    typeHierarchy?: {
                         description?: string;
                         identifier?: string;
                         label?: string;
-                    }>;
+                    }[];
                     unit?: string | null;
                     /** Format: float */
                     value?: number;
-                }> | null;
+                }[] | null;
                 viewClass: string;
                 when?: {
-                    timespans?: Array<{
+                    timespans?: {
                         end?: {
                             comment?: string | null;
                             earliest?: string | null;
@@ -835,18 +839,18 @@ export interface components {
                             earliest?: string | null;
                             latest?: string | null;
                         };
-                    }>;
+                    }[];
                 } | null;
-            }>;
+            }[];
             type: string;
         };
         NetworkVisualisationModel: {
-            results: Array<{
+            results: {
                 id: number;
                 label: string;
-                relations: Array<number>;
+                relations: number[];
                 systemClass: string;
-            }>;
+            }[];
         };
         PaginationIndexModel: {
             page?: number;
@@ -855,7 +859,7 @@ export interface components {
         PaginationModel: {
             entities: number;
             entitiesPerPage: number;
-            index: Array<components["schemas"]["PaginationIndexModel"]>;
+            index: components["schemas"]["PaginationIndexModel"][];
             totalPages: number;
         };
         Point: {
@@ -869,7 +873,7 @@ export interface components {
             type: "Point";
         };
         Polygon: {
-            coordinates: Array<components["schemas"]["LinearRing"]>;
+            coordinates: components["schemas"]["LinearRing"][];
             description?: string;
             locationId?: string;
             /** @enum {string} */
@@ -882,7 +886,7 @@ export interface components {
          *     Subsequent elements represent interior rings (holes). */
         PolygonCoordinates: [
             components["schemas"]["LinearRing"],
-            ...Array<components["schemas"]["LinearRing"]>
+            ...components["schemas"]["LinearRing"][]
         ];
         /** @description A single position represented as an array of numbers.
          *     The first two elements MUST be longitude and latitude (in that order).
@@ -891,19 +895,19 @@ export interface components {
         Position: [
             number,
             number,
-            ...Array<number>
+            ...number[]
         ];
         /** @description An array of two or more positions. Used for LineStrings. */
         PositionArray: [
             components["schemas"]["Position"],
             components["schemas"]["Position"],
-            ...Array<components["schemas"]["Position"]>
+            ...components["schemas"]["Position"][]
         ];
         PresentationViewModel: {
-            aliases: Array<string>;
+            aliases: string[];
             description: string;
-            externalReferenceSystems?: Array<components["schemas"]["ExternalReferenceModel"]> | null;
-            files?: Array<{
+            externalReferenceSystems?: components["schemas"]["ExternalReferenceModel"][] | null;
+            files?: {
                 IIIFBasePath?: string;
                 IIIFManifest?: string;
                 creator?: string | null;
@@ -914,10 +918,10 @@ export interface components {
                 publicShareable?: boolean | null;
                 title: string;
                 url: string;
-            }> | null;
+            }[] | null;
             geometries?: components["schemas"]["Geometries"];
             id: number;
-            references?: Array<{
+            references?: {
                 citation: string;
                 id: number;
                 pages?: string | null;
@@ -925,36 +929,36 @@ export interface components {
                 title: string;
                 type?: string | null;
                 typeId?: number | null;
-            }> | null;
+            }[] | null;
             relations?: {
-                acquisition?: Array<components["schemas"]["RelatedEntityModel"]>;
-                activity?: Array<components["schemas"]["RelatedEntityModel"]>;
-                actor_function?: Array<components["schemas"]["RelatedEntityModel"]>;
-                actor_relation?: Array<components["schemas"]["RelatedEntityModel"]>;
-                appellation?: Array<components["schemas"]["RelatedEntityModel"]>;
-                artifact?: Array<components["schemas"]["RelatedEntityModel"]>;
-                bibliography?: Array<components["schemas"]["RelatedEntityModel"]>;
-                creation?: Array<components["schemas"]["RelatedEntityModel"]>;
-                edition?: Array<components["schemas"]["RelatedEntityModel"]>;
-                event?: Array<components["schemas"]["RelatedEntityModel"]>;
-                external_reference?: Array<components["schemas"]["RelatedEntityModel"]>;
-                feature?: Array<components["schemas"]["RelatedEntityModel"]>;
-                file?: Array<components["schemas"]["RelatedEntityModel"]>;
-                group?: Array<components["schemas"]["RelatedEntityModel"]>;
-                human_remains?: Array<components["schemas"]["RelatedEntityModel"]>;
-                involvement?: Array<components["schemas"]["RelatedEntityModel"]>;
-                modification?: Array<components["schemas"]["RelatedEntityModel"]>;
-                move?: Array<components["schemas"]["RelatedEntityModel"]>;
-                person?: Array<components["schemas"]["RelatedEntityModel"]>;
-                place?: Array<components["schemas"]["RelatedEntityModel"]>;
-                production?: Array<components["schemas"]["RelatedEntityModel"]>;
-                source?: Array<components["schemas"]["RelatedEntityModel"]>;
-                source_translation?: Array<components["schemas"]["RelatedEntityModel"]>;
-                stratigraphic_unit?: Array<components["schemas"]["RelatedEntityModel"]>;
+                acquisition?: components["schemas"]["RelatedEntityModel"][];
+                activity?: components["schemas"]["RelatedEntityModel"][];
+                actor_function?: components["schemas"]["RelatedEntityModel"][];
+                actor_relation?: components["schemas"]["RelatedEntityModel"][];
+                appellation?: components["schemas"]["RelatedEntityModel"][];
+                artifact?: components["schemas"]["RelatedEntityModel"][];
+                bibliography?: components["schemas"]["RelatedEntityModel"][];
+                creation?: components["schemas"]["RelatedEntityModel"][];
+                edition?: components["schemas"]["RelatedEntityModel"][];
+                event?: components["schemas"]["RelatedEntityModel"][];
+                external_reference?: components["schemas"]["RelatedEntityModel"][];
+                feature?: components["schemas"]["RelatedEntityModel"][];
+                file?: components["schemas"]["RelatedEntityModel"][];
+                group?: components["schemas"]["RelatedEntityModel"][];
+                human_remains?: components["schemas"]["RelatedEntityModel"][];
+                involvement?: components["schemas"]["RelatedEntityModel"][];
+                modification?: components["schemas"]["RelatedEntityModel"][];
+                move?: components["schemas"]["RelatedEntityModel"][];
+                person?: components["schemas"]["RelatedEntityModel"][];
+                place?: components["schemas"]["RelatedEntityModel"][];
+                production?: components["schemas"]["RelatedEntityModel"][];
+                source?: components["schemas"]["RelatedEntityModel"][];
+                source_translation?: components["schemas"]["RelatedEntityModel"][];
+                stratigraphic_unit?: components["schemas"]["RelatedEntityModel"][];
             };
             systemClass: string;
             title: string;
-            types?: Array<components["schemas"]["EntityTypeModel"]> | null;
+            types?: components["schemas"]["EntityTypeModel"][] | null;
             viewClass: string;
             when?: components["schemas"]["TimeRangeModel"];
         };
@@ -971,8 +975,8 @@ export interface components {
             name: string;
             nameInverse: string;
             rangeClassCode: string;
-            sub?: Array<string>;
-            super: Array<string>;
+            sub?: string[];
+            super: string[];
         };
         PropertiesModel: {
             OA7: components["schemas"]["PropertiesDetailModel"];
@@ -1127,11 +1131,11 @@ export interface components {
             P99: components["schemas"]["PropertiesDetailModel"];
         };
         RelatedEntityModel: {
-            aliases?: Array<string>;
+            aliases?: string[];
             description: string;
             geometries: components["schemas"]["Geometries"];
             id: number;
-            relationTypes?: Array<components["schemas"]["RelationTypeModel"]>;
+            relationTypes?: components["schemas"]["RelationTypeModel"][];
             standardType?: {
                 id?: number;
                 title?: string;
@@ -1171,12 +1175,12 @@ export interface components {
             /** @description The system class of the entity */
             system_class: string;
         };
-        SubunitsModel: Array<{
-            children: Array<number>;
+        SubunitsModel: {
+            children: number[];
             created: string;
             crmClass: string;
             geometry: {
-                coordinates?: Array<number>;
+                coordinates?: number[];
                 description?: string;
                 shapeType?: string;
                 title?: string;
@@ -1192,32 +1196,32 @@ export interface components {
             properties: {
                 aliases: string | null;
                 description: string;
-                externalReferences: Array<{
+                externalReferences: {
                     id: string;
                     identifier: string;
                     referenceSystem: string;
                     referenceURL: string;
                     resolverURL: string;
                     type: string;
-                }>;
+                }[];
                 files: string | null;
                 name: string;
-                references: Array<{
+                references: {
                     abbreviation: string;
                     /** Format: int32 */
                     id: number;
                     pages: string | null;
                     title: string;
-                }>;
+                }[];
                 standardType: {
-                    externalReferences: Array<{
+                    externalReferences: {
                         id: string;
                         identifier: string;
                         referenceSystem: string;
                         referenceURL: string;
                         resolverURL: string;
                         type: string;
-                    }>;
+                    }[];
                     /** Format: int32 */
                     id: number;
                     name: string;
@@ -1231,15 +1235,15 @@ export interface components {
                     latestBegin: string;
                     latestEnd: string;
                 };
-                types: Array<{
-                    externalReferences: Array<{
+                types: {
+                    externalReferences: {
                         id?: string;
                         identifier?: string;
                         referenceSystem?: string;
                         referenceURL?: string;
                         resolverURL?: string;
                         type?: string;
-                    }>;
+                    }[];
                     /** Format: int32 */
                     id: number;
                     name: string;
@@ -1248,11 +1252,11 @@ export interface components {
                     rootId: number;
                     unit: string | null;
                     value: string | null;
-                }>;
+                }[];
             };
             /** Format: int32 */
             rootId: number;
-        }>;
+        }[];
         SystemClassCountModel: {
             /** Format: int32 */
             acquisition: number;
@@ -1307,18 +1311,18 @@ export interface components {
             label: string;
         };
         TypeOverviewEntryModel: {
-            children: Array<components["schemas"]["TypeOverviewEntryModel"]>;
+            children: components["schemas"]["TypeOverviewEntryModel"][];
             /** Format: int32 */
             id: number;
             name: string;
-            viewClass: Array<string>;
+            viewClass: string[];
         };
         TypeOverviewModel: {
-            custom: Array<components["schemas"]["TypeOverviewEntryModel"]>;
-            place: Array<components["schemas"]["TypeOverviewEntryModel"]>;
-            standard: Array<components["schemas"]["TypeOverviewEntryModel"]>;
-            system: Array<components["schemas"]["TypeOverviewEntryModel"]>;
-            value: Array<components["schemas"]["TypeOverviewEntryModel"]>;
+            custom: components["schemas"]["TypeOverviewEntryModel"][];
+            place: components["schemas"]["TypeOverviewEntryModel"][];
+            standard: components["schemas"]["TypeOverviewEntryModel"][];
+            system: components["schemas"]["TypeOverviewEntryModel"][];
+            value: components["schemas"]["TypeOverviewEntryModel"][];
         };
         TypeTreeModel: {
             type_tree: {
@@ -1332,57 +1336,57 @@ export interface components {
                     last: number;
                     name: string;
                     origin_id: number;
-                    root: Array<number>;
-                    subs: Array<number>;
+                    root: number[];
+                    subs: number[];
                 };
             };
         };
         TypeViewClassChildren: {
-            children: Array<components["schemas"]["TypeViewClassChildren"]>;
+            children: components["schemas"]["TypeViewClassChildren"][];
             id: string;
             label: string;
             url: string;
         };
         TypesByViewClassEntry: {
             category: string;
-            children: Array<components["schemas"]["TypeViewClassChildren"]>;
+            children: components["schemas"]["TypeViewClassChildren"][];
             id: number;
             name: string;
         };
         TypesByViewClassModel: {
-            acquisition: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            activity: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            actor_actor_relation: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            actor_function: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            artifact: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            bibliography: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            creation: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            edition: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            event: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            external_reference: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            feature: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            file: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            group: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            human_remains: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            involvement: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            move: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            person: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            place: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            production: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            source: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            source_translation: Array<components["schemas"]["TypesByViewClassEntry"]>;
-            stratigraphic_unit: Array<components["schemas"]["TypesByViewClassEntry"]>;
+            acquisition: components["schemas"]["TypesByViewClassEntry"][];
+            activity: components["schemas"]["TypesByViewClassEntry"][];
+            actor_actor_relation: components["schemas"]["TypesByViewClassEntry"][];
+            actor_function: components["schemas"]["TypesByViewClassEntry"][];
+            artifact: components["schemas"]["TypesByViewClassEntry"][];
+            bibliography: components["schemas"]["TypesByViewClassEntry"][];
+            creation: components["schemas"]["TypesByViewClassEntry"][];
+            edition: components["schemas"]["TypesByViewClassEntry"][];
+            event: components["schemas"]["TypesByViewClassEntry"][];
+            external_reference: components["schemas"]["TypesByViewClassEntry"][];
+            feature: components["schemas"]["TypesByViewClassEntry"][];
+            file: components["schemas"]["TypesByViewClassEntry"][];
+            group: components["schemas"]["TypesByViewClassEntry"][];
+            human_remains: components["schemas"]["TypesByViewClassEntry"][];
+            involvement: components["schemas"]["TypesByViewClassEntry"][];
+            move: components["schemas"]["TypesByViewClassEntry"][];
+            person: components["schemas"]["TypesByViewClassEntry"][];
+            place: components["schemas"]["TypesByViewClassEntry"][];
+            production: components["schemas"]["TypesByViewClassEntry"][];
+            source: components["schemas"]["TypesByViewClassEntry"][];
+            source_translation: components["schemas"]["TypesByViewClassEntry"][];
+            stratigraphic_unit: components["schemas"]["TypesByViewClassEntry"][];
         };
-        searchCriteria: Array<{
+        searchCriteria: {
             /**
              * @default and
              * @enum {string}
              */
-            logicalOperator: "and" | "or";
+            logicalOperator: "or" | "and";
             /** @enum {string} */
-            operator?: "equal" | "greaterThan" | "greaterThanEqual" | "lesserThan" | "lesserThanEqual" | "like" | "notEqual";
-            values?: Array<number | string>;
-        }>;
+            operator?: "equal" | "notEqual" | "like" | "greaterThan" | "greaterThanEqual" | "lesserThan" | "lesserThanEqual";
+            values?: (string | number)[];
+        }[];
     };
     responses: never;
     parameters: {
@@ -1397,12 +1401,12 @@ export interface components {
          * @description Retrieve entities based on the specified CIDOC classes.
          * @example E18
          */
-        cidoc_classes: Array<"all" | "E6" | "E7" | "E8" | "E9" | "E12" | "E18" | "E20" | "E21" | "E22" | "E31" | "E32" | "E33" | "E41" | "E53" | "E54" | "E55" | "E74">;
+        cidoc_classes: ("all" | "E6" | "E7" | "E8" | "E9" | "E12" | "E18" | "E20" | "E21" | "E22" | "E31" | "E32" | "E33" | "E41" | "E53" | "E54" | "E55" | "E74")[];
         /**
          * @description Choose one column to sort the results by. Default value is name.
          * @example name
          */
-        column: "begin_from" | "begin_to" | "cidoc_class" | "end_from" | "end_to" | "id" | "name" | "system_class";
+        column: "id" | "name" | "cidoc_class" | "system_class" | "begin_from" | "begin_to" | "end_from" | "end_to";
         /** @description Show integer count of how many entities would the result give back */
         count: boolean;
         /** @description Specifies the number of connection hops to include in the query. Higher values may significantly increase processing time. Default is 1. */
@@ -1410,14 +1414,14 @@ export interface components {
         /** @description Download results */
         download: boolean;
         /** @description The entity IDs to be requested. */
-        entities: Array<number>;
+        entities: number[];
         /**
          * @description Specific entity ID
          * @example 40
          */
         entityId: number;
         /** @description Excludes entities with the selected system classes from the network. */
-        exclude_system_classes: Array<"acquisition" | "activity" | "administrative_unit" | "appellation" | "artifact" | "bibliography" | "creation" | "edition" | "event" | "external_reference" | "feature" | "file" | "group" | "human_remains" | "modification" | "move" | "person" | "place" | "production" | "reference_system" | "source_translation" | "source" | "stratigraphic_unit" | "type_tools" | "type">;
+        exclude_system_classes: ("acquisition" | "activity" | "administrative_unit" | "appellation" | "artifact" | "bibliography" | "creation" | "edition" | "event" | "external_reference" | "feature" | "file" | "group" | "human_remains" | "modification" | "move" | "person" | "place" | "production" | "reference_system" | "source" | "source_translation" | "stratigraphic_unit" | "type" | "type_tools")[];
         /** @description Export the entities in either a simple CSV format or a ZIP file containing CSV files optimized for network analysis. */
         export: "csv" | "csvNetwork";
         /**
@@ -1431,30 +1435,30 @@ export interface components {
          * @description Specify the format for the returned results.
          * @example lp
          */
-        format: "geojson-v2" | "geojson" | "lp" | "lpx" | "n3" | "nt" | "pretty-xml" | "turtle" | "xml";
+        format: "lp" | "lpx" | "geojson" | "geojson-v2" | "pretty-xml" | "n3" | "turtle" | "nt" | "xml";
         /** @description Filters the geometries to be included in the response. The default is 'gisAll'. */
-        geometry: Array<"gisAll" | "gisLineAll" | "gisPointAll" | "gisPointSibling" | "gisPointSubs" | "gisPointSupers" | "gisPolygonAll">;
+        geometry: ("gisAll" | "gisPointAll" | "gisPointSupers" | "gisPointSubs" | "gisPointSibling" | "gisLineAll" | "gisPolygonAll")[];
         /**
          * @description Select the desired image size to display. The available values are fixed but can be customized for each OpenAtlas instance. The 'thumbnail' size is 200px, and the 'table' size is 100px.
          * @example table
          */
-        image_size: "table" | "thumbnail";
+        image_size: "thumbnail" | "table";
         /** @description Starts the result set after the specified entity ID. */
         last: number;
         /** @description Limits the number of entities returned in the response. A lower value may improve performance. The default is 20. Set to 0 to return all available entities. */
         limit: number;
         /** @description The entity IDs for which all linked entities will be retrieved. */
-        linked_entities: Array<number>;
+        linked_entities: number[];
         /** @description Displays only entities that are linked to the specified IDs. */
-        linked_to_ids: Array<number>;
+        linked_to_ids: number[];
         /** @description Choose language for system inherent labels */
         locale: "ca" | "de" | "en" | "es" | "fr";
         /** @description Specifies the page number to retrieve in a paginated result set. */
         page: number;
         /** @description Retrieves entities that are connected to the specified entity through the given `property`. */
-        properties: Array<"all" | "OA7" | "OA8" | "OA9" | "P1" | "P2" | "P4" | "P5" | "P7" | "P8" | "P9" | "P10" | "P11" | "P12" | "P13" | "P14" | "P15" | "P16" | "P17" | "P19" | "P20" | "P21" | "P22" | "P23" | "P24" | "P25" | "P26" | "P27" | "P28" | "P29" | "P30" | "P31" | "P32" | "P33" | "P34" | "P35" | "P37" | "P38" | "P39" | "P40" | "P41" | "P42" | "P43" | "P44" | "P45" | "P46" | "P48" | "P49" | "P50" | "P51" | "P52" | "P53" | "P54" | "P55" | "P56" | "P59" | "P62" | "P65" | "P67" | "P68" | "P69" | "P70" | "P71" | "P72" | "P73" | "P74" | "P75" | "P76" | "P86" | "P89" | "P91" | "P92" | "P93" | "P94" | "P95" | "P96" | "P97" | "P98" | "P99" | "P100" | "P101" | "P102" | "P103" | "P104" | "P105" | "P106" | "P107" | "P108" | "P109" | "P110" | "P111" | "P112" | "P113" | "P121" | "P122" | "P123" | "P124" | "P125" | "P126" | "P127" | "P128" | "P129" | "P130" | "P132" | "P133" | "P134" | "P135" | "P136" | "P137" | "P138" | "P139" | "P140" | "P141" | "P142" | "P143" | "P144" | "P145" | "P146" | "P147" | "P148" | "P150" | "P151" | "P152" | "P156" | "P157" | "P160" | "P161" | "P164" | "P165" | "P166" | "P167" | "P173" | "P174" | "P175" | "P176" | "P177" | "P179" | "P180" | "P182" | "P183" | "P184" | "P185" | "P186" | "P187" | "P188" | "P189" | "P191" | "P195" | "P196" | "P197" | "P198">;
+        properties: ("all" | "OA7" | "OA8" | "OA9" | "P1" | "P2" | "P4" | "P5" | "P7" | "P8" | "P9" | "P10" | "P11" | "P12" | "P13" | "P14" | "P15" | "P16" | "P17" | "P19" | "P20" | "P21" | "P22" | "P23" | "P24" | "P25" | "P26" | "P27" | "P28" | "P29" | "P30" | "P31" | "P32" | "P33" | "P34" | "P35" | "P37" | "P38" | "P39" | "P40" | "P41" | "P42" | "P43" | "P44" | "P45" | "P46" | "P48" | "P49" | "P50" | "P51" | "P52" | "P53" | "P54" | "P55" | "P56" | "P59" | "P62" | "P65" | "P67" | "P68" | "P69" | "P70" | "P71" | "P72" | "P73" | "P74" | "P75" | "P76" | "P86" | "P89" | "P91" | "P92" | "P93" | "P94" | "P95" | "P96" | "P97" | "P98" | "P99" | "P100" | "P101" | "P102" | "P103" | "P104" | "P105" | "P106" | "P107" | "P108" | "P109" | "P110" | "P111" | "P112" | "P113" | "P121" | "P122" | "P123" | "P124" | "P125" | "P126" | "P127" | "P128" | "P129" | "P130" | "P132" | "P133" | "P134" | "P135" | "P136" | "P137" | "P138" | "P139" | "P140" | "P141" | "P142" | "P143" | "P144" | "P145" | "P146" | "P147" | "P148" | "P150" | "P151" | "P152" | "P156" | "P157" | "P160" | "P161" | "P164" | "P165" | "P166" | "P167" | "P173" | "P174" | "P175" | "P176" | "P177" | "P179" | "P180" | "P182" | "P183" | "P184" | "P185" | "P186" | "P187" | "P188" | "P189" | "P191" | "P195" | "P196" | "P197" | "P198")[];
         /** @description Filters results to show only connections linked by the selected CIDOC CRM property code. If 'geometry', 'types', 'depictions', or 'links' are specified in the 'show' parameter, these properties will also be displayed. */
-        relation_type: Array<"all" | "OA7" | "OA8" | "OA9" | "P1" | "P2" | "P4" | "P5" | "P7" | "P8" | "P9" | "P10" | "P11" | "P12" | "P13" | "P14" | "P15" | "P16" | "P17" | "P19" | "P20" | "P21" | "P22" | "P23" | "P24" | "P25" | "P26" | "P27" | "P28" | "P29" | "P30" | "P31" | "P32" | "P33" | "P34" | "P35" | "P37" | "P38" | "P39" | "P40" | "P41" | "P42" | "P43" | "P44" | "P45" | "P46" | "P48" | "P49" | "P50" | "P51" | "P52" | "P53" | "P54" | "P55" | "P56" | "P59" | "P62" | "P65" | "P67" | "P68" | "P69" | "P70" | "P71" | "P72" | "P73" | "P74" | "P75" | "P76" | "P86" | "P89" | "P91" | "P92" | "P93" | "P94" | "P95" | "P96" | "P97" | "P98" | "P99" | "P100" | "P101" | "P102" | "P103" | "P104" | "P105" | "P106" | "P107" | "P108" | "P109" | "P110" | "P111" | "P112" | "P113" | "P121" | "P122" | "P123" | "P124" | "P125" | "P126" | "P127" | "P128" | "P129" | "P130" | "P132" | "P133" | "P134" | "P135" | "P136" | "P137" | "P138" | "P139" | "P140" | "P141" | "P142" | "P143" | "P144" | "P145" | "P146" | "P147" | "P148" | "P150" | "P151" | "P152" | "P156" | "P157" | "P160" | "P161" | "P164" | "P165" | "P166" | "P167" | "P173" | "P174" | "P175" | "P176" | "P177" | "P179" | "P180" | "P182" | "P183" | "P184" | "P185" | "P186" | "P187" | "P188" | "P189" | "P191" | "P195" | "P196" | "P197" | "P198">;
+        relation_type: ("all" | "OA7" | "OA8" | "OA9" | "P1" | "P2" | "P4" | "P5" | "P7" | "P8" | "P9" | "P10" | "P11" | "P12" | "P13" | "P14" | "P15" | "P16" | "P17" | "P19" | "P20" | "P21" | "P22" | "P23" | "P24" | "P25" | "P26" | "P27" | "P28" | "P29" | "P30" | "P31" | "P32" | "P33" | "P34" | "P35" | "P37" | "P38" | "P39" | "P40" | "P41" | "P42" | "P43" | "P44" | "P45" | "P46" | "P48" | "P49" | "P50" | "P51" | "P52" | "P53" | "P54" | "P55" | "P56" | "P59" | "P62" | "P65" | "P67" | "P68" | "P69" | "P70" | "P71" | "P72" | "P73" | "P74" | "P75" | "P76" | "P86" | "P89" | "P91" | "P92" | "P93" | "P94" | "P95" | "P96" | "P97" | "P98" | "P99" | "P100" | "P101" | "P102" | "P103" | "P104" | "P105" | "P106" | "P107" | "P108" | "P109" | "P110" | "P111" | "P112" | "P113" | "P121" | "P122" | "P123" | "P124" | "P125" | "P126" | "P127" | "P128" | "P129" | "P130" | "P132" | "P133" | "P134" | "P135" | "P136" | "P137" | "P138" | "P139" | "P140" | "P141" | "P142" | "P143" | "P144" | "P145" | "P146" | "P147" | "P148" | "P150" | "P151" | "P152" | "P156" | "P157" | "P160" | "P161" | "P164" | "P165" | "P166" | "P167" | "P173" | "P174" | "P175" | "P176" | "P177" | "P179" | "P180" | "P182" | "P183" | "P184" | "P185" | "P186" | "P187" | "P188" | "P189" | "P191" | "P195" | "P196" | "P197" | "P198")[];
         /** @description Search query for specific results.
          *
          *      **Filterable categories**
@@ -1506,7 +1510,7 @@ export interface components {
          *      */
         search: string;
         /** @description Select which keys should not be displayed. This can improve performance */
-        show: Array<"depictions" | "description" | "geometry" | "geonames" | "links" | "names" | "none" | "relations" | "types" | "when">;
+        show: ("when" | "types" | "relations" | "names" | "links" | "geometry" | "depictions" | "geonames" | "description" | "none")[];
         /**
          * @description Sorting result ascending or descending of the given column. Default value is asc.
          * @example asc
@@ -1516,23 +1520,23 @@ export interface components {
          * @description System class to be requested
          * @example acquisition
          */
-        system_class: "acquisition" | "activity" | "administrative_unit" | "all" | "appellation" | "artifact" | "bibliography" | "creation" | "edition" | "event" | "external_reference" | "feature" | "file" | "group" | "human_remains" | "modification" | "move" | "person" | "place" | "production" | "reference_system" | "source_translation" | "source" | "stratigraphic_unit" | "type_tools" | "type";
+        system_class: "all" | "acquisition" | "activity" | "administrative_unit" | "appellation" | "artifact" | "bibliography" | "creation" | "edition" | "event" | "external_reference" | "feature" | "file" | "group" | "human_remains" | "modification" | "move" | "person" | "place" | "production" | "reference_system" | "source" | "source_translation" | "stratigraphic_unit" | "type" | "type_tools";
         /** @description Retrieve entities based on the specified system classes */
-        system_classes: Array<"acquisition" | "activity" | "administrative_unit" | "all" | "appellation" | "artifact" | "bibliography" | "creation" | "edition" | "event" | "external_reference" | "feature" | "file" | "group" | "human_remains" | "move" | "person" | "place" | "production" | "reference_system" | "source_translation" | "source" | "stratigraphic_unit" | "tools" | "type">;
+        system_classes: ("all" | "acquisition" | "activity" | "administrative_unit" | "appellation" | "artifact" | "bibliography" | "creation" | "edition" | "event" | "external_reference" | "feature" | "file" | "group" | "human_remains" | "move" | "person" | "place" | "production" | "reference_system" | "source" | "source_translation" | "stratigraphic_unit" | "type" | "tools")[];
         /** @description Filter results to include only entities with the specified type ID or those linked to it. */
-        type_id: Array<number>;
+        type_id: number[];
         /** @description A valid URL to use as input (e.g., https://openatlas.eu/). When used with an IIIF endpoint, this value replaces the base URL in all annotations. */
         url: string;
         /**
          * @description View class to be requested
          * @example actor
          */
-        view_class: "actor" | "all" | "artifact" | "event" | "file" | "place" | "reference_system" | "reference" | "source_translation" | "source" | "type";
+        view_class: "all" | "actor" | "artifact" | "event" | "file" | "place" | "reference" | "reference_system" | "source" | "source_translation" | "type";
         /**
          * @description Retrieve entities based on the specified view classes.
          * @example actor
          */
-        view_classes: Array<"actor" | "all" | "artifact" | "event" | "file" | "place" | "reference_system" | "reference" | "source_translation" | "source" | "type">;
+        view_classes: ("all" | "actor" | "artifact" | "event" | "file" | "place" | "reference" | "reference_system" | "source" | "source_translation" | "type")[];
     };
     requestBodies: never;
     headers: never;
@@ -1554,14 +1558,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": components["schemas"]["BackendDetailsModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -1583,14 +1591,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": components["schemas"]["ChainEventModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -1702,14 +1714,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/ld+json": components["schemas"]["EntitiesOutputModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -1730,14 +1746,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": components["schemas"]["ClassMappingModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -1753,14 +1773,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": components["schemas"]["ClassesModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -1768,7 +1792,7 @@ export interface operations {
     DisplayImage: {
         parameters: {
             query?: {
-                image_size?: "table" | "thumbnail";
+                image_size?: "thumbnail" | "table";
             };
             header?: never;
             path: {
@@ -1784,7 +1808,9 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "image/jpeg": string;
                     "image/png": string;
@@ -1792,7 +1818,9 @@ export interface operations {
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -1823,14 +1851,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": components["schemas"]["NetworkVisualisationModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -1942,14 +1974,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/ld+json": components["schemas"]["EntitiesOutputModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -1987,14 +2023,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
-                    "application/ld+json": components["schemas"]["GeoJSONModel"] | components["schemas"]["LinkedPlacesModel"];
+                    "application/ld+json": components["schemas"]["LinkedPlacesModel"] | components["schemas"]["GeoJSONModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -2005,7 +2045,7 @@ export interface operations {
             header?: never;
             path: {
                 /** @example json */
-                format: "csv" | "json" | "xml";
+                format: "json" | "csv" | "xml";
             };
             cookie?: never;
         };
@@ -2013,14 +2053,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": string;
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -2043,14 +2087,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": components["schemas"]["GeometricEntitiesModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -2076,7 +2124,9 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "image/jpeg": string;
                     "image/png": string;
@@ -2084,7 +2134,9 @@ export interface operations {
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -2182,14 +2234,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/ld+json": components["schemas"]["EntitiesOutputModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -2207,14 +2263,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": components["schemas"]["LicensedFileOverviewModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -2328,14 +2388,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/ld+json": components["schemas"]["EntitiesOutputModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -2358,14 +2422,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": components["schemas"]["NetworkVisualisationModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -2387,12 +2455,16 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -2413,14 +2485,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": components["schemas"]["PropertiesModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -2542,14 +2618,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/ld+json": components["schemas"]["EntitiesOutputModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -2578,14 +2658,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": components["schemas"]["EntitiesOutputModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -2610,14 +2694,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": components["schemas"]["SubunitsModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -2729,14 +2817,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/ld+json": components["schemas"]["EntitiesOutputModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -2755,14 +2847,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": components["schemas"]["SystemClassCountModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -2781,14 +2877,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": components["schemas"]["TypesByViewClassModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -2900,14 +3000,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/ld+json": components["schemas"]["EntitiesOutputModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -3019,14 +3123,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/ld+json": components["schemas"]["EntitiesOutputModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -3045,14 +3153,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": components["schemas"]["TypeOverviewModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -3071,14 +3183,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": components["schemas"]["TypeTreeModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -3190,14 +3306,18 @@ export interface operations {
         responses: {
             /** @description Success */
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/ld+json": components["schemas"]["EntitiesOutputModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };

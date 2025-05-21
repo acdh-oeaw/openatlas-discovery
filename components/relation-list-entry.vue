@@ -86,8 +86,22 @@ const related = computed(() => {
 function getPropertyTranslation(property: string) {
 	const code = extractRelationTypeFromRelationString(property);
 
+	if (code?.crmCode === "P9") {
+		if (!code.inverse) {
+			return t("EntityPage.subEvent");
+		}
+		return t("EntityPage.superEvent");
+	}
+
+	if (code?.crmCode === "P73") {
+		if (code.inverse) {
+			return t("EntityPage.hasTranslationText");
+		}
+		return t("EntityPage.isOriginalText");
+	}
 	return code ? useRelationTitle({ ...code, inverse: !code.inverse }) : "";
 }
+
 const sourceAccordionOpen = ref(false);
 </script>
 
@@ -127,13 +141,13 @@ const sourceAccordionOpen = ref(false);
 		<!-- <template v-if="hasValidTimespans(relation.when)">
 			<SimpleTimespan class="text-xs" :timespans="[relation.when]" />
 		</template> -->
-		<Button
+		<Toggle
 			v-if="relation.systemClass === 'source_translation'"
 			variant="outline"
 			@click="sourceAccordionOpen = !sourceAccordionOpen"
 		>
-			<span class="text-xs font-normal">Show text</span>
-		</Button>
+			<span class="text-xs font-normal">{{ t("EntityPage.showText") }}</span>
+		</Toggle>
 		<template v-if="showIcon">
 			<Button :disabled="centroid === undefined" variant="outline" @click="setShowOnMap()">
 				<span class="text-xs font-normal">{{ t("EntityPage.showOnMap") }}</span>

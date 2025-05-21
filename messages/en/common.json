@@ -67,6 +67,11 @@
 		"no-descriptions": "No descriptions available."
 	},
 	"EntityPage": {
+		"superEvent": "Superevent",
+		"subEvent": "Subevent",
+		"hasTranslationText": "Translation",
+		"isOriginalText": "Original Text",
+		"showText": "Show Text",
 		"showOnMap": "Show on Map",
 		"details": "Further Information",
 		"noType": "No Type",

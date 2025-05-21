@@ -67,6 +67,11 @@
 		"no-descriptions": "Keine Beschreibungen verfügbar."
 	},
 	"EntityPage": {
+		"superEvent": "Überereignis",
+		"subEvent": "Unterereignis",
+		"hasTranslationText": "Übersetzung",
+		"isOriginalText": "Originaltext",
+		"showText": "Text anzeigen",
 		"showOnMap": "Auf Karte anzeigen",
 		"details": "Weitere Informationen",
 		"noType": "Kein Typ",

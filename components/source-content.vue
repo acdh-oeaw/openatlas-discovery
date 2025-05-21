@@ -5,6 +5,7 @@ const props = defineProps<{
 
 const { data } = useGetEntity(
 	computed(() => {
+		console.log("hello from button");
 		return { entityId: props.id };
 	}),
 );
