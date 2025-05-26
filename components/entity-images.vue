@@ -4,6 +4,7 @@ import { Toggle } from "@/components/ui/toggle";
 
 const props = defineProps<{
 	images: Array<{
+		id: number;
 		IIIFManifest?: string;
 		license?: string | null;
 		mimetype?: string;

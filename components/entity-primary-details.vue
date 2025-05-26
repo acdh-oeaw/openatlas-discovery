@@ -22,6 +22,7 @@ const props = defineProps<{
 }>();
 
 interface Image {
+	id: number;
 	IIIFManifest: string | undefined;
 	license: string | undefined;
 	mimetype?: string | undefined;
@@ -37,6 +38,7 @@ const images = computed(() => {
 		//@ts-expect-error - string instead of boolean
 		if (depiction.url && depiction.license && depiction.publicShareable !== "False") {
 			acc.push({
+				id: depiction.id,
 				url: depiction.url,
 				license: depiction.license,
 				IIIFManifest: depiction.IIIFManifest,
