@@ -15,6 +15,7 @@ const getRelationTitle = (relation: RelationType) => {
 
 const { getUnprefixedId } = useIdPrefix();
 const route = useRoute();
+const requestURL = useRequestURL();
 const t = useTranslations();
 
 const props = defineProps<{
@@ -41,7 +42,7 @@ const images = computed(() => {
 				id: depiction.id,
 				url: depiction.url,
 				license: depiction.license,
-				IIIFManifest: depiction.IIIFManifest,
+				IIIFManifest: `${depiction.IIIFManifest ?? ""}?url=${requestURL.origin}/entity`,
 				mimetype: depiction.mimetype,
 				title: depiction.title,
 			});
