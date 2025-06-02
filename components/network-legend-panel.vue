@@ -236,7 +236,7 @@ watch(
 		</div>
 	</aside>
 
-	<Teleport to="#ego-network-legend">
+	<Teleport to="#ego-network-legend" :disabled="!props.isEgoNetwork">
 		<div v-if="showLegend" class="absolute right-0 mr-2">
 			<Card class="min-w-max">
 				<CardContent class="p-4 text-sm">
