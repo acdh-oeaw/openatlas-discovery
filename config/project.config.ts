@@ -28,18 +28,22 @@ const schema = v.object({
 			};
 		}),
 	),
-	detailView: v.object({
-		primarySystemClasses: v.array(v.string()),
-		furtherSystemClasses: v.array(v.string()),
-		excludeTypeIds: v.array(
-			v.pipe(
-				v.string(),
-				v.transform((input) => {
-					return parseInt(input);
-				}),
+	detailView: v.array(
+		v.object({
+			affectedSystemClasses: v.optional(v.array(v.string())),
+			customOrdering: v.optional(v.array(v.string())),
+			primarySystemClasses: v.array(v.string()),
+			furtherSystemClasses: v.array(v.string()),
+			excludeTypeIds: v.array(
+				v.pipe(
+					v.string(),
+					v.transform((input) => {
+						return parseInt(input);
+					}),
+				),
 			),
-		),
-	}),
+		}),
+	),
 	network: v.object({
 		excludeSystemClasses: v.array(v.string()),
 	}),

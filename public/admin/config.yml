@@ -27,6 +27,29 @@ i18n:
     - en
     - de
   default_locale: en
+system_classes: &system_classes
+  - acquisition
+  - activity
+  - actor_function
+  - actor_relation
+  - appellation
+  - artifact
+  - creation
+  - event
+  - feature
+  - files
+  - group
+  - human_remains
+  - involvement
+  - modification
+  - move
+  - person
+  - place
+  - production
+  - references
+  - source
+  - source_translation
+  - stratigraphic_unit
 collections:
   - name: config
     label: Config
@@ -109,94 +132,48 @@ collections:
           - name: detailView
             label: Detail view configuration
             # hint: Detail view configuration
-            widget: object
+            widget: list
+            summary: Custom config for {{fields.affectedSystemClasses}}
+            label_singular: Add new custom detail view
             fields:
-              - name: excludeTypeIds
-                label: Configure which type ids should be excluded from the detail view
-                widget: list
+              - name: affectedSystemClasses
+                label: Which system classes should this custom configuration apply to?
+                hint:
+                  If none is selected, this config will affect all system classes that do not have a
+                  dedicated config
+                widget: select
+                multiple: true
+                options: *system_classes
 
               - name: primarySystemClasses
                 label: Configure which system classes should be highlighted in the detail view
                 widget: select
                 multiple: true
-                options:
-                  [
-                    "acquisition",
-                    "activity",
-                    "actor_function",
-                    "actor_relation",
-                    "appellation",
-                    "artifact",
-                    "creation",
-                    "event",
-                    "feature",
-                    "files",
-                    "group",
-                    "human_remains",
-                    "involvement",
-                    "modification",
-                    "move",
-                    "person",
-                    "place",
-                    "production",
-                    "references",
-                    "source",
-                    "source_translation",
-                    "stratigraphic_unit",
-                  ]
-                default:
-                  [
-                    "acquisition",
-                    "activity",
-                    "actor_function",
-                    "actor_relation",
-                    "appellation",
-                    "artifact",
-                    "creation",
-                    "event",
-                    "feature",
-                    "group",
-                    "human_remains",
-                    "involvement",
-                    "modification",
-                    "move",
-                    "person",
-                    "place",
-                    "production",
-                    "source",
-                    "source_translation",
-                    "stratigraphic_unit",
-                  ]
+                options: *system_classes
+                default: *system_classes
+
+              - name: customOrdering
+                label: Which system classes should be at the top of the highlighted list?
+                widget: list
+                label_singular: Add a system class
+                summary: "{{ fields.systemClass }}"
+                field:
+                  name: systemClass
+                  label: Select a system class
+                  widget: select
+                  multiple: false
+                  options: *system_classes
+
               - name: furtherSystemClasses
                 label: Configure which system classes should be displayed in a simple list
                 widget: select
                 multiple: true
-                options:
-                  [
-                    "acquisition",
-                    "activity",
-                    "actor_function",
-                    "actor_relation",
-                    "appellation",
-                    "artifact",
-                    "creation",
-                    "event",
-                    "feature",
-                    "files",
-                    "group",
-                    "human_remains",
-                    "involvement",
-                    "modification",
-                    "move",
-                    "person",
-                    "place",
-                    "production",
-                    "references",
-                    "source",
-                    "source_translation",
-                    "stratigraphic_unit",
-                  ]
+                options: *system_classes
                 default: ["files", "references"]
+
+              - name: excludeTypeIds
+                label: Configure which type ids should be excluded from the detail view
+                widget: list
 
           - name: map
             label: Map Configuration
@@ -240,33 +217,7 @@ collections:
                 # hint: Configure which system classes are not displayed in the network
                 widget: select
                 multiple: true
-                options:
-                  [
-                    "place",
-                    "feature",
-                    "move",
-                    "statigraphic_unit",
-                    "artifact",
-                    "appellation",
-                    "creation",
-                    "production",
-                    "person",
-                    "group",
-                    "event",
-                    "acquisition",
-                    "human_remains",
-                    "activity",
-                    "type",
-                    "reference_system",
-                    "file",
-                    "source_translation",
-                    "source",
-                    "bibliography",
-                    "external_reference",
-                    "administrative_unit",
-                    "edition",
-                    "type_tools",
-                  ]
+                options: *system_classes
                 default:
                   [
                     "type",
