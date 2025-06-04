@@ -32,14 +32,16 @@ const schema = v.object({
 		v.object({
 			affectedSystemClasses: v.optional(v.array(v.string())),
 			customOrdering: v.optional(v.array(v.string())),
-			primarySystemClasses: v.array(v.string()),
-			furtherSystemClasses: v.array(v.string()),
-			excludeTypeIds: v.array(
-				v.pipe(
-					v.string(),
-					v.transform((input) => {
-						return parseInt(input);
-					}),
+			primarySystemClasses: v.optional(v.array(v.string())),
+			furtherSystemClasses: v.optional(v.array(v.string())),
+			excludeTypeIds: v.optional(
+				v.array(
+					v.pipe(
+						v.string(),
+						v.transform((input) => {
+							return parseInt(input);
+						}),
+					),
 				),
 			),
 		}),

@@ -135,6 +135,7 @@ collections:
             widget: list
             summary: Custom config for {{fields.affectedSystemClasses}}
             label_singular: Add new custom detail view
+            default: []
             fields:
               - name: affectedSystemClasses
                 label: Which system classes should this custom configuration apply to?
@@ -144,6 +145,7 @@ collections:
                 widget: select
                 multiple: true
                 options: *system_classes
+                default: []
 
               - name: primarySystemClasses
                 label: Configure which system classes should be highlighted in the detail view
@@ -157,23 +159,27 @@ collections:
                 widget: list
                 label_singular: Add a system class
                 summary: "{{ fields.systemClass }}"
+                default: []
                 field:
                   name: systemClass
                   label: Select a system class
                   widget: select
                   multiple: false
                   options: *system_classes
+                  required: true
 
               - name: furtherSystemClasses
                 label: Configure which system classes should be displayed in a simple list
                 widget: select
                 multiple: true
                 options: *system_classes
+                required: false
                 default: ["files", "references"]
 
               - name: excludeTypeIds
                 label: Configure which type ids should be excluded from the detail view
                 widget: list
+                default: []
 
           - name: map
             label: Map Configuration

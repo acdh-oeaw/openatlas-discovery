@@ -184,6 +184,17 @@ const tabs = computed(() => {
 	return tabs;
 });
 
+const detailViewConfig = computed(() => {
+	return (
+		project.detailView.find((config) => {
+			return config.affectedSystemClasses?.includes(props.entity.systemClass);
+		}) ??
+		project.detailView.find((config) => {
+			return !config.affectedSystemClasses?.length;
+		})
+	);
+});
+
 const filteredTypes = computed(() => {
 	return props.entity.types
 		?.filter((type) => {
@@ -191,11 +202,11 @@ const filteredTypes = computed(() => {
 			if (!type.id) return true;
 			const unprefixedId = type.id;
 			return (
-				!project.detailView.excludeTypeIds.includes(Number(unprefixedId)) &&
+				!detailViewConfig.value?.excludeTypeIds?.includes(Number(unprefixedId)) &&
 				type.typeHierarchy?.every((hierarchyType) => {
 					return (
 						!hierarchyType.identifier ||
-						!project.detailView.excludeTypeIds.includes(
+						!detailViewConfig.value?.excludeTypeIds?.includes(
 							Number(getUnprefixedId(hierarchyType.identifier)),
 						)
 					);

@@ -3,7 +3,7 @@ import type { PresentationViewModel } from "@/types/api";
 
 const t = useTranslations();
 
-const _props = defineProps<{ entity: PresentationViewModel }>();
+const props = defineProps<{ entity: PresentationViewModel }>();
 
 const collapsibleRelations: Record<
 	string,
@@ -69,12 +69,18 @@ const handledRelations: Array<RelationType> = [
 onMounted(() => {
 	emit("handledRelations", handledRelations);
 });
+
+const { getFilteredRelations } = useGetFilteredRelations();
+
+const filteredRelations = computed(() => {
+	return getFilteredRelations(props.entity);
+});
 </script>
 
 <template>
 	<div v-if="entity.relations != null" class="flex w-full flex-col gap-4">
 		<GroupedRelationCollapsible
-			v-for="[key, rels] in Object.entries(entity.relations).filter(
+			v-for="[key, rels] in filteredRelations.filter(
 				([key, _]) =>
 					collapsibleRelations[key]?.fullWidth || collapsibleRelations[key]?.fullWidth == null,
 			)"
@@ -87,7 +93,7 @@ onMounted(() => {
 	</div>
 	<div v-if="entity.relations != null" class="flex w-full gap-4">
 		<GroupedRelationCollapsible
-			v-for="[key, rels] in Object.entries(entity.relations).filter(
+			v-for="[key, rels] in filteredRelations.filter(
 				([key, _]) => collapsibleRelations[key]?.fullWidth === false,
 			)"
 			:key="`${entity.id} - ${key}`"

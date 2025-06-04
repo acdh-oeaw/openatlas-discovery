@@ -95,6 +95,12 @@ function getPath() {
 const currentMode = computed(() => {
 	return route.query.mode;
 });
+
+const { getFilteredRelations } = useGetFilteredRelations();
+
+const filteredRelations = computed(() => {
+	return getFilteredRelations(props.entity);
+});
 </script>
 
 <template>
@@ -125,7 +131,7 @@ const currentMode = computed(() => {
 		</NavLink>
 	</div>
 	<GroupedRelationCollapsible
-		v-for="(rels, key) in entity.relations"
+		v-for="[key, rels] in filteredRelations"
 		:key="`${entity.id} - ${key}`"
 		:title="key"
 		:relations="(rels ?? []).filter((r) => r != null).filter((r) => r.id != entity.id)"

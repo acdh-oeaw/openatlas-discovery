@@ -13,11 +13,20 @@ const props = defineProps<{
 	handledRelations: Array<RelationType>;
 }>();
 
-const systemClasses = project.detailView.furtherSystemClasses;
+const systemClasses = computed(() => {
+	let customConfig = project.detailView.find((entry) => {
+		return entry.affectedSystemClasses?.includes(props.entity.systemClass);
+	});
+	if (!customConfig)
+		customConfig = project.detailView.find((entry) => {
+			return !entry.affectedSystemClasses?.length;
+		});
+	return customConfig?.furtherSystemClasses;
+});
 
 const relationsByType = computed(() => {
 	return Object.entries(props.relations).filter(([key, _]) => {
-		return systemClasses.includes(key);
+		return systemClasses.value?.includes(key);
 	}) as Array<[string, Array<AdditionalInfoType>]>;
 });
 
@@ -31,7 +40,7 @@ const additionalInfo = computed(() => {
 		return (
 			Array.isArray(val) &&
 			val.length > 0 &&
-			(systemClasses.includes(key) || systemClasses.includes(`${key}s`))
+			(systemClasses.value?.includes(key) ?? systemClasses.value?.includes(`${key}s`))
 		);
 	}) as Array<[string, Array<AdditionalInfoType>]>;
 });

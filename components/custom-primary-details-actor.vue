@@ -1,41 +1,13 @@
 <script setup lang="ts">
 import type { PresentationViewModel } from "@/types/api";
 
-const t = useTranslations();
-
 const props = defineProps<{ entity: PresentationViewModel }>();
 
-const getRelationGroupTitle = (relation: RelationType) => {
-	if (props.entity.systemClass === "person") {
-		return useRelationGroupTitle(relation, "person");
-	}
-	return useRelationGroupTitle(relation);
-};
+const { getFilteredRelations } = useGetFilteredRelations();
 
-const _collapsibleRelations: Array<{
-	relationType: RelationType;
-	title: string;
-}> = [
-	{
-		relationType: {
-			crmCode: "OA7",
-		},
-		title: t(getRelationGroupTitle({ crmCode: "OA7" })),
-	},
-	{
-		relationType: {
-			crmCode: "P107",
-			inverse: true,
-		},
-		title: t(getRelationGroupTitle({ crmCode: "P107", inverse: true })),
-	},
-	{
-		relationType: {
-			crmCode: "P107",
-		},
-		title: t(getRelationGroupTitle({ crmCode: "P107" })),
-	},
-];
+const filteredRelations = computed(() => {
+	return getFilteredRelations(props.entity);
+});
 
 const handledRelations: Array<RelationType> = [
 	{
@@ -68,7 +40,7 @@ onMounted(() => {
 
 <template>
 	<GroupedRelationCollapsible
-		v-for="(rels, key) in entity.relations"
+		v-for="[key, rels] in filteredRelations"
 		:key="`${entity.id} - ${key}`"
 		:title="key"
 		:relations="(rels ?? []).filter((r) => r != null)"
