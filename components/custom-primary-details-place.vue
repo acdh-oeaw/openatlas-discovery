@@ -88,7 +88,7 @@ const filteredRelations = computed(() => {
 			:title="key"
 			:relations="(rels ?? []).filter((r) => r != null).filter((r) => r.id != entity.id)"
 			:show-on-map="collapsibleRelations[key]?.showOnMap ?? false"
-			:entity-id="entity.id"
+			:entity="entity"
 		/>
 	</div>
 	<div v-if="entity.relations != null" class="flex w-full gap-4">
@@ -100,7 +100,7 @@ const filteredRelations = computed(() => {
 			:title="key"
 			:relations="(rels ?? []).filter((r) => r != null).filter((r) => r.id != entity.id)"
 			:show-on-map="collapsibleRelations[key]?.showOnMap ?? false"
-			:entity-id="entity.id"
+			:entity="entity"
 		/>
 	</div>
 </template>

@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import type { RelatedEntityModel } from "@/types/api";
+import type { PresentationViewModel, RelatedEntityModel } from "@/types/api";
 
 const props = defineProps<{
 	title: string;
 	relations: Array<NonNullable<RelatedEntityModel>>;
 	showIcon: boolean;
-	entityId: number;
+	entity: PresentationViewModel;
 }>();
 
 const _sortedRelations = computed(() => {
@@ -29,12 +29,7 @@ const _sortedRelations = computed(() => {
 <template v-if="relations?.length">
 	<div class="space-x-4 px-4"></div>
 	<template v-for="(relation, idx) in props.relations" :key="relation.id ?? ''">
-		<RelationListEntry
-			:relation="relation"
-			:type="title"
-			:show-icon="showIcon"
-			:entity-id="entityId"
-		/>
+		<RelationListEntry :relation="relation" :type="title" :show-icon="showIcon" :entity="entity" />
 		<div v-if="idx < props.relations.length - 1" class="border-separate border-[0.5px]" />
 	</template>
 </template>

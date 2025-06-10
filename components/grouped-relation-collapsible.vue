@@ -5,7 +5,7 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion";
-import type { RelatedEntityModel } from "@/types/api";
+import type { PresentationViewModel, RelatedEntityModel } from "@/types/api";
 
 const t = useTranslations();
 
@@ -16,7 +16,7 @@ const props = defineProps<{
 	// relationType: RelationType;
 	systemClass?: string;
 	showOnMap: boolean;
-	entityId: number;
+	entity: PresentationViewModel;
 }>();
 
 const filteredRelations = computed(() => {
@@ -27,7 +27,7 @@ const filteredRelations = computed(() => {
 			}) === idx;
 		const relationTypesAreFine =
 			rel.relationTypes?.some((type) => {
-				return type?.relationTo === props.entityId;
+				return type?.relationTo === props.entity.id;
 			}) ?? true;
 		return indexIsFine && relationTypesAreFine;
 	});
@@ -52,7 +52,7 @@ const filteredRelations = computed(() => {
 							:title="title ?? ''"
 							:relations="filteredRelations"
 							:show-icon="props.showOnMap"
-							:entity-id="entityId"
+							:entity="entity"
 						/>
 						<!-- </template> -->
 					</AccordionContent>
