@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { ClockIcon } from "lucide-vue-next";
+
 import type { PresentationViewModel, RelatedEntityModel } from "@/types/api";
 import { extractRelationTypeFromRelationString } from "@/utils/extract-crm-code";
 
@@ -110,6 +112,15 @@ function getPropertyTranslation(property: string) {
 	return code ? useRelationTitle({ ...code, inverse: !code.inverse }) : "";
 }
 
+const dateSpan = computed(() => {
+	let span: { start?: string; end?: string } = {
+		start: createDateSpan(props.relation.when.start),
+		end: createDateSpan(props.relation.when.end),
+	};
+	if (span.start === span.end) delete span.end;
+	return span;
+});
+
 const sourceAccordionOpen = ref(false);
 </script>
 
@@ -133,15 +144,31 @@ const sourceAccordionOpen = ref(false);
 					{{ relation.title }}
 				</NavLink>
 				<template v-if="relation.standardType != null">
-					<span class="text-xs text-muted-foreground"
-						>{{ relation.standardType.title }}
+					<div class="text-xs text-muted-foreground">
+						{{ relation.standardType.title }}
 						{{ relation.standardType.title && related.length > 0 ? "|" : "" }}
 						<span v-for="(rel, idx) in related" :key="`${relation.id}-${idx}`">
 							{{ getPropertyTranslation(rel.property) }}
 							{{ rel.type ? `| ${rel.type}` : "" }}
-							<br v-if="idx < related.length - 1" />
+							{{ idx < related.length - 1 ? "|" : "" }}
+							<!-- 	<br v-if="idx < related.length - 1" /> -->
 						</span>
-					</span>
+						<TooltipProvider v-if="dateSpan.start || dateSpan.end">
+							<Tooltip>
+								<TooltipTrigger
+									class="inline-flex items-center hover:text-neutral-1000 dark:hover:text-neutral-0"
+									><span class="!text-muted-foreground">| </span>
+									<ClockIcon class="ml-1 size-3"></ClockIcon
+									><span class="sr-only">{{ t("EntityPage.dateSpan-to") }}</span></TooltipTrigger
+								>
+								<TooltipContent>
+									{{ dateSpan.start }}
+									{{ dateSpan.start && dateSpan.end ? t("EntityPage.dateSpan-to") : "" }}
+									{{ dateSpan.end }}</TooltipContent
+								>
+							</Tooltip>
+						</TooltipProvider>
+					</div>
 				</template>
 			</span>
 		</div>

@@ -89,7 +89,9 @@
 		},
 		"no-details": "There are no further details for this entry.",
 		"no-map": "Not visible on the map.",
-		"no-network": "Not visible in the network."
+		"no-network": "Not visible in the network.",
+		"dateSpan": "Timespan",
+		"dateSpan-to": "until"
 	},
 	"EntitySidebar": {
 		"NextFeature": "NextFeature",

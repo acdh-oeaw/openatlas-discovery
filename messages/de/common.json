@@ -89,7 +89,10 @@
 		},
 		"no-map": "Nicht auf der Karte vorhanden.",
 		"no-network": "Nicht im Netzwerk vorhanden.",
-		"no-details": "Keine weiteren Details vorhanden."
+		"no-details": "Keine weiteren Details vorhanden.",
+
+		"dateSpan": "Zeitraum",
+		"dateSpan-to": "bis"
 	},
 	"EntitySidebar": {
 		"NextFeature": "Nächste Funktion",

@@ -7,7 +7,8 @@ export function normalizeIsoYear(dateString: string) {
 }
 
 export function createDateSpan(date: { earliest?: string | null; latest?: string | null }) {
-	const { d } = useNuxtApp().$i18n;
+	const { d } = useI18n();
+	const locale = useLocale();
 	const segments: Array<string> = [];
 	if (date.earliest != null) {
 		let dateValue: Date | string = date.earliest;
@@ -18,9 +19,9 @@ export function createDateSpan(date: { earliest?: string | null; latest?: string
 			isBC = true;
 		}
 		if (date.earliest === date.latest) {
-			return d(dateValue, { dateStyle: "long" });
+			return d(dateValue, "long", locale.value);
 		}
-		segments.push(d(dateValue, { dateStyle: "medium" }) + (isBC ? " BC" : ""));
+		segments.push(d(dateValue, "short", locale.value) + (isBC ? " BC" : ""));
 	}
 	if (date.latest != null) {
 		let latestDateValue: Date | string = date.latest;
@@ -30,7 +31,7 @@ export function createDateSpan(date: { earliest?: string | null; latest?: string
 			latestDateValue.setFullYear(latestDateValue.getFullYear() * -1);
 			isBC = true;
 		}
-		segments.push(d(latestDateValue, { dateStyle: "medium" }) + (isBC ? " BC" : ""));
+		segments.push(d(latestDateValue, "short", locale.value) + (isBC ? " BC" : ""));
 	}
 
 	return segments.join(" - ");
