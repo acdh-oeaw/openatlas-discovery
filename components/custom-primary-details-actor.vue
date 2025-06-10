@@ -45,6 +45,6 @@ onMounted(() => {
 		:title="key"
 		:relations="(rels ?? []).filter((r) => r != null)"
 		:show-on-map="false"
-		:entity-id="entity.id"
+		:entity="entity"
 	/>
 </template>
