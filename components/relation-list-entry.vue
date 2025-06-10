@@ -11,7 +11,7 @@ const props = defineProps<{
 	showIcon: boolean;
 	type?: string;
 	relation: NonNullable<RelatedEntityModel>;
-	entityId: number;
+	entity: PresentationViewModel;
 }>();
 
 function getPath() {
@@ -80,7 +80,7 @@ const related = computed(() => {
 	return (
 		props.relation.relationTypes
 			?.filter((rel) => {
-				return rel?.relationTo === props.entityId;
+				return rel?.relationTo === props.entity.id;
 			})
 			.filter((rel) => {
 				return !rel?.property.startsWith("crm:P73");
