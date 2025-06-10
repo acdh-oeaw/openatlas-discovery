@@ -50,6 +50,12 @@ function _hasValidTimespans(
 }
 
 const centroid = computed(() => {
+	if (
+		props.relation.geometries?.type === "Feature" &&
+		props.relation.geometries.geometry?.type === "Point"
+	) {
+		return props.relation.geometries.geometry;
+	}
 	if (props.relation.geometries?.type === "FeatureCollection") {
 		return props.relation.geometries.features.find((a) => {
 			return a.geometry?.type === "Point";
