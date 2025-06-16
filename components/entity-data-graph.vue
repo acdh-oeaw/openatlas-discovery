@@ -88,7 +88,7 @@ const network = useTemplateRef<NetworkTemplateRef>("networkClient");
 </script>
 
 <template>
-	<div class="absolute bottom-0 z-10 flex w-full max-w-full justify-end">
+	<div class="absolute bottom-0 right-0 z-10 flex">
 		<NetworkLegendPanel
 			:excluded-classes="[]"
 			:system-classes="relevantSystemClasses"
