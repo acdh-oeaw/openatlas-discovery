@@ -46,81 +46,6 @@
         "modification",
         "move",
         "person",
-        "place",
-        "production",
-        "source",
-        "source_translation",
-        "stratigraphic_unit"
-      ],
-      "furtherSystemClasses": [
-        "files",
-        "references"
-      ],
-      "affectedSystemClasses": [
-        "artifact",
-        "person"
-      ],
-      "customOrdering": [
-        "person",
-        "move"
-      ]
-    },
-    {
-      "affectedSystemClasses": [
-        "place"
-      ],
-      "primarySystemClasses": [
-        "acquisition",
-        "activity",
-        "actor_function",
-        "actor_relation",
-        "appellation",
-        "artifact",
-        "creation",
-        "event",
-        "feature",
-        "files",
-        "group",
-        "human_remains",
-        "involvement",
-        "modification",
-        "move",
-        "person",
-        "place",
-        "production",
-        "references",
-        "source",
-        "source_translation",
-        "stratigraphic_unit"
-      ],
-      "customOrdering": [
-        "move",
-        "activity",
-        "event"
-      ],
-      "furtherSystemClasses": [
-        "files",
-        "references"
-      ],
-      "excludeTypeIds": []
-    },
-    {
-      "primarySystemClasses": [
-        "acquisition",
-        "activity",
-        "actor_function",
-        "actor_relation",
-        "appellation",
-        "artifact",
-        "creation",
-        "event",
-        "feature",
-        "group",
-        "human_remains",
-        "involvement",
-        "modification",
-        "move",
-        "person",
         "production",
         "source",
         "source_translation",
@@ -150,11 +75,7 @@
         "stratigraphic_unit",
         "place"
       ],
-      "customOrdering": [
-        "actor_function",
-        "activity",
-        "creation"
-      ],
+      "customOrdering": [],
       "excludeTypeIds": []
     }
   ],
