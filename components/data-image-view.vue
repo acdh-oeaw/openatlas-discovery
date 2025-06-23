@@ -4,8 +4,7 @@ import { miradorConfig } from "@/config/mirador.config";
 const route = useRoute();
 
 const image = computed(() => {
-	console.log("image: ", route.query.image);
-	return route.query.image;
+	return route.query.image as string;
 });
 </script>
 

@@ -1,8 +1,9 @@
 <script lang="ts" setup>
+import { assert } from "@acdh-oeaw/lib";
 import Mirador from "mirador";
 
 const props = defineProps<{
-	config: object;
+	config: { window: object };
 	images: Array<string>;
 	id: string;
 	allowMaximize: boolean;
@@ -11,18 +12,22 @@ const props = defineProps<{
 const route = useRoute();
 const router = useRouter();
 
+interface ActionType {
+	type: unknown;
+	[x: number | string | symbol]: unknown;
+}
+
 interface MiradorViewerInstance {
 	store: {
-		getState: () => any;
+		getState: () => { windows: object };
 		subscribe: (listener: () => void) => void;
-		dispatch: (action: any) => void;
+		dispatch: (action: ActionType) => void;
 	};
 }
 
 const currentMode = ref("");
 
 function changeMode(mode: string) {
-	console.log(props.images);
 	void router.push({
 		query: { mode: mode, selection: route.query.selection, image: props.images[0] },
 	});
@@ -42,26 +47,29 @@ async function initializeMirador() {
 		return { manifestId: url };
 	});
 
-	miradorInstance.value = Mirador.viewer({
-		...props.config,
-		window: {
-			...props.config.window,
-			allowMaximize: props.allowMaximize,
-		},
-		id: props.id,
-		windows,
-	});
+	miradorInstance.value =
+		Mirador.viewer({
+			...props.config,
+			window: {
+				...props.config.window,
+				allowMaximize: props.allowMaximize,
+			},
+			id: props.id,
+			windows,
+		}) ?? {};
 
 	// Save original dispatch
+	assert(miradorInstance.value);
 	const store = miradorInstance.value.store;
 	const originalDispatch = store.dispatch.bind(store);
 
 	const actions = Mirador.actions;
-	let state = miradorInstance.value?.store.getState();
+	let state = miradorInstance.value.store.getState();
+	if (!("windows" in (state as object))) return;
 	const windowId = Object.keys(state.windows)[0];
 
 	if (props.id === "miradorFullscreen") {
-		miradorInstance.value?.store.dispatch({
+		miradorInstance.value.store.dispatch({
 			id: "annotations-window",
 			type: "mirador/ADD_COMPANION_WINDOW",
 			windowId,
@@ -70,7 +78,7 @@ async function initializeMirador() {
 				position: "right",
 			},
 		});
-		miradorInstance.value?.store.dispatch({
+		miradorInstance.value.store.dispatch({
 			id: "annotations-window",
 			type: "mirador/UPDATE_COMPANION_WINDOW",
 			windowId,
@@ -81,29 +89,28 @@ async function initializeMirador() {
 		});
 	}
 
-	miradorInstance.value?.store.subscribe(() => {
+	miradorInstance.value.store.subscribe(() => {
 		// Override dispatch with a wrapper that intercepts the action
 		store.dispatch = (action) => {
-			console.log("Entered!", action);
 			// Make sure action is defined and has type
-			if (action && action.type === actions.removeWindow().type) {
-				console.log("Close button triggered! Window ID:", action.windowId);
+			if (action.type === actions.removeWindow().type) {
 				delete route.query.image;
 				router.go(-1);
 			} else {
 				originalDispatch(action);
 			}
 		};
-		state = miradorInstance.value?.store.getState();
+		assert(miradorInstance.value);
+		state = miradorInstance.value.store.getState();
 		const isFullscreen =
 			Object.entries(state.windows).length > 0
-				? Object.entries(state.windows)[0][1].maximized
+				? Object.entries(state.windows)[0]?.[1]?.maximized
 				: false;
 		if (isFullscreen !== prevFullscreen.value) {
 			prevFullscreen.value = isFullscreen;
 
 			if (isFullscreen) {
-				currentMode.value = route.query.mode;
+				currentMode.value = route.query.mode as string;
 				changeMode("images");
 			} else {
 				changeMode(currentMode.value);
