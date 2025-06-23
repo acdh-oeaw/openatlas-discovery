@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { groupByToMap, keyByToMap } from "@acdh-oeaw/lib";
+import { keyByToMap } from "@acdh-oeaw/lib";
+import type { Geometry } from "geojson";
 import { z } from "zod";
 
-import { useIdPrefix } from "@/composables/use-id-prefix";
 import { hasCoordinates } from "@/utils/has-geojson-coordinates";
 
 // defineRouteRules({
@@ -21,7 +21,6 @@ definePageMeta({
 });
 
 const t = useTranslations();
-const { getUnprefixedId } = useIdPrefix();
 
 const route = useRoute();
 const id = computed(() => {
@@ -39,49 +38,58 @@ const isLoading = computed(() => {
 });
 
 const entity = computed(() => {
-	return data.value?.features[0];
+	return data.value;
 });
 
 const entities = computed(() => {
-	return data.value?.features ?? [];
+	return data.value ? [data.value] : [];
 });
 
 useHead({
 	title: computed(() => {
-		return entity.value?.properties.title ?? t("EntityPage.meta.title");
+		return entity.value?.title ?? t("EntityPage.meta.title");
 	}),
 	// TODO: description, other metadata
 });
 
 const tabs = computed(() => {
 	const tabs = [];
-	if (entity.value?.geometry != null && hasCoordinates(entity.value.geometry)) {
+	if (
+		entity.value?.geometries != null &&
+		hasCoordinates(entity.value.geometries as unknown as Geometry)
+	) {
 		tabs.push({
 			id: "geo-map",
 			label: t("EntityPage.map"),
 		});
 	}
-	if (entity.value?.depictions != null) {
+	if (entity.value?.files != null) {
 		tabs.push({
 			id: "images",
-			label: t("EntityPage.images", { count: entity.value.depictions.length }),
+			label: t("EntityPage.images", { count: entity.value.files.length }),
 		});
 	}
 	return tabs;
 });
 
 const relationsByType = computed(() => {
-	return groupByToMap(entity.value?.relations ?? [], (relation) => {
-		// FIXME: This used to use `relationType` (without the prefix)
+	return new Map(Object.entries(entity.value?.relations ?? {}));
+	// return groupByToMap(entity.value?.relations ?? [], (relation) => {
+	// 	// FIXME: This used to use `relationType` (without the prefix)
 
-		return relation.relationSystemClass;
-	});
+	// 	return relation.relationSystemClass;
+	// });
 });
 
 const typesById = computed(() => {
-	return keyByToMap(entity.value?.types ?? [], (type) => {
-		return type.identifier;
-	});
+	return keyByToMap(
+		entity.value?.types?.filter((type) => {
+			return type != null;
+		}) ?? [],
+		(type) => {
+			return type.id;
+		},
+	);
 });
 </script>
 
@@ -91,17 +99,17 @@ const typesById = computed(() => {
 			<Card>
 				<CardHeader>
 					<EntitySystemClass :system-class="entity.systemClass" />
-					<PageTitle>{{ entity.properties.title }}</PageTitle>
+					<PageTitle>{{ entity.title }}</PageTitle>
 				</CardHeader>
 				<CardContent>
 					<div class="grid gap-4">
-						<EntityTimespans :timespans="entity.when?.timespans" />
-						<EntityDescriptions :descriptions="entity?.descriptions ?? []" />
+						<EntityTimespans v-if="entity.when" :timespans="[entity.when]" />
+						<EntityDescriptions :descriptions="[entity?.description ?? '']" />
 						<!-- Types -->
 						<div class="flex flex-row flex-wrap gap-1">
 							<TypesPopover
 								v-for="type in entity.types"
-								:key="type.identifier ?? type.label ?? 'missing'"
+								:key="type?.id ?? type?.title ?? 'missing'"
 								:type="type"
 							/>
 						</div>
@@ -119,8 +127,8 @@ const typesById = computed(() => {
 				<TabsContent v-for="tab of tabs" :key="tab.id" :value="tab.id">
 					<EntityGeoMap v-if="tab.id === 'geo-map'" :entities="entities" />
 					<EntityImages
-						v-else-if="tab.id === 'images' && entity.depictions"
-						:images="entity.depictions"
+						v-else-if="tab.id === 'images' && entity.files && entity.files?.length > 0"
+						:images="entity.files"
 					/>
 				</TabsContent>
 			</Tabs>
@@ -141,25 +149,25 @@ const typesById = computed(() => {
 								<ul role="list">
 									<li v-for="(relation, index) of relations.slice(0, 10)" :key="index">
 										<NavLink
-											v-if="relation.relationTo"
+											v-if="relation?.id"
 											class="underline decoration-dotted hover:no-underline"
 											:href="{
 												path: `/visualization/`,
 												query: {
 													mode: 'table',
-													selection: getUnprefixedId(relation.relationTo),
+													selection: relation.id,
 												},
 											}"
 										>
-											{{ relation.label }}
+											{{ relation.title }}
 										</NavLink>
-										<span
-											v-if="
-												relation.relationSystemClass === 'type' &&
-												typesById.has(relation.relationTo)
-											"
-										>
-											({{ typesById.get(relation.relationTo)?.hierarchy }})
+										<span v-if="relation?.systemClass === 'type' && typesById.has(relation.id)">
+											({{
+												typesById
+													.get(relation.id)
+													?.typeHierarchy?.map((h) => h.label)
+													.join(" > ")
+											}})
 										</span>
 									</li>
 								</ul>
@@ -170,25 +178,25 @@ const typesById = computed(() => {
 									<ul role="list">
 										<li v-for="(relation, index) of relations.slice(10)" :key="index">
 											<NavLink
-												v-if="relation.relationTo"
+												v-if="relation?.id"
 												class="underline decoration-dotted hover:no-underline"
 												:href="{
 													path: `/visualization/`,
 													query: {
 														mode: 'table',
-														selection: getUnprefixedId(relation.relationTo),
+														selection: relation.id,
 													},
 												}"
 											>
-												{{ relation.label }}
+												{{ relation.title }}
 											</NavLink>
-											<span
-												v-if="
-													relation.relationSystemClass === 'type' &&
-													typesById.has(relation.relationTo)
-												"
-											>
-												({{ typesById.get(relation.relationTo)?.hierarchy }})
+											<span v-if="relation?.systemClass === 'type' && typesById.has(relation.id)">
+												({{
+													typesById
+														.get(relation.id)
+														?.typeHierarchy?.map((h) => h.label)
+														.join(" > ")
+												}})
 											</span>
 										</li>
 									</ul>

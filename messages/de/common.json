@@ -67,6 +67,11 @@
 		"no-descriptions": "Keine Beschreibungen verfügbar."
 	},
 	"EntityPage": {
+		"superEvent": "Überereignis",
+		"subEvent": "Unterereignis",
+		"hasTranslationText": "Übersetzung",
+		"isOriginalText": "Originaltext",
+		"showText": "Text anzeigen",
 		"showOnMap": "Auf Karte anzeigen",
 		"details": "Weitere Informationen",
 		"noType": "Kein Typ",
@@ -83,7 +88,11 @@
 			"toggle": "Details für {title} umschalten"
 		},
 		"no-map": "Nicht auf der Karte vorhanden.",
-		"no-network": "Nicht im Netzwerk vorhanden."
+		"no-network": "Nicht im Netzwerk vorhanden.",
+		"no-details": "Keine weiteren Details vorhanden.",
+
+		"dateSpan": "Zeitraum",
+		"dateSpan-to": "bis"
 	},
 	"EntitySidebar": {
 		"NextFeature": "Nächste Funktion",
@@ -221,6 +230,7 @@
 		"external_reference": "Externe Referenz",
 		"feature": "Feature",
 		"file": "Datei",
+		"files": "Dateien",
 		"group": "Gruppe",
 		"human_remains": "Menschliche Überreste",
 		"involvement": "Beteiligung",
@@ -230,9 +240,10 @@
 		"person": "Person",
 		"place": "Ort",
 		"production": "Produktion",
+		"references": "Referenzen",
 		"reference_system": "Referenzsystem",
 		"source": "Quelle",
-		"source_translation": "Quellenübersetzung",
+		"source_translation": "Quellentext",
 		"stratigraphic_unit": "Stratigraphische Einheit",
 		"type": "Typ",
 		"type_tools": "Typ-Werkzeuge"

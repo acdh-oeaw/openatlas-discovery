@@ -28,9 +28,57 @@
 		"geojsonMovement": "#D0031E"
 	},
 	"twitter": "@openatlas_eu",
-	"detailView": {
-		"excludeTypeIds": []
-	},
+	"detailView": [
+		{
+			"primarySystemClasses": [
+				"acquisition",
+				"activity",
+				"actor_function",
+				"actor_relation",
+				"appellation",
+				"artifact",
+				"creation",
+				"event",
+				"feature",
+				"group",
+				"human_remains",
+				"involvement",
+				"modification",
+				"move",
+				"person",
+				"production",
+				"source",
+				"source_translation",
+				"stratigraphic_unit",
+				"place"
+			],
+			"furtherSystemClasses": [],
+			"affectedSystemClasses": [
+				"acquisition",
+				"activity",
+				"actor_function",
+				"actor_relation",
+				"appellation",
+				"artifact",
+				"creation",
+				"event",
+				"feature",
+				"group",
+				"human_remains",
+				"involvement",
+				"modification",
+				"move",
+				"person",
+				"production",
+				"source",
+				"source_translation",
+				"stratigraphic_unit",
+				"place"
+			],
+			"customOrdering": [],
+			"excludeTypeIds": []
+		}
+	],
 	"fullscreen": true,
 	"defaultLocale": "en",
 	"map": {

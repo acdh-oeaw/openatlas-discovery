@@ -17,7 +17,7 @@ const { data } = useGetEntity(
 );
 
 const entity = computed(() => {
-	return data.value?.features[0];
+	return data.value;
 });
 
 const openState = ref(false);
@@ -45,6 +45,14 @@ function clearSelection() {
 	void router.push({ query: { ...route.query, selection: null } });
 }
 defineExpose({ openState });
+
+const nonEmptyRelations = computed(() => {
+	if (!entity.value?.relations) return null;
+	const filteredEntries = Object.entries(entity.value.relations).filter(([_, value]) => {
+		return value.length > 0;
+	});
+	return filteredEntries.length > 0 ? Object.fromEntries(filteredEntries) : null;
+});
 </script>
 
 <template>
@@ -73,9 +81,9 @@ defineExpose({ openState });
 				<!-- <component v-if="hasCustomDetails" v-bind:is="entityDetailsDict" bind:entity-data /> -->
 
 				<EntityDetails
-					v-if="entity.relations && entity.relations?.length > 0"
 					:handled-relations="handledRelations"
-					:relations="entity.relations"
+					:relations="nonEmptyRelations ?? {}"
+					:entity="entity"
 					class="rounded-md border px-4 py-3 text-sm"
 				/>
 			</div>
@@ -89,9 +97,7 @@ defineExpose({ openState });
 					class="ml-auto size-8"
 					:class="{ hidden: openState, block: !openState }"
 				/>
-				<span class="sr-only">{{
-					t("EntityPage.sidebar.toggle", { title: entity.properties.title })
-				}}</span>
+				<span class="sr-only">{{ t("EntityPage.sidebar.toggle", { title: entity.title }) }}</span>
 			</button>
 		</div>
 	</div>

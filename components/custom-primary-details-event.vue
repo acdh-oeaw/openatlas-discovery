@@ -1,61 +1,73 @@
 <script setup lang="ts">
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-vue-next";
 
+import type { PresentationViewModel } from "@/types/api";
+
 const t = useTranslations();
 
-const { getUnprefixedId } = useIdPrefix();
-
-const props = defineProps<{ entity: EntityFeature }>();
+const props = defineProps<{ entity: PresentationViewModel }>();
 const route = useRoute();
 
 const previousFeature = computed(() => {
-	const movement = props.entity.relations.find((rel) => {
-		return rel.relationType === "crm:P134_continued";
-	});
+	const movement = props.entity.relations?.activity
+		?.concat(props.entity.relations.move ?? [])
+		.find((rel) => {
+			return rel?.relationTypes?.find((type) => {
+				return type?.property === "crm:P134_continued";
+			});
+		});
 	if (movement)
 		return {
-			id: getUnprefixedId(movement["@id"]),
-			"@id": movement["@id"],
-			title: movement.label,
+			id: movement.id,
+			"@id": movement.id,
+			title: movement.title,
 			systemClass: movement.systemClass,
 		};
 	return null;
 });
 
 const nextFeature = computed(() => {
-	const movement = props.entity.relations.find((rel) => {
-		return rel.relationType === "crm:P134i_was_continued_by";
-	});
+	const movement = props.entity.relations?.activity
+		?.concat(props.entity.relations.move ?? [])
+		.find((rel) => {
+			return rel?.relationTypes?.find((type) => {
+				return type?.property === "crm:P134i_was_continued_by";
+			});
+		});
 	if (movement)
 		return {
-			id: getUnprefixedId(movement["@id"]),
-			"@id": movement["@id"],
-			title: movement.label,
+			id: movement.id,
+			"@id": movement.id,
+			title: movement.title,
 			systemClass: movement.systemClass,
 		};
 	return null;
 });
 
-const collapsibleRelations: Array<{
-	relationType: RelationType;
-	systemClass?: string;
-	title: string;
-}> = [
+const collapsibleRelations: Record<
+	string,
 	{
+		relationType: RelationType;
+		systemClass?: string;
+		title: string;
+		showOnMap?: boolean;
+	}
+> = {
+	artifact: {
 		relationType: {
 			crmCode: "P46",
 		},
 		systemClass: "artifact",
 		title: t("Relations.Artifacts"),
 	},
-	{
+	human_remains: {
 		relationType: {
 			crmCode: "P46",
 		},
 		systemClass: "human_remains",
 		title: t("Relations.HumanRemains"),
 	},
-];
+};
 
 const emit = defineEmits({
 	handledRelations(payload: Array<RelationType>) {
@@ -83,6 +95,12 @@ function getPath() {
 const currentMode = computed(() => {
 	return route.query.mode;
 });
+
+const { getFilteredRelations } = useGetFilteredRelations();
+
+const filteredRelations = computed(() => {
+	return getFilteredRelations(props.entity);
+});
 </script>
 
 <template>
@@ -91,11 +109,11 @@ const currentMode = computed(() => {
 			v-if="previousFeature"
 			:href="{
 				path: `/${getPath()}`,
-				query: { mode: currentMode, selection: getUnprefixedId(previousFeature['@id']) },
+				query: { mode: currentMode, selection: previousFeature.id },
 			}"
 			class="flex items-center underline decoration-dotted transition hover:no-underline focus-visible:no-underline"
 		>
-			<ChevronLeftIcon class="size-4" />
+			<ChevronLeftIcon class="size-4 shrink-0" />
 			<span>{{ previousFeature.title }}</span>
 			<span class="sr-only">{{ t("EntitySidebar.PreviousFeature") }}</span>
 		</NavLink>
@@ -103,22 +121,21 @@ const currentMode = computed(() => {
 			v-if="nextFeature"
 			:href="{
 				path: `/${getPath()}`,
-				query: { mode: currentMode, selection: getUnprefixedId(nextFeature['@id']) },
+				query: { mode: currentMode, selection: nextFeature.id },
 			}"
 			class="flex items-center underline decoration-dotted transition hover:no-underline focus-visible:no-underline"
 		>
 			<span>{{ nextFeature.title }}</span>
 			<span class="sr-only">{{ t("EntitySidebar.NextFeature") }}</span>
-			<ChevronRightIcon class="size-4" />
+			<ChevronRightIcon class="size-4 shrink-0" />
 		</NavLink>
 	</div>
 	<GroupedRelationCollapsible
-		v-for="rel in collapsibleRelations"
-		:key="rel.relationType.crmCode + rel.relationType.inverse"
-		:title="rel.title"
-		:relations="entity.relations"
-		:system-class="rel.systemClass"
-		:relation-type="rel.relationType"
-		:show-on-map="false"
+		v-for="[key, rels] in filteredRelations"
+		:key="`${entity.id} - ${key}`"
+		:title="key"
+		:relations="(rels ?? []).filter((r) => r != null).filter((r) => r.id != entity.id)"
+		:show-on-map="collapsibleRelations[key]?.showOnMap ?? false"
+		:entity="entity"
 	/>
 </template>

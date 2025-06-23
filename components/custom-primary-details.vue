@@ -2,39 +2,10 @@
 import type { PresentationViewModel } from "@/types/api";
 
 const props = defineProps<{ entity: PresentationViewModel }>();
-
 const { getFilteredRelations } = useGetFilteredRelations();
 
 const filteredRelations = computed(() => {
 	return getFilteredRelations(props.entity);
-});
-
-const handledRelations: Array<RelationType> = [
-	{
-		crmCode: "P107",
-	},
-	{
-		crmCode: "P74",
-	},
-	{
-		crmCode: "OA7",
-	},
-	{
-		crmCode: "OA8",
-	},
-	{
-		crmCode: "OA9",
-	},
-];
-
-const emit = defineEmits({
-	handledRelations(payload: Array<RelationType>) {
-		return payload;
-	},
-});
-
-onMounted(() => {
-	emit("handledRelations", handledRelations);
 });
 </script>
 

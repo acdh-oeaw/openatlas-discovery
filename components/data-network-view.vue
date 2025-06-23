@@ -52,12 +52,10 @@ function normalizeQuery(query: Array<LocationQueryValue> | string) {
 }
 function onChangeSearchFilters(values: NetworkSearchData) {
 	const query = { mode: route.query.mode, ...searchFilters.value, ...values };
-
-	if (searchFilters.value.search === "") {
+	if (searchFilters.value.search === "" && values.search === "") {
 		// @ts-expect-error Fix me later please
 		delete query.search;
 	}
-
 	void router.push({ query });
 }
 

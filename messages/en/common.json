@@ -67,6 +67,11 @@
 		"no-descriptions": "No descriptions available."
 	},
 	"EntityPage": {
+		"superEvent": "Superevent",
+		"subEvent": "Subevent",
+		"hasTranslationText": "Translation",
+		"isOriginalText": "Original Text",
+		"showText": "Show Text",
 		"showOnMap": "Show on Map",
 		"details": "Further Information",
 		"noType": "No Type",
@@ -82,8 +87,11 @@
 		"sidebar": {
 			"toggle": "Toggle details for {title}"
 		},
+		"no-details": "There are no further details for this entry.",
 		"no-map": "Not visible on the map.",
-		"no-network": "Not visible in the network."
+		"no-network": "Not visible in the network.",
+		"dateSpan": "Timespan",
+		"dateSpan-to": "until"
 	},
 	"EntitySidebar": {
 		"NextFeature": "NextFeature",
@@ -221,6 +229,7 @@
 		"external_reference": "External reference",
 		"feature": "Feature",
 		"file": "File",
+		"files": "Files",
 		"group": "Group",
 		"human_remains": "Human remains",
 		"involvement": "Involvement",
@@ -230,9 +239,10 @@
 		"person": "Person",
 		"place": "Place",
 		"production": "Production",
+		"references": "References",
 		"reference_system": "Reference system",
 		"source": "Source",
-		"source_translation": "Source translation",
+		"source_translation": "Source Text",
 		"stratigraphic_unit": "Stratigraphic unit",
 		"type": "Type",
 		"type_tools": "Type tools"

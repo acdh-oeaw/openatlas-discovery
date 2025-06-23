@@ -4,8 +4,9 @@ import { Toggle } from "@/components/ui/toggle";
 
 const props = defineProps<{
 	images: Array<{
+		id: number;
 		IIIFManifest?: string;
-		license?: string;
+		license?: string | null;
 		mimetype?: string;
 		title?: string;
 		url?: string;
@@ -45,11 +46,14 @@ const currentImage = computed(() => {
 <template>
 	<div class="relative">
 		<Carousel v-if="!show" @init-api="setApi">
-			<CarouselPrevious v-if="props.images.length > 2" />
+			<CarouselPrevious
+				v-if="props.images.length > 1"
+				class="z-20 ml-14 bg-white opacity-90 dark:bg-black"
+			/>
 			<CarouselContent>
 				<CarouselItem v-for="(image, index) of props.images" :key="index" class="h-full">
 					<Card class="pb-3">
-						<figure class="grid h-96 grid-rows-[1fr_auto] gap-y-1.5 overflow-hidden">
+						<figure class="grid aspect-video h-full grid-rows-[1fr_auto] gap-y-1.5 overflow-hidden">
 							<div class="relative">
 								<img alt="" class="absolute size-full object-contain" :src="image.url" />
 							</div>
@@ -58,7 +62,10 @@ const currentImage = computed(() => {
 					</Card>
 				</CarouselItem>
 			</CarouselContent>
-			<CarouselNext v-if="props.images.length > 2" />
+			<CarouselNext
+				v-if="props.images.length > 1"
+				class="z-20 mr-14 bg-white opacity-90 dark:bg-black"
+			/>
 		</Carousel>
 		<EntityMiradorViewer v-if="show && currentImage" :images="[currentImage]" />
 		<Toggle variant="iiif" class="absolute bottom-0 right-0 z-10 m-4" @click="toggleIIIF">

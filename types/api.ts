@@ -48,3 +48,8 @@ export interface ExtendedEntities extends RelationLinkedEntity {
 		];
 	};
 }
+
+export type PresentationViewModel = components["schemas"]["PresentationViewModel"];
+export type RelatedEntityModel = components["schemas"]["RelatedEntityModel"];
+
+export type File = NonNullable<components["schemas"]["PresentationViewModel"]["files"]>[0];
