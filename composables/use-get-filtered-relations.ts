@@ -29,10 +29,13 @@ function getFilteredRelations(entity: PresentationViewModel) {
 		)
 			res[otherKey] = entity[otherKey as keyof PresentationViewModel] as Array<RelatedEntityModel>;
 	}
-	if (!detailViewConfig?.affectedSystemClasses) return Object.entries(res);
+	if (!detailViewConfig?.affectedSystemClasses)
+		return Object.entries(res).filter((rel) => {
+			return Array.isArray(rel[1]) && rel[1].length;
+		});
 	const sortedRelations = Object.entries(res)
 		.filter((rel) => {
-			return rel[1].length;
+			return Array.isArray(rel[1]) && rel[1].length;
 		})
 		.toSorted((relA, relB) => {
 			let indexA = detailViewConfig.customOrdering?.indexOf(relA[0]) ?? -1;
