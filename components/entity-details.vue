@@ -33,6 +33,7 @@ const relationsByType = computed(() => {
 interface AdditionalInfoType {
 	title: string;
 	id: number;
+	identifier?: string;
 }
 
 const additionalInfo = computed(() => {
@@ -48,6 +49,7 @@ const additionalInfo = computed(() => {
 const combinedSystemClasses: ComputedRef<Array<[string, Array<AdditionalInfoType>]>> = computed(
 	() => {
 		const res = [...additionalInfo.value, ...relationsByType.value];
+		console.log("all system classes for entity details: ", res);
 		return res;
 	},
 );
@@ -108,7 +110,7 @@ function getFilename(file: unknown) {
 
 <template>
 	<div v-if="Object.keys(combinedSystemClasses).length > 0" class="mt-4">
-		<h1 class="pb-2 font-semibold leading-none tracking-tight">{{ t("EntityPage.details") }}</h1>
+		<h1 class="pb-4 font-semibold leading-none tracking-tight">{{ t("EntityPage.details") }}</h1>
 		<dl
 			class="grid gap-x-8 gap-y-4 sm:grid-cols-[repeat(auto-fill,minmax(min(20rem,100%),1fr))] sm:justify-start"
 		>
@@ -124,7 +126,7 @@ function getFilename(file: unknown) {
 							class="grid grid-cols-[1fr_auto] items-center py-1"
 						>
 							<NavLink
-								v-if="relation?.id"
+								v-if="relationType === 'files' && relation?.id"
 								class="underline decoration-dotted hover:no-underline"
 								:href="{
 									path: `/${getPath()}`,
@@ -136,7 +138,17 @@ function getFilename(file: unknown) {
 							>
 								{{ getFilename(relation) }}
 							</NavLink>
-							<span v-else> {{ getFilename(relation) }} </span>
+							<NavLink
+								v-else-if="relation?.identifier"
+								class="underline decoration-dotted hover:no-underline"
+								:href="relation.identifier"
+								external
+								target="_blank"
+								>{{ relation.identifier }}</NavLink
+							>
+							<span v-else>
+								{{ relationType === "files" ? getFilename(relation) : relation.identifier }}
+							</span>
 							<Button
 								v-if="relationType === 'files'"
 								variant="transparent"

@@ -228,6 +228,7 @@
 		"edition": "Edition",
 		"event": "Ereignis",
 		"external_reference": "Externe Referenz",
+		"externalReferenceSystems": "Externe Referenzen",
 		"feature": "Feature",
 		"file": "Datei",
 		"files": "Dateien",

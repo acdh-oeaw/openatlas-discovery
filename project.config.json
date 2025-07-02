@@ -52,7 +52,7 @@
 				"stratigraphic_unit",
 				"place"
 			],
-			"furtherSystemClasses": [],
+			"furtherSystemClasses": ["files", "externalReferenceSystems"],
 			"affectedSystemClasses": [
 				"acquisition",
 				"activity",

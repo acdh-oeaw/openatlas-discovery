@@ -38,6 +38,7 @@ function createURLObject(href: string): { path: string; query: { mode: string | 
 		:href="props.external ? props.href : localePath(props.href)"
 		:external="props.external"
 		:aria-current="isCurrentPage ? 'page' : undefined"
+		:target="props.target"
 	>
 		<slot />
 	</NuxtLink>

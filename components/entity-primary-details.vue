@@ -221,7 +221,7 @@ function updateDepth(newDepth: number) {
 	depth.value = newDepth;
 }
 
-const isEmptyEntity = computed(() => {
+const isEmptyPrimaryDetails = computed(() => {
 	return (
 		(images.value?.length ?? 0) === 0 &&
 		(props.entity.types?.length ?? 0) === 0 &&
@@ -229,6 +229,12 @@ const isEmptyEntity = computed(() => {
 		Object.values(props.entity.relations ?? {}).every((rel) => {
 			return rel.length === 0;
 		})
+	);
+});
+const isEmptyFurtherInformation = computed(() => {
+	return (
+		(props.entity.externalReferenceSystems?.length ?? 0) === 0 &&
+		(props.entity.files?.length ?? 0) === 0
 	);
 });
 
@@ -265,8 +271,10 @@ watch(
 	<EntityAliases v-if="entity.aliases" :aliases="entity.aliases as unknown as Array<string>" />
 	<EntityTimespans v-if="entity.when" :timespans="[entity.when]" />
 
-	<div v-if="isEmptyEntity" class="italic text-neutral-400">{{ t("EntityPage.no-details") }}</div>
-	<div class="grid gap-4">
+	<div v-if="isEmptyPrimaryDetails && isEmptyFurtherInformation" class="italic text-neutral-400">
+		{{ t("EntityPage.no-details") }}
+	</div>
+	<div v-else-if="!isEmptyPrimaryDetails" class="grid gap-4">
 		<EntityDescriptions :descriptions="[entity?.description ?? '']" />
 
 		<!-- Types -->
@@ -323,4 +331,5 @@ watch(
 			@handled-relations="emitHandledRelations"
 		/>
 	</div>
+	<Separator v-if="!isEmptyPrimaryDetails && !isEmptyFurtherInformation"></Separator>
 </template>

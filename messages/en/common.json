@@ -227,6 +227,7 @@
 		"edition": "Edition",
 		"event": "Event",
 		"external_reference": "External reference",
+		"externalReferenceSystems": "External references",
 		"feature": "Feature",
 		"file": "File",
 		"files": "Files",
