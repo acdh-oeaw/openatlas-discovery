@@ -35,7 +35,7 @@ const filteredRelations = computed(() => {
 </script>
 
 <template>
-	<div v-if="props.relations.length" class="w-full rounded-md border px-4 py-3 text-sm">
+	<div v-if="filteredRelations.length > 0" class="w-full rounded-md border px-4 py-3 text-sm">
 		<div class="flex items-center justify-between space-x-4">
 			<Accordion type="single" collapsible class="w-full">
 				<AccordionItem value="item-1">
