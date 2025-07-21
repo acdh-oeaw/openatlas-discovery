@@ -75,17 +75,17 @@ function entityInNetwork(entity: PresentationViewModel) {
 </script>
 
 <template>
-	<div class="grid gap-2 rounded-md bg-white/90 p-4 shadow-md dark:bg-black/90">
+	<div id="modeSwitch" class="flex w-fit flex-row gap-1.5 rounded-md p-2">
 		<TooltipProvider>
 			<Tooltip>
-				<TooltipTrigger>
+				<TooltipTrigger :style="{ cursor: inNetwork ? 'pointer' : 'auto' }">
 					<div
 						:class="
 							props.currentMode === 'map'
-								? 'rounded-md bg-brand p-4 shadow-md'
+								? 'bg-brand/90 text-white hover:bg-brand/90 p-1.5 rounded-md'
 								: !hasPlace
-									? 'rounded-md bg-neutral-300 p-4 shadow-md'
-									: 'rounded-md bg-primary/90 p-4 shadow-md dark:bg-white'
+									? 'rounded-md text-neutral-300 p-2'
+									: 'hover:bg-accent hover:text-accent-foreground rounded-md p-2 text-black dark:text-white'
 						"
 					>
 						<NavLink
@@ -99,9 +99,9 @@ function entityInNetwork(entity: PresentationViewModel) {
 								},
 							}"
 						>
-							<MapPinIcon class="size-6 text-white dark:text-black" />
+							<MapPinIcon :size="16" />
 						</NavLink>
-						<MapPinOffIcon v-if="!hasPlace" class="size-6 text-white dark:text-black" />
+						<MapPinOffIcon v-if="!hasPlace" :size="16" />
 					</div>
 				</TooltipTrigger>
 				<TooltipContent>
@@ -112,14 +112,14 @@ function entityInNetwork(entity: PresentationViewModel) {
 		</TooltipProvider>
 		<TooltipProvider>
 			<Tooltip>
-				<TooltipTrigger>
+				<TooltipTrigger :style="{ cursor: inNetwork ? 'pointer' : 'auto' }">
 					<div
 						:class="
 							props.currentMode === 'network'
-								? 'rounded-md bg-brand p-4 shadow-md'
+								? 'bg-brand/90 text-white hover:bg-brand/90 p-1.5 rounded-md'
 								: !inNetwork
-									? 'rounded-md bg-neutral-300 p-4 shadow-md'
-									: 'rounded-md bg-primary/90 p-4 shadow-md dark:bg-white'
+									? 'rounded-md text-neutral-300 p-2'
+									: 'hover:bg-accent hover:text-accent-foreground rounded-md p-2 text-black dark:text-white'
 						"
 					>
 						<NavLink
@@ -133,9 +133,9 @@ function entityInNetwork(entity: PresentationViewModel) {
 								},
 							}"
 						>
-							<RadiusIcon class="size-6 text-white dark:text-black" />
+							<RadiusIcon :size="16" />
 						</NavLink>
-						<CircleOffIcon v-if="!inNetwork" class="size-6 text-white dark:text-black" />
+						<CircleOffIcon v-if="!inNetwork" :size="16" />
 					</div>
 				</TooltipTrigger>
 				<TooltipContent>
@@ -150,8 +150,8 @@ function entityInNetwork(entity: PresentationViewModel) {
 					<div
 						:class="
 							props.currentMode === 'table'
-								? 'rounded-md bg-brand p-4 shadow-md'
-								: 'rounded-md bg-primary/90 p-4 shadow-md dark:bg-white'
+								? 'bg-brand/90 text-white hover:bg-brand/90 p-1.5 rounded-md'
+								: 'hover:bg-accent hover:text-accent-foreground rounded-md p-2 text-black dark:text-white'
 						"
 					>
 						<NavLink
@@ -164,7 +164,7 @@ function entityInNetwork(entity: PresentationViewModel) {
 								},
 							}"
 						>
-							<TablePropertiesIcon class="size-6 text-white dark:text-black" />
+							<TablePropertiesIcon :size="16" />
 						</NavLink>
 					</div>
 				</TooltipTrigger>

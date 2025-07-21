@@ -97,7 +97,8 @@
 		"NextFeature": "NextFeature",
 		"PreviousFeature": "Previous Feature",
 		"copy": "Permalink",
-		"copied": "Copied!"
+		"copied": "Copied!",
+		"copiedMessage": "The permalink has been successfully copied to the clipboard."
 	},
 	"ErrorBoundary": {
 		"error": "Error"

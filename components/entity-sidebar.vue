@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { ChevronLeftIcon, ChevronRightIcon, XIcon } from "lucide-vue-next";
+import { ChevronLeftIcon, ChevronRightIcon, CopyIcon, XIcon } from "lucide-vue-next";
+
+import { toast } from "@/components/ui/toast";
 
 const t = useTranslations();
 const router = useRouter();
@@ -7,6 +9,7 @@ const route = useRoute();
 
 const props = defineProps<{
 	id: number;
+	mode: string;
 	noTableSidebar: boolean;
 }>();
 
@@ -21,6 +24,7 @@ const entity = computed(() => {
 });
 
 const openState = ref(false);
+const expandedState = ref(false);
 
 onMounted(() => {
 	openState.value = true;
@@ -35,6 +39,7 @@ watch(
 	},
 	{ immediate: true, deep: true },
 );
+
 const handledRelations = ref<Array<RelationType>>([]);
 
 const updateHandledRelations = (relations: Array<RelationType>) => {
@@ -42,8 +47,15 @@ const updateHandledRelations = (relations: Array<RelationType>) => {
 };
 
 function clearSelection() {
-	void router.push({ query: { ...route.query, selection: null } });
+	const query = { ...route.query };
+	delete query.selection;
+
+	void router.push({
+		path: route.path,
+		query,
+	});
 }
+
 defineExpose({ openState });
 
 const nonEmptyRelations = computed(() => {
@@ -53,28 +65,69 @@ const nonEmptyRelations = computed(() => {
 	});
 	return filteredEntries.length > 0 ? Object.fromEntries(filteredEntries) : null;
 });
+
+function copyEntity() {
+	const fullUrl = window.location.href;
+	const baseUrl = fullUrl.split(route.path)[0];
+	if (baseUrl) {
+		return navigator.clipboard.writeText(`${baseUrl}/entity/${route.query.selection as string}`);
+	}
+	return null;
+}
 </script>
 
 <template>
 	<div v-if="entity != null && props.id != null">
 		<div
-			class="group z-20 mb-2 mr-2 flex h-full transition-transform duration-300"
-			:class="{
-				'absolute w-1/4': props.noTableSidebar,
-				'translate-x-0': openState,
-				'-translate-x-full': !openState,
-			}"
-			:open="openState"
+			class="group z-20 mb-2 mr-2 flex h-full bg-white transition-all duration-300 ease-in-out"
+			:style="
+				noTableSidebar
+					? {
+							width: expandedState ? 'calc(100% - 2rem)' : '25%',
+							position: 'absolute',
+						}
+					: {}
+			"
 		>
 			<div
 				class="relative size-full max-h-full grow basis-full overflow-y-auto rounded-lg border bg-card px-6 py-4 text-card-foreground shadow"
 			>
-				<Button
-					variant="transparent"
-					class="float-right -mr-6 -mt-4 p-2 text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white"
-					@click="clearSelection"
-					><XIcon class="size-4"></XIcon
-				></Button>
+				<div class="float-right flex flex-row items-center gap-2">
+					<div class="flex flex-row items-center">
+						<ModeSwitch :id="id" :current-mode="mode" />
+						<span class="text-neutral-300">|</span>
+					</div>
+
+					<div class="ml-auto">
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger>
+									<Button
+										variant="ghost"
+										class="h-full p-2"
+										@click="
+											() => {
+												toast.success(t('EntitySidebar.copied'), {
+													description: t('EntitySidebar.copiedMessage'),
+												});
+												copyEntity();
+											}
+										"
+									>
+										<span class="sr-only"> {{ t("EntitySidebar.copy") }}</span>
+										<CopyIcon :size="16" />
+									</Button>
+								</TooltipTrigger>
+								<TooltipContent>
+									<span>{{ t("EntitySidebar.copy") }}</span>
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+					</div>
+					<Button variant="ghost" class="h-full p-2" @click="clearSelection"
+						><XIcon class="size-4"></XIcon
+					></Button>
+				</div>
 				<EntityPrimaryDetails :entity="entity" @handled-relations="updateHandledRelations" />
 
 				<slot name="custom-details" />
@@ -90,12 +143,15 @@ const nonEmptyRelations = computed(() => {
 			<button
 				class="absolute left-full top-1/2 -z-10 block -translate-x-2 rounded-md bg-[hsl(var(--card))] py-2 pl-1 shadow-md"
 				style="top: calc(50% - 40px)"
-				@click="openState = !openState"
+				@click="expandedState = !expandedState"
 			>
-				<ChevronLeftIcon class="ml-auto size-8" :class="{ block: openState, hidden: !openState }" />
+				<ChevronLeftIcon
+					class="ml-auto size-8"
+					:class="{ block: expandedState, hidden: !expandedState }"
+				/>
 				<ChevronRightIcon
 					class="ml-auto size-8"
-					:class="{ hidden: openState, block: !openState }"
+					:class="{ hidden: expandedState, block: !expandedState }"
 				/>
 				<span class="sr-only">{{ t("EntityPage.sidebar.toggle", { title: entity.title }) }}</span>
 			</button>
