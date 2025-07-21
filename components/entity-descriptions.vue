@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { EyeIcon, EyeOffIcon } from "lucide-vue-next";
-
 const props = defineProps<{
 	descriptions: Array<string>;
 }>();
@@ -16,10 +14,6 @@ const route = useRoute();
 const router = useRouter();
 
 const processedNodes = ref<Array<string | { text: string; meta: Metadata }>>([]);
-const openTooltips = ref<Record<number, boolean>>({});
-const toggleTooltip = (index: number) => {
-	openTooltips.value[index] = !openTooltips.value[index];
-};
 
 onMounted(async () => {
 	await nextTick();
@@ -89,13 +83,10 @@ watch(
 						{{ part }}
 					</template>
 					<template v-else>
-						<TooltipProvider>
-							<Tooltip
-								:open="openTooltips[index]"
-								@update:open="(value) => (openTooltips[index] = value)"
-							>
-								<TooltipTrigger @click.stop="toggleTooltip(index)">
-									<span v-if="part.meta.entityId != null">
+						<span v-if="part.meta.entityId != null">
+							<TooltipProvider v-if="part.meta.comment != null">
+								<Tooltip>
+									<TooltipTrigger>
 										<NavLink
 											:href="{
 												path: router.currentRoute.value.path,
@@ -105,24 +96,36 @@ watch(
 											class="rounded-sm bg-brand px-1 hover:bg-brand/90"
 										>
 											{{ part.text }}
-										</NavLink></span
-									>
-									<span v-else class="rounded-sm bg-brand px-1 hover:bg-brand/90">
-										{{ part.text }}
-									</span>
-								</TooltipTrigger>
-								<TooltipContent>
-									<div class="flex flex-row">
-										<EyeIcon v-if="part.meta.entityId != null" :size="16" />
-										<EyeOffIcon v-else :size="16" />
-										<span v-if="part.meta.comment != null" class="pl-1">
-											|
-											{{ part.meta.comment }}
-										</span>
-									</div>
-								</TooltipContent>
-							</Tooltip>
-						</TooltipProvider>
+										</NavLink>
+									</TooltipTrigger>
+									<TooltipContent> {{ part.meta.comment }} </TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+
+							<NavLink
+								v-else
+								:href="{
+									path: router.currentRoute.value.path,
+									query: { ...route.query, selection: part.meta?.entityId },
+								}"
+								target="_blank"
+								class="rounded-sm bg-brand px-1 hover:bg-brand/90"
+							>
+								{{ part.text }}
+							</NavLink>
+						</span>
+						<span v-else>
+							<TooltipProvider v-if="part.meta.comment != null">
+								<Tooltip>
+									<TooltipTrigger :style="{ cursor: 'auto' }">
+										<span class="m-0 rounded-sm border-2 border-brand px-1 hover:border-brand/80">{{
+											part.text
+										}}</span>
+									</TooltipTrigger>
+									<TooltipContent> {{ part.meta.comment }} </TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+						</span>
 					</template>
 				</template>
 			</p>
