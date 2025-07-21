@@ -114,7 +114,7 @@ function copyEntity() {
 											}
 										"
 									>
-										<span classs="sr-only"> {{ t("EntitySidebar.copy") }}</span>
+										<span class="sr-only"> {{ t("EntitySidebar.copy") }}</span>
 										<CopyIcon :size="16" />
 									</Button>
 								</TooltipTrigger>
