@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { CheckIcon, CopyIcon } from "lucide-vue-next";
-
 import CustomPrimaryDetails from "@/components/custom-primary-details.vue";
 import CustomPrimaryDetailsActor from "@/components/custom-primary-details-actor.vue";
 import CustomPrimaryDetailsEvent from "@/components/custom-primary-details-event.vue";
@@ -14,7 +12,6 @@ const getRelationTitle = (relation: RelationType) => {
 };
 
 const { getUnprefixedId } = useIdPrefix();
-const route = useRoute();
 const requestURL = useRequestURL();
 const t = useTranslations();
 
@@ -112,8 +109,6 @@ interface Place {
 	relationType: RelationType | null;
 }
 
-const isCopied = ref(false);
-
 // TODO: For instances where there is no location set (at least for actors), make use of first and last event if no places are available
 const places = computed(() => {
 	console.log(props.entity);
@@ -137,10 +132,6 @@ const places = computed(() => {
 });
 
 watchEffect(() => {
-	if (route.query.selection) {
-		isCopied.value = false;
-	}
-
 	if (!places.value || places.value.length === 0) return;
 	const relTypes = places.value.map((place) => {
 		return place.relationType;
@@ -150,16 +141,6 @@ watchEffect(() => {
 	}
 	emitHandledRelations([]);
 });
-
-function copyEntity() {
-	const fullUrl = window.location.href;
-	const baseUrl = fullUrl.split(route.path)[0];
-	if (baseUrl) {
-		isCopied.value = true;
-		return navigator.clipboard.writeText(`${baseUrl}/entity/${route.query.selection as string}`);
-	}
-	return null;
-}
 
 const tabs = computed(() => {
 	const tabs = [];
@@ -251,21 +232,7 @@ watch(
 </script>
 
 <template>
-	<div class="grid grid-cols-1 md:grid-cols-[auto_auto]">
-		<EntitySystemClass :system-class="entity.systemClass" />
-		<div v-if="!isCopied" class="ml-auto">
-			<Button variant="outline" @click="copyEntity">
-				<CopyIcon :size="16" />
-				{{ t("EntitySidebar.copy") }}
-			</Button>
-		</div>
-		<div v-if="isCopied" class="ml-auto">
-			<Button variant="brand" @click="copyEntity">
-				<CheckIcon :size="16" />
-				{{ t("EntitySidebar.copied") }}
-			</Button>
-		</div>
-	</div>
+	<EntitySystemClass :system-class="entity.systemClass" />
 	<PageTitle>{{ entity.title }}</PageTitle>
 	<!-- @ts-expect FIXME: Incorrect information provided by openapi document. -->
 	<EntityAliases v-if="entity.aliases" :aliases="entity.aliases as unknown as Array<string>" />

@@ -98,7 +98,8 @@
 		"NextFeature": "Nächste Funktion",
 		"PreviousFeature": "Vorheriges Feature",
 		"copy": "Permalink",
-		"copied": "Kopiert!"
+		"copied": "Kopiert!",
+		"copiedMessage": "Der Permalink wurde erfolgreich auf das Clipboard kopiert."
 	},
 	"ErrorBoundary": {
 		"error": "Fehler"
