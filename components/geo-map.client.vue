@@ -439,7 +439,11 @@ function updateScope() {
 	sourceCenterpoints?.setData(geojsonCenterPoints);
 	sourceEventPoints?.setData(geojsonEventPoints);
 
-	if (geojsonPoints.features.length > 0) {
+	if (props.selectionBounds) {
+		zoomToSelection(props.selectionBounds);
+	} else if (props.currentSelectionCoordinates) {
+		flyToSelection(props.currentSelectionCoordinates);
+	} else if (geojsonPoints.features.length > 0) {
 		const bounds = turf.bbox(geojsonPoints) as [number, number, number, number];
 		map.fitBounds(bounds, { padding: 50, maxZoom: 16 });
 	} else if (geojsonCenterPoints.features.length > 0) {

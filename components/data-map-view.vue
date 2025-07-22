@@ -24,7 +24,7 @@ const searchFiltersSchema = v.object({
 });
 
 const entitySelectionSchema = v.object({
-	selection: v.fallback(v.array(v.string()), []),
+	selection: v.fallback(v.string(), ""),
 });
 
 const searchFilters = computed(() => {
@@ -41,7 +41,7 @@ function setEntitySelection(query: Partial<EntitySelection>) {
 
 function onChangeEntitySelection(values: EntityFeature) {
 	const temp: EntitySelection = {
-		selection: [getUnprefixedId(values["@id"])],
+		selection: getUnprefixedId(values["@id"]),
 	};
 	setEntitySelection(temp);
 }
@@ -116,6 +116,10 @@ const selection = computed(() => {
 	return route.query.selection;
 });
 
+const detailOnMap = computed(() => {
+	return route.query.showOnMap;
+});
+
 const mode = computed(() => {
 	return route.query.mode;
 });
@@ -152,11 +156,11 @@ const movements = computed(() => {
 				);
 			});
 
-			const from = feature.relations?.find((rel) => {
+			const from = feature.relations.find((rel) => {
 				return rel.relationType?.startsWith("crm:P27");
 			});
 
-			const to = feature.relations?.find((rel) => {
+			const to = feature.relations.find((rel) => {
 				return rel.relationType?.startsWith("crm:P26");
 			});
 
@@ -291,7 +295,6 @@ function onLayerClick({ features, targetCoordinates }: onLayerClickParams) {
 			]),
 		entities,
 	};
-	console.log("Popup: ", popover.value);
 }
 
 watch(data, () => {
@@ -303,6 +306,7 @@ watch(data, () => {
 });
 
 const selectionCoordinates = ref<[number, number] | undefined>(undefined);
+const detailSelectionCoordinates = ref<[number, number] | undefined>(undefined);
 const selectionBounds = ref<Array<[number, number]> | undefined>(undefined);
 
 function setCoordinates(entity: EntityFeature, coordinates: Ref<[number, number] | undefined>) {
@@ -338,24 +342,54 @@ function setCoordinates(entity: EntityFeature, coordinates: Ref<[number, number]
 
 watchEffect(() => {
 	if (mode.value && selection.value) {
+		console.log("mode & selection set", selection.value);
 		const entity = entities.value.find((feature) => {
 			const id = getUnprefixedId(feature["@id"]);
 			return id === selection.value;
 		});
+		console.log("Entity: ", entity, entities.value);
 
 		if (entity) {
 			setCoordinates(entity, selectionCoordinates);
 
-			if (entity.geometry == null) return;
-			popover.value = {
-				coordinates:
-					selectionCoordinates.value ??
-					(turf.center(createFeatureCollection([entity as Feature])).geometry.coordinates as [
-						number,
-						number,
-					]),
-				entities: [entity],
-			};
+			if (entity.geometry != null) {
+				popover.value = {
+					coordinates:
+						selectionCoordinates.value ??
+						(turf.center(createFeatureCollection([entity as Feature])).geometry.coordinates as [
+							number,
+							number,
+						]),
+					entities: [entity],
+				};
+			}
+
+			console.log(detailOnMap.value);
+			detailSelectionCoordinates.value = undefined;
+			if (detailOnMap.value) {
+				const detailEntity = entities.value.find((feature) => {
+					const id = getUnprefixedId(feature["@id"]);
+					return id === detailOnMap.value;
+				});
+
+				// should there be two popups? --> make popups array / more rendered components??
+				if (detailEntity) {
+					setCoordinates(detailEntity, detailSelectionCoordinates);
+					// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+					if (detailSelectionCoordinates.value === undefined) return;
+
+					console.log(
+						"Detail Coordinates: ",
+						detailSelectionCoordinates,
+						popover.value,
+						detailEntity,
+					);
+					popover.value = {
+						coordinates: detailSelectionCoordinates.value,
+						entities: [detailEntity],
+					};
+				}
+			}
 		}
 	}
 });
@@ -376,27 +410,29 @@ const movementDetails = computed(() => {
 });
 
 const linkedMovements = computed(() => {
-	if (movementDetails.value === null) {
+	if (movementDetails.value?.id == null) {
 		return null;
 	}
 
-	const features = Object.values(movementDetails.value).flatMap((entity) => {
-		if (entity && typeof entity === "object" && Array.isArray(entity.features)) {
-			return entity.features as Array<EntityFeature>;
-		}
-		return [];
-	});
+	let currentMovement = movementDetails.value;
+	let features = [currentMovement];
+
+	while (currentMovement.children && currentMovement.children.length > 0) {
+		assert(currentMovement.children[0]);
+		features = features.concat(currentMovement.children);
+		currentMovement = currentMovement.children[0];
+	}
 
 	// Now map through the features to get the IDs
 	return features.map((movement) => {
 		return {
-			id: getUnprefixedId(movement["@id"]),
-			systemClass: movement.systemClass,
+			id: String(movement.id),
+			systemClass: movement.system_class ?? "",
 		};
 	});
 });
 
-const multipleMovements = useGetLinkedEntitiesRecursive(
+const multipleMovements = useGetChainedEvents(
 	computed(() => {
 		return { entityId: movementId.value };
 	}),
@@ -417,7 +453,7 @@ function setMovementId({ id }: { id: string | null }) {
 			<SearchForm
 				:class="
 					project.fullscreen
-						? 'bg-white/90 dark:bg-neutral-900 max-w-[800px] w-full mt-2 rounded-md p-6 shadow-md pointer-events-auto'
+						? 'bg-white/90 dark:bg-neutral-900 max-w-[min(800px,49%)] min-w-fit w-full mt-2 rounded-md p-6 shadow-md pointer-events-auto'
 						: ''
 				"
 				:category="searchFilters.category"
@@ -481,7 +517,7 @@ function setMovementId({ id }: { id: string | null }) {
 				:has-polygons="show"
 				:show-movements="showMovements"
 				:multiple-movements="linkedMovements"
-				:current-selection-coordinates="selectionCoordinates"
+				:current-selection-coordinates="detailSelectionCoordinates || selectionCoordinates"
 				:selection-bounds="selectionBounds"
 				:current-selection-id="String(selection)"
 				@layer-click="onLayerClick"

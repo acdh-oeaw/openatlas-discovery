@@ -14,6 +14,19 @@ function close() {
 	isSidepanelOpen.value = false;
 }
 
+const filteredLinks = computed(() => {
+	const entries = Object.entries(props.links);
+	if (project.map.startPage) {
+		// Filter out the 'home' link when map is the start page
+		return Object.fromEntries(
+			entries.filter(([key]) => {
+				return key !== "home";
+			}),
+		);
+	}
+	return props.links;
+});
+
 onMounted(() => {
 	window.addEventListener("resize", close, { passive: true });
 });
@@ -31,7 +44,7 @@ onScopeDispose(() => {
 		<SheetContent class="overflow-y-auto">
 			<SheetTitle class="sr-only">{{ props.title }}</SheetTitle>
 			<ul class="grid py-8" role="list">
-				<li v-for="(link, key) of props.links" :key="key">
+				<li v-for="(link, key) of filteredLinks" :key="key">
 					<NavLink
 						class="flex py-2 font-medium opacity-80 transition-opacity hover:opacity-100 focus-visible:opacity-100"
 						:href="link.href"

@@ -1,6 +1,8 @@
 <script lang="ts" setup>
+import type { PresentationViewModel } from "@/types/api";
+
 const props = defineProps<{
-	entities: Array<EntityFeature>;
+	entities: Array<PresentationViewModel>;
 }>();
 
 const features = computed(() => {

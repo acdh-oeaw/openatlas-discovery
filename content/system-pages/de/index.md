@@ -4,10 +4,11 @@ navigation: false
 image:
   light: /assets/images/hero-light.svg
   dark: /assets/images/hero-dark.svg
-leadIn: >-
-  Das ist ein Prototyp für Projekte von [OpenAtlas](https://openatlas.eu). Die Demodaten wurden
-  freundlicherweise bereitgestellt von: [THANADOS](https://thanados.net/) - Die Anthropologische und
-  Archäologische Datenbank von Sepulturen
+leadIn: "Das ist eine Demo für [OpenAtlas
+  Discovery](https://github.com/craws/OpenAtlas-Discovery), eine
+  Präsentatiosseite für [OpenAtlas](https://openatlas.eu). Die Demodaten wurden
+  freundlicherweise bereitgestellt von: [THANADOS](https://thanados.net/) - Die
+  Anthropologische und Archäologische Datenbank von Sepulturen"
 links:
   - label: Daten anzeigen
     href: /visualization?mode=table

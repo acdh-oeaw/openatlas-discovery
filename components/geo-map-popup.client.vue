@@ -44,7 +44,10 @@ watch(
 	() => {
 		return props.coordinates;
 	},
-	(coordinates) => {
+	(coordinates, oldCoordinates) => {
+		if (coordinates !== oldCoordinates && geoMapContext.map && !context.popup?.isOpen()) {
+			context.popup?.addTo(geoMapContext.map);
+		}
 		context.popup?.setLngLat(coordinates);
 	},
 );

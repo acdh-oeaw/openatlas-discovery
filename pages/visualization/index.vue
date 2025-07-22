@@ -1,7 +1,13 @@
 <script lang="ts" setup>
 definePageMeta({
 	layout: "visualization",
-	middleware: "database-check",
+	middleware: [
+		"database-check",
+		() => {
+			const { markVisited } = useInitialVisit();
+			markVisited();
+		},
+	],
 });
 
 const t = useTranslations();
@@ -13,6 +19,7 @@ usePageMetadata({
 const route = useRoute();
 
 const currentMode = computed(() => {
+	console.log(route.query.mode);
 	return route.query.mode;
 });
 </script>
@@ -26,6 +33,7 @@ const currentMode = computed(() => {
 			<DataMapView v-if="currentMode === 'map'" />
 			<DataNetworkView v-if="currentMode === 'network'" />
 			<DataView v-if="currentMode === 'table'"></DataView>
+			<DataImageView v-if="currentMode === 'images'"></DataImageView>
 		</ErrorBoundary>
 	</MainContent>
 </template>

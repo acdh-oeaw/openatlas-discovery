@@ -19,3 +19,37 @@ export interface LinkedPlace extends LinkedPlacesModel {
 }
 
 export type NetworkEntity = components["schemas"]["NetworkVisualisationModel"]["results"];
+
+export type GetLinkedEntitiesResponse = components["schemas"]["EntitiesOutputModel"]["results"];
+
+export type GetEgoNetworkVisualisationResponse =
+	components["schemas"]["NetworkVisualisationModel"]["results"];
+
+export type RelationLinkedEntity = LinkedPlacesModel["features"][0];
+export interface ExtendedEntities extends RelationLinkedEntity {
+	label?: string;
+	relationType?: string;
+	relationTo?: string;
+	relationSystemClass: string;
+	when?: {
+		timespans?: [
+			{
+				end?: {
+					comment?: string;
+					earliest?: string;
+					latest?: string;
+				};
+				start?: {
+					comment?: string;
+					earliest?: string;
+					latest?: string;
+				};
+			},
+		];
+	};
+}
+
+export type PresentationViewModel = components["schemas"]["PresentationViewModel"];
+export type RelatedEntityModel = components["schemas"]["RelatedEntityModel"];
+
+export type File = NonNullable<components["schemas"]["PresentationViewModel"]["files"]>[0];

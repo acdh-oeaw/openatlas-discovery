@@ -160,6 +160,9 @@ const oadPlugin = createPlugin(
 	{
 		theme: {
 			extend: {
+				spacing: {
+					"18": "4.5rem",
+				},
 				colors: {
 					brand: {
 						DEFAULT: "var(--brand)",

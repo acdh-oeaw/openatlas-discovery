@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Graph from "graphology";
+import { useTemplateRef } from "vue";
 
 import { networkConfig } from "@/config/network-visualisation.config";
 import type { NetworkEntity } from "@/types/api";
@@ -8,12 +9,35 @@ const props = defineProps<{
 	networkData: NetworkEntity;
 	searchNode: string;
 	detailNode?: string;
+	showOrphans: boolean;
 }>();
 
 const graph = new Graph();
 
 const { entityColors } = networkConfig.colors;
 const defaultColor = networkConfig.colors.entityDefaultColor;
+
+export interface NetworkTemplateRef {
+	handleNetworkControls: (args: string) => void;
+	isRunning: boolean;
+}
+const networkRef = useTemplateRef<NetworkTemplateRef>("networkClient");
+function emitNetworkControls(args: string) {
+	//eslint-disable-next-line
+	//@ts-ignore
+	if (networkRef.value) networkRef.value.handleNetworkControls(args);
+}
+
+const layoutIsRunning = computed(() => {
+	//eslint-disable-next-line
+	//@ts-ignore
+	return networkRef.value?.isRunning;
+});
+
+defineExpose({
+	emitNetworkControls,
+	layoutIsRunning,
+});
 
 watch(
 	() => {
@@ -32,6 +56,9 @@ watch(
 					label: entity.label,
 					color: getNodeColor(entity.systemClass),
 					size: networkConfig.sourceNodeSize,
+					//set random value to prevent sigma error related to undefined x,y values
+					x: Math.random(),
+					y: Math.random(),
 				});
 			}
 		});
@@ -50,6 +77,12 @@ watch(
 				}
 			});
 		});
+
+		if (!layoutIsRunning.value) {
+			//eslint-disable-next-line
+			//@ts-ignore
+			networkRef.value?.handleNetworkControls("toggleRenderer");
+		}
 	},
 	{ immediate: true },
 );
@@ -64,8 +97,11 @@ function getNodeColor(nodeClass: string) {
 	<div class="absolute z-10 m-3 flex w-full"></div>
 	<Network
 		v-if="graph.size > 0"
+		ref="networkClient"
 		:graph="graph"
 		:search-node="props.searchNode"
 		:detail-node="props.detailNode"
+		:show-orphans="props.showOrphans"
+		network-container-id="network-view"
 	/>
 </template>

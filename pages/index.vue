@@ -12,23 +12,11 @@ defineRouteRules({
 const locale = useLocale();
 const t = useTranslations();
 const route = useRoute();
-const router = useRouter();
-
 const env = useRuntimeConfig();
-
-onMounted(() => {
-	if (project.map.startPage) {
-		if (!route.query.mode) {
-			return router.push({ query: { mode: "map" } });
-		}
-		return null;
-	}
-	return null;
-});
 
 definePageMeta({
 	layout: project.map.startPage ? "visualization" : "default",
-	middleware: project.map.startPage ? "database-check" : undefined,
+	middleware: project.map.startPage ? ["database-check", "redirect-home"] : undefined,
 });
 
 usePageMetadata({
@@ -77,8 +65,6 @@ const currentMode = computed(() => {
 							class="block h-80 w-full max-w-3xl object-contain dark:hidden"
 							preload
 							:src="content.image?.light"
-							:width="768"
-							:height="320"
 						/>
 						<NuxtImg
 							v-if="content.image?.dark != null"
@@ -86,8 +72,6 @@ const currentMode = computed(() => {
 							class="hidden h-80 w-full max-w-3xl object-contain dark:block"
 							preload
 							:src="content.image?.dark"
-							:width="768"
-							:height="320"
 						/>
 					</div>
 

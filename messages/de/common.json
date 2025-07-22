@@ -41,6 +41,7 @@
 	},
 	"DataMapView": {
 		"centerpoint": "Flächen",
+		"start-date": "Start-Datum",
 		"end-date": "End-Datum",
 		"point": "Orte",
 		"polygon": "Flächen anzeigen",
@@ -58,9 +59,6 @@
 		"title": "Datenliste",
 		"work-in-progress": "Die Datenbank ist derzeit im Aufbau."
 	},
-	"DataView": {
-		"nothing-found": "Keine Einträge zu dieser Suche."
-	},
 	"DefaultLayout": {
 		"skip-to-main-content": "Zum Hauptinhalt springen"
 	},
@@ -69,25 +67,40 @@
 		"no-descriptions": "Keine Beschreibungen verfügbar."
 	},
 	"EntityPage": {
-		"details": "Details",
+		"superEvent": "Überereignis",
+		"subEvent": "Unterereignis",
+		"hasTranslationText": "Übersetzung",
+		"isOriginalText": "Originaltext",
+		"showText": "Text anzeigen",
+		"showOnMap": "Auf Karte anzeigen",
+		"details": "Weitere Informationen",
+		"noType": "Kein Typ",
 		"iiif": "IIIF-Ansicht",
 		"images": "Bilder ({count})",
 		"map": "Karte",
 		"meta": {
 			"title": "Entität"
 		},
-		"network": "Netzwerk-Visualisierung",
+		"network": "Netzwerk",
+		"egoNetwork": "Ego-Netzwerk",
+		"networkDepth": "Netzwerk-Tiefe",
+		"networkLegend": "Netzwerk-Legende",
 		"sidebar": {
 			"toggle": "Details für {title} umschalten"
 		},
 		"no-map": "Nicht auf der Karte vorhanden.",
-		"no-network": "Nicht im Netzwerk vorhanden."
+		"no-network": "Nicht im Netzwerk vorhanden.",
+		"no-details": "Keine weiteren Details vorhanden.",
+
+		"dateSpan": "Zeitraum",
+		"dateSpan-to": "bis"
 	},
 	"EntitySidebar": {
 		"NextFeature": "Nächste Funktion",
 		"PreviousFeature": "Vorheriges Feature",
 		"copy": "Permalink",
-		"copied": "Kopiert!"
+		"copied": "Kopiert!",
+		"copiedMessage": "Der Permalink wurde erfolgreich auf das Clipboard kopiert."
 	},
 	"ErrorBoundary": {
 		"error": "Fehler"
@@ -141,7 +154,19 @@
 			"title": "Netzwerk-Visualisierung"
 		},
 		"title": "Netzwerk-Visualisierung",
-		"work-in-progress": "Die Datenbank ist derzeit im Aufbau."
+		"work-in-progress": "Die Datenbank ist derzeit im Aufbau.",
+		"controls": {
+			"start": "Abspielen",
+			"pause": "Pausieren",
+			"zoomIn": "Vergrößeren",
+			"zoomOut": "Verkleinern",
+			"reset-zoom": "Zoom zurücksetzen",
+			"fullscreen": "Vollbildmodus",
+			"reset-fullscreen": "Vollbildmodus beenden",
+			"download": "Netzwerk-Graph herunterladen",
+			"show-orphans": "Einzelne Knoten anzeigen",
+			"hide-orphans": "Einzelne Knoten verbergen"
+		}
 	},
 	"NotFoundPage": {
 		"meta": {
@@ -153,8 +178,10 @@
 		"CurrentOrFormerResidency": "Residenz"
 	},
 	"Relations": {
+		"Features": "Features",
 		"Artifacts": "Artefakte",
-		"HumanRemains": "Menschliche Überreste"
+		"HumanRemains": "Menschliche Überreste",
+		"Sources": "Quellen"
 	},
 	"SearchForm": {
 		"filter": "Filter",
@@ -203,8 +230,10 @@
 		"edition": "Edition",
 		"event": "Ereignis",
 		"external_reference": "Externe Referenz",
+		"externalReferenceSystems": "Externe Referenzen",
 		"feature": "Feature",
 		"file": "Datei",
+		"files": "Dateien",
 		"group": "Gruppe",
 		"human_remains": "Menschliche Überreste",
 		"involvement": "Beteiligung",
@@ -214,9 +243,10 @@
 		"person": "Person",
 		"place": "Ort",
 		"production": "Produktion",
+		"references": "Referenzen",
 		"reference_system": "Referenzsystem",
 		"source": "Quelle",
-		"source_translation": "Quellenübersetzung",
+		"source_translation": "Quellentext",
 		"stratigraphic_unit": "Stratigraphische Einheit",
 		"type": "Typ",
 		"type_tools": "Typ-Werkzeuge"

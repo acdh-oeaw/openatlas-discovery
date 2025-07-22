@@ -16,6 +16,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/chained_events/{entityId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get the chain of successive events also with forks but no super or sub events if they are not in the chain. */
+        get: operations["GetChainedEvents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/cidoc_class/{cidoc_class}": {
         parameters: {
             query?: never;
@@ -84,6 +101,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ego_network_visualisation/{entityId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Retrieves a list of object with id, system_class, label and related ids connected to one entity. */
+        get: operations["GetEgoNetworkVisualisation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/entities_linked_to_entity/{entityId}": {
         parameters: {
             query?: never;
@@ -128,7 +162,14 @@ export interface paths {
         /** @description Retrieves an Entity with its linked data for presentation sites */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description Will include the whole place hierarchy. This means that instead of only getting entities linked to the requested entity, all entities, which are connected with the property *P46* are included in the result set. This can significantly increase the load time. */
+                    place_hierarchy?: components["parameters"]["place_hierarchy"];
+                    /** @description This will remove any keys which are empty or have no values assigned, e.g. []. This can reduce the load time. */
+                    remove_empty_values?: components["parameters"]["remove_empty_values"];
+                    /** @description Will calculate the centerpoint for all polygons and linestrings and *add* them to geometries */
+                    centroid?: components["parameters"]["centroid"];
+                };
                 header?: never;
                 path: {
                     /**
@@ -286,6 +327,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/openapi_schema/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Retrieves OpenApi3 schema for this instance. Formats are `json` or `yaml`. */
+        get: operations["openapi_schema"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/properties/": {
         parameters: {
             query?: never;
@@ -312,6 +370,24 @@ export interface paths {
         };
         /** @description Retrieves a list with entity ID, CIDOC CRM code, system class, or view class. You can combine these endpoints in a single query. */
         get: operations["GetQuery"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/search/{system_class}/{term}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Searches the database for entries matching a provided search term.
+         *       Results are ordered with exact prefix matches appearing first, followed by entries containing the search term within their name or appellation. */
+        get: operations["GetSearchEntities"];
         put?: never;
         post?: never;
         delete?: never;
@@ -494,6 +570,13 @@ export interface components {
             siteName: string;
             version: string;
         };
+        ChainEventModel: {
+            children: components["schemas"]["ChainEventModel"][] | null;
+            geometry: (components["schemas"]["Polygon"] | components["schemas"]["Point"] | components["schemas"]["LineString"] | components["schemas"]["GeometryCollection"]) | null;
+            id: number;
+            name: string;
+            system_class: string;
+        };
         ClassMappingModel: {
             locale?: string;
             results?: {
@@ -513,7 +596,7 @@ export interface components {
         }[];
         EntitiesOutputModel: {
             pagination: components["schemas"]["PaginationModel"];
-            results: (components["schemas"]["LinkedPlacesModel"] | components["schemas"]["GeoJSONModel"])[];
+            results: (components["schemas"]["LinkedPlacesModel"] | components["schemas"]["GeoJSONModel"] | components["schemas"]["SearchModel"])[];
         };
         EntityTypeModel: {
             descriptions?: string | null;
@@ -521,6 +604,8 @@ export interface components {
             isStandard: boolean;
             title: string;
             typeHierarchy?: components["schemas"]["TypeHierarchyEntryModel"][] | null;
+            unit?: string;
+            value?: string;
         } | null;
         ExternalReferenceModel: {
             id: string;
@@ -530,6 +615,47 @@ export interface components {
             resolverURL: string;
             type: string;
         } | null;
+        /** @description A GeoJSON Feature object, linking a geometry to properties. */
+        Feature: {
+            geometry: (components["schemas"]["GeoJSONPoint"] | components["schemas"]["GeoJSONPolygon"] | components["schemas"]["GeoJSONLineString"]) | null;
+            properties: components["schemas"]["FeatureProperties"];
+            /**
+             * @description The GeoJSON object type.
+             * @enum {string}
+             */
+            type: "Feature";
+        };
+        /** @description A collection of GeoJSON Feature objects. */
+        FeatureCollection: {
+            features: components["schemas"]["Feature"][];
+            /**
+             * @description The GeoJSON object type.
+             * @enum {string}
+             */
+            type: "FeatureCollection";
+        };
+        FeatureProperties: {
+            /** @description A description of the feature. */
+            description?: string;
+            /**
+             * Format: int64
+             * @description A specific identifier for the location.
+             */
+            locationId?: number;
+            /** @description A custom identifier for the shape's role or type. */
+            shapeType?: string;
+            /** @description A title for the feature. */
+            title?: string;
+        };
+        /** @description A GeoJSON LineString geometry. */
+        GeoJSONLineString: {
+            coordinates: components["schemas"]["PositionArray"];
+            /**
+             * @description The GeoJSON geometry type.
+             * @enum {string}
+             */
+            type: "LineString";
+        };
         GeoJSONModel: {
             features: {
                 geometry: components["schemas"]["Polygon"] | components["schemas"]["Point"] | components["schemas"]["LineString"] | components["schemas"]["GeometryCollection"];
@@ -555,6 +681,25 @@ export interface components {
             /** @enum {string} */
             type: "FeatureCollection";
         };
+        /** @description A GeoJSON Point geometry. */
+        GeoJSONPoint: {
+            coordinates: components["schemas"]["Position"];
+            /**
+             * @description The GeoJSON geometry type.
+             * @enum {string}
+             */
+            type: "Point";
+        };
+        /** @description A GeoJSON Polygon geometry. */
+        GeoJSONPolygon: {
+            coordinates: components["schemas"]["PolygonCoordinates"];
+            /**
+             * @description The GeoJSON geometry type.
+             * @enum {string}
+             */
+            type: "Polygon";
+        };
+        GeoJsonGeometry: components["schemas"]["Point"] | components["schemas"]["LineString"] | components["schemas"]["Polygon"];
         GeometricEntitiesModel: {
             features?: {
                 geometry?: {
@@ -579,6 +724,10 @@ export interface components {
             }[];
             type?: string;
         };
+        /** @description Represents geographic data associated with an entity.
+         *     Can be explicitly null, a single GeoJSON geometry (Point, Polygon, or LineString),
+         *     or a GeoJSON FeatureCollection containing Features with specific properties. */
+        Geometries: (components["schemas"]["FeatureCollection"] | components["schemas"]["Feature"]) | null;
         GeometryCollection: {
             geometries: (components["schemas"]["Polygon"] | components["schemas"]["Point"] | components["schemas"]["LineString"])[];
             /** @enum {string} */
@@ -611,6 +760,8 @@ export interface components {
             components["schemas"]["Position"],
             ...components["schemas"]["Position"][]
         ];
+        /** @description An array of four or more positions where the first and last positions are equivalent (they represent closed loops).
+         *     Used for defining polygon boundaries. */
         LinearRing: [
             components["schemas"]["Position"],
             components["schemas"]["Position"],
@@ -679,7 +830,7 @@ export interface components {
                         label?: string;
                     }[];
                     unit?: string | null;
-                    /** Format: float */
+                    /** Format: string */
                     value?: number;
                 }[] | null;
                 viewClass: string;
@@ -738,15 +889,34 @@ export interface components {
             /** @enum {string} */
             type: "Polygon";
         };
+        /** @description An array of LinearRing coordinate arrays. The first element MUST be the exterior ring.
+         *     Subsequent elements represent interior rings (holes). */
+        PolygonCoordinates: [
+            components["schemas"]["LinearRing"],
+            ...components["schemas"]["LinearRing"][]
+        ];
+        /** @description A single position represented as an array of numbers.
+         *     The first two elements MUST be longitude and latitude (in that order).
+         *     An optional third element represents altitude. More elements are discouraged.
+         *     Example: [10.9787, 49.7606] or [10.9787, 49.7606, 150.5] */
         Position: [
-        ] | [
-            number
+            number,
+            number,
+            ...number[]
+        ];
+        /** @description An array of two or more positions. Used for LineStrings. */
+        PositionArray: [
+            components["schemas"]["Position"],
+            components["schemas"]["Position"],
+            ...components["schemas"]["Position"][]
         ];
         PresentationViewModel: {
             aliases: string[];
             description: string;
             externalReferenceSystems?: components["schemas"]["ExternalReferenceModel"][] | null;
             files?: {
+                IIIFBasePath?: string;
+                IIIFManifest?: string;
                 creator?: string | null;
                 id: number;
                 license: string | null;
@@ -756,14 +926,17 @@ export interface components {
                 title: string;
                 url: string;
             }[] | null;
-            geometries?: {
-                coordinates: number[];
-                description: string;
-                shapeType: string;
-                title: string;
-                type: string;
-            } | null;
+            geometries?: components["schemas"]["Geometries"];
             id: number;
+            references?: {
+                citation: string;
+                id: number;
+                pages?: string | null;
+                systemClass: string;
+                title: string;
+                type?: string | null;
+                typeId?: number | null;
+            }[] | null;
             relations?: {
                 acquisition?: components["schemas"]["RelatedEntityModel"][];
                 activity?: components["schemas"]["RelatedEntityModel"][];
@@ -793,6 +966,7 @@ export interface components {
             systemClass: string;
             title: string;
             types?: components["schemas"]["EntityTypeModel"][] | null;
+            viewClass: string;
             when?: components["schemas"]["TimeRangeModel"];
         };
         PropertiesDetailModel: {
@@ -966,15 +1140,16 @@ export interface components {
         RelatedEntityModel: {
             aliases?: string[];
             description: string;
-            geometries: Record<string, never>;
+            geometries: components["schemas"]["Geometries"];
             id: number;
-            relationTypesModel?: components["schemas"]["RelationTypeModel"][];
+            relationTypes?: components["schemas"]["RelationTypeModel"][];
             standardType?: {
                 id?: number;
                 title?: string;
             };
             systemClass: string;
             title: string;
+            viewClass: string;
             when: components["schemas"]["TimeRangeModel"];
         } | null;
         RelationTypeModel: {
@@ -984,6 +1159,29 @@ export interface components {
             type?: string | null;
             when?: components["schemas"]["TimeRangeModel"];
         } | null;
+        SearchModel: {
+            /**
+             * Format: date-time
+             * @description The start date of the entity
+             */
+            begin?: string | null;
+            /** @description A description of the entity */
+            description?: string | null;
+            /**
+             * Format: date-time
+             * @description The end date of the entity
+             */
+            end?: string | null;
+            /**
+             * Format: uri
+             * @description The unique identifier URL of the entity
+             */
+            id: string;
+            /** @description The name of the entity */
+            name: string;
+            /** @description The system class of the entity */
+            system_class: string;
+        };
         SubunitsModel: {
             children: number[];
             created: string;
@@ -1207,7 +1405,7 @@ export interface components {
          */
         cidoc_class: "all" | "E5" | "E7" | "E8" | "E9" | "E12" | "E18" | "E20" | "E21" | "E22" | "E31" | "E32" | "E33" | "E41" | "E53" | "E54" | "E55" | "E65" | "E74";
         /**
-         * @description CIDOC classes to be requested
+         * @description Retrieve entities based on the specified CIDOC classes.
          * @example E18
          */
         cidoc_classes: ("all" | "E6" | "E7" | "E8" | "E9" | "E12" | "E18" | "E20" | "E21" | "E22" | "E31" | "E32" | "E33" | "E41" | "E53" | "E54" | "E55" | "E74")[];
@@ -1218,54 +1416,60 @@ export interface components {
         column: "id" | "name" | "cidoc_class" | "system_class" | "begin_from" | "begin_to" | "end_from" | "end_to";
         /** @description Show integer count of how many entities would the result give back */
         count: boolean;
+        /** @description Specifies the number of connection hops to include in the query. Higher values may significantly increase processing time. Default is 1. */
+        depth: number;
         /** @description Download results */
         download: boolean;
-        /** @description Entity ids which will be requested */
+        /** @description The entity IDs to be requested. */
         entities: number[];
         /**
          * @description Specific entity ID
          * @example 40
          */
         entityId: number;
-        /** @description System classes to be excluded from network */
-        exclude_system_classes: ("acquisition" | "activity" | "administrative_unit" | "appellation" | "artifact" | "bibliography" | "creation" | "edition" | "event" | "external_reference" | "feature" | "file" | "group" | "human_remains" | "move" | "person" | "place" | "production" | "reference_system" | "source" | "source_translation" | "stratigraphic_unit" | "type" | "type_tools")[];
-        /** @description Export the entities into either a simple CSV representation or a zip file of CSV's especially designed for network analyses. */
+        /** @description Excludes entities with the selected system classes from the network. */
+        exclude_system_classes: ("acquisition" | "activity" | "administrative_unit" | "appellation" | "artifact" | "bibliography" | "creation" | "edition" | "event" | "external_reference" | "feature" | "file" | "group" | "human_remains" | "modification" | "move" | "person" | "place" | "production" | "reference_system" | "source" | "source_translation" | "stratigraphic_unit" | "type" | "type_tools")[];
+        /** @description Export the entities in either a simple CSV format or a ZIP file containing CSV files optimized for network analysis. */
         export: "csv" | "csvNetwork";
         /**
          * @description Specific ID of a file entity.
          * @example 40
          */
         fileId: number;
-        /** @description Begin results at the given entity id. */
+        /** @description Starts the result set at the specified entity ID. */
         first: number;
         /**
-         * @description Choose the format for the results.
+         * @description Specify the format for the returned results.
          * @example lp
          */
         format: "lp" | "lpx" | "geojson" | "geojson-v2" | "pretty-xml" | "n3" | "turtle" | "nt" | "xml";
-        /** @description Filters which geometries will be received. Default is gisAll */
+        /** @description Filters the geometries to be included in the response. The default is 'gisAll'. */
         geometry: ("gisAll" | "gisPointAll" | "gisPointSupers" | "gisPointSubs" | "gisPointSibling" | "gisLineAll" | "gisPolygonAll")[];
         /**
-         * @description Select which size of the image you want to display. Values are fixed but can be changed for each OpenAtlas instance. Thumbnail is 200px and table 100px.
+         * @description Select the desired image size to display. The available values are fixed but can be customized for each OpenAtlas instance. The 'thumbnail' size is 200px, and the 'table' size is 100px.
          * @example table
          */
         image_size: "thumbnail" | "table";
-        /** @description Begin results after the given entity id. */
+        /** @description Starts the result set after the specified entity ID. */
         last: number;
-        /** @description Limits the entities displayed. Influences the performance of the request. Default value is 20. 0 means all available entities will be displayed. */
+        /** @description Limits the number of entities returned in the response. A lower value may improve performance. The default is 20. Set to 0 to return all available entities. */
         limit: number;
-        /** @description Entity IDs, from which all linked entities are requested */
+        /** @description The entity IDs for which all linked entities will be retrieved. */
         linked_entities: number[];
-        /** @description Show only entities, which are linked to given IDs */
+        /** @description Displays only entities that are linked to the specified IDs. */
         linked_to_ids: number[];
         /** @description Choose language for system inherent labels */
         locale: "ca" | "de" | "en" | "es" | "fr";
-        /** @description Jump to page number. */
+        /** @description Specifies the page number to retrieve in a paginated result set. */
         page: number;
-        /** @description Retrieves entities which are connected to the requested entity with the `property` */
+        /** @description Will include the whole place hierarchy. This means that instead of only getting entities linked to the requested entity, all entities, which are connected with the property *P46* are included in the result set. This can significantly increase the load time. */
+        place_hierarchy: boolean;
+        /** @description Retrieves entities that are connected to the specified entity through the given `property`. */
         properties: ("all" | "OA7" | "OA8" | "OA9" | "P1" | "P2" | "P4" | "P5" | "P7" | "P8" | "P9" | "P10" | "P11" | "P12" | "P13" | "P14" | "P15" | "P16" | "P17" | "P19" | "P20" | "P21" | "P22" | "P23" | "P24" | "P25" | "P26" | "P27" | "P28" | "P29" | "P30" | "P31" | "P32" | "P33" | "P34" | "P35" | "P37" | "P38" | "P39" | "P40" | "P41" | "P42" | "P43" | "P44" | "P45" | "P46" | "P48" | "P49" | "P50" | "P51" | "P52" | "P53" | "P54" | "P55" | "P56" | "P59" | "P62" | "P65" | "P67" | "P68" | "P69" | "P70" | "P71" | "P72" | "P73" | "P74" | "P75" | "P76" | "P86" | "P89" | "P91" | "P92" | "P93" | "P94" | "P95" | "P96" | "P97" | "P98" | "P99" | "P100" | "P101" | "P102" | "P103" | "P104" | "P105" | "P106" | "P107" | "P108" | "P109" | "P110" | "P111" | "P112" | "P113" | "P121" | "P122" | "P123" | "P124" | "P125" | "P126" | "P127" | "P128" | "P129" | "P130" | "P132" | "P133" | "P134" | "P135" | "P136" | "P137" | "P138" | "P139" | "P140" | "P141" | "P142" | "P143" | "P144" | "P145" | "P146" | "P147" | "P148" | "P150" | "P151" | "P152" | "P156" | "P157" | "P160" | "P161" | "P164" | "P165" | "P166" | "P167" | "P173" | "P174" | "P175" | "P176" | "P177" | "P179" | "P180" | "P182" | "P183" | "P184" | "P185" | "P186" | "P187" | "P188" | "P189" | "P191" | "P195" | "P196" | "P197" | "P198")[];
-        /** @description Displays only connections connected by the selected CIDOC CRM property code. If geometry, types, depictions and/or links is in the show parameter, these properties are also displayed. */
+        /** @description Filters results to show only connections linked by the selected CIDOC CRM property code. If 'geometry', 'types', 'depictions', or 'links' are specified in the 'show' parameter, these properties will also be displayed. */
         relation_type: ("all" | "OA7" | "OA8" | "OA9" | "P1" | "P2" | "P4" | "P5" | "P7" | "P8" | "P9" | "P10" | "P11" | "P12" | "P13" | "P14" | "P15" | "P16" | "P17" | "P19" | "P20" | "P21" | "P22" | "P23" | "P24" | "P25" | "P26" | "P27" | "P28" | "P29" | "P30" | "P31" | "P32" | "P33" | "P34" | "P35" | "P37" | "P38" | "P39" | "P40" | "P41" | "P42" | "P43" | "P44" | "P45" | "P46" | "P48" | "P49" | "P50" | "P51" | "P52" | "P53" | "P54" | "P55" | "P56" | "P59" | "P62" | "P65" | "P67" | "P68" | "P69" | "P70" | "P71" | "P72" | "P73" | "P74" | "P75" | "P76" | "P86" | "P89" | "P91" | "P92" | "P93" | "P94" | "P95" | "P96" | "P97" | "P98" | "P99" | "P100" | "P101" | "P102" | "P103" | "P104" | "P105" | "P106" | "P107" | "P108" | "P109" | "P110" | "P111" | "P112" | "P113" | "P121" | "P122" | "P123" | "P124" | "P125" | "P126" | "P127" | "P128" | "P129" | "P130" | "P132" | "P133" | "P134" | "P135" | "P136" | "P137" | "P138" | "P139" | "P140" | "P141" | "P142" | "P143" | "P144" | "P145" | "P146" | "P147" | "P148" | "P150" | "P151" | "P152" | "P156" | "P157" | "P160" | "P161" | "P164" | "P165" | "P166" | "P167" | "P173" | "P174" | "P175" | "P176" | "P177" | "P179" | "P180" | "P182" | "P183" | "P184" | "P185" | "P186" | "P187" | "P188" | "P189" | "P191" | "P195" | "P196" | "P197" | "P198")[];
+        /** @description This will remove any keys which are empty or have no values assigned, e.g. []. This can reduce the load time. */
+        remove_empty_values: boolean;
         /** @description Search query for specific results.
          *
          *      **Filterable categories**
@@ -1327,12 +1531,12 @@ export interface components {
          * @description System class to be requested
          * @example acquisition
          */
-        system_class: "all" | "acquisition" | "activity" | "administrative_unit" | "appellation" | "artifact" | "bibliography" | "creation" | "edition" | "event" | "external_reference" | "feature" | "file" | "group" | "human_remains" | "move" | "person" | "place" | "production" | "reference_system" | "source" | "source_translation" | "stratigraphic_unit" | "type" | "tools";
-        /** @description System classes to be requested */
+        system_class: "all" | "acquisition" | "activity" | "administrative_unit" | "appellation" | "artifact" | "bibliography" | "creation" | "edition" | "event" | "external_reference" | "feature" | "file" | "group" | "human_remains" | "modification" | "move" | "person" | "place" | "production" | "reference_system" | "source" | "source_translation" | "stratigraphic_unit" | "type" | "type_tools";
+        /** @description Retrieve entities based on the specified system classes */
         system_classes: ("all" | "acquisition" | "activity" | "administrative_unit" | "appellation" | "artifact" | "bibliography" | "creation" | "edition" | "event" | "external_reference" | "feature" | "file" | "group" | "human_remains" | "move" | "person" | "place" | "production" | "reference_system" | "source" | "source_translation" | "stratigraphic_unit" | "type" | "tools")[];
-        /** @description Show only entities with the given type id or linked to it. */
+        /** @description Filter results to include only entities with the specified type ID or those linked to it. */
         type_id: number[];
-        /** @description Provide a valid URL, e.g. https://openatlas.eu/. At an IIIF endpoint this will replace the base URL of all annotations. */
+        /** @description A valid URL to use as input (e.g., https://openatlas.eu/). When used with an IIIF endpoint, this value replaces the base URL in all annotations. */
         url: string;
         /**
          * @description View class to be requested
@@ -1340,7 +1544,7 @@ export interface components {
          */
         view_class: "all" | "actor" | "artifact" | "event" | "file" | "place" | "reference" | "reference_system" | "source" | "source_translation" | "type";
         /**
-         * @description View classes to be requested
+         * @description Retrieve entities based on the specified view classes.
          * @example actor
          */
         view_classes: ("all" | "actor" | "artifact" | "event" | "file" | "place" | "reference" | "reference_system" | "source" | "source_translation" | "type")[];
@@ -1381,6 +1585,39 @@ export interface operations {
             };
         };
     };
+    GetChainedEvents: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Specific entity ID
+                 * @example 40
+                 */
+                entityId: components["parameters"]["entityId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChainEventModel"];
+                };
+            };
+            /** @description Something went wrong. Please consult the error message. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     GetByCidocClass: {
         parameters: {
             query?: {
@@ -1391,11 +1628,11 @@ export interface operations {
                 /** @description Select which keys should not be displayed. This can improve performance */
                 show?: components["parameters"]["show"];
                 /**
-                 * @description Choose the format for the results.
+                 * @description Specify the format for the returned results.
                  * @example lp
                  */
                 format?: components["parameters"]["format"];
-                /** @description Export the entities into either a simple CSV representation or a zip file of CSV's especially designed for network analyses. */
+                /** @description Export the entities in either a simple CSV format or a ZIP file containing CSV files optimized for network analysis. */
                 export?: components["parameters"]["export"];
                 /**
                  * @description Choose one column to sort the results by. Default value is name.
@@ -1457,17 +1694,17 @@ export interface operations {
                  *
                  *      */
                 search?: components["parameters"]["search"];
-                /** @description Begin results at the given entity id. */
+                /** @description Starts the result set at the specified entity ID. */
                 first?: components["parameters"]["first"];
-                /** @description Begin results after the given entity id. */
+                /** @description Starts the result set after the specified entity ID. */
                 last?: components["parameters"]["last"];
-                /** @description Jump to page number. */
+                /** @description Specifies the page number to retrieve in a paginated result set. */
                 page?: components["parameters"]["page"];
-                /** @description Limits the entities displayed. Influences the performance of the request. Default value is 20. 0 means all available entities will be displayed. */
+                /** @description Limits the number of entities returned in the response. A lower value may improve performance. The default is 20. Set to 0 to return all available entities. */
                 limit?: components["parameters"]["limit"];
-                /** @description Show only entities with the given type id or linked to it. */
+                /** @description Filter results to include only entities with the specified type ID or those linked to it. */
                 type_id?: components["parameters"]["type_id"];
-                /** @description Displays only connections connected by the selected CIDOC CRM property code. If geometry, types, depictions and/or links is in the show parameter, these properties are also displayed. */
+                /** @description Filters results to show only connections linked by the selected CIDOC CRM property code. If 'geometry', 'types', 'depictions', or 'links' are specified in the 'show' parameter, these properties will also be displayed. */
                 relation_type?: components["parameters"]["relation_type"];
                 /** @description Choose language for system inherent labels */
                 locale?: components["parameters"]["locale"];
@@ -1599,6 +1836,48 @@ export interface operations {
             };
         };
     };
+    GetEgoNetworkVisualisation: {
+        parameters: {
+            query?: {
+                /** @description Specifies the number of connection hops to include in the query. Higher values may significantly increase processing time. Default is 1. */
+                depth?: components["parameters"]["depth"];
+                /** @description Excludes entities with the selected system classes from the network. */
+                exclude_system_classes?: components["parameters"]["exclude_system_classes"];
+                /** @description Displays only entities that are linked to the specified IDs. */
+                linked_to_ids?: components["parameters"]["linked_to_ids"];
+                /** @description Download results */
+                download?: components["parameters"]["download"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description Specific entity ID
+                 * @example 40
+                 */
+                entityId: components["parameters"]["entityId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NetworkVisualisationModel"];
+                };
+            };
+            /** @description Something went wrong. Please consult the error message. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     GetEntitiesLinkedToEntity: {
         parameters: {
             query?: {
@@ -1609,11 +1888,11 @@ export interface operations {
                 /** @description Select which keys should not be displayed. This can improve performance */
                 show?: components["parameters"]["show"];
                 /**
-                 * @description Choose the format for the results.
+                 * @description Specify the format for the returned results.
                  * @example lp
                  */
                 format?: components["parameters"]["format"];
-                /** @description Export the entities into either a simple CSV representation or a zip file of CSV's especially designed for network analyses. */
+                /** @description Export the entities in either a simple CSV format or a ZIP file containing CSV files optimized for network analysis. */
                 export?: components["parameters"]["export"];
                 /**
                  * @description Choose one column to sort the results by. Default value is name.
@@ -1675,17 +1954,17 @@ export interface operations {
                  *
                  *      */
                 search?: components["parameters"]["search"];
-                /** @description Begin results at the given entity id. */
+                /** @description Starts the result set at the specified entity ID. */
                 first?: components["parameters"]["first"];
-                /** @description Begin results after the given entity id. */
+                /** @description Starts the result set after the specified entity ID. */
                 last?: components["parameters"]["last"];
-                /** @description Jump to page number. */
+                /** @description Specifies the page number to retrieve in a paginated result set. */
                 page?: components["parameters"]["page"];
-                /** @description Limits the entities displayed. Influences the performance of the request. Default value is 20. 0 means all available entities will be displayed. */
+                /** @description Limits the number of entities returned in the response. A lower value may improve performance. The default is 20. Set to 0 to return all available entities. */
                 limit?: components["parameters"]["limit"];
-                /** @description Show only entities with the given type id or linked to it. */
+                /** @description Filter results to include only entities with the specified type ID or those linked to it. */
                 type_id?: components["parameters"]["type_id"];
-                /** @description Displays only connections connected by the selected CIDOC CRM property code. If geometry, types, depictions and/or links is in the show parameter, these properties are also displayed. */
+                /** @description Filters results to show only connections linked by the selected CIDOC CRM property code. If 'geometry', 'types', 'depictions', or 'links' are specified in the 'show' parameter, these properties will also be displayed. */
                 relation_type?: components["parameters"]["relation_type"];
                 /** @description Choose language for system inherent labels */
                 locale?: components["parameters"]["locale"];
@@ -1730,11 +2009,11 @@ export interface operations {
                 /** @description Select which keys should not be displayed. This can improve performance */
                 show?: components["parameters"]["show"];
                 /**
-                 * @description Choose the format for the results.
+                 * @description Specify the format for the returned results.
                  * @example lp
                  */
                 format?: components["parameters"]["format"];
-                /** @description Export the entities into either a simple CSV representation or a zip file of CSV's especially designed for network analyses. */
+                /** @description Export the entities in either a simple CSV format or a ZIP file containing CSV files optimized for network analysis. */
                 export?: components["parameters"]["export"];
                 /** @description Choose language for system inherent labels */
                 locale?: components["parameters"]["locale"];
@@ -1804,7 +2083,7 @@ export interface operations {
     GetGeometricEntities: {
         parameters: {
             query?: {
-                /** @description Filters which geometries will be received. Default is gisAll */
+                /** @description Filters the geometries to be included in the response. The default is 'gisAll'. */
                 geometry?: components["parameters"]["geometry"];
                 /** @description Download results */
                 download?: components["parameters"]["download"];
@@ -1838,7 +2117,7 @@ export interface operations {
     IIIFManifest: {
         parameters: {
             query?: {
-                /** @description Provide a valid URL, e.g. https://openatlas.eu/. At an IIIF endpoint this will replace the base URL of all annotations. */
+                /** @description A valid URL to use as input (e.g., https://openatlas.eu/). When used with an IIIF endpoint, this value replaces the base URL in all annotations. */
                 url?: components["parameters"]["url"];
             };
             header?: never;
@@ -1881,11 +2160,11 @@ export interface operations {
                 /** @description Select which keys should not be displayed. This can improve performance */
                 show?: components["parameters"]["show"];
                 /**
-                 * @description Choose the format for the results.
+                 * @description Specify the format for the returned results.
                  * @example lp
                  */
                 format?: components["parameters"]["format"];
-                /** @description Export the entities into either a simple CSV representation or a zip file of CSV's especially designed for network analyses. */
+                /** @description Export the entities in either a simple CSV format or a ZIP file containing CSV files optimized for network analysis. */
                 export?: components["parameters"]["export"];
                 /**
                  * @description Choose one column to sort the results by. Default value is name.
@@ -1947,9 +2226,9 @@ export interface operations {
                  *
                  *      */
                 search?: components["parameters"]["search"];
-                /** @description Show only entities with the given type id or linked to it. */
+                /** @description Filter results to include only entities with the specified type ID or those linked to it. */
                 type_id?: components["parameters"]["type_id"];
-                /** @description Displays only connections connected by the selected CIDOC CRM property code. If geometry, types, depictions and/or links is in the show parameter, these properties are also displayed. */
+                /** @description Filters results to show only connections linked by the selected CIDOC CRM property code. If 'geometry', 'types', 'depictions', or 'links' are specified in the 'show' parameter, these properties will also be displayed. */
                 relation_type?: components["parameters"]["relation_type"];
                 /** @description Choose language for system inherent labels */
                 locale?: components["parameters"]["locale"];
@@ -2014,7 +2293,7 @@ export interface operations {
     GetLinkedEntitiesByPropertyRecursive: {
         parameters: {
             query: {
-                /** @description Retrieves entities which are connected to the requested entity with the `property` */
+                /** @description Retrieves entities that are connected to the specified entity through the given `property`. */
                 properties: components["parameters"]["properties"];
                 /** @description Download results */
                 download?: components["parameters"]["download"];
@@ -2023,11 +2302,11 @@ export interface operations {
                 /** @description Select which keys should not be displayed. This can improve performance */
                 show?: components["parameters"]["show"];
                 /**
-                 * @description Choose the format for the results.
+                 * @description Specify the format for the returned results.
                  * @example lp
                  */
                 format?: components["parameters"]["format"];
-                /** @description Export the entities into either a simple CSV representation or a zip file of CSV's especially designed for network analyses. */
+                /** @description Export the entities in either a simple CSV format or a ZIP file containing CSV files optimized for network analysis. */
                 export?: components["parameters"]["export"];
                 /**
                  * @description Choose one column to sort the results by. Default value is name.
@@ -2089,17 +2368,17 @@ export interface operations {
                  *
                  *      */
                 search?: components["parameters"]["search"];
-                /** @description Begin results at the given entity id. */
+                /** @description Starts the result set at the specified entity ID. */
                 first?: components["parameters"]["first"];
-                /** @description Begin results after the given entity id. */
+                /** @description Starts the result set after the specified entity ID. */
                 last?: components["parameters"]["last"];
-                /** @description Jump to page number. */
+                /** @description Specifies the page number to retrieve in a paginated result set. */
                 page?: components["parameters"]["page"];
-                /** @description Limits the entities displayed. Influences the performance of the request. Default value is 20. 0 means all available entities will be displayed. */
+                /** @description Limits the number of entities returned in the response. A lower value may improve performance. The default is 20. Set to 0 to return all available entities. */
                 limit?: components["parameters"]["limit"];
-                /** @description Show only entities with the given type id or linked to it. */
+                /** @description Filter results to include only entities with the specified type ID or those linked to it. */
                 type_id?: components["parameters"]["type_id"];
-                /** @description Displays only connections connected by the selected CIDOC CRM property code. If geometry, types, depictions and/or links is in the show parameter, these properties are also displayed. */
+                /** @description Filters results to show only connections linked by the selected CIDOC CRM property code. If 'geometry', 'types', 'depictions', or 'links' are specified in the 'show' parameter, these properties will also be displayed. */
                 relation_type?: components["parameters"]["relation_type"];
                 /** @description Choose language for system inherent labels */
                 locale?: components["parameters"]["locale"];
@@ -2139,9 +2418,9 @@ export interface operations {
     GetNetworkVisualisation: {
         parameters: {
             query?: {
-                /** @description System classes to be excluded from network */
+                /** @description Excludes entities with the selected system classes from the network. */
                 exclude_system_classes?: components["parameters"]["exclude_system_classes"];
-                /** @description Show only entities, which are linked to given IDs */
+                /** @description Displays only entities that are linked to the specified IDs. */
                 linked_to_ids?: components["parameters"]["linked_to_ids"];
                 /** @description Download results */
                 download?: components["parameters"]["download"];
@@ -2160,6 +2439,37 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["NetworkVisualisationModel"];
                 };
+            };
+            /** @description Something went wrong. Please consult the error message. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    openapi_schema: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Choose the format for the results.
+                 * @example json
+                 */
+                format?: "json" | "yaml";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Something went wrong. Please consult the error message. */
             404: {
@@ -2205,21 +2515,21 @@ export interface operations {
     GetQuery: {
         parameters: {
             query?: {
-                /** @description Entity ids which will be requested */
+                /** @description The entity IDs to be requested. */
                 entities?: components["parameters"]["entities"];
                 /**
-                 * @description View classes to be requested
+                 * @description Retrieve entities based on the specified view classes.
                  * @example actor
                  */
                 view_classes?: components["parameters"]["view_classes"];
-                /** @description System classes to be requested */
+                /** @description Retrieve entities based on the specified system classes */
                 system_classes?: components["parameters"]["system_classes"];
                 /**
-                 * @description CIDOC classes to be requested
+                 * @description Retrieve entities based on the specified CIDOC classes.
                  * @example E18
                  */
                 cidoc_classes?: components["parameters"]["cidoc_classes"];
-                /** @description Entity IDs, from which all linked entities are requested */
+                /** @description The entity IDs for which all linked entities will be retrieved. */
                 linked_entities?: components["parameters"]["linked_entities"];
                 /** @description Download results */
                 download?: components["parameters"]["download"];
@@ -2230,11 +2540,11 @@ export interface operations {
                 /** @description Select which keys should not be displayed. This can improve performance */
                 show?: components["parameters"]["show"];
                 /**
-                 * @description Choose the format for the results.
+                 * @description Specify the format for the returned results.
                  * @example lp
                  */
                 format?: components["parameters"]["format"];
-                /** @description Export the entities into either a simple CSV representation or a zip file of CSV's especially designed for network analyses. */
+                /** @description Export the entities in either a simple CSV format or a ZIP file containing CSV files optimized for network analysis. */
                 export?: components["parameters"]["export"];
                 /**
                  * @description Choose one column to sort the results by. Default value is name.
@@ -2296,17 +2606,17 @@ export interface operations {
                  *
                  *      */
                 search?: components["parameters"]["search"];
-                /** @description Begin results at the given entity id. */
+                /** @description Starts the result set at the specified entity ID. */
                 first?: components["parameters"]["first"];
-                /** @description Begin results after the given entity id. */
+                /** @description Starts the result set after the specified entity ID. */
                 last?: components["parameters"]["last"];
-                /** @description Jump to page number. */
+                /** @description Specifies the page number to retrieve in a paginated result set. */
                 page?: components["parameters"]["page"];
-                /** @description Limits the entities displayed. Influences the performance of the request. Default value is 20. 0 means all available entities will be displayed. */
+                /** @description Limits the number of entities returned in the response. A lower value may improve performance. The default is 20. Set to 0 to return all available entities. */
                 limit?: components["parameters"]["limit"];
-                /** @description Show only entities with the given type id or linked to it. */
+                /** @description Filter results to include only entities with the specified type ID or those linked to it. */
                 type_id?: components["parameters"]["type_id"];
-                /** @description Displays only connections connected by the selected CIDOC CRM property code. If geometry, types, depictions and/or links is in the show parameter, these properties are also displayed. */
+                /** @description Filters results to show only connections linked by the selected CIDOC CRM property code. If 'geometry', 'types', 'depictions', or 'links' are specified in the 'show' parameter, these properties will also be displayed. */
                 relation_type?: components["parameters"]["relation_type"];
                 /** @description Choose language for system inherent labels */
                 locale?: components["parameters"]["locale"];
@@ -2324,6 +2634,46 @@ export interface operations {
                 };
                 content: {
                     "application/ld+json": components["schemas"]["EntitiesOutputModel"];
+                };
+            };
+            /** @description Something went wrong. Please consult the error message. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GetSearchEntities: {
+        parameters: {
+            query?: {
+                /** @description Limits the number of entities returned in the response. A lower value may improve performance. The default is 20. Set to 0 to return all available entities. */
+                limit?: components["parameters"]["limit"];
+                /** @description Specifies the page number to retrieve in a paginated result set. */
+                page?: components["parameters"]["page"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description System class to be requested
+                 * @example acquisition
+                 */
+                system_class: components["parameters"]["system_class"];
+                /** @description Search term */
+                term: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EntitiesOutputModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */
@@ -2381,11 +2731,11 @@ export interface operations {
                 /** @description Select which keys should not be displayed. This can improve performance */
                 show?: components["parameters"]["show"];
                 /**
-                 * @description Choose the format for the results.
+                 * @description Specify the format for the returned results.
                  * @example lp
                  */
                 format?: components["parameters"]["format"];
-                /** @description Export the entities into either a simple CSV representation or a zip file of CSV's especially designed for network analyses. */
+                /** @description Export the entities in either a simple CSV format or a ZIP file containing CSV files optimized for network analysis. */
                 export?: components["parameters"]["export"];
                 /**
                  * @description Choose one column to sort the results by. Default value is name.
@@ -2447,17 +2797,17 @@ export interface operations {
                  *
                  *      */
                 search?: components["parameters"]["search"];
-                /** @description Begin results at the given entity id. */
+                /** @description Starts the result set at the specified entity ID. */
                 first?: components["parameters"]["first"];
-                /** @description Begin results after the given entity id. */
+                /** @description Starts the result set after the specified entity ID. */
                 last?: components["parameters"]["last"];
-                /** @description Jump to page number. */
+                /** @description Specifies the page number to retrieve in a paginated result set. */
                 page?: components["parameters"]["page"];
-                /** @description Limits the entities displayed. Influences the performance of the request. Default value is 20. 0 means all available entities will be displayed. */
+                /** @description Limits the number of entities returned in the response. A lower value may improve performance. The default is 20. Set to 0 to return all available entities. */
                 limit?: components["parameters"]["limit"];
-                /** @description Show only entities with the given type id or linked to it. */
+                /** @description Filter results to include only entities with the specified type ID or those linked to it. */
                 type_id?: components["parameters"]["type_id"];
-                /** @description Displays only connections connected by the selected CIDOC CRM property code. If geometry, types, depictions and/or links is in the show parameter, these properties are also displayed. */
+                /** @description Filters results to show only connections linked by the selected CIDOC CRM property code. If 'geometry', 'types', 'depictions', or 'links' are specified in the 'show' parameter, these properties will also be displayed. */
                 relation_type?: components["parameters"]["relation_type"];
                 /** @description Choose language for system inherent labels */
                 locale?: components["parameters"]["locale"];
@@ -2497,7 +2847,7 @@ export interface operations {
     SystemClassCount: {
         parameters: {
             query?: {
-                /** @description Show only entities with the given type id or linked to it. */
+                /** @description Filter results to include only entities with the specified type ID or those linked to it. */
                 type_id?: components["parameters"]["type_id"];
             };
             header?: never;
@@ -2564,11 +2914,11 @@ export interface operations {
                 /** @description Select which keys should not be displayed. This can improve performance */
                 show?: components["parameters"]["show"];
                 /**
-                 * @description Choose the format for the results.
+                 * @description Specify the format for the returned results.
                  * @example lp
                  */
                 format?: components["parameters"]["format"];
-                /** @description Export the entities into either a simple CSV representation or a zip file of CSV's especially designed for network analyses. */
+                /** @description Export the entities in either a simple CSV format or a ZIP file containing CSV files optimized for network analysis. */
                 export?: components["parameters"]["export"];
                 /**
                  * @description Choose one column to sort the results by. Default value is name.
@@ -2630,17 +2980,17 @@ export interface operations {
                  *
                  *      */
                 search?: components["parameters"]["search"];
-                /** @description Begin results at the given entity id. */
+                /** @description Starts the result set at the specified entity ID. */
                 first?: components["parameters"]["first"];
-                /** @description Begin results after the given entity id. */
+                /** @description Starts the result set after the specified entity ID. */
                 last?: components["parameters"]["last"];
-                /** @description Jump to page number. */
+                /** @description Specifies the page number to retrieve in a paginated result set. */
                 page?: components["parameters"]["page"];
-                /** @description Limits the entities displayed. Influences the performance of the request. Default value is 20. 0 means all available entities will be displayed. */
+                /** @description Limits the number of entities returned in the response. A lower value may improve performance. The default is 20. Set to 0 to return all available entities. */
                 limit?: components["parameters"]["limit"];
-                /** @description Show only entities with the given type id or linked to it. */
+                /** @description Filter results to include only entities with the specified type ID or those linked to it. */
                 type_id?: components["parameters"]["type_id"];
-                /** @description Displays only connections connected by the selected CIDOC CRM property code. If geometry, types, depictions and/or links is in the show parameter, these properties are also displayed. */
+                /** @description Filters results to show only connections linked by the selected CIDOC CRM property code. If 'geometry', 'types', 'depictions', or 'links' are specified in the 'show' parameter, these properties will also be displayed. */
                 relation_type?: components["parameters"]["relation_type"];
                 /** @description Choose language for system inherent labels */
                 locale?: components["parameters"]["locale"];
@@ -2687,11 +3037,11 @@ export interface operations {
                 /** @description Select which keys should not be displayed. This can improve performance */
                 show?: components["parameters"]["show"];
                 /**
-                 * @description Choose the format for the results.
+                 * @description Specify the format for the returned results.
                  * @example lp
                  */
                 format?: components["parameters"]["format"];
-                /** @description Export the entities into either a simple CSV representation or a zip file of CSV's especially designed for network analyses. */
+                /** @description Export the entities in either a simple CSV format or a ZIP file containing CSV files optimized for network analysis. */
                 export?: components["parameters"]["export"];
                 /**
                  * @description Choose one column to sort the results by. Default value is name.
@@ -2753,17 +3103,17 @@ export interface operations {
                  *
                  *      */
                 search?: components["parameters"]["search"];
-                /** @description Begin results at the given entity id. */
+                /** @description Starts the result set at the specified entity ID. */
                 first?: components["parameters"]["first"];
-                /** @description Begin results after the given entity id. */
+                /** @description Starts the result set after the specified entity ID. */
                 last?: components["parameters"]["last"];
-                /** @description Jump to page number. */
+                /** @description Specifies the page number to retrieve in a paginated result set. */
                 page?: components["parameters"]["page"];
-                /** @description Limits the entities displayed. Influences the performance of the request. Default value is 20. 0 means all available entities will be displayed. */
+                /** @description Limits the number of entities returned in the response. A lower value may improve performance. The default is 20. Set to 0 to return all available entities. */
                 limit?: components["parameters"]["limit"];
-                /** @description Show only entities with the given type id or linked to it. */
+                /** @description Filter results to include only entities with the specified type ID or those linked to it. */
                 type_id?: components["parameters"]["type_id"];
-                /** @description Displays only connections connected by the selected CIDOC CRM property code. If geometry, types, depictions and/or links is in the show parameter, these properties are also displayed. */
+                /** @description Filters results to show only connections linked by the selected CIDOC CRM property code. If 'geometry', 'types', 'depictions', or 'links' are specified in the 'show' parameter, these properties will also be displayed. */
                 relation_type?: components["parameters"]["relation_type"];
                 /** @description Choose language for system inherent labels */
                 locale?: components["parameters"]["locale"];
@@ -2870,11 +3220,11 @@ export interface operations {
                 /** @description Select which keys should not be displayed. This can improve performance */
                 show?: components["parameters"]["show"];
                 /**
-                 * @description Choose the format for the results.
+                 * @description Specify the format for the returned results.
                  * @example lp
                  */
                 format?: components["parameters"]["format"];
-                /** @description Export the entities into either a simple CSV representation or a zip file of CSV's especially designed for network analyses. */
+                /** @description Export the entities in either a simple CSV format or a ZIP file containing CSV files optimized for network analysis. */
                 export?: components["parameters"]["export"];
                 /**
                  * @description Choose one column to sort the results by. Default value is name.
@@ -2936,17 +3286,17 @@ export interface operations {
                  *
                  *      */
                 search?: components["parameters"]["search"];
-                /** @description Begin results at the given entity id. */
+                /** @description Starts the result set at the specified entity ID. */
                 first?: components["parameters"]["first"];
-                /** @description Begin results after the given entity id. */
+                /** @description Starts the result set after the specified entity ID. */
                 last?: components["parameters"]["last"];
-                /** @description Jump to page number. */
+                /** @description Specifies the page number to retrieve in a paginated result set. */
                 page?: components["parameters"]["page"];
-                /** @description Limits the entities displayed. Influences the performance of the request. Default value is 20. 0 means all available entities will be displayed. */
+                /** @description Limits the number of entities returned in the response. A lower value may improve performance. The default is 20. Set to 0 to return all available entities. */
                 limit?: components["parameters"]["limit"];
-                /** @description Show only entities with the given type id or linked to it. */
+                /** @description Filter results to include only entities with the specified type ID or those linked to it. */
                 type_id?: components["parameters"]["type_id"];
-                /** @description Displays only connections connected by the selected CIDOC CRM property code. If geometry, types, depictions and/or links is in the show parameter, these properties are also displayed. */
+                /** @description Filters results to show only connections linked by the selected CIDOC CRM property code. If 'geometry', 'types', 'depictions', or 'links' are specified in the 'show' parameter, these properties will also be displayed. */
                 relation_type?: components["parameters"]["relation_type"];
                 /** @description Choose language for system inherent labels */
                 locale?: components["parameters"]["locale"];

@@ -41,11 +41,10 @@
 	},
 	"DataMapView": {
 		"centerpoint": "Areas",
+		"start-date": "Start date",
 		"end-date": "End date",
 		"point": "Locations",
 		"polygon": "Display Areas",
-		"centerpoint": "Areas",
-		"point": "Locations",
 		"movement": "Movement",
 		"showMovement": "Display Movement"
 	},
@@ -60,9 +59,6 @@
 		"title": "Datalist",
 		"work-in-progress": "The database is currently work in progress."
 	},
-	"DataView": {
-		"nothing-found": "No entries found for this search."
-	},
 	"DefaultLayout": {
 		"skip-to-main-content": "Skip to main content"
 	},
@@ -71,25 +67,39 @@
 		"no-descriptions": "No descriptions available."
 	},
 	"EntityPage": {
-		"details": "Details",
+		"superEvent": "Superevent",
+		"subEvent": "Subevent",
+		"hasTranslationText": "Translation",
+		"isOriginalText": "Original Text",
+		"showText": "Show Text",
+		"showOnMap": "Show on Map",
+		"details": "Further Information",
+		"noType": "No Type",
 		"iiif": "IIIF-Viewer",
 		"images": "Images ({count})",
 		"map": "Map",
 		"meta": {
 			"title": "Entity"
 		},
-		"network": "Network Visualization",
+		"network": "Network",
+		"egoNetwork": "Ego-Network",
+		"networkDepth": "Network-Depth",
+		"networkLegend": "Network-Legend",
 		"sidebar": {
 			"toggle": "Toggle details for {title}"
 		},
+		"no-details": "There are no further details for this entry.",
 		"no-map": "Not visible on the map.",
-		"no-network": "Not visible in the network."
+		"no-network": "Not visible in the network.",
+		"dateSpan": "Timespan",
+		"dateSpan-to": "until"
 	},
 	"EntitySidebar": {
 		"NextFeature": "NextFeature",
 		"PreviousFeature": "Previous Feature",
 		"copy": "Permalink",
-		"copied": "Copied!"
+		"copied": "Copied!",
+		"copiedMessage": "The permalink has been successfully copied to the clipboard."
 	},
 	"ErrorBoundary": {
 		"error": "Error"
@@ -143,7 +153,19 @@
 			"title": "Network Visualization"
 		},
 		"title": "Network Visualization",
-		"work-in-progress": "The database is currently work in progress."
+		"work-in-progress": "The database is currently work in progress.",
+		"controls": {
+			"start": "Play",
+			"pause": "Pause",
+			"zoomIn": "Zoom in",
+			"zoomOut": "Zoom out",
+			"reset-zoom": "Reset zoom",
+			"fullscreen": "Fullscreen",
+			"reset-fullscreen": "Exit fullscreen",
+			"download": "Download network-graph",
+			"show-orphans": "Show single nodes",
+			"hide-orphans": "Hide single nodes"
+		}
 	},
 	"NotFoundPage": {
 		"meta": {
@@ -155,8 +177,10 @@
 		"CurrentOrFormerResidency": "Residency"
 	},
 	"Relations": {
+		"Features": "Features",
 		"Artifacts": "Artifacts",
-		"HumanRemains": "Human Remains"
+		"HumanRemains": "Human Remains",
+		"Sources": "Sources"
 	},
 	"SearchForm": {
 		"filter": "Filter",
@@ -205,8 +229,10 @@
 		"edition": "Edition",
 		"event": "Event",
 		"external_reference": "External reference",
+		"externalReferenceSystems": "External references",
 		"feature": "Feature",
 		"file": "File",
+		"files": "Files",
 		"group": "Group",
 		"human_remains": "Human remains",
 		"involvement": "Involvement",
@@ -216,9 +242,10 @@
 		"person": "Person",
 		"place": "Place",
 		"production": "Production",
+		"references": "References",
 		"reference_system": "Reference system",
 		"source": "Source",
-		"source_translation": "Source translation",
+		"source_translation": "Source Text",
 		"stratigraphic_unit": "Stratigraphic unit",
 		"type": "Type",
 		"type_tools": "Type tools"

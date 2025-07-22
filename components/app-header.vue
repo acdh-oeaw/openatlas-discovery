@@ -15,15 +15,11 @@ const defaultLinks = computed<
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	Record<"home" & (string & {}), { href: NavLinkProps["href"]; label: string }>
 >(() => {
-	if (env.public.database === "enabled" && !project.map.startPage) {
+	if (env.public.database === "enabled") {
 		return {
 			home: {
 				href: { path: "/" },
 				label: t("AppHeader.links.home"),
-			},
-			data: {
-				href: { path: "/visualization", query: { mode: "table" } },
-				label: t("AppHeader.links.data"),
 			},
 			map: {
 				href: { path: "/visualization", query: { mode: "map" } },
@@ -33,12 +29,16 @@ const defaultLinks = computed<
 				href: { path: "/visualization", query: { mode: "network" } },
 				label: t("AppHeader.links.network"),
 			},
+			data: {
+				href: { path: "/visualization", query: { mode: "table" } },
+				label: t("AppHeader.links.data"),
+			},
 			team: { href: { path: "/team" }, label: t("AppHeader.links.team") },
 		};
 	}
 	return {
 		home: {
-			href: project.map.startPage ? { path: "/", query: { mode: "map" } } : { path: "/" },
+			href: { path: "/" },
 			label: t("AppHeader.links.home"),
 		},
 		team: { href: { path: "/team" }, label: t("AppHeader.links.team") },
@@ -103,17 +103,13 @@ const links = computed(() => {
 				<span class="sr-only">{{ links.home.label }}</span>
 				<NuxtImg
 					alt=""
-					class="block size-10 object-contain lg:size-12 dark:hidden"
-					height="64"
-					width="64"
+					class="mr-6 block h-18 w-44 object-contain lg:size-12 dark:hidden"
 					preload
 					:src="project.logos.light"
 				/>
 				<NuxtImg
 					alt=""
-					class="hidden size-10 object-contain lg:size-12 dark:block"
-					height="64"
-					width="64"
+					class="mr-6 hidden h-18 w-44 object-contain lg:size-12 dark:block"
 					preload
 					:src="project.logos.dark"
 				/>
