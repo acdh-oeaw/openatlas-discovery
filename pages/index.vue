@@ -12,23 +12,11 @@ defineRouteRules({
 const locale = useLocale();
 const t = useTranslations();
 const route = useRoute();
-const router = useRouter();
-
 const env = useRuntimeConfig();
-
-onMounted(() => {
-	if (project.map.startPage) {
-		if (!route.query.mode) {
-			return router.push({ query: { mode: "map" } });
-		}
-		return null;
-	}
-	return null;
-});
 
 definePageMeta({
 	layout: project.map.startPage ? "visualization" : "default",
-	middleware: project.map.startPage ? "database-check" : undefined,
+	middleware: project.map.startPage ? ["database-check", "redirect-home"] : undefined,
 });
 
 usePageMetadata({
