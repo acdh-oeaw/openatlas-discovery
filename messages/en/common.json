@@ -81,7 +81,8 @@
 		"meta": {
 			"title": "Entity"
 		},
-		"network": "Ego-Network",
+		"network": "Network",
+		"egoNetwork": "Ego-Network",
 		"networkDepth": "Network-Depth",
 		"networkLegend": "Network-Legend",
 		"sidebar": {

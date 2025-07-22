@@ -158,7 +158,7 @@ const tabs = computed(() => {
 	) {
 		tabs.push({
 			id: "ego-network",
-			label: t("EntityPage.network"),
+			label: t("EntityPage.egoNetwork"),
 		});
 	}
 	return tabs;
