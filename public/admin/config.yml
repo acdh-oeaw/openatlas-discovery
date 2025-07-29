@@ -304,7 +304,10 @@ collections:
   - name: metadata
     label: Metadata
     i18n: true
-    folder: messages
+    # currently file collections only support the "single_file" i18n structure,
+    # so we create a folder collection with a single entry, and disallow creating
+    # new entries.
+    folder: messages/de
     identifier_field: __cms__
     format: json
     create: false
