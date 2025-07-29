@@ -1,9 +1,9 @@
 {
 	"logos": {
-		"light": "/assets/images/logo.svg",
-		"dark": "/assets/images/logo.svg",
-		"withTextLight": "/assets/images/logo-with-text-light.svg",
-		"withTextDark": "/assets/images/logo-with-text-dark.svg"
+		"light": "/assets/images/logo.jpg",
+		"dark": "/assets/images/logo.jpg",
+		"withTextLight": "/assets/images/logo.jpg",
+		"withTextDark": "/assets/images/logo.jpg"
 	},
 	"imprint": "acdh",
 	"network": {
@@ -21,9 +21,9 @@
 		]
 	},
 	"colors": {
-		"brand": "#b8cf5b",
-		"geojsonPoints": "#69c0ef",
-		"geojsonAreaCenterPoints": "#b8cf5b",
+		"brand": "#6b5bcf",
+		"geojsonPoints": "#3A2A59",
+		"geojsonAreaCenterPoints": "#B2814E",
 		"geojsonMovement": "#D0031E"
 	},
 	"twitter": "@openatlas_eu",
@@ -83,7 +83,7 @@
 		"partner_logos": []
 	},
 	"fullscreen": true,
-	"defaultLocale": "en",
+	"defaultLocale": "de",
 	"map": {
 		"startPage": false,
 		"mapDisplayedSystemClasses": ["place", "feature"],
