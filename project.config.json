@@ -83,6 +83,16 @@
 	"defaultLocale": "en",
 	"map": {
 		"startPage": false,
-		"mapDisplayedSystemClasses": ["place", "feature"]
+		"mapDisplayedSystemClasses": ["place", "feature"],
+		"customIconConfig": [
+			{
+				"entityType": "Inhumation Cemetery",
+				"iconName": "Activity"
+			},
+			{
+				"entityType": "Flat grave",
+				"iconName": "Skull"
+			}
+		]
 	}
 }

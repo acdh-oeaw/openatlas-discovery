@@ -71,7 +71,7 @@ const { data, isPending, isPlaceholderData } = useGetSearchResults(
 				search.length > 0
 					? [{ [category]: [{ operator: operator, values: [search], logicalOperator: "and" }] }]
 					: [],
-			show: ["geometry", "when", "relations"],
+			show: ["geometry", "when", "relations", "types"],
 			centroid: true,
 			relation_type: ["P26", "P27"],
 			system_classes: project.map.mapDisplayedSystemClasses,
@@ -130,7 +130,12 @@ const mode = computed(() => {
 const features = computed(() => {
 	return entities.value
 		.filter((entity) => {
-			return entity.geometry;
+			return entity.geometry /* &&
+				!entity.types?.find((type) => {
+					return project.map.customIconConfig.find((config) => {
+						return config.entityType === type.label;
+					});
+				}) */;
 		})
 		.map((entity) => {
 			return createGeoJsonFeature(entity);
@@ -342,12 +347,12 @@ function setCoordinates(entity: EntityFeature, coordinates: Ref<[number, number]
 
 watchEffect(() => {
 	if (mode.value && selection.value) {
-		console.log("mode & selection set", selection.value);
+		// console.log("mode & selection set", selection.value);
 		const entity = entities.value.find((feature) => {
 			const id = getUnprefixedId(feature["@id"]);
 			return id === selection.value;
 		});
-		console.log("Entity: ", entity, entities.value);
+		// console.log("Entity: ", entity, entities.value);
 
 		if (entity) {
 			setCoordinates(entity, selectionCoordinates);
@@ -364,7 +369,7 @@ watchEffect(() => {
 				};
 			}
 
-			console.log(detailOnMap.value);
+			// console.log(detailOnMap.value);
 			detailSelectionCoordinates.value = undefined;
 			if (detailOnMap.value) {
 				const detailEntity = entities.value.find((feature) => {
@@ -378,12 +383,12 @@ watchEffect(() => {
 					// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 					if (detailSelectionCoordinates.value === undefined) return;
 
-					console.log(
-						"Detail Coordinates: ",
-						detailSelectionCoordinates,
-						popover.value,
-						detailEntity,
-					);
+					// console.log(
+					// 	"Detail Coordinates: ",
+					// 	detailSelectionCoordinates,
+					// 	popover.value,
+					// 	detailEntity,
+					// );
 					popover.value = {
 						coordinates: detailSelectionCoordinates.value,
 						entities: [detailEntity],
@@ -441,6 +446,36 @@ const multipleMovements = useGetChainedEvents(
 function setMovementId({ id }: { id: string | null }) {
 	return (movementId.value = id ? parseInt(id) : null);
 }
+
+const customIconEntries = computed(() => {
+	const entries: Record<string, Record<string, unknown>> = {};
+	entities.value.forEach((entity) => {
+		const foundType = entity.types?.findLast((type) => {
+			return project.map.customIconConfig.find((config) => {
+				return config.entityType === type.label;
+			});
+		});
+		if (foundType?.label) {
+			if (!(foundType.label in entries)) {
+				const customEntry = {
+					type: foundType,
+					icon: project.map.customIconConfig.find((config) => {
+						return config.entityType === foundType.label;
+					})?.iconName,
+					color: "",
+					entities: [],
+				};
+				entries[foundType.label] = customEntry;
+			}
+			if (entity.geometry)
+				(entries[foundType.label]?.entities as Array<GeoJsonFeature>).push(
+					createGeoJsonFeature(entity),
+				);
+		}
+	});
+	console.log("custom entries: ", entries);
+	return entries;
+});
 </script>
 
 <template>
@@ -512,6 +547,7 @@ function setMovementId({ id }: { id: string | null }) {
 				:features="features"
 				:movements="movements"
 				:events="events"
+				:custom-icons="customIconEntries"
 				:height="height"
 				:width="width"
 				:has-polygons="show"

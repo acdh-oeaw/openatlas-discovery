@@ -61,6 +61,12 @@ const schema = v.object({
 	map: v.object({
 		startPage: v.boolean(),
 		mapDisplayedSystemClasses: v.array(v.string()),
+		customIconConfig: v.array(
+			v.object({
+				iconName: v.string(),
+				entityType: v.string(),
+			}),
+		),
 	}),
 	twitter: v.optional(v.string()),
 });

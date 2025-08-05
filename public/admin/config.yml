@@ -50,6 +50,12 @@ system_classes: &system_classes
   - source
   - source_translation
   - stratigraphic_unit
+icon_names: &icon_names
+  - Accessibility
+  - Activity
+  - AlarmSmoke
+  - Annoyed
+  - Skull
 collections:
   - name: config
     label: Config
@@ -212,6 +218,16 @@ collections:
                     "activity",
                   ]
                 default: ["place"]
+
+              - name: customIconConfig
+                label: Configure custom icons for certain entity types
+                widget: list
+                fields:
+                  - name: entityType
+                    widget: string
+                  - name: iconName
+                    widget: select
+                    options: *icon_names
 
           - name: network
             label: Network Configuration

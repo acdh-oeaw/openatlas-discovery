@@ -78,6 +78,7 @@
 		"graphology": "^0.25.4",
 		"graphology-layout": "^0.6.1",
 		"graphology-layout-forceatlas2": "^0.10.1",
+		"lucide-static": "^0.536.0",
 		"lucide-vue-next": "^0.471.0",
 		"maplibre-gl": "^4.4.1",
 		"mirador": "^3.4.3",

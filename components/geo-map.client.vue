@@ -7,6 +7,7 @@ import { ArcLayer } from "@deck.gl/layers";
 import * as mapbox from "@deck.gl/mapbox";
 import * as turf from "@turf/turf";
 import type { Point } from "geojson";
+import * as LucideIcons from "lucide-static";
 import {
 	FullscreenControl,
 	type GeoJSONSource,
@@ -82,6 +83,7 @@ const overlay = ref<mapbox.MapboxOverlay | null>(null);
 const supportOverlay = ref<mapbox.MapboxOverlay | null>(null);
 const props = defineProps<{
 	features: Array<GeoJsonFeature>;
+	customIcons: Record<string, Record<string, unknown>>;
 	movements: Array<GeoJsonFeature>;
 	events: Array<GeoJsonFeature>;
 	height: number;
@@ -166,6 +168,45 @@ async function create() {
 	console.log("created", props);
 }
 
+function initializeCustomIconLayer(key: string) {
+	assert(context.map != null);
+	const map = context.map;
+	const sourceCustomIconId = `custom-icon-data-${key}`;
+	map.addSource(sourceCustomIconId, {
+		type: "geojson",
+		data: createFeatureCollection([]),
+		// try cluster and cluster radius properties
+	});
+
+	//@ts-expect-error ensure iconName is a valid Lucide Icon
+	// eslint-disable-next-line import-x/namespace
+	const iconSVG = LucideIcons[props.customIcons[key].icon];
+
+	const svgBlob = new Blob([iconSVG], {
+		type: "image/svg+xml;charset=utf-8",
+	});
+	// convert the blob object to a dedicated URL
+	const url = URL.createObjectURL(svgBlob);
+
+	// load the SVG blob to a flesh image object
+	const img = new Image();
+	img.addEventListener("load", () => {
+		map.addImage(`custom-icon-image-${key}`, img);
+	});
+	img.src = url;
+
+	map.addLayer({
+		id: `customIconLayer-${key}`,
+		type: "symbol",
+		source: sourceCustomIconId,
+		layout: {
+			"icon-image": `custom-icon-image-${key}`,
+			"icon-size": 0.5,
+			"icon-allow-overlap": true,
+		},
+	});
+}
+
 function init() {
 	assert(context.map != null);
 	const map = context.map;
@@ -191,6 +232,7 @@ function init() {
 	const sourcePolygonsId = "polygon-data";
 	const sourceCenterPointsId = "centerpoints-data";
 	const sourceEventPointsId = "event-points-data";
+
 	map.addSource(sourcePointsId, { type: "geojson", data: createFeatureCollection([]) });
 	map.addSource(sourcePolygonsId, { type: "geojson", data: createFeatureCollection([]) });
 	map.addSource(sourceCenterPointsId, { type: "geojson", data: createFeatureCollection([]) });
@@ -279,7 +321,9 @@ function init() {
 		map.getCanvas().classList.remove("!cursor-pointer");
 	});
 
-	//
+	for (const key in props.customIcons) {
+		initializeCustomIconLayer(key);
+	}
 
 	updateScope();
 	updatePolygons();
@@ -401,6 +445,30 @@ watch(
 	{ immediate: true },
 );
 
+watch(
+	() => {
+		return props.customIcons;
+	},
+	() => {
+		updateScopeOfCustomIconLayers();
+	},
+);
+
+function updateScopeOfCustomIconLayers() {
+	assert(context.map != null);
+	const map = context.map;
+	for (const key in props.customIcons) {
+		if (!map.getLayer(`customIconLayer-${key}`)) initializeCustomIconLayer(key);
+		const sourceCustomIconsId = `custom-icon-data-${key}`;
+		const sourceCustomIconPoints = map.getSource(sourceCustomIconsId) as GeoJSONSource | undefined;
+		const geojsonCustomIconPoints = createFeatureCollection(
+			props.customIcons[key]?.entities as Array<GeoJsonFeature>,
+		);
+		sourceCustomIconPoints?.setData(geojsonCustomIconPoints);
+		map.moveLayer(`customIconLayer-${key}`);
+	}
+}
+
 function updateScope() {
 	assert(context.map != null);
 
@@ -410,6 +478,7 @@ function updateScope() {
 	const sourcePolygonsId = "polygon-data";
 	const sourceCenterPointsId = "centerpoints-data";
 	const sourceEventPointsId = "event-points-data";
+
 	const sourcePoints = map.getSource(sourcePointsId) as GeoJSONSource | undefined;
 	const sourcePolygons = map.getSource(sourcePolygonsId) as GeoJSONSource | undefined;
 	const sourceCenterpoints = map.getSource(sourceCenterPointsId) as GeoJSONSource | undefined;
