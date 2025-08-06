@@ -183,18 +183,13 @@ function initializeCustomIconLayer(key: string) {
 	map.addSource(sourceCustomIconId, {
 		type: "geojson",
 		data: createFeatureCollection([]),
-		// try cluster and cluster radius properties
+		cluster: true,
+		clusterMaxZoom: 14,
 	});
 
 	//@ts-expect-error ensure iconName is a valid Lucide Icon
-	// eslint-disable-next-line import-x/namespace
 	const iconSVG = LucideIcons[props.customIcons[key].icon];
-	const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-	circle.setAttribute("cx", "12");
-	circle.setAttribute("cy", "12");
-	circle.setAttribute("r", "16");
-	circle.setAttribute("fill", props.customIcons[key]?.backgroundColor as string);
-	circle.setAttribute("stroke", "none");
+
 	const div = document.createElement("div");
 	div.innerHTML = iconSVG;
 
@@ -203,28 +198,31 @@ function initializeCustomIconLayer(key: string) {
 		.querySelector("svg")
 		?.setAttribute("stroke", getContrastColor(props.customIcons[key].backgroundColor));
 
-	div.querySelector("svg")?.insertBefore(circle, div.querySelector("svg").firstChild);
-
 	// convert the blob object to a dedicated URL
 	const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(div.innerHTML)}`;
+
+	if (map.hasImage(`custom-icon-image-${key}`)) {
+		map.removeImage(`custom-icon-image-${key}`);
+	}
 
 	// load the SVG blob to a flesh image object
 	const img = new Image();
 	img.addEventListener("load", () => {
 		map.addImage(`custom-icon-image-${key}`, img);
+		console.log("map image", map.getImage(`custom-icon-image-${key}`));
 
 		map.addLayer({
 			id: `customIconLayer-${key}`,
 			type: "symbol",
 			source: sourceCustomIconId,
+			filter: ["==", "$type", "Point"],
 			layout: {
 				"icon-image": `custom-icon-image-${key}`,
-				"icon-size": 0.5,
 				"icon-allow-overlap": true,
 			},
 		});
+		updateScopeOfCustomIconLayers();
 	});
-	console.log("IconLayer: ", map.getLayer(`customIconLayer-${key}`));
 	img.src = url;
 }
 
@@ -254,23 +252,13 @@ function init() {
 	const sourceCenterPointsId = "centerpoints-data";
 	const sourceEventPointsId = "event-points-data";
 
-	map.addSource(sourcePointsId, { type: "geojson", data: createFeatureCollection([]) });
+	map.addSource(sourcePointsId, {
+		type: "geojson",
+		data: createFeatureCollection([]),
+	});
 	map.addSource(sourcePolygonsId, { type: "geojson", data: createFeatureCollection([]) });
 	map.addSource(sourceCenterPointsId, { type: "geojson", data: createFeatureCollection([]) });
 	map.addSource(sourceEventPointsId, { type: "geojson", data: createFeatureCollection([]) });
-
-	//
-
-	map.addLayer({
-		id: "points",
-		type: "circle",
-		source: sourcePointsId,
-		filter: ["==", "$type", "Point"],
-		paint: {
-			"circle-color": colors.points,
-			"circle-radius": 6,
-		},
-	});
 
 	//
 
@@ -282,6 +270,18 @@ function init() {
 		paint: {
 			"circle-color": colors.areaCenterPoints,
 			"circle-radius": 6,
+		},
+	});
+	//
+
+	map.addLayer({
+		id: "points",
+		type: "circle",
+		source: sourcePointsId,
+		filter: ["==", "$type", "Point"],
+		paint: {
+			"circle-color": ["case", ["has", "color"], ["get", "color"], colors.points],
+			"circle-radius": ["case", ["has", "size"], ["get", "size"], 6],
 		},
 	});
 
@@ -477,15 +477,26 @@ watch(
 function updateScopeOfCustomIconLayers() {
 	assert(context.map != null);
 	const map = context.map;
+	console.log(props.customIcons);
 	for (const key in props.customIcons) {
-		if (map.getLayer(`customIconLayer-${key}`)) return;
+		if (!map.hasImage(`custom-icon-image-${key}`)) {
+			continue;
+		}
+
+		const validFeatures = (props.customIcons[key]?.entities as Array<GeoJsonFeature>).filter(
+			(feature) => {
+				return feature.geometry.coordinates && Array.isArray(feature.geometry.coordinates);
+			},
+		);
+
+		const geojsonCustomIconPoints = createFeatureCollection(validFeatures);
+		console.log(geojsonCustomIconPoints);
 		const sourceCustomIconsId = `custom-icon-data-${key}`;
 		const sourceCustomIconPoints = map.getSource(sourceCustomIconsId) as GeoJSONSource | undefined;
-		const geojsonCustomIconPoints = createFeatureCollection(
-			props.customIcons[key]?.entities as Array<GeoJsonFeature>,
-		);
+		console.log(sourceCustomIconPoints);
+		console.log(map.getLayer(`customIconLayer-${key}`));
+
 		sourceCustomIconPoints?.setData(geojsonCustomIconPoints);
-		// map.moveLayer(`customIconLayer-${key}`);
 	}
 }
 

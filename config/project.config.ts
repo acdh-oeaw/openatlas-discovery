@@ -63,8 +63,8 @@ const schema = v.object({
 		mapDisplayedSystemClasses: v.array(v.string()),
 		customIconConfig: v.array(
 			v.object({
+				entityType: v.number(),
 				iconName: v.string(),
-				entityType: v.string(),
 				backgroundColor: v.optional(v.string()),
 			}),
 		),

@@ -138,7 +138,20 @@ const features = computed(() => {
 				}) */;
 		})
 		.map((entity) => {
-			return createGeoJsonFeature(entity);
+			const feature = createGeoJsonFeature(entity);
+			const customConfig = Object.entries(project.map.customIconConfig).findLast((entry) => {
+				return entity.types?.find((type) => {
+					return getUnprefixedId(type.identifier ?? "") === String(entry[1].entityType);
+				});
+			});
+			if (customConfig != null) {
+				feature.properties.color = customConfig[1].backgroundColor;
+				feature.properties.size = 10;
+			}
+			return feature;
+		})
+		.sort((a, b) => {
+			return (a.properties.color ? 1 : 0) - (b.properties.color ? 1 : 0);
 		});
 });
 
@@ -452,13 +465,14 @@ const customIconEntries = computed(() => {
 	entities.value.forEach((entity) => {
 		const foundType = entity.types?.findLast((type) => {
 			return project.map.customIconConfig.find((config) => {
-				return config.entityType === type.label;
+				return String(config.entityType) === getUnprefixedId(type.identifier ?? "");
 			});
 		});
-		if (foundType?.label) {
-			if (!(foundType.label in entries)) {
+		const unprefixedType = getUnprefixedId(foundType?.identifier ?? "");
+		if (foundType) {
+			if (!(unprefixedType in entries)) {
 				const configEntry = project.map.customIconConfig.find((config) => {
-					return config.entityType === foundType.label;
+					return String(config.entityType) === unprefixedType;
 				});
 				const customEntry = {
 					type: foundType,
@@ -466,10 +480,10 @@ const customIconEntries = computed(() => {
 					backgroundColor: configEntry?.backgroundColor,
 					entities: [],
 				};
-				entries[foundType.label] = customEntry;
+				entries[unprefixedType] = customEntry;
 			}
 			if (entity.geometry)
-				(entries[foundType.label]?.entities as Array<GeoJsonFeature>).push(
+				(entries[unprefixedType]?.entities as Array<GeoJsonFeature>).push(
 					createGeoJsonFeature(entity),
 				);
 		}
@@ -568,7 +582,7 @@ const customIconEntries = computed(() => {
 					<article
 						v-for="entity of popover.entities"
 						:key="entity.properties._id"
-						class="grid gap-1 font-body text-xs"
+						class="font-body grid gap-1 text-xs"
 					>
 						<strong class="font-medium">
 							<NavLink
@@ -582,7 +596,7 @@ const customIconEntries = computed(() => {
 						</strong>
 						<dl
 							v-if="entity.when?.timespans != null && entity.when.timespans.length > 0"
-							class="grid grid-cols-[auto_auto] justify-start gap-x-6 gap-y-1 pl-[18px] text-2xs text-neutral-600"
+							class="text-2xs grid grid-cols-[auto_auto] justify-start gap-x-6 gap-y-1 pl-[18px] text-neutral-600"
 						>
 							<template v-for="(timespan, index) of entity.when.timespans" :key="index">
 								<template v-if="timespan.start?.earliest != null || timespan.start?.latest != null">

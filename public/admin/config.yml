@@ -224,7 +224,8 @@ collections:
                 widget: list
                 fields:
                   - name: entityType
-                    widget: string
+                    widget: number
+                    hint: ID of the Type
                   - name: iconName
                     widget: select
                     options: *icon_names
