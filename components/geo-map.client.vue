@@ -3,7 +3,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import { assert } from "@acdh-oeaw/lib";
 import type * as deck from "@deck.gl/core";
-import { ArcLayer, IconLayer } from "@deck.gl/layers";
+import { ArcLayer } from "@deck.gl/layers";
 import * as mapbox from "@deck.gl/mapbox";
 import * as turf from "@turf/turf";
 import type { Point } from "geojson";
@@ -17,6 +17,7 @@ import {
 	type MapGeoJSONFeature,
 	NavigationControl,
 	ScaleControl,
+	type SymbolLayerSpecification,
 } from "maplibre-gl";
 import { animate } from "popmotion";
 
@@ -206,45 +207,25 @@ function initializeCustomIconLayer(key: string) {
 
 	// convert the blob object to a dedicated URL
 	const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(div.innerHTML)}`;
-	// const url = "https://upload.wikimedia.org/wikipedia/commons/b/b1/Red-Circle-Transparent.png";
-	console.log(url);
-
-	// const layer = new IconLayer({
-	// 	id: `customIconLayer-${key}`,
-	// 	data: props.customIcons[key]?.entities as deck.LayerDataSource<unknown>,
-	// 	getIcon: () => {
-	// 		return {
-	// 			url: url,
-	// 			width: 24,
-	// 			height: 24,
-	// 		};
-	// 	},
-	// 	getPosition: (d: GeoJsonFeature) => {
-	// 		return d.geometry.coordinates;
-	// 	},
-	// 	getSize: 24,
-	// 	pickable: true,
-	// });
-
-	// return layer;
 
 	// load the SVG blob to a flesh image object
 	const img = new Image();
 	img.addEventListener("load", () => {
 		map.addImage(`custom-icon-image-${key}`, img);
-	});
-	img.src = url;
 
-	map.addLayer({
-		id: `customIconLayer-${key}`,
-		type: "symbol",
-		source: sourceCustomIconId,
-		layout: {
-			"icon-image": `custom-icon-image-${key}`,
-			"icon-size": 0.5,
-			"icon-allow-overlap": true,
-		},
+		map.addLayer({
+			id: `customIconLayer-${key}`,
+			type: "symbol",
+			source: sourceCustomIconId,
+			layout: {
+				"icon-image": `custom-icon-image-${key}`,
+				"icon-size": 0.5,
+				"icon-allow-overlap": true,
+			},
+		});
 	});
+	console.log("IconLayer: ", map.getLayer(`customIconLayer-${key}`));
+	img.src = url;
 }
 
 function init() {
@@ -361,21 +342,9 @@ function init() {
 		map.getCanvas().classList.remove("!cursor-pointer");
 	});
 
-	customIconOverlay.value = new mapbox.MapboxOverlay({
-		interleaved: true,
-	});
-	map.addControl(customIconOverlay.value);
-
 	Object.keys(props.customIcons).forEach((key) => {
 		initializeCustomIconLayer(key);
 	});
-	/* for (const key in props.customIcons) {
-		initializeCustomIconLayer(key);
-	} */
-
-	// customIconOverlay.value.setProps({
-	// 	layers: [layers],
-	// });
 
 	updateScope();
 	updatePolygons();
@@ -390,7 +359,6 @@ watch(
 		return props.currentSelectionCoordinates;
 	},
 	() => {
-		console.log("selection changed: ", props.currentSelectionCoordinates, props.selectionBounds);
 		if (!props.selectionBounds && props.currentSelectionCoordinates)
 			flyToSelection(props.currentSelectionCoordinates);
 	},
@@ -510,7 +478,7 @@ function updateScopeOfCustomIconLayers() {
 	assert(context.map != null);
 	const map = context.map;
 	for (const key in props.customIcons) {
-		if (!map.getLayer(`customIconLayer-${key}`)) initializeCustomIconLayer(key);
+		if (map.getLayer(`customIconLayer-${key}`)) return;
 		const sourceCustomIconsId = `custom-icon-data-${key}`;
 		const sourceCustomIconPoints = map.getSource(sourceCustomIconsId) as GeoJSONSource | undefined;
 		const geojsonCustomIconPoints = createFeatureCollection(
@@ -559,6 +527,8 @@ function updateScope() {
 	sourcePolygons?.setData(geojsonPolygons);
 	sourceCenterpoints?.setData(geojsonCenterPoints);
 	sourceEventPoints?.setData(geojsonEventPoints);
+
+	updateScopeOfCustomIconLayers();
 
 	if (props.selectionBounds) {
 		zoomToSelection(props.selectionBounds);
@@ -660,7 +630,6 @@ function getCoef(d: CurvedMovementLine) {
 }
 
 function updateMovements() {
-	console.log("multipleMovements: ", props.multipleMovements);
 	const groupedMovements = new Map<string, Array<CurvedMovementLine>>();
 	// Process the GeoJSON movements array to create curved lines
 
@@ -906,15 +875,11 @@ function renderArcs() {
 		},
 		onClick: (info) => {
 			if (info.object != null) {
-				console.log("Clicked Arc:", info.object);
-
 				const clickedIds = info.object.id.flat();
 
 				const clickedMovements = props.movements.filter((movement) => {
 					return clickedIds.includes(movement.properties._id);
 				});
-
-				console.log(clickedMovements);
 
 				if (clickedMovements.length > 0) {
 					const targetCoordinates = info.object.coordinates.map(
