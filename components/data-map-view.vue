@@ -457,12 +457,13 @@ const customIconEntries = computed(() => {
 		});
 		if (foundType?.label) {
 			if (!(foundType.label in entries)) {
+				const configEntry = project.map.customIconConfig.find((config) => {
+					return config.entityType === foundType.label;
+				});
 				const customEntry = {
 					type: foundType,
-					icon: project.map.customIconConfig.find((config) => {
-						return config.entityType === foundType.label;
-					})?.iconName,
-					color: "",
+					icon: configEntry?.iconName,
+					backgroundColor: configEntry?.backgroundColor,
 					entities: [],
 				};
 				entries[foundType.label] = customEntry;

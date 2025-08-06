@@ -65,6 +65,7 @@ const schema = v.object({
 			v.object({
 				iconName: v.string(),
 				entityType: v.string(),
+				backgroundColor: v.optional(v.string()),
 			}),
 		),
 	}),

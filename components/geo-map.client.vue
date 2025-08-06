@@ -3,7 +3,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import { assert } from "@acdh-oeaw/lib";
 import type * as deck from "@deck.gl/core";
-import { ArcLayer } from "@deck.gl/layers";
+import { ArcLayer, IconLayer } from "@deck.gl/layers";
 import * as mapbox from "@deck.gl/mapbox";
 import * as turf from "@turf/turf";
 import type { Point } from "geojson";
@@ -81,6 +81,7 @@ interface MultipleMovementType {
 
 const overlay = ref<mapbox.MapboxOverlay | null>(null);
 const supportOverlay = ref<mapbox.MapboxOverlay | null>(null);
+const customIconOverlay = ref<mapbox.MapboxOverlay | null>(null);
 const props = defineProps<{
 	features: Array<GeoJsonFeature>;
 	customIcons: Record<string, Record<string, unknown>>;
@@ -168,6 +169,12 @@ async function create() {
 	console.log("created", props);
 }
 
+function getContrastColor(hex: string) {
+	const rgbValue = hexToRgb(hex);
+	if (rgbValue?.[0] * 0.299 + rgbValue?.[1] * 0.587 + rgbValue?.[2] * 0.114 > 186) return "#000000";
+	else return "#ffffff";
+}
+
 function initializeCustomIconLayer(key: string) {
 	assert(context.map != null);
 	const map = context.map;
@@ -181,12 +188,45 @@ function initializeCustomIconLayer(key: string) {
 	//@ts-expect-error ensure iconName is a valid Lucide Icon
 	// eslint-disable-next-line import-x/namespace
 	const iconSVG = LucideIcons[props.customIcons[key].icon];
+	const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+	circle.setAttribute("cx", "12");
+	circle.setAttribute("cy", "12");
+	circle.setAttribute("r", "16");
+	circle.setAttribute("fill", props.customIcons[key]?.backgroundColor as string);
+	circle.setAttribute("stroke", "none");
+	const div = document.createElement("div");
+	div.innerHTML = iconSVG;
 
-	const svgBlob = new Blob([iconSVG], {
-		type: "image/svg+xml;charset=utf-8",
-	});
+	div.querySelector("svg")?.setAttribute("viewBox", "-4 -4 32 32");
+	div
+		.querySelector("svg")
+		?.setAttribute("stroke", getContrastColor(props.customIcons[key].backgroundColor));
+
+	div.querySelector("svg")?.insertBefore(circle, div.querySelector("svg").firstChild);
+
 	// convert the blob object to a dedicated URL
-	const url = URL.createObjectURL(svgBlob);
+	const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(div.innerHTML)}`;
+	// const url = "https://upload.wikimedia.org/wikipedia/commons/b/b1/Red-Circle-Transparent.png";
+	console.log(url);
+
+	// const layer = new IconLayer({
+	// 	id: `customIconLayer-${key}`,
+	// 	data: props.customIcons[key]?.entities as deck.LayerDataSource<unknown>,
+	// 	getIcon: () => {
+	// 		return {
+	// 			url: url,
+	// 			width: 24,
+	// 			height: 24,
+	// 		};
+	// 	},
+	// 	getPosition: (d: GeoJsonFeature) => {
+	// 		return d.geometry.coordinates;
+	// 	},
+	// 	getSize: 24,
+	// 	pickable: true,
+	// });
+
+	// return layer;
 
 	// load the SVG blob to a flesh image object
 	const img = new Image();
@@ -321,9 +361,21 @@ function init() {
 		map.getCanvas().classList.remove("!cursor-pointer");
 	});
 
-	for (const key in props.customIcons) {
+	customIconOverlay.value = new mapbox.MapboxOverlay({
+		interleaved: true,
+	});
+	map.addControl(customIconOverlay.value);
+
+	Object.keys(props.customIcons).forEach((key) => {
 		initializeCustomIconLayer(key);
-	}
+	});
+	/* for (const key in props.customIcons) {
+		initializeCustomIconLayer(key);
+	} */
+
+	// customIconOverlay.value.setProps({
+	// 	layers: [layers],
+	// });
 
 	updateScope();
 	updatePolygons();
@@ -465,7 +517,7 @@ function updateScopeOfCustomIconLayers() {
 			props.customIcons[key]?.entities as Array<GeoJsonFeature>,
 		);
 		sourceCustomIconPoints?.setData(geojsonCustomIconPoints);
-		map.moveLayer(`customIconLayer-${key}`);
+		// map.moveLayer(`customIconLayer-${key}`);
 	}
 }
 

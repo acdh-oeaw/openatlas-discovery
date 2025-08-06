@@ -228,6 +228,8 @@ collections:
                   - name: iconName
                     widget: select
                     options: *icon_names
+                  - name: backgroundColor
+                    widget: color
 
           - name: network
             label: Network Configuration
