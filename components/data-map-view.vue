@@ -128,7 +128,7 @@ const mode = computed(() => {
  * because `maplibre-gl` will serialize geojson features when sending them to the webworker.
  */
 const features = computed(() => {
-	return entities.value
+	const mappedFeatures = entities.value
 		.filter((entity) => {
 			if (!entity.geometry) return false;
 
@@ -152,13 +152,33 @@ const features = computed(() => {
 				feature.properties.color = customConfig[1].backgroundColor;
 				feature.properties.size = 10;
 				feature.properties.isIcon = true;
+				feature.properties.isDisplayed = true;
 			}
 
 			return feature;
 		});
-	/*.sort((a, b) => {
-			return (a.properties.color ? 1 : 0) - (b.properties.color ? 1 : 0);
-		});*/
+
+	mappedFeatures.forEach((feature, index, self) => {
+		if (feature.geometry.type !== "Point") return;
+		const coords = feature.geometry.coordinates.join(",");
+
+		const firstIndex = self.filter((f) => {
+			if (f.geometry.type !== "Point") return false;
+			return f.geometry.coordinates.join(",") === coords;
+		});
+
+		const foundIcon = firstIndex.some((f) => {
+			return f.properties.isIcon;
+		});
+
+		if (foundIcon) {
+			feature.properties.isDisplayed = false;
+		} else {
+			feature.properties.isDisplayed = true;
+		}
+	});
+
+	return mappedFeatures;
 });
 
 const movements = computed(() => {
@@ -257,10 +277,37 @@ const events = computed(() => {
 			return featureClone;
 		});
 
-	return event.map((entity) => {
+	const mappedEvents = event.map((entity) => {
 		let feature = createGeoJsonFeature(entity);
 		return feature;
 	});
+
+	console.log(mappedEvents);
+	mappedEvents.forEach((feature) => {
+		if (feature.geometry.type !== "GeometryCollection") return;
+
+		const coords = feature.geometry.geometries[0]?.coordinates.join(",");
+
+		const firstIndex = features.value.filter((f) => {
+			if (f.geometry.type !== "Point") return false;
+			return f.geometry.coordinates.join(",") === coords;
+		});
+
+		console.log("hello: ", firstIndex);
+
+		const foundIcon = firstIndex.some((f) => {
+			return f.properties.isIcon;
+		});
+
+		if (foundIcon) {
+			console.log("foundIcon: ", feature);
+			feature.properties.isDisplayed = false;
+		} else {
+			feature.properties.isDisplayed = true;
+		}
+	});
+
+	return mappedEvents;
 });
 
 const centerpoints = computed(() => {
@@ -283,6 +330,7 @@ interface onLayerClickParams {
 }
 
 function onLayerClick({ features, targetCoordinates }: onLayerClickParams) {
+	console.log("Layer click", features);
 	const entitiesMap = new Map<string, EntityFeature>();
 
 	features.forEach((feature) => {

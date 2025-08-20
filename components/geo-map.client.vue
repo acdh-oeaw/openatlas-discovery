@@ -16,6 +16,7 @@ import {
 	Map as GeoMap,
 	type MapGeoJSONFeature,
 	NavigationControl,
+	type PointLike,
 	ScaleControl,
 	type SymbolLayerSpecification,
 } from "maplibre-gl";
@@ -245,26 +246,8 @@ function initializeCustomIconLayer(key: string) {
 
 		//
 
-		map.on("click", `iconPoints-${key}`, (event) => {
-			emit("layer-click", {
-				features: (event.features ?? []) as Array<
-					MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
-				>,
-			});
-		});
-
-		map.on("click", `customIconLayer-${key}`, (event) => {
-			emit("layer-click", {
-				features: (event.features ?? []) as Array<
-					MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
-				>,
-			});
-		});
-
-		//
-
 		map.on("mouseleave", `customIconLayer-${key}`, () => {
-			map.getCanvas().classList.add("!cursor-pointer");
+			map.getCanvas().classList.remove("!cursor-pointer");
 		});
 
 		map.on("mouseleave", `iconPoints-${key}`, () => {
@@ -331,6 +314,7 @@ function init() {
 		filter: ["all", ["==", "$type", "Point"], ["!has", "isIcon"]],
 		paint: {
 			"circle-color": colors.points,
+			"circle-opacity": ["case", ["==", ["get", "isDisplayed"], true], 1, 0],
 			"circle-radius": 6,
 		},
 	});
@@ -347,25 +331,8 @@ function init() {
 				? ["match", ["get", "id"], hoveredMovementId.value, colors.movement, "#808080"]
 				: colors.movement,
 			"circle-radius": 6,
+			"circle-opacity": ["case", ["==", ["get", "isDisplayed"], true], 1, 0],
 		},
-	});
-
-	//
-
-	map.on("click", "points", (event) => {
-		emit("layer-click", {
-			features: (event.features ?? []) as Array<
-				MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
-			>,
-		});
-	});
-
-	map.on("click", "centerpoints", (event) => {
-		emit("layer-click", {
-			features: (event.features ?? []) as Array<
-				MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
-			>,
-		});
 	});
 
 	//
@@ -394,6 +361,37 @@ function init() {
 
 	Object.keys(props.customIcons).forEach((key) => {
 		initializeCustomIconLayer(key);
+	});
+
+	map.on("click", (event) => {
+		const layersToQuery = [
+			"points",
+			"centerpoints",
+			"events",
+			...Object.keys(props.customIcons).map((key) => {
+				return `iconPoints-${key}`;
+			}),
+			...Object.keys(props.customIcons).map((key) => {
+				return `customIconLayer-${key}`;
+			}),
+		];
+
+		const radius = 6; // pixels around click
+		const box: [PointLike, PointLike] = [
+			[event.point.x - radius, event.point.y - radius],
+			[event.point.x + radius, event.point.y + radius],
+		];
+
+		// query all visible features at the click point
+		const features = map.queryRenderedFeatures(box, { layers: layersToQuery });
+
+		console.log("event click: ", features);
+
+		if (features.length > 0) {
+			emit("layer-click", {
+				features: features as Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">>,
+			});
+		}
 	});
 
 	updateScope();

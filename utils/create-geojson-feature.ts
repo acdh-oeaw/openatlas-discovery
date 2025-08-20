@@ -13,6 +13,7 @@ export interface CustomGeoJsonFeature extends GeoJsonFeature {
 		color?: string;
 		size?: number;
 		isIcon?: boolean;
+		isDisplayed?: boolean;
 	};
 }
 
