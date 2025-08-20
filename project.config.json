@@ -86,9 +86,8 @@
 		"mapDisplayedSystemClasses": ["place", "feature"],
 		"customIconConfig": [
 			{
-				"iconName": "Skull",
-				"entityType": 443,
-				"backgroundColor": "#ff008b"
+				"iconName": "Church",
+				"entityType": 443
 			}
 		]
 	}

@@ -130,12 +130,16 @@ const mode = computed(() => {
 const features = computed(() => {
 	return entities.value
 		.filter((entity) => {
-			return entity.geometry /* &&
+			if (!entity.geometry) return false;
+
+			return entity.geometry;
+
+			/* &&
 				!entity.types?.find((type) => {
 					return project.map.customIconConfig.find((config) => {
 						return config.entityType === type.label;
 					});
-				}) */;
+				}) */
 		})
 		.map((entity) => {
 			const feature = createGeoJsonFeature(entity);
@@ -147,12 +151,14 @@ const features = computed(() => {
 			if (customConfig != null) {
 				feature.properties.color = customConfig[1].backgroundColor;
 				feature.properties.size = 10;
+				feature.properties.isIcon = true;
 			}
+
 			return feature;
-		})
-		.sort((a, b) => {
-			return (a.properties.color ? 1 : 0) - (b.properties.color ? 1 : 0);
 		});
+	/*.sort((a, b) => {
+			return (a.properties.color ? 1 : 0) - (b.properties.color ? 1 : 0);
+		});*/
 });
 
 const movements = computed(() => {
@@ -224,6 +230,13 @@ const events = computed(() => {
 		})
 		.filter((feature) => {
 			return feature.geometry && "geometries" in feature.geometry;
+		})
+		.filter((feature) => {
+			return !feature.types?.find((type) => {
+				return project.map.customIconConfig.find((config) => {
+					return String(config.entityType) === getUnprefixedId(type.identifier ?? "");
+				});
+			});
 		})
 		.map((feature) => {
 			assert(feature.geometry, "Feature has no geometry");
@@ -482,10 +495,21 @@ const customIconEntries = computed(() => {
 				};
 				entries[unprefixedType] = customEntry;
 			}
-			if (entity.geometry)
-				(entries[unprefixedType]?.entities as Array<GeoJsonFeature>).push(
-					createGeoJsonFeature(entity),
-				);
+			if (entity.geometry) {
+				const feature = createGeoJsonFeature(entity);
+				const customConfig = Object.entries(project.map.customIconConfig).findLast((entry) => {
+					return entity.types?.find((type) => {
+						return getUnprefixedId(type.identifier ?? "") === String(entry[1].entityType);
+					});
+				});
+				if (customConfig != null) {
+					feature.properties.color = customConfig[1].backgroundColor;
+					feature.properties.size = 10;
+					feature.properties.isIcon = true;
+				}
+
+				(entries[unprefixedType]?.entities as Array<GeoJsonFeature>).push(feature);
+			}
 		}
 	});
 	console.log("custom entries: ", entries);
@@ -582,7 +606,7 @@ const customIconEntries = computed(() => {
 					<article
 						v-for="entity of popover.entities"
 						:key="entity.properties._id"
-						class="font-body grid gap-1 text-xs"
+						class="grid gap-1 font-body text-xs"
 					>
 						<strong class="font-medium">
 							<NavLink
@@ -596,7 +620,7 @@ const customIconEntries = computed(() => {
 						</strong>
 						<dl
 							v-if="entity.when?.timespans != null && entity.when.timespans.length > 0"
-							class="text-2xs grid grid-cols-[auto_auto] justify-start gap-x-6 gap-y-1 pl-[18px] text-neutral-600"
+							class="grid grid-cols-[auto_auto] justify-start gap-x-6 gap-y-1 pl-[18px] text-2xs text-neutral-600"
 						>
 							<template v-for="(timespan, index) of entity.when.timespans" :key="index">
 								<template v-if="timespan.start?.earliest != null || timespan.start?.latest != null">

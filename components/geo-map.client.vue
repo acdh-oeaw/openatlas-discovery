@@ -84,7 +84,7 @@ const overlay = ref<mapbox.MapboxOverlay | null>(null);
 const supportOverlay = ref<mapbox.MapboxOverlay | null>(null);
 const customIconOverlay = ref<mapbox.MapboxOverlay | null>(null);
 const props = defineProps<{
-	features: Array<GeoJsonFeature>;
+	features: Array<CustomGeoJsonFeature>;
 	customIcons: Record<string, Record<string, unknown>>;
 	movements: Array<GeoJsonFeature>;
 	events: Array<GeoJsonFeature>;
@@ -185,6 +185,7 @@ function initializeCustomIconLayer(key: string) {
 		data: createFeatureCollection([]),
 		cluster: true,
 		clusterMaxZoom: 14,
+		clusterRadius: 10,
 	});
 
 	//@ts-expect-error ensure iconName is a valid Lucide Icon
@@ -196,7 +197,7 @@ function initializeCustomIconLayer(key: string) {
 	div.querySelector("svg")?.setAttribute("viewBox", "-4 -4 32 32");
 	div
 		.querySelector("svg")
-		?.setAttribute("stroke", getContrastColor(props.customIcons[key].backgroundColor));
+		?.setAttribute("stroke", getContrastColor(props.customIcons[key].backgroundColor ?? "#ffffff"));
 
 	// convert the blob object to a dedicated URL
 	const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(div.innerHTML)}`;
@@ -209,7 +210,17 @@ function initializeCustomIconLayer(key: string) {
 	const img = new Image();
 	img.addEventListener("load", () => {
 		map.addImage(`custom-icon-image-${key}`, img);
-		console.log("map image", map.getImage(`custom-icon-image-${key}`));
+
+		map.addLayer({
+			id: `iconPoints-${key}`,
+			type: "circle",
+			source: sourceCustomIconId,
+			filter: ["all", ["==", "$type", "Point"], ["has", "color"]],
+			paint: {
+				"circle-color": ["get", "color"],
+				"circle-radius": ["case", ["has", "size"], ["get", "size"], 6],
+			},
+		});
 
 		map.addLayer({
 			id: `customIconLayer-${key}`,
@@ -221,6 +232,45 @@ function initializeCustomIconLayer(key: string) {
 				"icon-allow-overlap": true,
 			},
 		});
+
+		//
+
+		map.on("mouseenter", `customIconLayer-${key}`, () => {
+			map.getCanvas().classList.add("!cursor-pointer");
+		});
+
+		map.on("mouseenter", `iconPoints-${key}`, () => {
+			map.getCanvas().classList.add("!cursor-pointer");
+		});
+
+		//
+
+		map.on("click", `iconPoints-${key}`, (event) => {
+			emit("layer-click", {
+				features: (event.features ?? []) as Array<
+					MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
+				>,
+			});
+		});
+
+		map.on("click", `customIconLayer-${key}`, (event) => {
+			emit("layer-click", {
+				features: (event.features ?? []) as Array<
+					MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">
+				>,
+			});
+		});
+
+		//
+
+		map.on("mouseleave", `customIconLayer-${key}`, () => {
+			map.getCanvas().classList.add("!cursor-pointer");
+		});
+
+		map.on("mouseleave", `iconPoints-${key}`, () => {
+			map.getCanvas().classList.remove("!cursor-pointer");
+		});
+
 		updateScopeOfCustomIconLayers();
 	});
 	img.src = url;
@@ -278,10 +328,10 @@ function init() {
 		id: "points",
 		type: "circle",
 		source: sourcePointsId,
-		filter: ["==", "$type", "Point"],
+		filter: ["all", ["==", "$type", "Point"], ["!has", "isIcon"]],
 		paint: {
-			"circle-color": ["case", ["has", "color"], ["get", "color"], colors.points],
-			"circle-radius": ["case", ["has", "size"], ["get", "size"], 6],
+			"circle-color": colors.points,
+			"circle-radius": 6,
 		},
 	});
 
@@ -477,7 +527,6 @@ watch(
 function updateScopeOfCustomIconLayers() {
 	assert(context.map != null);
 	const map = context.map;
-	console.log(props.customIcons);
 	for (const key in props.customIcons) {
 		if (!map.hasImage(`custom-icon-image-${key}`)) {
 			continue;
@@ -490,11 +539,8 @@ function updateScopeOfCustomIconLayers() {
 		);
 
 		const geojsonCustomIconPoints = createFeatureCollection(validFeatures);
-		console.log(geojsonCustomIconPoints);
 		const sourceCustomIconsId = `custom-icon-data-${key}`;
 		const sourceCustomIconPoints = map.getSource(sourceCustomIconsId) as GeoJSONSource | undefined;
-		console.log(sourceCustomIconPoints);
-		console.log(map.getLayer(`customIconLayer-${key}`));
 
 		sourceCustomIconPoints?.setData(geojsonCustomIconPoints);
 	}
@@ -516,7 +562,7 @@ function updateScope() {
 	const sourceEventPoints = map.getSource(sourceEventPointsId) as GeoJSONSource | undefined;
 
 	const points = props.features.filter((point) => {
-		return point.geometry.type === "Point";
+		return point.geometry.type === "Point" && !point.properties.isIcon;
 	});
 
 	const polygons = props.features.filter((polygon) => {
