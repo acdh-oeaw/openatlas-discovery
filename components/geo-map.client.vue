@@ -18,7 +18,6 @@ import {
 	NavigationControl,
 	type PointLike,
 	ScaleControl,
-	type SymbolLayerSpecification,
 } from "maplibre-gl";
 import { animate } from "popmotion";
 
@@ -376,20 +375,25 @@ function init() {
 			}),
 		];
 
-		const radius = 6; // pixels around click
-		const box: [PointLike, PointLike] = [
-			[event.point.x - radius, event.point.y - radius],
-			[event.point.x + radius, event.point.y + radius],
-		];
-
 		// query all visible features at the click point
-		const features = map.queryRenderedFeatures(box, { layers: layersToQuery });
+		const features = map.queryRenderedFeatures(event.point, { layers: layersToQuery });
 
-		console.log("event click: ", features);
+		const preciseFeatures = features.filter((f) => {
+			if (f.geometry.type !== "Point") return true;
 
-		if (features.length > 0) {
+			const [lng, lat] = f.geometry.coordinates;
+			const screenPoint = map.project([lng, lat]);
+
+			const dx = event.point.x - screenPoint.x;
+			const dy = event.point.y - screenPoint.y;
+			const dist = Math.sqrt(dx * dx + dy * dy);
+
+			return dist <= 6;
+		});
+
+		if (preciseFeatures.length > 0) {
 			emit("layer-click", {
-				features: features as Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">>,
+				features: preciseFeatures as Array<MapGeoJSONFeature & Pick<GeoJsonFeature, "properties">>,
 			});
 		}
 	});
