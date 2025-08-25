@@ -229,7 +229,7 @@ collections:
                   - name: iconName
                     widget: select
                     options: *icon_names
-                  - name: backgroundColor
+                  - name: color
                     widget: color
 
           - name: network

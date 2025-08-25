@@ -169,13 +169,6 @@ async function create() {
 	console.log("created", props);
 }
 
-function getContrastColor(hex: string) {
-	const rgbValue = hexToRgb(hex);
-	if (rgbValue == null) return "#ffffff";
-	if (rgbValue[0] * 0.299 + rgbValue[1] * 0.587 + rgbValue[2] * 0.114 > 186) return "#000000";
-	else return "#ffffff";
-}
-
 function initializeCustomIconLayer(key: string) {
 	assert(context.map != null);
 	const map = context.map;
@@ -197,12 +190,7 @@ function initializeCustomIconLayer(key: string) {
 	div.innerHTML = iconSVG;
 
 	div.querySelector("svg")?.setAttribute("viewBox", "-4 -4 32 32");
-	div
-		.querySelector("svg")
-		?.setAttribute(
-			"stroke",
-			getContrastColor(props.customIcons[key]?.backgroundColor ?? "#ffffff"),
-		);
+	div.querySelector("svg")?.setAttribute("stroke", props.customIcons[key]?.color ?? "#000000");
 
 	// convert the blob object to a dedicated URL
 	const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(div.innerHTML)}`;
@@ -216,17 +204,6 @@ function initializeCustomIconLayer(key: string) {
 	img.addEventListener("load", () => {
 		if (map.hasImage(`custom-icon-image-${key}`)) return;
 		map.addImage(`custom-icon-image-${key}`, img);
-
-		map.addLayer({
-			id: `iconPoints-${key}`,
-			type: "circle",
-			source: sourceCustomIconId,
-			filter: ["all", ["==", "$type", "Point"], ["has", "color"]],
-			paint: {
-				"circle-color": ["get", "color"],
-				"circle-radius": ["case", ["has", "size"], ["get", "size"], 6],
-			},
-		});
 
 		map.addLayer({
 			id: `customIconLayer-${key}`,
@@ -245,22 +222,13 @@ function initializeCustomIconLayer(key: string) {
 			map.getCanvas().classList.add("!cursor-pointer");
 		});
 
-		map.on("mouseenter", `iconPoints-${key}`, () => {
-			map.getCanvas().classList.add("!cursor-pointer");
-		});
-
 		//
 
 		map.on("mouseleave", `customIconLayer-${key}`, () => {
 			map.getCanvas().classList.remove("!cursor-pointer");
 		});
 
-		map.on("mouseleave", `iconPoints-${key}`, () => {
-			map.getCanvas().classList.remove("!cursor-pointer");
-		});
-
 		updateScopeOfCustomIconLayers();
-		console.log("Added layer ", `customIconLayer-${key}`);
 	});
 	img.src = url;
 }
@@ -375,9 +343,6 @@ function init() {
 			"points",
 			"centerpoints",
 			"events",
-			...Object.keys(props.customIcons).map((key) => {
-				return `iconPoints-${key}`;
-			}),
 			...Object.keys(props.customIcons).map((key) => {
 				return `customIconLayer-${key}`;
 			}),
@@ -550,11 +515,11 @@ function updateScopeOfCustomIconLayers() {
 				return /* feature.geometry.coordinates && */ Array.isArray(feature.geometry.coordinates);
 			}) ?? [];
 
-		const geojsonCustomIconPoints = createFeatureCollection(validFeatures);
+		const geojsonCustomIconData = createFeatureCollection(validFeatures);
 		const sourceCustomIconsId = `custom-icon-data-${key}`;
-		const sourceCustomIconPoints = map.getSource(sourceCustomIconsId) as GeoJSONSource | undefined;
+		const sourceCustomIconData = map.getSource(sourceCustomIconsId) as GeoJSONSource | undefined;
 
-		sourceCustomIconPoints?.setData(geojsonCustomIconPoints);
+		sourceCustomIconData?.setData(geojsonCustomIconData);
 	}
 }
 

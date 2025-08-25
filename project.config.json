@@ -87,7 +87,8 @@
 		"customIconConfig": [
 			{
 				"iconName": "Church",
-				"entityType": 443
+				"entityType": 443,
+				"color": "#cb1414"
 			}
 		]
 	}

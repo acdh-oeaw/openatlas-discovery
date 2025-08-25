@@ -150,7 +150,7 @@ const features = computed(() => {
 				});
 			});
 			if (customConfig != null) {
-				feature.properties.color = customConfig[1].backgroundColor;
+				feature.properties.color = customConfig[1].color;
 				feature.properties.size = 10;
 				feature.properties.isIcon = true;
 				feature.properties.isDisplayed = true;
@@ -558,7 +558,7 @@ const customIconEntries = computed(() => {
 				const customEntry: CustomIconEntry = {
 					type: foundType,
 					icon: configEntry?.iconName,
-					backgroundColor: configEntry?.backgroundColor,
+					color: configEntry?.color,
 					entities: [],
 				};
 				entries[unprefixedType] = customEntry;
@@ -571,7 +571,7 @@ const customIconEntries = computed(() => {
 					});
 				});
 				if (customConfig != null) {
-					feature.properties.color = customConfig[1].backgroundColor;
+					feature.properties.color = customConfig[1].color;
 					feature.properties.size = 10;
 					feature.properties.isIcon = true;
 				}

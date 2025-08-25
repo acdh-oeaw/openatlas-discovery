@@ -57,6 +57,6 @@ export type File = NonNullable<components["schemas"]["PresentationViewModel"]["f
 export interface CustomIconEntry {
 	type: NonNullable<EntityFeature["types"]>[0] | undefined;
 	icon?: string;
-	backgroundColor?: string;
+	color?: string;
 	entities: Array<GeoJsonFeature>;
 }
