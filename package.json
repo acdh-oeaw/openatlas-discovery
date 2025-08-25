@@ -29,7 +29,7 @@
 		"lint:styles:fix": "pnpm run lint:styles:check --fix",
 		"postinstall": "nuxt prepare",
 		"preinstall": "npx only-allow pnpm",
-		"prepare": "run-s setup generate:api-client generate:crm-messages generate:cms-icon-config",
+		"prepare": "run-s setup generate:api-client generate:crm-messages generate:cms-icon-config format:fix",
 		"setup": "is-ci || simple-git-hooks",
 		"start": "nuxt preview --dotenv ./.env.local",
 		"sync": "nuxt prepare",
