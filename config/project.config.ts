@@ -2,7 +2,7 @@ import { log } from "@acdh-oeaw/lib";
 import { ColorSpace, getLuminance, HSL, OKLCH, parse, sRGB, to as convert } from "colorjs.io/fn";
 import * as v from "valibot";
 
-import projectConfig from "../project.config.json" assert { type: "json" };
+import projectConfig from "../project.config.json" with { type: "json" };
 
 ColorSpace.register(sRGB);
 ColorSpace.register(HSL);
@@ -61,6 +61,13 @@ const schema = v.object({
 	map: v.object({
 		startPage: v.boolean(),
 		mapDisplayedSystemClasses: v.array(v.string()),
+		customIconConfig: v.array(
+			v.object({
+				entityType: v.number(),
+				iconName: v.string(),
+				color: v.optional(v.string()),
+			}),
+		),
 	}),
 	twitter: v.optional(v.string()),
 });

@@ -116,6 +116,9 @@ importers:
       graphology-layout-forceatlas2:
         specifier: ^0.10.1
         version: 0.10.1(graphology-types@0.24.7)
+      lucide-static:
+        specifier: ^0.536.0
+        version: 0.536.0
       lucide-vue-next:
         specifier: ^0.471.0
         version: 0.471.0(vue@3.5.13(typescript@5.5.2))
@@ -255,6 +258,9 @@ importers:
       is-ci:
         specifier: ^3.0.1
         version: 3.0.1
+      js-yaml:
+        specifier: ^4.1.0
+        version: 4.1.0
       lint-staged:
         specifier: ^15.2.7
         version: 15.2.7
@@ -291,6 +297,9 @@ importers:
       vue-tsc:
         specifier: ^2.0.22
         version: 2.0.22(typescript@5.5.2)
+      yaml:
+        specifier: ^2.8.1
+        version: 2.8.1
 
 packages:
 
@@ -5076,6 +5085,9 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
+  lucide-static@0.536.0:
+    resolution: {integrity: sha512-sP/CE7WIORRnPcutL0tSm1SiLEQ2g8FYbUUkYNNscCGSmUA3LDHfOXdghEFSzFQuo+6yxaTJ+/xNDUGHKPPD5g==}
+
   lucide-vue-next@0.471.0:
     resolution: {integrity: sha512-ZJyImsuBOR91VF5auILuo1U0m93sSjYs+i/m5ISx8oG4FWMXX7hzuotx24/dTMRp+e8pMWUeVmPBKsNcNSrUzg==}
     peerDependencies:
@@ -7874,6 +7886,11 @@ packages:
   yaml@2.4.5:
     resolution: {integrity: sha512-aBx2bnqDzVOyNKfsysjA2ms5ZlnjSAW2eG3/L5G/CSujfjLJTJsEw1bGw8kCf04KodQWk1pxlGnZ56CRxiawmg==}
     engines: {node: '>= 14'}
+    hasBin: true
+
+  yaml@2.8.1:
+    resolution: {integrity: sha512-lcYcMxX2PO9XMGvAJkJ3OsNMw+/7FKes7/hgerGUYWIoWu5j/+YQqcZr5JnPZWzOsEBgMbSbiSTn/dv/69Mkpw==}
+    engines: {node: '>= 14.6'}
     hasBin: true
 
   yargs-parser@21.1.1:
@@ -14241,6 +14258,8 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
+  lucide-static@0.536.0: {}
+
   lucide-vue-next@0.471.0(vue@3.5.13(typescript@5.5.2)):
     dependencies:
       vue: 3.5.13(typescript@5.5.2)
@@ -15601,7 +15620,7 @@ snapshots:
   postcss-load-config@4.0.2(postcss@8.4.38):
     dependencies:
       lilconfig: 3.1.2
-      yaml: 2.4.5
+      yaml: 2.8.1
     optionalDependencies:
       postcss: 8.4.38
 
@@ -17364,7 +17383,7 @@ snapshots:
       pathe: 1.1.2
       scule: 1.3.0
       unplugin: 1.10.1
-      yaml: 2.4.5
+      yaml: 2.8.1
     optionalDependencies:
       vue-router: 4.4.0(vue@3.5.13(typescript@5.5.2))
     transitivePeerDependencies:
@@ -17805,9 +17824,11 @@ snapshots:
     dependencies:
       eslint-visitor-keys: 3.4.3
       lodash: 4.17.21
-      yaml: 2.4.5
+      yaml: 2.8.1
 
   yaml@2.4.5: {}
+
+  yaml@2.8.1: {}
 
   yargs-parser@21.1.1: {}
 

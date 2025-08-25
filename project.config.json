@@ -83,6 +83,18 @@
 	"defaultLocale": "en",
 	"map": {
 		"startPage": false,
-		"mapDisplayedSystemClasses": ["place", "feature"]
+		"mapDisplayedSystemClasses": ["place", "feature"],
+		"customIconConfig": [
+			{
+				"entityType": 22378,
+				"iconName": "Skull",
+				"color": "#2b2b2b"
+			},
+			{
+				"entityType": 5083,
+				"iconName": "Skull",
+				"color": "#2b2b2b"
+			}
+		]
 	}
 }

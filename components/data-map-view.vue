@@ -8,6 +8,7 @@ import * as v from "valibot";
 import type { SearchFormData } from "@/components/search-form.vue";
 import type { EntityFeature } from "@/composables/use-create-entity";
 import { categories, operatorMap } from "@/composables/use-get-search-results";
+import type { CustomIconEntry } from "@/types/api";
 import type { GeoJsonFeature } from "@/utils/create-geojson-feature";
 
 import { project } from "../config/project.config";
@@ -71,7 +72,7 @@ const { data, isPending, isPlaceholderData } = useGetSearchResults(
 				search.length > 0
 					? [{ [category]: [{ operator: operator, values: [search], logicalOperator: "and" }] }]
 					: [],
-			show: ["geometry", "when", "relations"],
+			show: ["geometry", "when", "relations", "types"],
 			centroid: true,
 			relation_type: ["P26", "P27"],
 			system_classes: project.map.mapDisplayedSystemClasses,
@@ -128,13 +129,77 @@ const mode = computed(() => {
  * because `maplibre-gl` will serialize geojson features when sending them to the webworker.
  */
 const features = computed(() => {
-	return entities.value
+	const mappedFeatures = entities.value
 		.filter((entity) => {
+			if (!entity.geometry) return false;
+
 			return entity.geometry;
+
+			/* &&
+				!entity.types?.find((type) => {
+					return project.map.customIconConfig.find((config) => {
+						return config.entityType === type.label;
+					});
+				}) */
 		})
 		.map((entity) => {
-			return createGeoJsonFeature(entity);
+			const feature = createGeoJsonFeature(entity);
+			const customConfig = Object.entries(project.map.customIconConfig).findLast((entry) => {
+				return entity.types?.find((type) => {
+					return getUnprefixedId(type.identifier ?? "") === String(entry[1].entityType);
+				});
+			});
+			if (customConfig != null) {
+				feature.properties.color = customConfig[1].color;
+				feature.properties.size = 10;
+				feature.properties.isIcon = true;
+				feature.properties.isDisplayed = true;
+			}
+
+			return feature;
 		});
+
+	mappedFeatures.forEach((feature, index, self) => {
+		let foundIcon;
+
+		// For GeometryCollections such as areas
+		if (feature.geometry.type === "GeometryCollection") {
+			feature.geometry.geometries.forEach((geo) => {
+				if (geo.type !== "Point") return;
+				const coords = geo.coordinates.join(",");
+				const matchingCoordinatesFeatures = self.filter((f) => {
+					if (f.geometry.type !== "Point") return false;
+					return f.geometry.coordinates.join(",") === coords;
+				});
+				if (
+					matchingCoordinatesFeatures.some((f) => {
+						return f.properties.isIcon;
+					})
+				)
+					foundIcon = true;
+			});
+		}
+
+		// For single points
+		if (feature.geometry.type === "Point") {
+			const coords = feature.geometry.coordinates.join(",");
+			const matchingCoordinatesFeatures = self.filter((f) => {
+				if (f.geometry.type !== "Point") return false;
+				return f.geometry.coordinates.join(",") === coords;
+			});
+			foundIcon = matchingCoordinatesFeatures.some((f) => {
+				return f.properties.isIcon;
+			});
+		}
+
+		if (foundIcon) {
+			feature.properties.isDisplayed = false;
+		} else {
+			feature.properties.isDisplayed = true;
+		}
+	});
+
+	return mappedFeatures;
 });
 
 const movements = computed(() => {
@@ -207,6 +272,13 @@ const events = computed(() => {
 		.filter((feature) => {
 			return feature.geometry && "geometries" in feature.geometry;
 		})
+		.filter((feature) => {
+			return !feature.types?.find((type) => {
+				return project.map.customIconConfig.find((config) => {
+					return String(config.entityType) === getUnprefixedId(type.identifier ?? "");
+				});
+			});
+		})
 		.map((feature) => {
 			assert(feature.geometry, "Feature has no geometry");
 			assert("geometries" in feature.geometry, "Feature has no geometries");
@@ -226,10 +298,36 @@ const events = computed(() => {
 			return featureClone;
 		});
 
-	return event.map((entity) => {
+	const mappedEvents = event.map((entity) => {
 		let feature = createGeoJsonFeature(entity);
 		return feature;
 	});
+
+	mappedEvents.forEach((feature) => {
+		if (feature.geometry.type !== "GeometryCollection") {
+			return;
+		}
+		const eventPoint = feature.geometry.geometries[0];
+		if (!eventPoint || eventPoint.type !== "Point") return;
+		const coords = eventPoint.coordinates.join(",");
+
+		const matchingCoordinatesFeatures = features.value.filter((f) => {
+			if (f.geometry.type !== "Point") return false;
+			return f.geometry.coordinates.join(",") === coords;
+		});
+
+		const foundIcon = matchingCoordinatesFeatures.some((f) => {
+			return f.properties.isIcon;
+		});
+
+		if (foundIcon) {
+			feature.properties.isDisplayed = false;
+		} else {
+			feature.properties.isDisplayed = true;
+		}
+	});
+
+	return mappedEvents;
 });
 
 const centerpoints = computed(() => {
@@ -252,6 +350,7 @@ interface onLayerClickParams {
 }
 
 function onLayerClick({ features, targetCoordinates }: onLayerClickParams) {
+	console.log("Layer click", features);
 	const entitiesMap = new Map<string, EntityFeature>();
 
 	features.forEach((feature) => {
@@ -342,12 +441,12 @@ function setCoordinates(entity: EntityFeature, coordinates: Ref<[number, number]
 
 watchEffect(() => {
 	if (mode.value && selection.value) {
-		console.log("mode & selection set", selection.value);
+		// console.log("mode & selection set", selection.value);
 		const entity = entities.value.find((feature) => {
 			const id = getUnprefixedId(feature["@id"]);
 			return id === selection.value;
 		});
-		console.log("Entity: ", entity, entities.value);
+		// console.log("Entity: ", entity, entities.value);
 
 		if (entity) {
 			setCoordinates(entity, selectionCoordinates);
@@ -364,7 +463,7 @@ watchEffect(() => {
 				};
 			}
 
-			console.log(detailOnMap.value);
+			// console.log(detailOnMap.value);
 			detailSelectionCoordinates.value = undefined;
 			if (detailOnMap.value) {
 				const detailEntity = entities.value.find((feature) => {
@@ -378,12 +477,12 @@ watchEffect(() => {
 					// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 					if (detailSelectionCoordinates.value === undefined) return;
 
-					console.log(
-						"Detail Coordinates: ",
-						detailSelectionCoordinates,
-						popover.value,
-						detailEntity,
-					);
+					// console.log(
+					// 	"Detail Coordinates: ",
+					// 	detailSelectionCoordinates,
+					// 	popover.value,
+					// 	detailEntity,
+					// );
 					popover.value = {
 						coordinates: detailSelectionCoordinates.value,
 						entities: [detailEntity],
@@ -441,6 +540,49 @@ const multipleMovements = useGetChainedEvents(
 function setMovementId({ id }: { id: string | null }) {
 	return (movementId.value = id ? parseInt(id) : null);
 }
+
+const customIconEntries = computed(() => {
+	const entries: Record<string, CustomIconEntry> = {};
+	entities.value.forEach((entity) => {
+		const foundType = entity.types?.findLast((type) => {
+			return project.map.customIconConfig.find((config) => {
+				return String(config.entityType) === getUnprefixedId(type.identifier ?? "");
+			});
+		});
+		const unprefixedType = getUnprefixedId(foundType?.identifier ?? "");
+		if (foundType) {
+			if (!(unprefixedType in entries)) {
+				const configEntry = project.map.customIconConfig.find((config) => {
+					return String(config.entityType) === unprefixedType;
+				});
+				const customEntry: CustomIconEntry = {
+					type: foundType,
+					icon: configEntry?.iconName,
+					color: configEntry?.color,
+					entities: [],
+				};
+				entries[unprefixedType] = customEntry;
+			}
+			if (entity.geometry) {
+				const feature = createGeoJsonFeature(entity);
+				const customConfig = Object.entries(project.map.customIconConfig).findLast((entry) => {
+					return entity.types?.find((type) => {
+						return getUnprefixedId(type.identifier ?? "") === String(entry[1].entityType);
+					});
+				});
+				if (customConfig != null) {
+					feature.properties.color = customConfig[1].color;
+					feature.properties.size = 10;
+					feature.properties.isIcon = true;
+				}
+
+				entries[unprefixedType]?.entities.push(feature);
+			}
+		}
+	});
+	console.log("custom entries: ", entries);
+	return entries;
+});
 </script>
 
 <template>
@@ -512,6 +654,7 @@ function setMovementId({ id }: { id: string | null }) {
 				:features="features"
 				:movements="movements"
 				:events="events"
+				:custom-icons="customIconEntries"
 				:height="height"
 				:width="width"
 				:has-polygons="show"
