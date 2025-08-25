@@ -180,13 +180,14 @@ function initializeCustomIconLayer(key: string) {
 	assert(context.map != null);
 	const map = context.map;
 	const sourceCustomIconId = `custom-icon-data-${key}`;
-	map.addSource(sourceCustomIconId, {
-		type: "geojson",
-		data: createFeatureCollection([]),
-		cluster: true,
-		clusterMaxZoom: 14,
-		clusterRadius: 10,
-	});
+	if (!map.getSource(sourceCustomIconId))
+		map.addSource(sourceCustomIconId, {
+			type: "geojson",
+			data: createFeatureCollection([]),
+			cluster: true,
+			clusterMaxZoom: 14,
+			clusterRadius: 10,
+		});
 
 	//@ts-expect-error ensure iconName is a valid Lucide Icon
 	// eslint-disable-next-line import-x/namespace
@@ -213,6 +214,7 @@ function initializeCustomIconLayer(key: string) {
 	// load the SVG blob to a flesh image object
 	const img = new Image();
 	img.addEventListener("load", () => {
+		if (map.hasImage(`custom-icon-image-${key}`)) return;
 		map.addImage(`custom-icon-image-${key}`, img);
 
 		map.addLayer({
@@ -258,6 +260,7 @@ function initializeCustomIconLayer(key: string) {
 		});
 
 		updateScopeOfCustomIconLayers();
+		console.log("Added layer ", `customIconLayer-${key}`);
 	});
 	img.src = url;
 }
@@ -537,6 +540,7 @@ function updateScopeOfCustomIconLayers() {
 	const map = context.map;
 	for (const key in props.customIcons) {
 		if (!map.hasImage(`custom-icon-image-${key}`)) {
+			initializeCustomIconLayer(key);
 			continue;
 		}
 
