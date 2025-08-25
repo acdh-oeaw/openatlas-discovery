@@ -24,6 +24,7 @@ import { type GeoMapContext, geoMapContextKey } from "@/components/geo-map.conte
 import { initialViewState } from "@/config/geo-map.config";
 import { project } from "@/config/project.config";
 import type { components } from "@/lib/api-client/api";
+import type { CustomIconEntry } from "@/types/api";
 import type { GeoJsonFeature } from "@/utils/create-geojson-feature";
 
 const vsDeclaration = `
@@ -83,7 +84,7 @@ const overlay = ref<mapbox.MapboxOverlay | null>(null);
 const supportOverlay = ref<mapbox.MapboxOverlay | null>(null);
 const props = defineProps<{
 	features: Array<CustomGeoJsonFeature>;
-	customIcons: Record<string, Record<string, unknown>>;
+	customIcons: Record<string, CustomIconEntry>;
 	movements: Array<GeoJsonFeature>;
 	events: Array<GeoJsonFeature>;
 	height: number;
@@ -170,7 +171,8 @@ async function create() {
 
 function getContrastColor(hex: string) {
 	const rgbValue = hexToRgb(hex);
-	if (rgbValue?.[0] * 0.299 + rgbValue?.[1] * 0.587 + rgbValue?.[2] * 0.114 > 186) return "#000000";
+	if (rgbValue == null) return "#ffffff";
+	if (rgbValue[0] * 0.299 + rgbValue[1] * 0.587 + rgbValue[2] * 0.114 > 186) return "#000000";
 	else return "#ffffff";
 }
 
@@ -187,6 +189,7 @@ function initializeCustomIconLayer(key: string) {
 	});
 
 	//@ts-expect-error ensure iconName is a valid Lucide Icon
+	// eslint-disable-next-line import-x/namespace
 	const iconSVG = LucideIcons[props.customIcons[key].icon];
 
 	const div = document.createElement("div");
@@ -195,7 +198,10 @@ function initializeCustomIconLayer(key: string) {
 	div.querySelector("svg")?.setAttribute("viewBox", "-4 -4 32 32");
 	div
 		.querySelector("svg")
-		?.setAttribute("stroke", getContrastColor(props.customIcons[key].backgroundColor ?? "#ffffff"));
+		?.setAttribute(
+			"stroke",
+			getContrastColor(props.customIcons[key]?.backgroundColor ?? "#ffffff"),
+		);
 
 	// convert the blob object to a dedicated URL
 	const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(div.innerHTML)}`;
@@ -381,6 +387,7 @@ function init() {
 			if (f.geometry.type !== "Point") return true;
 
 			const [lng, lat] = f.geometry.coordinates;
+			if (lng == null || lat == null) return false;
 			const screenPoint = map.project([lng, lat]);
 
 			const dx = event.point.x - screenPoint.x;
@@ -533,11 +540,11 @@ function updateScopeOfCustomIconLayers() {
 			continue;
 		}
 
-		const validFeatures = (props.customIcons[key]?.entities as Array<GeoJsonFeature>).filter(
-			(feature) => {
-				return feature.geometry.coordinates && Array.isArray(feature.geometry.coordinates);
-			},
-		);
+		const validFeatures =
+			props.customIcons[key]?.entities.filter((feature) => {
+				if (feature.geometry.type === "GeometryCollection") return false;
+				return /* feature.geometry.coordinates && */ Array.isArray(feature.geometry.coordinates);
+			}) ?? [];
 
 		const geojsonCustomIconPoints = createFeatureCollection(validFeatures);
 		const sourceCustomIconsId = `custom-icon-data-${key}`;

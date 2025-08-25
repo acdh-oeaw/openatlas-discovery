@@ -8,6 +8,7 @@ import * as v from "valibot";
 import type { SearchFormData } from "@/components/search-form.vue";
 import type { EntityFeature } from "@/composables/use-create-entity";
 import { categories, operatorMap } from "@/composables/use-get-search-results";
+import type { CustomIconEntry } from "@/types/api";
 import type { GeoJsonFeature } from "@/utils/create-geojson-feature";
 
 import { project } from "../config/project.config";
@@ -306,8 +307,9 @@ const events = computed(() => {
 		if (feature.geometry.type !== "GeometryCollection") {
 			return;
 		}
-
-		const coords = feature.geometry.geometries[0]?.coordinates.join(",");
+		const eventPoint = feature.geometry.geometries[0];
+		if (!eventPoint || eventPoint.type !== "Point") return;
+		const coords = eventPoint.coordinates.join(",");
 
 		const matchingCoordinatesFeatures = features.value.filter((f) => {
 			if (f.geometry.type !== "Point") return false;
@@ -540,7 +542,7 @@ function setMovementId({ id }: { id: string | null }) {
 }
 
 const customIconEntries = computed(() => {
-	const entries: Record<string, Record<string, unknown>> = {};
+	const entries: Record<string, CustomIconEntry> = {};
 	entities.value.forEach((entity) => {
 		const foundType = entity.types?.findLast((type) => {
 			return project.map.customIconConfig.find((config) => {
@@ -553,7 +555,7 @@ const customIconEntries = computed(() => {
 				const configEntry = project.map.customIconConfig.find((config) => {
 					return String(config.entityType) === unprefixedType;
 				});
-				const customEntry = {
+				const customEntry: CustomIconEntry = {
 					type: foundType,
 					icon: configEntry?.iconName,
 					backgroundColor: configEntry?.backgroundColor,
@@ -574,7 +576,7 @@ const customIconEntries = computed(() => {
 					feature.properties.isIcon = true;
 				}
 
-				(entries[unprefixedType]?.entities as Array<GeoJsonFeature>).push(feature);
+				entries[unprefixedType]?.entities.push(feature);
 			}
 		}
 	});
