@@ -159,17 +159,37 @@ const features = computed(() => {
 		});
 
 	mappedFeatures.forEach((feature, index, self) => {
-		if (feature.geometry.type !== "Point") return;
-		const coords = feature.geometry.coordinates.join(",");
+		let foundIcon;
 
-		const firstIndex = self.filter((f) => {
-			if (f.geometry.type !== "Point") return false;
-			return f.geometry.coordinates.join(",") === coords;
-		});
+		// For GeometryCollections such as areas
+		if (feature.geometry.type === "GeometryCollection") {
+			feature.geometry.geometries.forEach((geo) => {
+				if (geo.type !== "Point") return;
+				const coords = geo.coordinates.join(",");
+				const matchingCoordinatesFeatures = self.filter((f) => {
+					if (f.geometry.type !== "Point") return false;
+					return f.geometry.coordinates.join(",") === coords;
+				});
+				if (
+					matchingCoordinatesFeatures.some((f) => {
+						return f.properties.isIcon;
+					})
+				)
+					foundIcon = true;
+			});
+		}
 
-		const foundIcon = firstIndex.some((f) => {
-			return f.properties.isIcon;
-		});
+		// For single points
+		if (feature.geometry.type === "Point") {
+			const coords = feature.geometry.coordinates.join(",");
+			const matchingCoordinatesFeatures = self.filter((f) => {
+				if (f.geometry.type !== "Point") return false;
+				return f.geometry.coordinates.join(",") === coords;
+			});
+			foundIcon = matchingCoordinatesFeatures.some((f) => {
+				return f.properties.isIcon;
+			});
+		}
 
 		if (foundIcon) {
 			feature.properties.isDisplayed = false;
@@ -282,25 +302,23 @@ const events = computed(() => {
 		return feature;
 	});
 
-	console.log(mappedEvents);
 	mappedEvents.forEach((feature) => {
-		if (feature.geometry.type !== "GeometryCollection") return;
+		if (feature.geometry.type !== "GeometryCollection") {
+			return;
+		}
 
 		const coords = feature.geometry.geometries[0]?.coordinates.join(",");
 
-		const firstIndex = features.value.filter((f) => {
+		const matchingCoordinatesFeatures = features.value.filter((f) => {
 			if (f.geometry.type !== "Point") return false;
 			return f.geometry.coordinates.join(",") === coords;
 		});
 
-		console.log("hello: ", firstIndex);
-
-		const foundIcon = firstIndex.some((f) => {
+		const foundIcon = matchingCoordinatesFeatures.some((f) => {
 			return f.properties.isIcon;
 		});
 
 		if (foundIcon) {
-			console.log("foundIcon: ", feature);
 			feature.properties.isDisplayed = false;
 		} else {
 			feature.properties.isDisplayed = true;

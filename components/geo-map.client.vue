@@ -16,7 +16,6 @@ import {
 	Map as GeoMap,
 	type MapGeoJSONFeature,
 	NavigationControl,
-	type PointLike,
 	ScaleControl,
 } from "maplibre-gl";
 import { animate } from "popmotion";
@@ -82,7 +81,6 @@ interface MultipleMovementType {
 
 const overlay = ref<mapbox.MapboxOverlay | null>(null);
 const supportOverlay = ref<mapbox.MapboxOverlay | null>(null);
-const customIconOverlay = ref<mapbox.MapboxOverlay | null>(null);
 const props = defineProps<{
 	features: Array<CustomGeoJsonFeature>;
 	customIcons: Record<string, Record<string, unknown>>;
@@ -301,6 +299,7 @@ function init() {
 		filter: ["==", "$type", "Point"],
 		paint: {
 			"circle-color": colors.areaCenterPoints,
+			"circle-opacity": ["case", ["==", ["get", "isDisplayed"], true], 1, 0],
 			"circle-radius": 6,
 		},
 	});
