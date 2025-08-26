@@ -141,8 +141,8 @@ importers:
         specifier: ^10.1.0
         version: 10.1.0
       pnpm:
-        specifier: ^10.3.0
-        version: 10.3.0
+        specifier: ^9.4.0
+        version: 9.15.9
       popmotion:
         specifier: ^11.0.5
         version: 11.0.5
@@ -5909,8 +5909,8 @@ packages:
     resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
     engines: {node: '>=4'}
 
-  pnpm@10.3.0:
-    resolution: {integrity: sha512-7lku2ogVqKKTwga7CRfEuw/ydMUN73y8F74F7GQfwtGwJJDOZgBhNWvQ0Sak1+suyIMOaVn7ikR1ccYx1aJELQ==}
+  pnpm@9.15.9:
+    resolution: {integrity: sha512-aARhQYk8ZvrQHAeSMRKOmvuJ74fiaR1p5NQO7iKJiClf1GghgbrlW1hBjDolO95lpQXsfF+UA+zlzDzTfc8lMQ==}
     engines: {node: '>=18.12'}
     hasBin: true
 
@@ -15539,7 +15539,7 @@ snapshots:
 
   pluralize@8.0.0: {}
 
-  pnpm@10.3.0: {}
+  pnpm@9.15.9: {}
 
   point-in-polygon-hao@1.1.0: {}
 
