@@ -196,13 +196,13 @@ function initializeCustomIconLayer(key: string) {
 	const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(div.innerHTML)}`;
 
 	if (map.hasImage(`custom-icon-image-${key}`)) {
-		map.removeImage(`custom-icon-image-${key}`);
+		return;
 	}
 
 	// load the SVG blob to a flesh image object
 	const img = new Image();
 	img.addEventListener("load", () => {
-		if (map.hasImage(`custom-icon-image-${key}`)) return;
+		if (map.hasImage(`custom-icon-image-${key}`) || map.getLayer(`customIconLayer-${key}`)) return;
 		map.addImage(`custom-icon-image-${key}`, img);
 
 		map.addLayer({
@@ -520,6 +520,10 @@ function updateScopeOfCustomIconLayers() {
 		const sourceCustomIconData = map.getSource(sourceCustomIconsId) as GeoJSONSource | undefined;
 
 		sourceCustomIconData?.setData(geojsonCustomIconData);
+
+		if (map.getLayer(`customIconLayer-${key}`)) {
+			map.moveLayer(`customIconLayer-${key}`);
+		}
 	}
 }
 
