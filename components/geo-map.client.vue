@@ -25,7 +25,7 @@ import { initialViewState } from "@/config/geo-map.config";
 import { project } from "@/config/project.config";
 import type { components } from "@/lib/api-client/api";
 import type { CustomIconEntry } from "@/types/api";
-import type { GeoJsonFeature } from "@/utils/create-geojson-feature";
+import type { CustomGeoJsonFeature, GeoJsonFeature } from "@/utils/create-geojson-feature";
 
 const vsDeclaration = `
 	in float instanceCoefficient;
@@ -85,7 +85,7 @@ const supportOverlay = ref<mapbox.MapboxOverlay | null>(null);
 const props = defineProps<{
 	features: Array<CustomGeoJsonFeature>;
 	customIcons: Record<string, CustomIconEntry>;
-	movements: Array<GeoJsonFeature>;
+	movements: Array<CustomGeoJsonFeature>;
 	events: Array<GeoJsonFeature>;
 	height: number;
 	width: number;
@@ -622,8 +622,8 @@ function flyToSelection(selection: [number, number] | undefined) {
 	}
 }
 
-function pointsToMapKey(startPoint: Point, endPoint: Point) {
-	return `${String(startPoint.coordinates[0])}-${String(startPoint.coordinates[1])}-${String(endPoint.coordinates[0])}-${String(endPoint.coordinates[1])}`;
+function pointsToMapKey(startPoint: Point, endPoint: Point, color: string) {
+	return `${String(startPoint.coordinates[0])}-${String(startPoint.coordinates[1])}-${String(endPoint.coordinates[0])}-${String(endPoint.coordinates[1])}-${color}`;
 }
 
 function checkHighlight(d: CurvedMovementLine) {
@@ -693,15 +693,24 @@ function updateMovements() {
 				if (!startPoint?.coordinates.length || !endPoint.coordinates.length) return;
 
 				if (Array.isArray(startPoint.coordinates) && Array.isArray(endPoint.coordinates)) {
-					if (!groupedMovements.has(pointsToMapKey(startPoint, endPoint))) {
-						groupedMovements.set(pointsToMapKey(startPoint, endPoint), []);
+					if (
+						!groupedMovements.has(
+							pointsToMapKey(startPoint, endPoint, movement.properties.color ?? colors.movement),
+						)
+					) {
+						groupedMovements.set(
+							pointsToMapKey(startPoint, endPoint, movement.properties.color ?? colors.movement),
+							[],
+						);
 					}
-					groupedMovements.get(pointsToMapKey(startPoint, endPoint))?.push({
-						id: movement.properties._id,
-						// @ts-expect-error - coordinates are not typed correctly due to a bug in openapi-typescript (https://github.com/openapi-ts/openapi-typescript/issues/2048)
-						coordinates: [startPoint.coordinates, endPoint.coordinates],
-						color: hexToRgb(colors.movement) ?? [0, 0, 0],
-					});
+					groupedMovements
+						.get(pointsToMapKey(startPoint, endPoint, movement.properties.color ?? colors.movement))
+						?.push({
+							id: movement.properties._id,
+							// @ts-expect-error - coordinates are not typed correctly due to a bug in openapi-typescript (https://github.com/openapi-ts/openapi-typescript/issues/2048)
+							coordinates: [startPoint.coordinates, endPoint.coordinates],
+							color: hexToRgb(movement.properties.color ?? colors.movement) ?? [0, 0, 0],
+						});
 				}
 			});
 		}
