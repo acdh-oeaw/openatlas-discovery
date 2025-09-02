@@ -985,7 +985,6 @@ function renderArcs() {
 					: 0.3;
 			return opacity;
 		},
-		// @ts-expect-error - thickness exists on CurvedMovementLine
 		getWidth: (d: CurvedMovementLine) => {
 			return project.map.customMovementConfig.arcThickness
 				? mapThicknessToRange(d.thickness ?? 0)

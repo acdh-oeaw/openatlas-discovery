@@ -77,8 +77,8 @@ const schema = v.object({
 			),
 			arcThickness: v.boolean(),
 		}),
-		twitter: v.optional(v.string()),
 	}),
+	twitter: v.optional(v.string()),
 });
 
 const result = v.safeParse(schema, projectConfig);

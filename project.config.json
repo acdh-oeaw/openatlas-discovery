@@ -97,12 +97,7 @@
 			}
 		],
 		"customMovementConfig": {
-			"colorConfig": [
-				{
-					"entityType": 4784,
-					"color": "#00ff30"
-				}
-			],
+			"colorConfig": [],
 			"arcThickness": false
 		}
 	}
