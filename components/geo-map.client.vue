@@ -25,7 +25,7 @@ import { initialViewState } from "@/config/geo-map.config";
 import { project } from "@/config/project.config";
 import type { components } from "@/lib/api-client/api";
 import type { CustomIconEntry } from "@/types/api";
-import type { GeoJsonFeature } from "@/utils/create-geojson-feature";
+import type { CustomGeoJsonFeature, GeoJsonFeature } from "@/utils/create-geojson-feature";
 
 const vsDeclaration = `
 	in float instanceCoefficient;
@@ -85,7 +85,7 @@ const supportOverlay = ref<mapbox.MapboxOverlay | null>(null);
 const props = defineProps<{
 	features: Array<CustomGeoJsonFeature>;
 	customIcons: Record<string, CustomIconEntry>;
-	movements: Array<GeoJsonFeature>;
+	movements: Array<CustomGeoJsonFeature>;
 	events: Array<GeoJsonFeature>;
 	height: number;
 	width: number;
@@ -303,10 +303,29 @@ function init() {
 		filter: ["==", "$type", "Point"],
 		paint: {
 			"circle-color": hoveredMovementId.value
-				? ["match", ["get", "id"], hoveredMovementId.value, colors.movement, "#808080"]
-				: colors.movement,
+				? [
+						"match",
+						["get", "id"],
+						hoveredMovementId.value,
+						["coalesce", ["get", "color"], colors.movement],
+						"#808080",
+					]
+				: ["coalesce", ["get", "color"], colors.movement],
 			"circle-radius": 6,
-			"circle-opacity": ["case", ["==", ["get", "isDisplayed"], true], 1, 0],
+			"circle-opacity": [
+				"case",
+				// if isDisplayed is false -> 0
+				["==", ["get", "isDisplayed"], false],
+				0,
+				// else if hoveredMovementIds is inside otherFeatures (= another event in the same
+				// location is hovered) -> 0
+				hoveredMovementId.value && hoveredMovementId.value.length > 0
+					? ["in", hoveredMovementId.value[0] ?? "", ["get", "otherFeatures"]]
+					: ["!=", true, true],
+				0,
+				// else -> 1
+				1,
+			],
 		},
 	});
 
@@ -402,6 +421,17 @@ watch(
 	{ immediate: true },
 );
 
+watch(
+	() => {
+		return props.currentSelectionId;
+	},
+	(newVal, oldVal) => {
+		if (newVal === "undefined" && oldVal != null) {
+			hoveredMovementId.value = null;
+		}
+	},
+);
+
 // watch(
 // 	() => {
 // 		return props.currentSelectionId;
@@ -461,8 +491,22 @@ watch(
 					type: "circle",
 					source: { type: "geojson", data: createFeatureCollection(source) },
 					paint: {
-						"circle-color": colors.movement,
+						"circle-color": ["coalesce", ["get", "color"], colors.movement],
 						"circle-radius": 6,
+						"circle-opacity": [
+							"case",
+							// if isDisplayed is false -> 0
+							["==", ["get", "isDisplayed"], false],
+							0,
+							// else if hoveredMovementIds is inside otherFeatures (= another event in the same
+							// location is hovered) -> 0
+							hoveredMovementId.value && hoveredMovementId.value.length > 0
+								? ["in", hoveredMovementId.value[0] ?? "", ["get", "otherFeatures"]]
+								: ["!=", true, true],
+							0,
+							// else -> 1
+							1,
+						],
 					},
 				});
 			}
@@ -622,8 +666,8 @@ function flyToSelection(selection: [number, number] | undefined) {
 	}
 }
 
-function pointsToMapKey(startPoint: Point, endPoint: Point) {
-	return `${String(startPoint.coordinates[0])}-${String(startPoint.coordinates[1])}-${String(endPoint.coordinates[0])}-${String(endPoint.coordinates[1])}`;
+function pointsToMapKey(startPoint: Point, endPoint: Point, color: string) {
+	return `${String(startPoint.coordinates[0])}-${String(startPoint.coordinates[1])}-${String(endPoint.coordinates[0])}-${String(endPoint.coordinates[1])}-${color}`;
 }
 
 function checkHighlight(d: CurvedMovementLine) {
@@ -649,9 +693,29 @@ function colorEvents(movements: Array<string> | null | undefined) {
 		"events",
 		"circle-color", // The paint property
 		movements != null && movements.length > 0
-			? ["case", ["in", ["get", "_id"], ["literal", movements]], colors.movement, "#808080"]
-			: colors.movement, // If no movement is hovered, use the default color for all
+			? [
+					"case",
+					["in", ["get", "_id"], ["literal", movements]],
+					["coalesce", ["get", "color"], colors.movement],
+					"#808080",
+				]
+			: ["coalesce", ["get", "color"], colors.movement], // If no movement is hovered, use the default color for all
 	);
+
+	context.map.setPaintProperty("events", "circle-opacity", [
+		"case",
+		// if isDisplayed is false -> 0
+		["==", ["get", "isDisplayed"], false],
+		0,
+		// else if hoveredMovementIds is inside otherFeatures (= another event in the same
+		// location is hovered) -> 0
+		hoveredMovementId.value && hoveredMovementId.value.length > 0
+			? ["in", hoveredMovementId.value[0] ?? "", ["get", "otherFeatures"]]
+			: ["!=", true, true],
+		0,
+		// else -> 1
+		1,
+	]);
 }
 
 function getCoef(d: CurvedMovementLine) {
@@ -693,15 +757,24 @@ function updateMovements() {
 				if (!startPoint?.coordinates.length || !endPoint.coordinates.length) return;
 
 				if (Array.isArray(startPoint.coordinates) && Array.isArray(endPoint.coordinates)) {
-					if (!groupedMovements.has(pointsToMapKey(startPoint, endPoint))) {
-						groupedMovements.set(pointsToMapKey(startPoint, endPoint), []);
+					if (
+						!groupedMovements.has(
+							pointsToMapKey(startPoint, endPoint, movement.properties.color ?? colors.movement),
+						)
+					) {
+						groupedMovements.set(
+							pointsToMapKey(startPoint, endPoint, movement.properties.color ?? colors.movement),
+							[],
+						);
 					}
-					groupedMovements.get(pointsToMapKey(startPoint, endPoint))?.push({
-						id: movement.properties._id,
-						// @ts-expect-error - coordinates are not typed correctly due to a bug in openapi-typescript (https://github.com/openapi-ts/openapi-typescript/issues/2048)
-						coordinates: [startPoint.coordinates, endPoint.coordinates],
-						color: hexToRgb(colors.movement) ?? [0, 0, 0],
-					});
+					groupedMovements
+						.get(pointsToMapKey(startPoint, endPoint, movement.properties.color ?? colors.movement))
+						?.push({
+							id: movement.properties._id,
+							// @ts-expect-error - coordinates are not typed correctly due to a bug in openapi-typescript (https://github.com/openapi-ts/openapi-typescript/issues/2048)
+							coordinates: [startPoint.coordinates, endPoint.coordinates],
+							color: hexToRgb(movement.properties.color ?? colors.movement) ?? [0, 0, 0],
+						});
 				}
 			});
 		}

@@ -260,6 +260,14 @@ const movements = computed(() => {
 	return move.map((entity) => {
 		let feature = createGeoJsonFeature(entity);
 
+		const customConfig = Object.entries(project.map.customMovementConfig).findLast((entry) => {
+			return entity.types?.find((type) => {
+				return getUnprefixedId(type.identifier ?? "") === String(entry[1].entityType);
+			});
+		});
+		if (customConfig != null) {
+			feature.properties.color = customConfig[1].color;
+		}
 		return feature;
 	});
 });
@@ -267,7 +275,7 @@ const movements = computed(() => {
 const events = computed(() => {
 	const event = entities.value
 		.filter((event) => {
-			return event.viewClass === "event" && event.systemClass !== "move";
+			return event.viewClass === "event";
 		})
 		.filter((feature) => {
 			return feature.geometry && "geometries" in feature.geometry;
@@ -300,9 +308,16 @@ const events = computed(() => {
 
 	const mappedEvents = event.map((entity) => {
 		let feature = createGeoJsonFeature(entity);
+		const customConfig = Object.entries(project.map.customMovementConfig).findLast((entry) => {
+			return entity.types?.find((type) => {
+				return getUnprefixedId(type.identifier ?? "") === String(entry[1].entityType);
+			});
+		});
+		if (customConfig != null) {
+			feature.properties.color = customConfig[1].color;
+		}
 		return feature;
 	});
-
 	mappedEvents.forEach((feature) => {
 		if (feature.geometry.type !== "GeometryCollection") {
 			return;
@@ -325,9 +340,29 @@ const events = computed(() => {
 		} else {
 			feature.properties.isDisplayed = true;
 		}
-	});
 
-	return mappedEvents;
+		const matchingCoordinatesEvents = mappedEvents.filter((e) => {
+			if (e.geometry.type !== "GeometryCollection" || e.properties._id === feature.properties._id)
+				return false;
+			return e.geometry.geometries.find((g) => {
+				return (
+					g.type === "Point" &&
+					"geometries" in feature.geometry &&
+					feature.geometry.geometries.find((geo) => {
+						if ("coordinates" in geo) return g.coordinates.join(",") === geo.coordinates.join(",");
+						return false;
+					})
+				);
+			});
+		});
+
+		feature.properties.otherFeatures = matchingCoordinatesEvents.map((f) => {
+			return f.properties._id;
+		});
+	});
+	return mappedEvents.toSorted((a, b) => {
+		return Number(Boolean(b.properties.color)) - Number(Boolean(a.properties.color));
+	});
 });
 
 const centerpoints = computed(() => {
@@ -509,7 +544,7 @@ const movementDetails = computed(() => {
 });
 
 const linkedMovements = computed(() => {
-	if (movementDetails.value?.id == null) {
+	if (movementId.value == null || movementDetails.value?.id == null) {
 		return null;
 	}
 
