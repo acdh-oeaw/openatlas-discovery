@@ -68,12 +68,15 @@ const schema = v.object({
 				color: v.optional(v.string()),
 			}),
 		),
-		customMovementConfig: v.array(
-			v.object({
-				entityType: v.number(),
-				color: v.string(),
-			}),
-		),
+		customMovementConfig: v.object({
+			colorConfig: v.array(
+				v.object({
+					entityType: v.number(),
+					color: v.string(),
+				}),
+			),
+			arcThickness: v.boolean(),
+		}),
 	}),
 	twitter: v.optional(v.string()),
 });
