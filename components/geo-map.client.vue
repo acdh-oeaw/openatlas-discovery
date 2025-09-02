@@ -303,10 +303,29 @@ function init() {
 		filter: ["==", "$type", "Point"],
 		paint: {
 			"circle-color": hoveredMovementId.value
-				? ["match", ["get", "id"], hoveredMovementId.value, colors.movement, "#808080"]
-				: colors.movement,
+				? [
+						"match",
+						["get", "id"],
+						hoveredMovementId.value,
+						["coalesce", ["get", "color"], colors.movement],
+						"#808080",
+					]
+				: ["coalesce", ["get", "color"], colors.movement],
 			"circle-radius": 6,
-			"circle-opacity": ["case", ["==", ["get", "isDisplayed"], true], 1, 0],
+			"circle-opacity": [
+				"case",
+				// if isDisplayed is false -> 0
+				["==", ["get", "isDisplayed"], false],
+				0,
+				// else if hoveredMovementIds is inside otherFeatures (= another event in the same
+				// location is hovered) -> 0
+				hoveredMovementId.value && hoveredMovementId.value.length > 0
+					? ["in", hoveredMovementId.value[0] ?? "", ["get", "otherFeatures"]]
+					: ["!=", true, true],
+				0,
+				// else -> 1
+				1,
+			],
 		},
 	});
 
@@ -402,6 +421,17 @@ watch(
 	{ immediate: true },
 );
 
+watch(
+	() => {
+		return props.currentSelectionId;
+	},
+	(newVal, oldVal) => {
+		if (newVal === "undefined" && oldVal != null) {
+			hoveredMovementId.value = null;
+		}
+	},
+);
+
 // watch(
 // 	() => {
 // 		return props.currentSelectionId;
@@ -461,8 +491,22 @@ watch(
 					type: "circle",
 					source: { type: "geojson", data: createFeatureCollection(source) },
 					paint: {
-						"circle-color": colors.movement,
+						"circle-color": ["coalesce", ["get", "color"], colors.movement],
 						"circle-radius": 6,
+						"circle-opacity": [
+							"case",
+							// if isDisplayed is false -> 0
+							["==", ["get", "isDisplayed"], false],
+							0,
+							// else if hoveredMovementIds is inside otherFeatures (= another event in the same
+							// location is hovered) -> 0
+							hoveredMovementId.value && hoveredMovementId.value.length > 0
+								? ["in", hoveredMovementId.value[0] ?? "", ["get", "otherFeatures"]]
+								: ["!=", true, true],
+							0,
+							// else -> 1
+							1,
+						],
 					},
 				});
 			}
@@ -649,9 +693,29 @@ function colorEvents(movements: Array<string> | null | undefined) {
 		"events",
 		"circle-color", // The paint property
 		movements != null && movements.length > 0
-			? ["case", ["in", ["get", "_id"], ["literal", movements]], colors.movement, "#808080"]
-			: colors.movement, // If no movement is hovered, use the default color for all
+			? [
+					"case",
+					["in", ["get", "_id"], ["literal", movements]],
+					["coalesce", ["get", "color"], colors.movement],
+					"#808080",
+				]
+			: ["coalesce", ["get", "color"], colors.movement], // If no movement is hovered, use the default color for all
 	);
+
+	context.map.setPaintProperty("events", "circle-opacity", [
+		"case",
+		// if isDisplayed is false -> 0
+		["==", ["get", "isDisplayed"], false],
+		0,
+		// else if hoveredMovementIds is inside otherFeatures (= another event in the same
+		// location is hovered) -> 0
+		hoveredMovementId.value && hoveredMovementId.value.length > 0
+			? ["in", hoveredMovementId.value[0] ?? "", ["get", "otherFeatures"]]
+			: ["!=", true, true],
+		0,
+		// else -> 1
+		1,
+	]);
 }
 
 function getCoef(d: CurvedMovementLine) {
