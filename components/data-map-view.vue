@@ -260,11 +260,13 @@ const movements = computed(() => {
 	return move.map((entity) => {
 		let feature = createGeoJsonFeature(entity);
 
-		const customConfig = Object.entries(project.map.customMovementConfig).findLast((entry) => {
-			return entity.types?.find((type) => {
-				return getUnprefixedId(type.identifier ?? "") === String(entry[1].entityType);
-			});
-		});
+		const customConfig = Object.entries(project.map.customMovementConfig.colorConfig).findLast(
+			(entry) => {
+				return entity.types?.find((type) => {
+					return getUnprefixedId(type.identifier ?? "") === String(entry[1].entityType);
+				});
+			},
+		);
 		if (customConfig != null) {
 			feature.properties.color = customConfig[1].color;
 		}
@@ -308,11 +310,13 @@ const events = computed(() => {
 
 	const mappedEvents = event.map((entity) => {
 		let feature = createGeoJsonFeature(entity);
-		const customConfig = Object.entries(project.map.customMovementConfig).findLast((entry) => {
-			return entity.types?.find((type) => {
-				return getUnprefixedId(type.identifier ?? "") === String(entry[1].entityType);
-			});
-		});
+		const customConfig = Object.entries(project.map.customMovementConfig.colorConfig).findLast(
+			(entry) => {
+				return entity.types?.find((type) => {
+					return getUnprefixedId(type.identifier ?? "") === String(entry[1].entityType);
+				});
+			},
+		);
 		if (customConfig != null) {
 			feature.properties.color = customConfig[1].color;
 		}

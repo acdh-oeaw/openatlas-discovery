@@ -1,112 +1,109 @@
 {
-  "logos": {
-    "light": "/assets/images/logo.svg",
-    "dark": "/assets/images/logo.svg",
-    "withTextLight": "/assets/images/logo-with-text-light.svg",
-    "withTextDark": "/assets/images/logo-with-text-dark.svg"
-  },
-  "imprint": "acdh-ch",
-  "network": {
-    "excludeSystemClasses": [
-      "type",
-      "reference_system",
-      "source_translation",
-      "source",
-      "bibliography",
-      "external_reference",
-      "administrative_unit",
-      "edition",
-      "type_tools",
-      "file",
-      "appellation"
-    ]
-  },
-  "colors": {
-    "brand": "#b8cf5b",
-    "geojsonPoints": "#69c0ef",
-    "geojsonAreaCenterPoints": "#b8cf5b",
-    "geojsonMovement": "#D0031E"
-  },
-  "twitter": "@openatlas_eu",
-  "detailView": [
-    {
-      "primarySystemClasses": [
-        "acquisition",
-        "activity",
-        "actor_function",
-        "actor_relation",
-        "appellation",
-        "artifact",
-        "creation",
-        "event",
-        "feature",
-        "group",
-        "human_remains",
-        "involvement",
-        "modification",
-        "move",
-        "person",
-        "production",
-        "source",
-        "source_translation",
-        "stratigraphic_unit",
-        "place"
-      ],
-      "furtherSystemClasses": [
-        "files",
-        "externalReferenceSystems"
-      ],
-      "affectedSystemClasses": [
-        "acquisition",
-        "activity",
-        "actor_function",
-        "actor_relation",
-        "appellation",
-        "artifact",
-        "creation",
-        "event",
-        "feature",
-        "group",
-        "human_remains",
-        "involvement",
-        "modification",
-        "move",
-        "person",
-        "production",
-        "source",
-        "source_translation",
-        "stratigraphic_unit",
-        "place"
-      ],
-      "customOrdering": [],
-      "excludeTypeIds": []
-    }
-  ],
-  "fullscreen": true,
-  "defaultLocale": "en",
-  "map": {
-    "startPage": false,
-    "mapDisplayedSystemClasses": [
-      "place",
-      "feature"
-    ],
-    "customIconConfig": [
-      {
-        "entityType": 22378,
-        "iconName": "Skull",
-        "color": "#2b2b2b"
-      },
-      {
-        "entityType": 5083,
-        "iconName": "Skull",
-        "color": "#2b2b2b"
-      }
-    ],
-    "customMovementConfig": [
-      {
-        "entityType": 4784,
-        "color": "#00ff30"
-      }
-    ]
-  }
+	"logos": {
+		"light": "/assets/images/logo.svg",
+		"dark": "/assets/images/logo.svg",
+		"withTextLight": "/assets/images/logo-with-text-light.svg",
+		"withTextDark": "/assets/images/logo-with-text-dark.svg"
+	},
+	"imprint": "acdh-ch",
+	"network": {
+		"excludeSystemClasses": [
+			"type",
+			"reference_system",
+			"source_translation",
+			"source",
+			"bibliography",
+			"external_reference",
+			"administrative_unit",
+			"edition",
+			"type_tools",
+			"file",
+			"appellation"
+		]
+	},
+	"colors": {
+		"brand": "#b8cf5b",
+		"geojsonPoints": "#69c0ef",
+		"geojsonAreaCenterPoints": "#b8cf5b",
+		"geojsonMovement": "#D0031E"
+	},
+	"twitter": "@openatlas_eu",
+	"detailView": [
+		{
+			"primarySystemClasses": [
+				"acquisition",
+				"activity",
+				"actor_function",
+				"actor_relation",
+				"appellation",
+				"artifact",
+				"creation",
+				"event",
+				"feature",
+				"group",
+				"human_remains",
+				"involvement",
+				"modification",
+				"move",
+				"person",
+				"production",
+				"source",
+				"source_translation",
+				"stratigraphic_unit",
+				"place"
+			],
+			"furtherSystemClasses": ["files", "externalReferenceSystems"],
+			"affectedSystemClasses": [
+				"acquisition",
+				"activity",
+				"actor_function",
+				"actor_relation",
+				"appellation",
+				"artifact",
+				"creation",
+				"event",
+				"feature",
+				"group",
+				"human_remains",
+				"involvement",
+				"modification",
+				"move",
+				"person",
+				"production",
+				"source",
+				"source_translation",
+				"stratigraphic_unit",
+				"place"
+			],
+			"customOrdering": [],
+			"excludeTypeIds": []
+		}
+	],
+	"fullscreen": true,
+	"defaultLocale": "en",
+	"map": {
+		"startPage": false,
+		"mapDisplayedSystemClasses": ["place", "feature"],
+		"customIconConfig": [
+			{
+				"entityType": 22378,
+				"iconName": "Skull",
+				"color": "#2b2b2b"
+			},
+			{
+				"entityType": 5083,
+				"iconName": "Skull",
+				"color": "#2b2b2b"
+			}
+		],
+		"customMovementConfig": {
+			"colorConfig": [
+				{
+					"entityType": 4784,
+					"color": "#00ff30"
+				}
+			],
+			"arcThickness": false
+		}
+	}
 }

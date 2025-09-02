@@ -73,6 +73,7 @@ interface CurvedMovementLine {
 	id: Array<string> | string;
 	coordinates: [deck.Position, deck.Position];
 	color: deck.Color;
+	thickness?: number;
 }
 
 interface MultipleMovementType {
@@ -666,6 +667,37 @@ function flyToSelection(selection: [number, number] | undefined) {
 	}
 }
 
+function mapThicknessToRange(arcs: number) {
+	if (curvedMovements.value == null || curvedMovements.value.length === 0) return 3;
+
+	const inMin = Math.min(
+		...curvedMovements.value.map((move) => {
+			return move.thickness ?? 1;
+		}),
+	);
+	const inMax = Math.max(
+		...curvedMovements.value.map((move) => {
+			return move.thickness ?? 1;
+		}),
+	);
+
+	const outMin = 3;
+	const outMax = 10;
+
+	const clamped = Math.max(Math.min(arcs, inMax), Math.max(inMin, 1e-6));
+
+	if (inMax === inMin) return (outMin + outMax) / 2;
+
+	// logarithmic scaling
+	const logMin = Math.log(inMin);
+	const logMax = Math.log(inMax);
+	const logVal = Math.log(clamped);
+
+	const scaled = outMin + ((logVal - logMin) / (logMax - logMin)) * (outMax - outMin);
+
+	return scaled;
+}
+
 function pointsToMapKey(startPoint: Point, endPoint: Point, color: string) {
 	return `${String(startPoint.coordinates[0])}-${String(startPoint.coordinates[1])}-${String(endPoint.coordinates[0])}-${String(endPoint.coordinates[1])}-${color}`;
 }
@@ -790,6 +822,7 @@ function updateMovements() {
 
 			coordinates: group[0].coordinates,
 			color: group[0].color,
+			thickness: group.length,
 		};
 	});
 
@@ -952,7 +985,12 @@ function renderArcs() {
 					: 0.3;
 			return opacity;
 		},
-		getWidth: 3,
+		// @ts-expect-error - thickness exists on CurvedMovementLine
+		getWidth: (d: CurvedMovementLine) => {
+			return project.map.customMovementConfig.arcThickness
+				? mapThicknessToRange(d.thickness ?? 0)
+				: 3;
+		},
 		updateTriggers: {
 			getSourceColor: coefficient.value,
 			getTargetColor: coefficient.value,

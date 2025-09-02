@@ -1830,14 +1830,24 @@ collections:
                     widget: color
                     required: false
               - name: customMovementConfig
-                label: Configure movements display for certain entity types
-                widget: list
+                label: Configure the movement visualization
+                widget: object
                 fields:
-                  - name: entityType
-                    widget: number
-                    hint: ID of the Type
-                  - name: color
-                    widget: color
+                  - name: colorConfig
+                    label: Configure movements display for certain entity types
+                    widget: list
+                    fields:
+                      - name: entityType
+                        widget: number
+                        hint: ID of the Type
+                      - name: color
+                        label: Color of the arc
+                        widget: color
+                  - name: arcThickness
+                    label: >-
+                      Configure if overlaying arcs should be displayed with thicker lines
+                    widget: boolean
+                    default: false
           - name: network
             label: Network Configuration
             widget: object
