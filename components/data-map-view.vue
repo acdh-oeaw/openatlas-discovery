@@ -134,16 +134,10 @@ const features = computed(() => {
 			if (!entity.geometry) return false;
 
 			return entity.geometry;
-
-			/* &&
-				!entity.types?.find((type) => {
-					return project.map.customIconConfig.find((config) => {
-						return config.entityType === type.label;
-					});
-				}) */
 		})
 		.map((entity) => {
 			const feature = createGeoJsonFeature(entity);
+
 			const customConfig = Object.entries(project.map.customIconConfig).findLast((entry) => {
 				return entity.types?.find((type) => {
 					return getUnprefixedId(type.identifier ?? "") === String(entry[1].entityType);
@@ -155,7 +149,6 @@ const features = computed(() => {
 				feature.properties.isIcon = true;
 				feature.properties.isDisplayed = true;
 			}
-
 			return feature;
 		});
 
@@ -165,6 +158,8 @@ const features = computed(() => {
 		// For GeometryCollections such as areas
 		if (feature.geometry.type === "GeometryCollection") {
 			feature.geometry.geometries.forEach((geo) => {
+				if (geo.type === "Polygon" && "shapeType" in geo)
+					feature.properties.shapeType = geo.shapeType;
 				if (geo.type !== "Point") return;
 				const coords = geo.coordinates.join(",");
 				const matchingCoordinatesFeatures = self.filter((f) => {
@@ -196,6 +191,32 @@ const features = computed(() => {
 			feature.properties.isDisplayed = false;
 		} else {
 			feature.properties.isDisplayed = true;
+		}
+	});
+
+	//find other features with the same polygons to prevent overlapping
+	mappedFeatures.forEach((feature, featureIdx) => {
+		if (feature.geometry.type === "GeometryCollection") {
+			const foundIdx = mappedFeatures.findIndex((f) => {
+				//if (f.properties._id == feature.properties._id) return false;
+				if (f.geometry.type === "GeometryCollection") {
+					return f.geometry.geometries.some((geo) => {
+						assert(feature.geometry.type === "GeometryCollection");
+						return (
+							geo.type === "Polygon" &&
+							feature.geometry.geometries.find((g) => {
+								return (
+									g.type === "Polygon" && g.coordinates.join(",") === geo.coordinates.join(",")
+								);
+							})
+						);
+					});
+				}
+				return false;
+			});
+			if (foundIdx !== featureIdx) {
+				feature.properties.isDisplayed = false;
+			} else feature.properties.isDisplayed = true;
 		}
 	});
 

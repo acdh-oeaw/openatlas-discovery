@@ -8,6 +8,7 @@ export type GeoJsonFeature = Feature<Geometry, { _id: string }>;
 
 export interface CustomGeoJsonFeature extends GeoJsonFeature {
 	geometry: GeoJsonFeature["geometry"] | NonNullable<LinkedPlaceFeature["geometry"]>;
+
 	properties: {
 		_id: string;
 		color?: string;
@@ -15,6 +16,7 @@ export interface CustomGeoJsonFeature extends GeoJsonFeature {
 		isIcon?: boolean;
 		isDisplayed?: boolean;
 		otherFeatures?: Array<string>;
+		shapeType?: string;
 	};
 }
 

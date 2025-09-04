@@ -14,6 +14,9 @@ importers:
       '@deck.gl/core':
         specifier: ^9.1.0
         version: 9.1.0
+      '@deck.gl/extensions':
+        specifier: ^9.1.14
+        version: 9.1.14(@deck.gl/core@9.1.0)(@luma.gl/core@9.1.0)(@luma.gl/engine@9.1.0(@luma.gl/core@9.1.0)(@luma.gl/shadertools@9.1.0(@luma.gl/core@9.1.0)))
       '@deck.gl/layers':
         specifier: ^9.1.0
         version: 9.1.0(@deck.gl/core@9.1.0)(@loaders.gl/core@4.3.3)(@luma.gl/core@9.1.0)(@luma.gl/engine@9.1.0(@luma.gl/core@9.1.0)(@luma.gl/shadertools@9.1.0(@luma.gl/core@9.1.0)))
@@ -586,6 +589,13 @@ packages:
   '@deck.gl/core@9.1.0':
     resolution: {integrity: sha512-leocNGky9jZ0HUk8xm+HH4f+EL86PKiG8O4REpw4l/K1UbMssekR/L2moYwt7Bx98jSIibcUbhDWOBatKAUaTA==}
 
+  '@deck.gl/extensions@9.1.14':
+    resolution: {integrity: sha512-uPm9Ye/XD8YAYNxT1G6HxyIOBxa2+MBdGLyqobQj3pCnkO/YtgY/fi/BjM+eVOBXX+keBrXEclEvB0Add5eS8Q==}
+    peerDependencies:
+      '@deck.gl/core': ^9.1.0
+      '@luma.gl/core': ~9.1.9
+      '@luma.gl/engine': ~9.1.9
+
   '@deck.gl/layers@9.1.0':
     resolution: {integrity: sha512-0GWZyHk5G48avEuGRbzHk60E0aNpo5h/3lSpzl0BSyqZnVTqsGa1jLJvjS17eaEkR51KIhUBf6NSCyGK1Tp22g==}
     peerDependencies:
@@ -1154,6 +1164,9 @@ packages:
   '@luma.gl/constants@9.1.1':
     resolution: {integrity: sha512-tV53ZUoMvZnHUTHoRXdTdZUKCUKqGeNTE99q8zrs1rg0gBr6d3MGHVvQDLTd4t0GDEY3EXmlZOHSXgPB5ZQxjA==}
 
+  '@luma.gl/constants@9.1.9':
+    resolution: {integrity: sha512-yc9fml04OeTTcwK+7gmDMxoLQ67j4ZiAFXjmYvPomYyBVzS0NZxTDuwcCBmnxjLOiroOZW8FRRrVc/yOiFug2w==}
+
   '@luma.gl/core@9.1.0':
     resolution: {integrity: sha512-HkcqDlxal6gOP7Y6KTRcEjnPuxSFMy+oJYfk623TGIxrEbN3x5uLqvbNgqLMXhV60WWq5Fj0LG1gHs1NyJHrLg==}
 
@@ -1174,6 +1187,11 @@ packages:
     resolution: {integrity: sha512-BRDKnf2g+Xq86f1OK00F2PA2QbmkcKiM8HJ/Iw8wZB3DvPu2jBKBaboHmEoo6gxq46P32vFGyvxso8umai5eJw==}
     peerDependencies:
       '@luma.gl/core': ^9.1.0-beta.1
+
+  '@luma.gl/shadertools@9.1.9':
+    resolution: {integrity: sha512-Uqp2xfgIEunRMLXTeCJ4uEMlWcUGcYMZGJ8GAOrAeDzn4bMKVRKmZDC71vkuTctnaodM3UdrI9W6s1sJlrXsxw==}
+    peerDependencies:
+      '@luma.gl/core': ^9.1.0
 
   '@luma.gl/webgl@9.1.1':
     resolution: {integrity: sha512-w/BoaScUl9riQYGIA0ZIia35Ck6vzJFq1oBpZVOhip7zcyeGcGQY3ImIpUEreYl3eiVomFgwg+R1sOEu86CWWA==}
@@ -7767,6 +7785,9 @@ packages:
   wgsl_reflect@1.0.16:
     resolution: {integrity: sha512-OE3urfXXbHMD5lhKZwxOxC9SFYynEGEkWXQmvi7B1gzzr5jb9+drh9A8MeBvVqKqznCoBuh8WOzVuSGSZs4CkQ==}
 
+  wgsl_reflect@1.2.3:
+    resolution: {integrity: sha512-BQWBIsOn411M+ffBxmA6QRLvAOVbuz3Uk4NusxnqC1H7aeQcVLhdA3k2k/EFFFtqVjhz3z7JOOZF1a9hj2tv4Q==}
+
   what-the-diff@0.6.0:
     resolution: {integrity: sha512-8BgQ4uo4cxojRXvCIcqDpH4QHaq0Ksn2P3LYfztylC5LDSwZKuGHf0Wf7sAStjPLTcB8eCB8pJJcPQSWfhZlkg==}
 
@@ -8296,6 +8317,15 @@ snapshots:
       gl-matrix: 3.4.3
       mjolnir.js: 3.0.0
 
+  '@deck.gl/extensions@9.1.14(@deck.gl/core@9.1.0)(@luma.gl/core@9.1.0)(@luma.gl/engine@9.1.0(@luma.gl/core@9.1.0)(@luma.gl/shadertools@9.1.0(@luma.gl/core@9.1.0)))':
+    dependencies:
+      '@deck.gl/core': 9.1.0
+      '@luma.gl/constants': 9.1.9
+      '@luma.gl/core': 9.1.0
+      '@luma.gl/engine': 9.1.0(@luma.gl/core@9.1.0)(@luma.gl/shadertools@9.1.0(@luma.gl/core@9.1.0))
+      '@luma.gl/shadertools': 9.1.9(@luma.gl/core@9.1.0)
+      '@math.gl/core': 4.1.0
+
   '@deck.gl/layers@9.1.0(@deck.gl/core@9.1.0)(@loaders.gl/core@4.3.3)(@luma.gl/core@9.1.0)(@luma.gl/engine@9.1.0(@luma.gl/core@9.1.0)(@luma.gl/shadertools@9.1.0(@luma.gl/core@9.1.0)))':
     dependencies:
       '@deck.gl/core': 9.1.0
@@ -8762,6 +8792,8 @@ snapshots:
 
   '@luma.gl/constants@9.1.1': {}
 
+  '@luma.gl/constants@9.1.9': {}
+
   '@luma.gl/core@9.1.0':
     dependencies:
       '@math.gl/types': 4.1.0
@@ -8794,6 +8826,13 @@ snapshots:
       '@math.gl/core': 4.1.0
       '@math.gl/types': 4.1.0
       wgsl_reflect: 1.0.16
+
+  '@luma.gl/shadertools@9.1.9(@luma.gl/core@9.1.0)':
+    dependencies:
+      '@luma.gl/core': 9.1.0
+      '@math.gl/core': 4.1.0
+      '@math.gl/types': 4.1.0
+      wgsl_reflect: 1.2.3
 
   '@luma.gl/webgl@9.1.1(@luma.gl/core@9.1.0)':
     dependencies:
@@ -17700,6 +17739,8 @@ snapshots:
   webpack-virtual-modules@0.6.2: {}
 
   wgsl_reflect@1.0.16: {}
+
+  wgsl_reflect@1.2.3: {}
 
   what-the-diff@0.6.0: {}
 

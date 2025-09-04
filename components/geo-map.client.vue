@@ -3,7 +3,8 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import { assert } from "@acdh-oeaw/lib";
 import type * as deck from "@deck.gl/core";
-import { ArcLayer } from "@deck.gl/layers";
+import { FillStyleExtension } from "@deck.gl/extensions";
+import { ArcLayer, GeoJsonLayer } from "@deck.gl/layers";
 import * as mapbox from "@deck.gl/mapbox";
 import * as turf from "@turf/turf";
 import type { Point } from "geojson";
@@ -83,6 +84,7 @@ interface MultipleMovementType {
 
 const overlay = ref<mapbox.MapboxOverlay | null>(null);
 const supportOverlay = ref<mapbox.MapboxOverlay | null>(null);
+const polygonOverlay = ref<mapbox.MapboxOverlay | null>(null);
 const props = defineProps<{
 	features: Array<CustomGeoJsonFeature>;
 	customIcons: Record<string, CustomIconEntry>;
@@ -371,13 +373,16 @@ function init() {
 		const layersToQuery = [
 			"points",
 			"centerpoints",
-			"polygons",
-			"polygon-lines",
 			"events",
 			...Object.keys(props.customIcons).map((key) => {
 				return `customIconLayer-${key}`;
 			}),
 		];
+
+		if (props.hasPolygons) {
+			layersToQuery.push("polygons");
+			layersToQuery.push("polygon-lines");
+		}
 
 		// query all visible features at the click point
 		const features = map.queryRenderedFeatures(event.point, { layers: layersToQuery });
@@ -637,21 +642,62 @@ function updateScope() {
 	}
 }
 
+const polygonData = computed(() => {
+	return createFeatureCollection(
+		props.features.filter((polygon) => {
+			return polygon.geometry.type === "GeometryCollection" || polygon.geometry.type === "Polygon";
+		}),
+	);
+});
 function updatePolygons() {
 	assert(context.map != null);
 	const sourcePolygonsId = "polygon-data";
+	if (polygonOverlay.value === null)
+		polygonOverlay.value = new mapbox.MapboxOverlay({ interleaved: true });
 
 	if (props.hasPolygons) {
+		let polygonLayer = new GeoJsonLayer<CustomGeoJsonFeature>({
+			id: "deck-polygons",
+			data: polygonData.value.features.filter((f) => {
+				return f.properties.shapeType === "area";
+			}),
+			// props from GeoJsonLayer
+			getFillColor: hexToRgb(colors.areaCenterPoints) ?? [0, 0, 0],
+			getLineColor: [0, 0, 0, 0],
+			getLineWidth: 10,
+
+			//@ts-expect-error these properties are introduced by FillStyleExtension
+			fillPatternAtlas:
+				"https://raw.githubusercontent.com/visgl/deck.gl/master/examples/layer-browser/data/pattern.png",
+			fillPatternMapping:
+				"https://raw.githubusercontent.com/visgl/deck.gl/master/examples/layer-browser/data/pattern.json",
+			getFillPattern: () => {
+				return "hatch-1x";
+			},
+			getFillPatternScale: 0.5,
+			getFillPatternOffset: [0, 0],
+
+			// Define extensions
+			extensions: [new FillStyleExtension({ pattern: true })],
+		});
+
+		// Add/update the layer
+		polygonOverlay.value.setProps({
+			layers: [polygonLayer],
+		});
+		context.map.addControl(polygonOverlay.value);
+
 		context.map.addLayer({
 			id: "polygons",
-			filter: ["!=", "$type", "LineString"],
+			filter: ["all", ["!=", "$type", "LineString"], ["==", "shapeType", "shape"]],
 			type: "fill",
 			source: sourcePolygonsId,
 			paint: {
 				"fill-color": colors.areaCenterPoints,
-				"fill-opacity": 0.35,
+				"fill-opacity": ["case", ["==", ["get", "isDisplayed"], false], 0, 0.35],
 			},
 		});
+
 		context.map.addLayer({
 			id: "polygon-lines",
 			type: "line",
@@ -663,12 +709,13 @@ function updatePolygons() {
 				"line-width": 5,
 			},
 		});
-	}
-	if (!props.hasPolygons && context.map.getLayer("polygons")) {
-		context.map.removeLayer("polygons");
-	}
-	if (!props.hasPolygons && context.map.getLayer("polygon-lines")) {
+
+		context.map.moveLayer("polygons", "points");
+	} else {
+		polygonOverlay.value.finalize();
+		context.map.removeControl(polygonOverlay.value);
 		context.map.removeLayer("polygon-lines");
+		context.map.removeLayer("polygons");
 	}
 }
 
