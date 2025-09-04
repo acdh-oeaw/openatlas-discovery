@@ -339,6 +339,12 @@ function init() {
 	map.on("mouseenter", "centerpoints", () => {
 		map.getCanvas().classList.add("!cursor-pointer");
 	});
+	map.on("mouseenter", "polygons", () => {
+		map.getCanvas().classList.add("!cursor-pointer");
+	});
+	map.on("mouseenter", "polygon-lines", () => {
+		map.getCanvas().classList.add("!cursor-pointer");
+	});
 
 	//
 
@@ -353,6 +359,9 @@ function init() {
 	map.on("mouseleave", "polygons", () => {
 		map.getCanvas().classList.remove("!cursor-pointer");
 	});
+	map.on("mouseleave", "polygon-lines", () => {
+		map.getCanvas().classList.remove("!cursor-pointer");
+	});
 
 	Object.keys(props.customIcons).forEach((key) => {
 		initializeCustomIconLayer(key);
@@ -362,6 +371,8 @@ function init() {
 		const layersToQuery = [
 			"points",
 			"centerpoints",
+			"polygons",
+			"polygon-lines",
 			"events",
 			...Object.keys(props.customIcons).map((key) => {
 				return `customIconLayer-${key}`;
@@ -633,6 +644,7 @@ function updatePolygons() {
 	if (props.hasPolygons) {
 		context.map.addLayer({
 			id: "polygons",
+			filter: ["!=", "$type", "LineString"],
 			type: "fill",
 			source: sourcePolygonsId,
 			paint: {
@@ -640,9 +652,23 @@ function updatePolygons() {
 				"fill-opacity": 0.35,
 			},
 		});
+		context.map.addLayer({
+			id: "polygon-lines",
+			type: "line",
+			filter: ["==", "$type", "LineString"],
+			source: sourcePolygonsId,
+			paint: {
+				"line-color": colors.areaCenterPoints,
+				"line-opacity": 0.35,
+				"line-width": 5,
+			},
+		});
 	}
 	if (!props.hasPolygons && context.map.getLayer("polygons")) {
 		context.map.removeLayer("polygons");
+	}
+	if (!props.hasPolygons && context.map.getLayer("polygon-lines")) {
+		context.map.removeLayer("polygon-lines");
 	}
 }
 
