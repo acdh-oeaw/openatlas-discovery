@@ -749,7 +749,7 @@ function zoomToSelection(bounds: Array<[number, number]> | undefined) {
 }
 function flyToSelection(selection: [number, number] | undefined) {
 	if (selection) {
-		context.map?.flyTo({ center: selection, zoom: 10 });
+		context.map?.flyTo({ center: selection, zoom: project.map.flyToZoom });
 	}
 }
 

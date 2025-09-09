@@ -52,7 +52,7 @@
 				"stratigraphic_unit",
 				"place"
 			],
-			"furtherSystemClasses": ["files", "externalReferenceSystems"],
+			"furtherSystemClasses": ["files", "externalReferenceSystems", "references"],
 			"affectedSystemClasses": [
 				"acquisition",
 				"activity",
@@ -99,6 +99,7 @@
 		"customMovementConfig": {
 			"colorConfig": [],
 			"arcThickness": false
-		}
+		},
+		"flyToZoom": 20
 	}
 }

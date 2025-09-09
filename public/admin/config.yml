@@ -1816,6 +1816,12 @@ collections:
                   - activity
                 default:
                   - place
+              - name: flyToZoom
+                label: Configure to which zoom level the camera should fly to focused points
+                widget: number
+                min: 1
+                max: 100
+                default: 10
               - name: customIconConfig
                 label: Configure custom icons for certain entity types
                 widget: list

@@ -60,6 +60,7 @@ const schema = v.object({
 	}),
 	map: v.object({
 		startPage: v.boolean(),
+		flyToZoom: v.number(),
 		mapDisplayedSystemClasses: v.array(v.string()),
 		customIconConfig: v.array(
 			v.object({
