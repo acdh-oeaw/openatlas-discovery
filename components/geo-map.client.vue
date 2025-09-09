@@ -674,7 +674,20 @@ function updatePolygons() {
 			getFillPattern: () => {
 				return "hatch-1x";
 			},
-			getFillPatternScale: 0.5,
+			getFillPatternScale: (d: CustomGeoJsonFeature) => {
+				if (d.geometry.type === "GeometryCollection") {
+					const polygon = d.geometry.geometries.find((geo) => {
+						return geo.type === "Polygon";
+					});
+					if (polygon) {
+						const area = turf.area(polygon);
+						let scale = 0.2 * Math.log10(area) - 0.5;
+						if (area > 10 ** 6) scale = Math.log10(area) * 0.5;
+						return Math.max(scale, 0.05);
+					}
+				}
+				return 0.5;
+			},
 			getFillPatternOffset: [0, 0],
 
 			// Define extensions
@@ -714,8 +727,8 @@ function updatePolygons() {
 	} else {
 		polygonOverlay.value.finalize();
 		context.map.removeControl(polygonOverlay.value);
-		context.map.removeLayer("polygon-lines");
-		context.map.removeLayer("polygons");
+		if (context.map.getLayer("polygon-lines")) context.map.removeLayer("polygon-lines");
+		if (context.map.getLayer("polygons")) context.map.removeLayer("polygons");
 	}
 }
 
