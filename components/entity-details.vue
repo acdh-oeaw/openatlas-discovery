@@ -126,7 +126,7 @@ function getFilename(file: unknown) {
 							class="grid grid-cols-[1fr_auto] items-center py-1"
 						>
 							<NavLink
-								v-if="relationType === 'files' && relation?.id"
+								v-if="['files', 'references'].includes(relationType) && relation?.id"
 								class="underline decoration-dotted hover:no-underline"
 								:href="{
 									path: `/${getPath()}`,
