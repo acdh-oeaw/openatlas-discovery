@@ -50,6 +50,16 @@ const schema = v.object({
 		excludeSystemClasses: v.array(v.string()),
 	}),
 	defaultLocale: v.picklist(["de", "en"]),
+	footer: v.object({
+		partner_logos: v.array(
+			v.object({
+				name: v.string(),
+				url: v.string(),
+				light: v.string(),
+				dark: v.string(),
+			}),
+		),
+	}),
 	fullscreen: v.boolean(),
 	imprint: v.picklist(["acdh-ch", "custom", "none"]),
 	logos: v.object({

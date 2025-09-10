@@ -13,6 +13,8 @@ const links = computed(() => {
 		imprint: { href: { path: "/imprint" }, label: t("AppFooter.links.imprint") },
 	} satisfies Record<string, { href: NavLinkProps["href"]; label: string }>;
 });
+
+const logos = project.footer.partner_logos;
 </script>
 
 <template>
@@ -42,6 +44,24 @@ const links = computed(() => {
 					</li>
 				</ul>
 			</nav>
+
+			<div v-if="logos && logos.length > 0" class="-my-2 flex justify-around">
+				<NuxtLink v-for="logo in logos" :key="logo.name" :to="logo.url" external target="_blank">
+					<span class="sr-only">{{ logo.name }}</span>
+					<NuxtImg
+						:src="logo.light"
+						class="block h-12 w-auto object-contain dark:hidden"
+						:alt="logo.name"
+						preload
+					></NuxtImg>
+					<NuxtImg
+						:src="logo.dark ?? logo.light"
+						class="hidden h-12 w-auto object-contain dark:block"
+						:alt="logo.name"
+						preload
+					></NuxtImg>
+				</NuxtLink>
+			</div>
 		</div>
 	</footer>
 </template>
