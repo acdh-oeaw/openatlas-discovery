@@ -586,6 +586,14 @@ function updateScopeOfCustomIconLayers() {
 			map.moveLayer(`customIconLayer-${key}`);
 		}
 	}
+	map.getLayersOrder().forEach((layer) => {
+		if (!layer.startsWith("customIconLayer-")) return;
+		if (!(layer.replace("customIconLayer-", "") in props.customIcons)) {
+			map.setPaintProperty(layer, "icon-opacity", 0);
+		} else {
+			map.setPaintProperty(layer, "icon-opacity", 1);
+		}
+	});
 }
 
 function updateScope() {

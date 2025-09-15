@@ -46,7 +46,10 @@
 		"point": "Locations",
 		"polygon": "Display Areas",
 		"movement": "Movement",
-		"showMovement": "Display Movement"
+		"showMovement": "Display Movement",
+		"filter": "Filter",
+		"icons": "Icons",
+		"no-icons": "No icons visible on the map."
 	},
 	"DataView": {
 		"nothing-found": "No entries found for this search."

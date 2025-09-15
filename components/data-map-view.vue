@@ -2,6 +2,8 @@
 import { assert, keyByToMap } from "@acdh-oeaw/lib";
 import * as turf from "@turf/turf";
 import type { Feature } from "geojson";
+import * as LucideIcons from "lucide-static";
+import { FilterIcon } from "lucide-vue-next";
 import type { MapGeoJSONFeature } from "maplibre-gl";
 import * as v from "valibot";
 
@@ -57,6 +59,7 @@ function onChangeSearchFilters(values: SearchFormData) {
 
 onMounted(() => {
 	setMovementId({ id: selection.value as unknown as string });
+	visibleIcons.value = Object.keys(customIconEntries.value);
 });
 
 const { data, isPending, isPlaceholderData } = useGetSearchResults(
@@ -641,7 +644,27 @@ const customIconEntries = computed(() => {
 		}
 	});
 	console.log("custom entries: ", entries);
+	console.log("LucideIcons: ", LucideIcons);
 	return entries;
+});
+
+const visibleIcons = ref<Array<string>>([]);
+function toggleIcon(key: string) {
+	if (visibleIcons.value.includes(key))
+		visibleIcons.value = visibleIcons.value.filter((i) => {
+			return i !== key;
+		});
+	else {
+		visibleIcons.value.push(key);
+	}
+}
+
+const filteredCustomIconEntries = computed(() => {
+	return Object.fromEntries(
+		Object.entries(customIconEntries.value).filter(([key, _]) => {
+			return visibleIcons.value.length === 0 || visibleIcons.value.includes(key);
+		}),
+	);
 });
 </script>
 
@@ -673,7 +696,9 @@ const customIconEntries = computed(() => {
 				<div
 					class="max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent bg-white/90 p-2 text-sm font-medium shadow-md dark:bg-neutral-900"
 				>
-					<div class="grid grid-cols-[auto_auto_auto_auto_1fr] items-center gap-3 align-middle">
+					<div
+						class="grid grid-cols-[auto_auto_auto_auto_1fr_auto] items-center gap-3 align-middle"
+					>
 						<div class="grid grid-cols-[auto_1fr] gap-1">
 							<span
 								class="m-1.5 size-2 rounded-full"
@@ -705,6 +730,57 @@ const customIconEntries = computed(() => {
 								{{ $t("DataMapView.showMovement") }}
 							</Toggle>
 						</div>
+						<div v-if="project.map.customIconConfig && project.map.customIconConfig.length > 0">
+							<Popover>
+								<PopoverTrigger>
+									<TooltipProvider>
+										<Tooltip :disabled="Object.keys(customIconEntries).length > 0">
+											<TooltipTrigger>
+												<Button
+													variant="iiif"
+													class="group"
+													:disabled="Object.keys(customIconEntries).length === 0"
+													><FilterIcon :size="16"></FilterIcon> {{ $t("DataMapView.filter") }}
+													<Badge v-if="visibleIcons.length" variant="groupOutline">{{
+														visibleIcons.length
+													}}</Badge></Button
+												>
+											</TooltipTrigger>
+											<TooltipContent>{{ $t("DataMapView.no-icons") }}</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
+								</PopoverTrigger>
+								<PopoverContent side="top" class="w-auto">
+									<div class="">
+										<div class="text-xs text-muted-foreground">
+											{{ $t("DataMapView.icons") }}
+										</div>
+										<Toggle
+											v-for="[key, entry] in Object.entries(customIconEntries).sort(
+												(a, b) => a[1].type?.label?.localeCompare(b[1].type?.label ?? '') ?? 0,
+											)"
+											:key="entry.type?.identifier"
+											:pressed="visibleIcons.includes(key)"
+											class="group my-2 flex min-w-0 items-center text-left"
+											variant="iiif"
+											@click="() => toggleIcon(key)"
+										>
+											<div
+												v-if="entry.icon != null"
+												class="mr-2 size-6 scale-[0.7]"
+												v-html="LucideIcons[entry.icon]"
+											></div>
+											<span
+												>{{ entry.type?.label
+												}}<Badge variant="groupOutline" class="ml-4">{{
+													entry.entities.length
+												}}</Badge></span
+											>
+										</Toggle>
+									</div>
+								</PopoverContent>
+							</Popover>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -714,7 +790,7 @@ const customIconEntries = computed(() => {
 				:features="features"
 				:movements="movements"
 				:events="events"
-				:custom-icons="customIconEntries"
+				:custom-icons="filteredCustomIconEntries"
 				:height="height"
 				:width="width"
 				:has-polygons="show"
