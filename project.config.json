@@ -79,6 +79,9 @@
 			"excludeTypeIds": []
 		}
 	],
+	"footer": {
+		"partner_logos": []
+	},
 	"fullscreen": true,
 	"defaultLocale": "en",
 	"map": {

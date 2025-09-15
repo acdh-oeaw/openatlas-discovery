@@ -1724,6 +1724,28 @@ collections:
                 label: Logo with text (dark mode)
                 hint: Logo with text in dark mode
                 widget: image
+          - name: footer
+            label: Footer
+            widget: object
+            fields:
+              - name: partner_logos
+                label: Partner logos
+                widget: list
+                default: []
+                fields:
+                  - name: name
+                    label: Institution Name
+                  - name: url
+                    label: URL
+                  - name: light
+                    label: Logo (light mode)
+                    hint: Logo in light mode
+                    widget: image
+                  - name: dark
+                    label: Logo (dark mode)
+                    hint: Logo in dark mode
+                    widget: image
+
           - name: defaultLocale
             label: Default locale
             widget: select
