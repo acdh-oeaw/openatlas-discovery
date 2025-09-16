@@ -96,7 +96,11 @@
 		"no-details": "Keine weiteren Details vorhanden.",
 
 		"dateSpan": "Zeitraum",
-		"dateSpan-to": "bis"
+		"dateSpan-to": "bis",
+		"license": "Lizenz",
+		"creator": "Urheber*in",
+		"licenseHolder": "Lizenzinhaber*in",
+		"not-available": "Nicht angegeben."
 	},
 	"EntitySidebar": {
 		"NextFeature": "Nächste Funktion",

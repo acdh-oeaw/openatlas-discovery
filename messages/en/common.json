@@ -95,7 +95,11 @@
 		"no-map": "Not visible on the map.",
 		"no-network": "Not visible in the network.",
 		"dateSpan": "Timespan",
-		"dateSpan-to": "until"
+		"dateSpan-to": "until",
+		"license": "License",
+		"creator": "Creator",
+		"licenseHolder": "License Holder",
+		"not-available": "Not provided."
 	},
 	"EntitySidebar": {
 		"NextFeature": "NextFeature",
