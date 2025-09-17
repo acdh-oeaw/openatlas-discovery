@@ -87,16 +87,7 @@
 	"map": {
 		"startPage": false,
 		"mapDisplayedSystemClasses": ["place", "feature"],
-		"customIconConfig": [
-			{
-				"entityType": 22378,
-				"iconName": "Skull"
-			},
-			{
-				"entityType": 5083,
-				"iconName": "Skull"
-			}
-		],
+		"customIconConfig": [],
 		"customMovementConfig": {
 			"colorConfig": [],
 			"arcThickness": false
