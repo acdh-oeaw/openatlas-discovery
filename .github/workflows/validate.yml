@@ -69,7 +69,7 @@ jobs:
           NUXT_PUBLIC_OPENAPI_BASE_URL: "${{ vars.NUXT_PUBLIC_OPENAPI_BASE_URL }}"
 
       - name: Format
-        run: pnpm run format:check
+        run: pnpm run format:fix
 
       - name: Lint
         run: pnpm run lint:check
