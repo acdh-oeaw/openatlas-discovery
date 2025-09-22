@@ -49,6 +49,8 @@ export interface ExtendedEntities extends RelationLinkedEntity {
 	};
 }
 
+export type TypeTreeModel = components["schemas"]["TypeTreeModel"];
+
 export type PresentationViewModel = components["schemas"]["PresentationViewModel"];
 export type RelatedEntityModel = components["schemas"]["RelatedEntityModel"];
 

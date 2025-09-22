@@ -6,6 +6,7 @@ import CustomPrimaryDetailsFeature from "@/components/custom-primary-details-fea
 import CustomPrimaryDetailsPlace from "@/components/custom-primary-details-place.vue";
 import { project } from "@/config/project.config";
 import type { PresentationViewModel } from "@/types/api";
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getRelationTitle = (relation: RelationType) => {
 	return useRelationTitle(relation, props.entity.systemClass);
@@ -161,6 +162,12 @@ const tabs = computed(() => {
 			label: t("EntityPage.egoNetwork"),
 		});
 	}
+	if (props.entity.systemClass === "type") {
+		tabs.push({
+			id: "types",
+			label: t("EntityPage.type-distribution"),
+		});
+	}
 	return tabs;
 });
 
@@ -278,6 +285,13 @@ watch(
 							v-if="tab.id === 'images' && images && images.length > 0"
 							class="overflow-hidden"
 							:images="images"
+						/>
+
+						<EntityTypeDistribution
+							v-if="tab.id === 'types' && width && height"
+							:id="props.entity.id"
+							:height="height"
+							:width="width"
 						/>
 					</VisualisationContainer>
 					<div class="relative max-w-full">

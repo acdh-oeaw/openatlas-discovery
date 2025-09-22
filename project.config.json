@@ -73,7 +73,8 @@
 				"source",
 				"source_translation",
 				"stratigraphic_unit",
-				"place"
+				"place",
+				"type"
 			],
 			"customOrdering": [],
 			"excludeTypeIds": []

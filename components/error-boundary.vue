@@ -3,8 +3,9 @@ const t = useTranslations();
 </script>
 
 <template>
-	<NuxtErrorBoundary>
-		<slot />
+	<div><slot /></div>
+	<!-- <NuxtErrorBoundary>
+
 
 		<template #error="{ error }">
 			<div class="relative">
@@ -13,5 +14,5 @@ const t = useTranslations();
 				</Centered>
 			</div>
 		</template>
-	</NuxtErrorBoundary>
+	</NuxtErrorBoundary> -->
 </template>
