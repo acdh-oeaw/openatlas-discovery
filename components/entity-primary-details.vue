@@ -5,7 +5,7 @@ import CustomPrimaryDetailsEvent from "@/components/custom-primary-details-event
 import CustomPrimaryDetailsFeature from "@/components/custom-primary-details-feature.vue";
 import CustomPrimaryDetailsPlace from "@/components/custom-primary-details-place.vue";
 import { project } from "@/config/project.config";
-import type { PresentationViewModel } from "@/types/api";
+import type { PresentationViewModel, TypeTreeModel } from "@/types/api";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getRelationTitle = (relation: RelationType) => {
@@ -205,6 +205,38 @@ const filteredTypes = computed(() => {
 		});
 });
 
+const { data: typeData } = useGetTypeDistribution();
+const typeTree = computed(() => {
+	if (!typeData.value) return {} as TypeTreeModel["type_tree"];
+	//@ts-expect-error error in OpenAPI definition
+	return typeData.value.typeTree as TypeTreeModel["type_tree"];
+});
+
+const superTypes: typeof filteredTypes = computed(() => {
+	const currentType = typeTree.value[String(props.entity.id) as keyof TypeTreeModel["type_tree"]];
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+	if (currentType == null) {
+		return [];
+	}
+	const hierarchy = currentType.root.map((entry) => {
+		return typeTree.value[String(entry) as keyof TypeTreeModel["type_tree"]];
+	});
+	const directParent = hierarchy.pop();
+	if (!directParent) return [];
+	const result = [
+		{
+			...directParent,
+			id: directParent.id,
+			isStandard: directParent.category === "standard",
+			title: directParent.name,
+			typeHierarchy: hierarchy.map((e) => {
+				return { ...e, identifier: String(e.id), label: e.name };
+			}),
+		},
+	];
+	return result;
+});
+
 function updateDepth(newDepth: number) {
 	depth.value = newDepth;
 }
@@ -260,7 +292,7 @@ watch(
 		<!-- Types -->
 		<div class="flex flex-row flex-wrap gap-1">
 			<TypesPopover
-				v-for="type in filteredTypes"
+				v-for="type in isType ? superTypes : filteredTypes"
 				:key="type.id ?? type.title ?? 'missing'"
 				:type="type"
 			/>
