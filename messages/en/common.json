@@ -94,6 +94,7 @@
 		"no-details": "There are no further details for this entry.",
 		"no-map": "Not visible on the map.",
 		"no-network": "Not visible in the network.",
+		"type-distribution": "Type Distrubition",
 		"dateSpan": "Timespan",
 		"dateSpan-to": "until",
 		"license": "License",

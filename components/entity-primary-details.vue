@@ -6,6 +6,7 @@ import CustomPrimaryDetailsFeature from "@/components/custom-primary-details-fea
 import CustomPrimaryDetailsPlace from "@/components/custom-primary-details-place.vue";
 import { project } from "@/config/project.config";
 import type { PresentationViewModel } from "@/types/api";
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getRelationTitle = (relation: RelationType) => {
 	return useRelationTitle(relation, props.entity.systemClass);
@@ -161,6 +162,12 @@ const tabs = computed(() => {
 			label: t("EntityPage.egoNetwork"),
 		});
 	}
+	if (props.entity.systemClass === "type") {
+		tabs.push({
+			id: "types",
+			label: t("EntityPage.type-distribution"),
+		});
+	}
 	return tabs;
 });
 
@@ -218,6 +225,9 @@ const isEmptyFurtherInformation = computed(() => {
 		(props.entity.files?.length ?? 0) === 0
 	);
 });
+const isType = computed(() => {
+	return props.entity.systemClass === "type";
+});
 
 const defaultTab = ref();
 watch(
@@ -238,10 +248,13 @@ watch(
 	<EntityAliases v-if="entity.aliases" :aliases="entity.aliases as unknown as Array<string>" />
 	<EntityTimespans v-if="entity.when" :timespans="[entity.when]" />
 
-	<div v-if="isEmptyPrimaryDetails && isEmptyFurtherInformation" class="italic text-neutral-400">
+	<div
+		v-if="isEmptyPrimaryDetails && isEmptyFurtherInformation && !isType"
+		class="italic text-neutral-400"
+	>
 		{{ t("EntityPage.no-details") }}
 	</div>
-	<div v-else-if="!isEmptyPrimaryDetails" class="grid gap-4">
+	<div v-else-if="!isEmptyPrimaryDetails || isType" class="relative flex max-w-full flex-col gap-4">
 		<EntityDescriptions :descriptions="[entity?.description ?? '']" />
 
 		<!-- Types -->
@@ -278,6 +291,13 @@ watch(
 							v-if="tab.id === 'images' && images && images.length > 0"
 							class="overflow-hidden"
 							:images="images"
+						/>
+
+						<EntityTypeDistribution
+							v-if="tab.id === 'types' && width && height"
+							:id="props.entity.id"
+							:height="height"
+							:width="width"
 						/>
 					</VisualisationContainer>
 					<div class="relative max-w-full">

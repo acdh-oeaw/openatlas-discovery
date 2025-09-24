@@ -12,6 +12,10 @@
 	"framework": "nuxt",
 	"aliases": {
 		"components": "@/components",
-		"utils": "@/utils/styles"
-	}
+		"composables": "@/composables",
+		"utils": "@/utils/styles",
+		"ui": "@/components/ui",
+		"lib": "@/lib"
+	},
+	"iconLibrary": "lucide"
 }

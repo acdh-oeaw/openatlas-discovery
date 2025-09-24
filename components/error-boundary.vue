@@ -5,7 +5,6 @@ const t = useTranslations();
 <template>
 	<NuxtErrorBoundary>
 		<slot />
-
 		<template #error="{ error }">
 			<div class="relative">
 				<Centered>

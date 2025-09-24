@@ -8,6 +8,15 @@ const shadcnPlugin = createPlugin(
 	({ addBase }) => {
 		addBase({
 			":root": {
+				"--vis-tooltip-background-color": "none !important",
+				"--vis-tooltip-border-color": "none !important",
+				"--vis-tooltip-text-color": "none !important",
+				"--vis-tooltip-shadow-color": "none !important",
+				"--vis-tooltip-backdrop-filter": "none !important",
+				"--vis-tooltip-padding": "none !important",
+				" --vis-primary-color": "var(--primary)",
+				"--vis-secondary-color": "160 81% 40%",
+				"--vis-text-color": "var(--muted-foreground)",
 				"--background": "0 0% 100%",
 				"--foreground": "0 0% 3.9%",
 				"--card": "0 0% 100%",

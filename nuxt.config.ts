@@ -9,6 +9,16 @@ const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL!;
 const { branchName, commitHash, tag } = getGitInfo();
 
 export default defineNuxtConfig({
+	vite: {
+		resolve: {
+			alias: {
+				// Force Unovis (and your code) to use the modern d3-geo
+				"@unovis/ts/node_modules/d3-geo": require.resolve("d3-geo"),
+				"d3-geo": require.resolve("d3-geo"),
+			},
+		},
+	},
+
 	alias: {
 		"@": fileURLToPath(new URL("./", import.meta.url)),
 	},
