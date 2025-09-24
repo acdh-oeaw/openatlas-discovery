@@ -225,6 +225,9 @@ const isEmptyFurtherInformation = computed(() => {
 		(props.entity.files?.length ?? 0) === 0
 	);
 });
+const isType = computed(() => {
+	return props.entity.systemClass === "type";
+});
 
 const defaultTab = ref();
 watch(
@@ -245,10 +248,13 @@ watch(
 	<EntityAliases v-if="entity.aliases" :aliases="entity.aliases as unknown as Array<string>" />
 	<EntityTimespans v-if="entity.when" :timespans="[entity.when]" />
 
-	<div v-if="isEmptyPrimaryDetails && isEmptyFurtherInformation" class="italic text-neutral-400">
+	<div
+		v-if="isEmptyPrimaryDetails && isEmptyFurtherInformation && !isType"
+		class="italic text-neutral-400"
+	>
 		{{ t("EntityPage.no-details") }}
 	</div>
-	<div v-else-if="!isEmptyPrimaryDetails" class="grid gap-4">
+	<div v-else-if="!isEmptyPrimaryDetails || isType" class="grid gap-4">
 		<EntityDescriptions :descriptions="[entity?.description ?? '']" />
 
 		<!-- Types -->
