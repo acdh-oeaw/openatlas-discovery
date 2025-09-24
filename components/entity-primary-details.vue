@@ -254,7 +254,7 @@ watch(
 	>
 		{{ t("EntityPage.no-details") }}
 	</div>
-	<div v-else-if="!isEmptyPrimaryDetails || isType" class="grid gap-4">
+	<div v-else-if="!isEmptyPrimaryDetails || isType" class="relative flex max-w-full flex-col gap-4">
 		<EntityDescriptions :descriptions="[entity?.description ?? '']" />
 
 		<!-- Types -->
