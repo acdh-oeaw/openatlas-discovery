@@ -15,11 +15,12 @@ const props = defineProps<{
 
 // Use weakmap to store reference to each datapoint for Tooltip
 const wm = new WeakMap();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function template(d: any, i: number, elements: Array<HTMLElement | SVGElement>) {
 	const valueFormatter =
 		props.valueFormatter ??
 		((tick: number) => {
-			return `${tick}`;
+			return String(tick);
 		});
 	if (props.index in d) {
 		if (wm.has(d)) {
@@ -43,6 +44,7 @@ function template(d: any, i: number, elements: Array<HTMLElement | SVGElement>) 
 		if (wm.has(data)) {
 			return wm.get(data);
 		} else {
+			if (elements[i] == null) return "";
 			const style = getComputedStyle(elements[i]);
 			const omittedData = [
 				{ name: data.name, value: valueFormatter(data[props.index]), color: style.fill },

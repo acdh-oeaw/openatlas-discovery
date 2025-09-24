@@ -5,7 +5,7 @@ export function useGetTypeDistribution() {
 
 	return useQuery({
 		queryKey: ["types"] as const,
-		async queryFn({ queryKey, signal }) {
+		async queryFn({ signal }) {
 			const types = api.GET("/type_tree/", {
 				signal,
 			});

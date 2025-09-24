@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { Spacing } from "@unovis/ts";
 
 export { default as BarChart } from "./BarChart.vue";

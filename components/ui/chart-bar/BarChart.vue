@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
 import { Axis, type BulletLegendItemInterface, GroupedBar, StackedBar } from "@unovis/ts";
 import { VisAxis, VisGroupedBar, VisStackedBar, VisXYContainer } from "@unovis/vue";
-import { useMounted } from "@vueuse/core";
+// import { useMounted } from "@vueuse/core";
 import { type Component, computed, ref } from "vue";
 
 import { ChartCrosshair, ChartLegend, defaultColors } from "@/components/ui/chart";
@@ -103,7 +103,7 @@ const selectorsBar = computed(() => {
 			v-model:items="legendItems"
 			@legend-item-click="handleLegendItemClick"
 		/>
-
+		<!-- @vue-expect-error ".value" is needed here  -->
 		<VisXYContainer
 			:data="data"
 			class="flex-1"

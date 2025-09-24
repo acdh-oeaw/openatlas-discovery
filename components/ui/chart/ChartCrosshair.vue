@@ -21,7 +21,8 @@ const props = withDefaults(
 
 // Use weakmap to store reference to each datapoint for Tooltip
 const wm = new WeakMap();
-function template(d: unknown) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function template(d: any) {
 	if (wm.has(d)) {
 		return wm.get(d);
 	} else {
@@ -37,6 +38,7 @@ function template(d: unknown) {
 				return { ...legendReference, value };
 			});
 		const TooltipComponent = props.customTooltip ?? ChartTooltip;
+		if (d[props.index] == null) return "";
 		createApp(TooltipComponent, { title: d[props.index].toString(), data: omittedData }).mount(
 			componentDiv,
 		);

@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import type { PresentationViewModel } from "@/types/api";
+import type { TypeTreeModel } from "@/types/api";
 
 import BarChart from "./ui/chart-bar/BarChart.vue";
 
 const router = useRouter();
-const route = useRoute();
-const { locale } = useI18n();
 
 const props = defineProps<{
 	id: number;
@@ -17,12 +15,16 @@ const { data, isLoading } = useGetTypeDistribution();
 
 const types = computed(() => {
 	// current entity.id type
+	// @ts-expect-error wrong in OpenAPI schema, see https://redmine.openatlas.eu/issues/2625
 	const currentType = data.value?.typeTree[props.id];
 
 	// all subtypes of currentType
-	const subTypes = Object.values(data.value?.typeTree).filter((el) => {
-		return currentType.subs.includes(el.id);
-	});
+	// @ts-expect-error wrong in OpenAPI schema, see https://redmine.openatlas.eu/issues/2625
+	const subTypes = Object.values(data.value?.typeTree as TypeTreeModel["type_tree"]).filter(
+		(el) => {
+			return currentType.subs.includes(el.id);
+		},
+	);
 
 	return [currentType, ...subTypes].map((el) => {
 		return {
@@ -33,7 +35,7 @@ const types = computed(() => {
 	});
 });
 
-function onBarClick(d: PresentationViewModel) {
+function onBarClick(d: (typeof types.value)[0]) {
 	const entity = types.value.find((el) => {
 		return el.id === d.id;
 	});
@@ -54,13 +56,14 @@ function onBarClick(d: PresentationViewModel) {
 			:categories="['count']"
 			:colors="[project.colors.brand]"
 			:y-formatter="
-				(count: number) => {
+				(count) => {
 					return String(count);
 				}
 			"
 			:show-x-axis="false"
 			:width="props.width"
 			:height="props.height"
+			:margin="{ left: 10, bottom: 3 }"
 			@on-bar-click="onBarClick"
 		/>
 	</div>

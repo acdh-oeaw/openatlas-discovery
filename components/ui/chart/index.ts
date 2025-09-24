@@ -11,10 +11,10 @@ export function defaultColors(count = 3) {
 	const secondaryCount = quotient;
 	return [
 		...Array.from(new Array(primaryCount).keys()).map((i) => {
-			return `hsl(var(--vis-primary-color) / ${1 - (1 / primaryCount) * i})`;
+			return `hsl(var(--vis-primary-color) / ${String(1 - (1 / primaryCount) * i)})`;
 		}),
 		...Array.from(new Array(secondaryCount).keys()).map((i) => {
-			return `hsl(var(--vis-secondary-color) / ${1 - (1 / secondaryCount) * i})`;
+			return `hsl(var(--vis-secondary-color) / ${String(1 - (1 / secondaryCount) * i)})`;
 		}),
 	];
 }
