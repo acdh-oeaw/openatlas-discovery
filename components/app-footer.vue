@@ -5,6 +5,7 @@ import type { NavLinkProps } from "@/components/nav-link.vue";
 import { project } from "@/config/project.config";
 
 const t = useTranslations();
+const env = useRuntimeConfig();
 
 const links = computed(() => {
 	if (project.imprint === "none") return null;
@@ -35,6 +36,7 @@ const logos = project.footer.partner_logos;
 				</I18nT>
 			</div>
 
+			<div>{{ env.public.currentGitTag }}</div>
 			<nav
 				:aria-label="t('AppFooter.navigation-secondary')"
 				:class="logos?.length > 0 ? 'sm:justify-self-center' : 'sm:justify-self-end'"

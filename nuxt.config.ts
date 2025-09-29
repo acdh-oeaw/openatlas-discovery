@@ -1,12 +1,9 @@
 import { fileURLToPath } from "node:url";
 
 import { defaultLocale, localesMap } from "./config/i18n.config";
-import { getGitInfo } from "./utils/get-git-info";
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL!;
-
-const { branchName, commitHash, tag } = getGitInfo();
 
 export default defineNuxtConfig({
 	vite: {
@@ -121,9 +118,6 @@ export default defineNuxtConfig({
 			appBaseUrl: process.env.NUXT_PUBLIC_APP_BASE_URL,
 			bots: process.env.NUXT_PUBLIC_BOTS,
 			database: process.env.NUXT_PUBLIC_DATABASE,
-			gitBranchName: branchName,
-			gitCommitHash: commitHash,
-			gitTag: tag,
 			googleSiteVerification: process.env.NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
 			mapBaselayerUrlDark: process.env.NUXT_PUBLIC_MAP_BASELAYER_URL_DARK,
 			mapBaselayerUrlLight: process.env.NUXT_PUBLIC_MAP_BASELAYER_URL_LIGHT,
@@ -132,6 +126,7 @@ export default defineNuxtConfig({
 			openapiBaseUrl: process.env.NUXT_PUBLIC_OPENAPI_BASE_URL,
 			redmineId: process.env.NUXT_PUBLIC_REDMINE_ID,
 			specialImprint: process.env.NUXT_PUBLIC_SPECIAL_IMPRINT,
+			currentGitTag: process.env.NUXT_PUBLIC_GIT_CURRENT_TAG,
 		},
 	},
 	typescript: {
