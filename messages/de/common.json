@@ -107,7 +107,14 @@
 		"PreviousFeature": "Vorheriges Feature",
 		"copy": "Permalink",
 		"copied": "Kopiert!",
-		"copiedMessage": "Der Permalink wurde erfolgreich auf das Clipboard kopiert."
+		"copiedMessage": "Der Permalink wurde erfolgreich auf das Clipboard kopiert.",
+		"download": "Download",
+		"format": "Format",
+		"json": "JSON",
+		"rdf": "RDF/XML",
+		"ttl": "Turtle",
+		"downloaded": "Heruntergeladen!",
+		"downloadedMessage": "Die Datei {filename} wurde erfolgreich heruntergeladen."
 	},
 	"ErrorBoundary": {
 		"error": "Fehler"
