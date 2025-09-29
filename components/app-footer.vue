@@ -42,13 +42,17 @@ const logos = project.footer.partner_logos;
 			>
 				<ul class="flex items-center gap-6" role="list">
 					<li v-for="(link, key) of links" :key="key">
-						<span v-if="link.href.path === '/imprint'" class="inline-flex gap-1">
+						<span
+							v-if="link.href.path === '/imprint' && env.public.currentGitTag"
+							class="inline-flex gap-1"
+						>
 							<span>{{ t("AppFooter.version-number") }}</span>
 							<NavLink
 								href="https://redmine.openatlas.eu/projects/openatlas-discovery/roadmap"
 								target="_blank"
+								external
 								class="mr-2 decoration-dotted underline-offset-4 hover:underline focus-visible:underline"
-								>{{ env.public.currentGitTag }}</NavLink
+								>{{ env.public.currentGitTag ?? t("AppFooter.no-version") }}</NavLink
 							>
 							<span class="mr-2">|</span>
 						</span>

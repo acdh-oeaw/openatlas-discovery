@@ -10,6 +10,7 @@
 		},
 		"navigation-secondary": "Sekundärnavigation",
 		"version-number": "Version",
+		"no-version": "Keine Version gefunden.",
 		"with-love": "Mit {0} von {1}"
 	},
 	"AppHeader": {
