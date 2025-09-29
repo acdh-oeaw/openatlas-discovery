@@ -9,14 +9,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  extractGitTag:
-    name: Extract Git info
-    run: |
-      echo "GIT_CURRENT_TAG=$(git tag --merged HEAD --sort=-v:refname | head -n1)" >> $GITHUB_ENV
   env:
     name: Generate environment variables
     runs-on: ubuntu-latest
     steps:
+      - name: Extract Git Tag
+        run: |
+          echo "GIT_CURRENT_TAG=$(git tag --merged HEAD --sort=-v:refname | head -n1)" >> $GITHUB_ENV
       - name: Derive environment from git ref
         id: environment
         run: |
