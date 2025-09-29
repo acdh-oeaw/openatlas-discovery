@@ -107,7 +107,14 @@
 		"PreviousFeature": "Previous Feature",
 		"copy": "Permalink",
 		"copied": "Copied!",
-		"copiedMessage": "The permalink has been successfully copied to the clipboard."
+		"copiedMessage": "The permalink has been successfully copied to the clipboard.",
+		"download": "Export",
+		"format": "Format",
+		"json": "JSON",
+		"rdf": "RDF/XML",
+		"ttl": "Turtle",
+		"downloaded": "Exported!",
+		"downloadedMessage": "The file {filename} was downloaded successfully."
 	},
 	"ErrorBoundary": {
 		"error": "Error"

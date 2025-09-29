@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ChevronLeftIcon, ChevronRightIcon, CopyIcon, XIcon } from "lucide-vue-next";
+import { ChevronLeftIcon, ChevronRightIcon, CopyIcon, DownloadIcon, XIcon } from "lucide-vue-next";
 
 import { toast } from "@/components/ui/toast";
+import type { ExportEntityParams } from "@/composables/use-export-entity";
 
 const t = useTranslations();
 const router = useRouter();
@@ -74,6 +75,30 @@ function copyEntity() {
 	}
 	return null;
 }
+const exportFormats = computed<Array<[ExportEntityParams["format"], string, string]>>(() => {
+	return [
+		["lpx", t("EntitySidebar.json"), ".json"],
+		["xml", t("EntitySidebar.rdf"), ".xml"],
+		["turtle", t("EntitySidebar.ttl"), ".ttl"],
+	];
+});
+async function exportEntity(format: ExportEntityParams["format"], extension: string) {
+	const result_raw = await useExportEntity({ format, entityId: props.id });
+	const result = format === "lpx" ? JSON.stringify(result_raw) : String(result_raw);
+	const blob = new Blob([result], { type: "text/plain" });
+	const fileURL = URL.createObjectURL(blob);
+	const downloadLink = document.createElement("a");
+	const filename = `${data.value?.title ?? String(props.id)}${extension}`;
+	downloadLink.href = fileURL;
+	downloadLink.download = filename;
+	document.body.appendChild(downloadLink);
+	downloadLink.click();
+	document.body.removeChild(downloadLink);
+	URL.revokeObjectURL(fileURL);
+	toast.success(t("EntitySidebar.downloaded"), {
+		description: t("EntitySidebar.downloadedMessage", { filename: filename }),
+	});
+}
 </script>
 
 <template>
@@ -120,6 +145,34 @@ function copyEntity() {
 								</TooltipTrigger>
 								<TooltipContent>
 									<span>{{ t("EntitySidebar.copy") }}</span>
+								</TooltipContent>
+							</Tooltip>
+							<Tooltip>
+								<TooltipTrigger>
+									<Popover>
+										<PopoverTrigger as-child>
+											<Button variant="ghost" class="h-full p-2"
+												><span class="sr-only"> {{ t("EntitySidebar.download") }}</span>
+												<DownloadIcon :size="16" />
+											</Button>
+										</PopoverTrigger>
+										<PopoverContent class="w-fit items-start">
+											<div class="text-center text-xs text-muted-foreground">
+												{{ t("EntitySidebar.format") }}
+											</div>
+											<Button
+												v-for="format in exportFormats"
+												:key="format[0]"
+												variant="ghost"
+												class="block w-full text-xs"
+												@click="exportEntity(format[0], format[2])"
+												>{{ format[1] }}</Button
+											>
+										</PopoverContent>
+									</Popover>
+								</TooltipTrigger>
+								<TooltipContent>
+									<span>{{ t("EntitySidebar.download") }}</span>
 								</TooltipContent>
 							</Tooltip>
 						</TooltipProvider>
