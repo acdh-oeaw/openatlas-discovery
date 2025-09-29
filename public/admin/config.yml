@@ -2024,6 +2024,21 @@ collections:
         widget: markdown
         modes:
           - rich_text
+        buttons:
+          [
+            "bold",
+            "italic",
+            "code",
+            "link",
+            "heading-two",
+            "heading-three",
+            "heading-four",
+            "heading-five",
+            "heading-six",
+            "bulleted-list",
+            "numbered-list",
+            "quote",
+          ]
   - name: team
     label: Team
     label_singular: Team member

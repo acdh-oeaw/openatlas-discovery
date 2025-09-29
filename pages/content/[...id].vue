@@ -49,13 +49,29 @@ useContentHead(content);
 </script>
 
 <template>
-	<MainContent class="container max-w-3xl py-8">
+	<MainContent class="container w-full py-8">
 		<div>
-			<PageTitle>{{ content?.title }}</PageTitle>
+			<div class="mx-auto grid w-full grid-cols-[1fr_48rem_1fr] gap-x-10">
+				<div></div>
+				<div>
+					<div>
+						<PageTitle>{{ content?.title }}</PageTitle>
+					</div>
+					<ContentRenderer v-if="content != null" class="prose" :value="content">
+						<template #empty></template>
+					</ContentRenderer>
+				</div>
+				<aside class="sticky top-24 max-h-screen text-sm text-neutral-500">
+					<h2>Table of contents</h2>
+					<ol class="ml-0">
+						<TocEntry
+							v-for="link in content?.body.toc?.links"
+							:key="link.id"
+							:entry="link"
+						></TocEntry>
+					</ol>
+				</aside>
+			</div>
 		</div>
-
-		<ContentRenderer v-if="content != null" class="prose" :value="content">
-			<template #empty></template>
-		</ContentRenderer>
 	</MainContent>
 </template>
