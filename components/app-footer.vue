@@ -44,11 +44,11 @@ const logos = project.footer.partner_logos;
 					<li v-for="(link, key) of links" :key="key">
 						<span v-if="link.href.path === '/imprint'" class="inline-flex gap-1">
 							<span>{{ t("AppFooter.version-number") }}</span>
-							<NuxtLink
+							<NavLink
 								href="https://redmine.openatlas.eu/projects/openatlas-discovery/roadmap"
 								target="_blank"
 								class="mr-2 decoration-dotted underline-offset-4 hover:underline focus-visible:underline"
-								>{{ env.public.currentGitTag }}</NuxtLink
+								>{{ env.public.currentGitTag }}</NavLink
 							>
 							<span class="mr-2">|</span>
 						</span>
