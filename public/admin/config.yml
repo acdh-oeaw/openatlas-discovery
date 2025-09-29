@@ -2022,6 +2022,7 @@ collections:
         label: Display table of contents
         widget: boolean
         i18n: true
+        default: false
       - name: body
         label: Content
         i18n: true
