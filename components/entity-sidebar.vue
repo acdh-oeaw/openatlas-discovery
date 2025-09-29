@@ -156,15 +156,15 @@ async function exportEntity(format: ExportEntityParams["format"], extension: str
 												<DownloadIcon :size="16" />
 											</Button>
 										</PopoverTrigger>
-										<PopoverContent class="w-fit">
-											<div class="text-xs text-muted-foreground">
+										<PopoverContent class="w-fit items-start">
+											<div class="text-center text-xs text-muted-foreground">
 												{{ t("EntitySidebar.format") }}
 											</div>
 											<Button
 												v-for="format in exportFormats"
 												:key="format[0]"
 												variant="ghost"
-												class="block w-full text-start"
+												class="block w-full text-xs"
 												@click="exportEntity(format[0], format[2])"
 												>{{ format[1] }}</Button
 											>
