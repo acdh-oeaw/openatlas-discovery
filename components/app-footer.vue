@@ -36,13 +36,22 @@ const logos = project.footer.partner_logos;
 				</I18nT>
 			</div>
 
-			<div>{{ env.public.currentGitTag }}</div>
 			<nav
 				:aria-label="t('AppFooter.navigation-secondary')"
 				:class="logos?.length > 0 ? 'sm:justify-self-center' : 'sm:justify-self-end'"
 			>
 				<ul class="flex items-center gap-6" role="list">
 					<li v-for="(link, key) of links" :key="key">
+						<span v-if="link.href.path === '/imprint'" class="inline-flex gap-1">
+							<span>{{ t("AppFooter.version-number") }}</span>
+							<NuxtLink
+								href="https://redmine.openatlas.eu/projects/openatlas-discovery/roadmap"
+								target="_blank"
+								class="mr-2 decoration-dotted underline-offset-4 hover:underline focus-visible:underline"
+								>{{ env.public.currentGitTag }}</NuxtLink
+							>
+							<span class="mr-2">|</span>
+						</span>
 						<NavLink
 							class="decoration-dotted underline-offset-4 hover:underline focus-visible:underline"
 							:href="link.href"

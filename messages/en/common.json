@@ -9,6 +9,7 @@
 			"imprint": "Imprint"
 		},
 		"navigation-secondary": "Secondary",
+		"version-number": "Version",
 		"with-love": "With {0} from {1}"
 	},
 	"AppHeader": {

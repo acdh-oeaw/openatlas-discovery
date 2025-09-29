@@ -9,6 +9,7 @@
 			"imprint": "Impressum"
 		},
 		"navigation-secondary": "Sekundärnavigation",
+		"version-number": "Version",
 		"with-love": "Mit {0} von {1}"
 	},
 	"AppHeader": {
