@@ -37,7 +37,8 @@
 		},
 		"meta": {
 			"title": "Content"
-		}
+		},
+		"table-of-contents": "Table of Contents"
 	},
 	"DataMapView": {
 		"centerpoint": "Areas",

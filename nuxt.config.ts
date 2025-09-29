@@ -34,6 +34,11 @@ export default defineNuxtConfig({
 	content: {
 		defaultLocale,
 		locales: Object.keys(localesMap),
+		markdown: {
+			toc: {
+				depth: 5,
+			},
+		},
 	},
 	css: [
 		"@fontsource-variable/inter/standard.css",

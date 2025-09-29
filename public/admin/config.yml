@@ -2018,6 +2018,10 @@ collections:
           - name: title
             label: Title
             i18n: true
+      - name: toc
+        label: Display table of contents
+        widget: boolean
+        i18n: true
       - name: body
         label: Content
         i18n: true
