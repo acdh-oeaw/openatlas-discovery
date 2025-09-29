@@ -13,9 +13,6 @@ jobs:
     name: Generate environment variables
     runs-on: ubuntu-latest
     steps:
-      - name: Extract Git Tag
-        run: |
-          echo "GIT_CURRENT_TAG=$(git tag --merged HEAD --sort=-v:refname | head -n1)" >> $GITHUB_ENV
       - name: Derive environment from git ref
         id: environment
         run: |
@@ -73,6 +70,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Extract Git Tag
+        run: |
+          echo "GIT_CURRENT_TAG=$(git tag --merged HEAD --sort=-v:refname | head -n1)" >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
