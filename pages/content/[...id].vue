@@ -51,7 +51,11 @@ useContentHead(content);
 const contentRef = useTemplateRef("content");
 const currentHash = ref<string | undefined>();
 function updateHashUrl() {
+	// eslint-disable-next-line  @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	if (!content.value || !contentRef.value?.$el?.querySelectorAll) return;
+	// eslint-disable-next-line  @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	const sections = contentRef.value.$el.querySelectorAll("h2, h3, h4, h5, h6") ?? [];
 
 	for (const section of sections) {
