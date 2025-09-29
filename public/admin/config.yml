@@ -2018,12 +2018,32 @@ collections:
           - name: title
             label: Title
             i18n: true
+      - name: toc
+        label: Display table of contents
+        widget: boolean
+        i18n: true
+        default: false
       - name: body
         label: Content
         i18n: true
         widget: markdown
         modes:
           - rich_text
+        buttons:
+          [
+            "bold",
+            "italic",
+            "code",
+            "link",
+            "heading-two",
+            "heading-three",
+            "heading-four",
+            "heading-five",
+            "heading-six",
+            "bulleted-list",
+            "numbered-list",
+            "quote",
+          ]
   - name: team
     label: Team
     label_singular: Team member

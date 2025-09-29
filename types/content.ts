@@ -5,6 +5,7 @@ export interface ContentPage extends MarkdownParsedContent {
 	navigation: {
 		title: string;
 	};
+	toc: boolean;
 }
 
 export interface SystemPage extends MarkdownParsedContent {

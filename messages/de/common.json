@@ -39,7 +39,8 @@
 		},
 		"meta": {
 			"title": "Inhalt"
-		}
+		},
+		"table-of-contents": "Inhaltsverzeichnis"
 	},
 	"DataMapView": {
 		"centerpoint": "Flächen",
