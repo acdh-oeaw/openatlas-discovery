@@ -1819,6 +1819,19 @@ collections:
                 label: Make the Map the Start Page of the Website
                 widget: boolean
                 default: false
+              - name: baseLayerURL
+                widget: object
+                label: Specify the map's base layer url
+                fields:
+                  - name: light
+                    label: Base layer for light mode
+                    widget: string
+                    default: https://basemaps.cartocdn.com/gl/positron-gl-style/style.json
+                  - name: dark
+                    label: Base layer for dark mode
+                    widget: string
+                    default: https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json
+
               - name: mapDisplayedSystemClasses
                 label: >-
                   Configure which system classes with coordinates are displayed on the map

@@ -60,10 +60,6 @@ Environment variables:
   `/database` and `/maps` pages should be added to the website. Allowed values are: "enabled" or
   "disabled".
 
-- `NUXT_PUBLIC_MAP_BASELAYER_URL_LIGHT` and `NUXT_PUBLIC_MAP_BASELAYER_URL_DARK`: The map base layer
-  used on the "/maps" page, in "light" and "dark" mode. Defaults to an OpenStreetMap map.
-- `NUXT_PUBLIC_MAP_BASELAYER_ATTRIBUTION`: Attribution text for the above map.
-
 - `NUXT_PUBLIC_MATOMO_BASE_URL` and `NUXT_PUBLIC_MATOMO_ID`: When using `matomo` for website
   analytics, set the base URL and property id (optional).
 - `NUXT_PUBLIC_BOTS`: Set this to "enabled" to allow web crawlers like the Google bot to index this

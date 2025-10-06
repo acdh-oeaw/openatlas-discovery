@@ -110,7 +110,6 @@ const emit = defineEmits<{
 	): void;
 }>();
 
-const env = useRuntimeConfig();
 const theme = useColorMode();
 
 const hoveredMovementId = ref<Array<string> | null>(null);
@@ -138,7 +137,9 @@ const colors = {
 };
 
 const mapStyle = computed(() => {
-	return theme.value === "dark" ? env.public.mapBaselayerUrlDark : env.public.mapBaselayerUrlLight;
+	return theme.value === "dark"
+		? (project.map.baseLayerURL.dark ?? project.map.baseLayerURL.light)
+		: project.map.baseLayerURL.light;
 });
 
 const elementRef = ref<HTMLElement | null>(null);
@@ -146,6 +147,21 @@ const elementRef = ref<HTMLElement | null>(null);
 const context: GeoMapContext = {
 	map: null,
 };
+
+watch(mapStyle, () => {
+	assert(context.map != null);
+	// const oldLayers = context.map?.getLayersOrder().map((layer) => {
+	// 	return context.map?.getLayer(layer);
+	// });
+	context.map.setStyle(mapStyle.value);
+	// context.map?.setStyle({ ...context.map.getStyle(), sprite: mapStyle.value });
+	void context.map.once("idle", () => {
+		console.log(context.map?.getStyle().sprite);
+		console.log("Style loaded");
+		init(true);
+		console.log(context.map?.getLayersOrder());
+	});
+});
 
 onMounted(create);
 onScopeDispose(dispose);
@@ -168,11 +184,13 @@ async function create() {
 
 	context.map = map;
 
-	map.on("load", init);
+	map.on("load", () => {
+		init(false);
+	});
 	console.log("created", props);
 }
 
-function initializeCustomIconLayer(key: string) {
+function initializeCustomIconLayer(key: string, reloadImage = false) {
 	assert(context.map != null);
 	const map = context.map;
 	const sourceCustomIconId = `custom-icon-data-${key}`;
@@ -193,13 +211,20 @@ function initializeCustomIconLayer(key: string) {
 	div.innerHTML = iconSVG;
 
 	div.querySelector("svg")?.setAttribute("viewBox", "-4 -4 32 32");
-	div.querySelector("svg")?.setAttribute("stroke", props.customIcons[key]?.color ?? "#000000");
-
+	div
+		.querySelector("svg")
+		?.setAttribute(
+			"stroke",
+			props.customIcons[key]?.color ?? (theme.value === "dark" ? "#ffffff" : "#000000"),
+		);
 	// convert the blob object to a dedicated URL
 	const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(div.innerHTML)}`;
 
 	if (map.hasImage(`custom-icon-image-${key}`)) {
-		return;
+		if (!reloadImage) return;
+		else {
+			map.removeImage(`custom-icon-image-${key}`);
+		}
 	}
 
 	// load the SVG blob to a flesh image object
@@ -236,24 +261,25 @@ function initializeCustomIconLayer(key: string) {
 	img.src = url;
 }
 
-function init() {
+function init(initAfterThemeSwitch = false) {
 	assert(context.map != null);
 	const map = context.map;
 
 	//
+	if (!initAfterThemeSwitch) {
+		const nav = new NavigationControl({});
+		map.addControl(nav, "top-left");
 
-	const nav = new NavigationControl({});
-	map.addControl(nav, "top-left");
+		//
 
-	//
+		const fullscreen = new FullscreenControl({});
+		map.addControl(fullscreen, "top-right");
 
-	const fullscreen = new FullscreenControl({});
-	map.addControl(fullscreen, "top-right");
+		//
 
-	//
-
-	const scale = new ScaleControl({});
-	map.addControl(scale, "bottom-left");
+		const scale = new ScaleControl({});
+		map.addControl(scale, "bottom-left");
+	}
 
 	//
 
@@ -271,66 +297,66 @@ function init() {
 	map.addSource(sourceEventPointsId, { type: "geojson", data: createFeatureCollection([]) });
 
 	//
-
-	map.addLayer({
-		id: "centerpoints",
-		type: "circle",
-		source: sourceCenterPointsId,
-		filter: ["==", "$type", "Point"],
-		paint: {
-			"circle-color": colors.areaCenterPoints,
-			"circle-opacity": ["case", ["==", ["get", "isDisplayed"], true], 1, 0],
-			"circle-radius": 6,
-		},
-	});
+	if (!map.getLayer("centerpoints"))
+		map.addLayer({
+			id: "centerpoints",
+			type: "circle",
+			source: sourceCenterPointsId,
+			filter: ["==", "$type", "Point"],
+			paint: {
+				"circle-color": colors.areaCenterPoints,
+				"circle-opacity": ["case", ["==", ["get", "isDisplayed"], true], 1, 0],
+				"circle-radius": 6,
+			},
+		});
 	//
-
-	map.addLayer({
-		id: "points",
-		type: "circle",
-		source: sourcePointsId,
-		filter: ["all", ["==", "$type", "Point"], ["!has", "isIcon"]],
-		paint: {
-			"circle-color": colors.points,
-			"circle-opacity": ["case", ["==", ["get", "isDisplayed"], true], 1, 0],
-			"circle-radius": 6,
-		},
-	});
+	if (!map.getLayer("points"))
+		map.addLayer({
+			id: "points",
+			type: "circle",
+			source: sourcePointsId,
+			filter: ["all", ["==", "$type", "Point"], ["!has", "isIcon"]],
+			paint: {
+				"circle-color": colors.points,
+				"circle-opacity": ["case", ["==", ["get", "isDisplayed"], true], 1, 0],
+				"circle-radius": 6,
+			},
+		});
 
 	//
-
-	map.addLayer({
-		id: "events",
-		type: "circle",
-		source: sourceEventPointsId,
-		filter: ["==", "$type", "Point"],
-		paint: {
-			"circle-color": hoveredMovementId.value
-				? [
-						"match",
-						["get", "id"],
-						hoveredMovementId.value,
-						["coalesce", ["get", "color"], colors.movement],
-						"#808080",
-					]
-				: ["coalesce", ["get", "color"], colors.movement],
-			"circle-radius": 6,
-			"circle-opacity": [
-				"case",
-				// if isDisplayed is false -> 0
-				["==", ["get", "isDisplayed"], false],
-				0,
-				// else if hoveredMovementIds is inside otherFeatures (= another event in the same
-				// location is hovered) -> 0
-				hoveredMovementId.value && hoveredMovementId.value.length > 0
-					? ["in", hoveredMovementId.value[0] ?? "", ["get", "otherFeatures"]]
-					: ["!=", true, true],
-				0,
-				// else -> 1
-				1,
-			],
-		},
-	});
+	if (!map.getLayer("events"))
+		map.addLayer({
+			id: "events",
+			type: "circle",
+			source: sourceEventPointsId,
+			filter: ["==", "$type", "Point"],
+			paint: {
+				"circle-color": hoveredMovementId.value
+					? [
+							"match",
+							["get", "id"],
+							hoveredMovementId.value,
+							["coalesce", ["get", "color"], colors.movement],
+							"#808080",
+						]
+					: ["coalesce", ["get", "color"], colors.movement],
+				"circle-radius": 6,
+				"circle-opacity": [
+					"case",
+					// if isDisplayed is false -> 0
+					["==", ["get", "isDisplayed"], false],
+					0,
+					// else if hoveredMovementIds is inside otherFeatures (= another event in the same
+					// location is hovered) -> 0
+					hoveredMovementId.value && hoveredMovementId.value.length > 0
+						? ["in", hoveredMovementId.value[0] ?? "", ["get", "otherFeatures"]]
+						: ["!=", true, true],
+					0,
+					// else -> 1
+					1,
+				],
+			},
+		});
 
 	//
 
@@ -366,7 +392,7 @@ function init() {
 	});
 
 	Object.keys(props.customIcons).forEach((key) => {
-		initializeCustomIconLayer(key);
+		initializeCustomIconLayer(key, initAfterThemeSwitch);
 	});
 
 	map.on("click", (event) => {
@@ -409,7 +435,7 @@ function init() {
 	});
 
 	updateScope();
-	updatePolygons();
+	if (!initAfterThemeSwitch) updatePolygons();
 }
 
 function dispose() {
@@ -706,7 +732,7 @@ function updatePolygons() {
 		polygonOverlay.value.setProps({
 			layers: [polygonLayer],
 		});
-		context.map.addControl(polygonOverlay.value);
+		if (!context.map.hasControl(polygonOverlay.value)) context.map.addControl(polygonOverlay.value);
 
 		context.map.addLayer({
 			id: "polygons",

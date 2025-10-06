@@ -91,19 +91,21 @@
 		"customIconConfig": [
 			{
 				"entityType": 22378,
-				"iconName": "Skull",
-				"color": "#2b2b2b"
+				"iconName": "Skull"
 			},
 			{
 				"entityType": 5083,
-				"iconName": "Skull",
-				"color": "#2b2b2b"
+				"iconName": "Skull"
 			}
 		],
 		"customMovementConfig": {
 			"colorConfig": [],
 			"arcThickness": false
 		},
-		"flyToZoom": 20
+		"flyToZoom": 20,
+		"baseLayerURL": {
+			"light": "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+			"dark": "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
+		}
 	}
 }
