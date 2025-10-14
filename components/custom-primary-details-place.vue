@@ -73,7 +73,7 @@ const filteredRelations = computed(() => {
 </script>
 
 <template>
-	<div>
+	<div class="flex flex-col gap-4">
 		<div v-if="entity.relations != null" class="flex w-full flex-col gap-4">
 			<GroupedRelationCollapsible
 				v-for="[key, rels] in filteredRelations.filter(
