@@ -12,6 +12,7 @@ const localePath = useLocalePath();
 const route = useRoute();
 
 const isCurrentPage = computed<boolean>(() => {
+	if (props.external) return false;
 	const href = typeof props.href === "string" ? createURLObject(props.href) : props.href;
 	const path = localePath(href.path ?? "");
 	const query = href.query ?? {};
