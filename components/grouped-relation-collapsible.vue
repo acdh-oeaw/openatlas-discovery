@@ -15,7 +15,6 @@ const props = defineProps<{
 	relations: Array<NonNullable<RelatedEntityModel>>;
 	// relationType: RelationType;
 	systemClass?: string;
-	showOnMap: boolean;
 	entity: PresentationViewModel;
 }>();
 
@@ -31,6 +30,10 @@ const filteredRelations = computed(() => {
 			}) ?? true;
 		return indexIsFine && relationTypesAreFine;
 	});
+});
+
+const showOnMap = computed(() => {
+	return project.map.mapDisplayedSystemClasses.includes(props.title);
 });
 </script>
 
@@ -48,10 +51,9 @@ const filteredRelations = computed(() => {
 					<AccordionContent>
 						<!-- <template v-for="rels in props.relations" :key="title"> -->
 						<RelationCollapsible
-							class="mb-8"
 							:title="title ?? ''"
 							:relations="filteredRelations"
-							:show-icon="props.showOnMap"
+							:show-icon="showOnMap"
 							:entity="entity"
 						/>
 						<!-- </template> -->
