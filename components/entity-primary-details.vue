@@ -208,19 +208,15 @@ const filteredTypes = computed(() => {
 
 const { data: typeData } = useGetTypeDistribution();
 const typeTree = computed(() => {
-	if (!typeData.value) return {} as TypeTreeModel["type_tree"];
-	//@ts-expect-error error in OpenAPI definition
-	return typeData.value.typeTree as TypeTreeModel["type_tree"];
+	if (!typeData.value) return {} as TypeTreeModel["typeTree"];
+	return typeData.value.typeTree;
 });
 
 const superTypes: typeof filteredTypes = computed(() => {
-	const currentType = typeTree.value[String(props.entity.id) as keyof TypeTreeModel["type_tree"]];
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-	if (currentType == null) {
-		return [];
-	}
+	const currentType = typeTree.value[String(props.entity.id) as keyof TypeTreeModel["typeTree"]];
+
 	const hierarchy = currentType.root.map((entry) => {
-		return typeTree.value[String(entry) as keyof TypeTreeModel["type_tree"]];
+		return typeTree.value[String(entry) as keyof TypeTreeModel["typeTree"]];
 	});
 	const directParent = hierarchy.pop();
 	if (!directParent) return [];
