@@ -1,28 +1,9 @@
 <script lang="ts" setup>
-import { isNonEmptyString } from "@acdh-oeaw/lib";
-
-import type { EntityFeature } from "@/composables/use-create-entity";
-
-const props = defineProps<{
-	timespans: NonNullable<EntityFeature["when"]>["timespans"];
+const _props = defineProps<{
+	datespans: Array<{ start: string | null; end: string | null }>;
 }>();
 
 const t = useTranslations();
-
-const datespans = computed(() => {
-	const datespans: Array<{ start: string | null; end: string | null }> = [];
-
-	props.timespans?.forEach((timespan) => {
-		const _start = timespan.start ? createDateSpan(timespan.start) : null;
-		const _end = timespan.end ? createDateSpan(timespan.end) : null;
-		const start = isNonEmptyString(_start) ? _start : null;
-		const end = isNonEmptyString(_end) ? _end : null;
-		if (start == null && end == null) return;
-		datespans.push({ start, end });
-	});
-
-	return datespans;
-});
 </script>
 
 <template>

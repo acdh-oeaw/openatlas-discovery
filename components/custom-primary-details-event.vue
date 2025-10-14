@@ -44,31 +44,6 @@ const nextFeature = computed(() => {
 	return null;
 });
 
-const collapsibleRelations: Record<
-	string,
-	{
-		relationType: RelationType;
-		systemClass?: string;
-		title: string;
-		showOnMap?: boolean;
-	}
-> = {
-	artifact: {
-		relationType: {
-			crmCode: "P46",
-		},
-		systemClass: "artifact",
-		title: t("Relations.Artifacts"),
-	},
-	human_remains: {
-		relationType: {
-			crmCode: "P46",
-		},
-		systemClass: "human_remains",
-		title: t("Relations.HumanRemains"),
-	},
-};
-
 const emit = defineEmits({
 	handledRelations(payload: Array<RelationType>) {
 		return payload;
@@ -135,7 +110,6 @@ const filteredRelations = computed(() => {
 		:key="`${entity.id} - ${key}`"
 		:title="key"
 		:relations="(rels ?? []).filter((r) => r != null).filter((r) => r.id != entity.id)"
-		:show-on-map="collapsibleRelations[key]?.showOnMap ?? false"
 		:entity="entity"
 	/>
 </template>

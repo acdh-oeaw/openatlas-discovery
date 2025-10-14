@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { keyByToMap } from "@acdh-oeaw/lib";
+import { isNonEmptyString, keyByToMap } from "@acdh-oeaw/lib";
 import type { Geometry } from "geojson";
 import { z } from "zod";
 
@@ -91,6 +91,21 @@ const typesById = computed(() => {
 		},
 	);
 });
+
+const datespans = computed(() => {
+	const datespans: Array<{ start: string | null; end: string | null }> = [];
+	if (entity.value?.when == null) return datespans;
+	[entity.value.when].forEach((timespan) => {
+		const _start = createDateSpan(timespan.start);
+		const _end = createDateSpan(timespan.end);
+		const start = isNonEmptyString(_start) ? _start : null;
+		const end = isNonEmptyString(_end) ? _end : null;
+		if (start == null && end == null) return;
+		datespans.push({ start, end });
+	});
+
+	return datespans;
+});
 </script>
 
 <template>
@@ -103,7 +118,7 @@ const typesById = computed(() => {
 				</CardHeader>
 				<CardContent>
 					<div class="grid gap-4">
-						<EntityTimespans v-if="entity.when" :timespans="[entity.when]" />
+						<EntityTimespans v-if="datespans.length > 0" :datespans="datespans" />
 						<EntityDescriptions :descriptions="[entity?.description ?? '']" />
 						<!-- Types -->
 						<div class="flex flex-row flex-wrap gap-1">

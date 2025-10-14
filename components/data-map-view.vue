@@ -503,13 +503,13 @@ function setCoordinates(entity: EntityFeature, coordinates: Ref<[number, number]
 }
 
 watchEffect(() => {
+	const showOnMap = detailOnMap.value; // forces dependency tracking
 	if (mode.value && selection.value) {
 		// console.log("mode & selection set", selection.value);
 		const entity = entities.value.find((feature) => {
 			const id = getUnprefixedId(feature["@id"]);
 			return id === selection.value;
 		});
-		// console.log("Entity: ", entity, entities.value);
 
 		if (entity) {
 			setCoordinates(entity, selectionCoordinates);
@@ -525,33 +525,24 @@ watchEffect(() => {
 					entities: [entity],
 				};
 			}
+		}
+	}
+	detailSelectionCoordinates.value = undefined;
+	if (showOnMap) {
+		const detailEntity = entities.value.find((feature) => {
+			const id = getUnprefixedId(feature["@id"]);
+			return id === showOnMap;
+		});
 
-			// console.log(detailOnMap.value);
-			detailSelectionCoordinates.value = undefined;
-			if (detailOnMap.value) {
-				const detailEntity = entities.value.find((feature) => {
-					const id = getUnprefixedId(feature["@id"]);
-					return id === detailOnMap.value;
-				});
-
-				// should there be two popups? --> make popups array / more rendered components??
-				if (detailEntity) {
-					setCoordinates(detailEntity, detailSelectionCoordinates);
-					// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-					if (detailSelectionCoordinates.value === undefined) return;
-
-					// console.log(
-					// 	"Detail Coordinates: ",
-					// 	detailSelectionCoordinates,
-					// 	popover.value,
-					// 	detailEntity,
-					// );
-					popover.value = {
-						coordinates: detailSelectionCoordinates.value,
-						entities: [detailEntity],
-					};
-				}
-			}
+		// should there be two popups? --> make popups array / more rendered components??
+		if (detailEntity) {
+			setCoordinates(detailEntity, detailSelectionCoordinates);
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+			if (detailSelectionCoordinates.value === undefined) return;
+			popover.value = {
+				coordinates: detailSelectionCoordinates.value,
+				entities: [detailEntity],
+			};
 		}
 	}
 });

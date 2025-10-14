@@ -12,7 +12,6 @@ const collapsibleRelations: Record<
 		systemClass: string;
 		title: string;
 		fullWidth: boolean;
-		showOnMap: boolean;
 	}
 > = {
 	feature: {
@@ -22,7 +21,6 @@ const collapsibleRelations: Record<
 		systemClass: "feature",
 		title: t("Relations.Features"),
 		fullWidth: true,
-		showOnMap: true,
 	},
 	artifact: {
 		relationType: {
@@ -31,7 +29,6 @@ const collapsibleRelations: Record<
 		systemClass: "artifact",
 		title: t("Relations.Artifacts"),
 		fullWidth: false,
-		showOnMap: false,
 	},
 	human_remains: {
 		relationType: {
@@ -40,7 +37,6 @@ const collapsibleRelations: Record<
 		systemClass: "human_remains",
 		title: t("Relations.HumanRemains"),
 		fullWidth: false,
-		showOnMap: false,
 	},
 	source: {
 		relationType: {
@@ -50,7 +46,6 @@ const collapsibleRelations: Record<
 		systemClass: "source",
 		title: t("Relations.Sources"),
 		fullWidth: true,
-		showOnMap: false,
 	},
 };
 
@@ -78,29 +73,29 @@ const filteredRelations = computed(() => {
 </script>
 
 <template>
-	<div v-if="entity.relations != null" class="flex w-full flex-col gap-4">
-		<GroupedRelationCollapsible
-			v-for="[key, rels] in filteredRelations.filter(
-				([key, _]) =>
-					collapsibleRelations[key]?.fullWidth || collapsibleRelations[key]?.fullWidth == null,
-			)"
-			:key="`${entity.id} - ${key}`"
-			:title="key"
-			:relations="(rels ?? []).filter((r) => r != null).filter((r) => r.id != entity.id)"
-			:show-on-map="collapsibleRelations[key]?.showOnMap ?? false"
-			:entity="entity"
-		/>
-	</div>
-	<div v-if="entity.relations != null" class="flex w-full gap-4">
-		<GroupedRelationCollapsible
-			v-for="[key, rels] in filteredRelations.filter(
-				([key, _]) => collapsibleRelations[key]?.fullWidth === false,
-			)"
-			:key="`${entity.id} - ${key}`"
-			:title="key"
-			:relations="(rels ?? []).filter((r) => r != null).filter((r) => r.id != entity.id)"
-			:show-on-map="collapsibleRelations[key]?.showOnMap ?? false"
-			:entity="entity"
-		/>
+	<div class="flex flex-col gap-4">
+		<div v-if="entity.relations != null" class="flex w-full flex-col gap-4">
+			<GroupedRelationCollapsible
+				v-for="[key, rels] in filteredRelations.filter(
+					([key, _]) =>
+						collapsibleRelations[key]?.fullWidth || collapsibleRelations[key]?.fullWidth == null,
+				)"
+				:key="`${entity.id} - ${key}`"
+				:title="key"
+				:relations="(rels ?? []).filter((r) => r != null).filter((r) => r.id != entity.id)"
+				:entity="entity"
+			/>
+		</div>
+		<div v-if="entity.relations != null" class="flex w-full gap-4">
+			<GroupedRelationCollapsible
+				v-for="[key, rels] in filteredRelations.filter(
+					([key, _]) => collapsibleRelations[key]?.fullWidth === false,
+				)"
+				:key="`${entity.id} - ${key}`"
+				:title="key"
+				:relations="(rels ?? []).filter((r) => r != null).filter((r) => r.id != entity.id)"
+				:entity="entity"
+			/>
+		</div>
 	</div>
 </template>

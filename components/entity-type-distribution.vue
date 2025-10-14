@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { TypeTreeModel } from "@/types/api";
-
 import BarChart from "./ui/chart-bar/BarChart.vue";
 
 const router = useRouter();
@@ -20,11 +18,9 @@ const types = computed(() => {
 
 	// all subtypes of currentType
 	// @ts-expect-error wrong in OpenAPI schema, see https://redmine.openatlas.eu/issues/2625
-	const subTypes = Object.values(data.value?.typeTree as TypeTreeModel["type_tree"]).filter(
-		(el) => {
-			return currentType.subs.includes(el.id);
-		},
-	);
+	const subTypes = Object.values(data.value?.typeTree).filter((el) => {
+		return currentType.subs.includes(el.id);
+	});
 
 	return [currentType, ...subTypes].map((el) => {
 		return {

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { isNonEmptyString } from "@acdh-oeaw/lib";
+
 import CustomPrimaryDetails from "@/components/custom-primary-details.vue";
 import CustomPrimaryDetailsActor from "@/components/custom-primary-details-actor.vue";
 import CustomPrimaryDetailsEvent from "@/components/custom-primary-details-event.vue";
@@ -6,7 +8,6 @@ import CustomPrimaryDetailsFeature from "@/components/custom-primary-details-fea
 import CustomPrimaryDetailsPlace from "@/components/custom-primary-details-place.vue";
 import { project } from "@/config/project.config";
 import type { PresentationViewModel, TypeTreeModel } from "@/types/api";
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getRelationTitle = (relation: RelationType) => {
 	return useRelationTitle(relation, props.entity.systemClass);
@@ -207,19 +208,15 @@ const filteredTypes = computed(() => {
 
 const { data: typeData } = useGetTypeDistribution();
 const typeTree = computed(() => {
-	if (!typeData.value) return {} as TypeTreeModel["type_tree"];
-	//@ts-expect-error error in OpenAPI definition
-	return typeData.value.typeTree as TypeTreeModel["type_tree"];
+	if (!typeData.value) return {} as TypeTreeModel["typeTree"];
+	return typeData.value.typeTree;
 });
 
 const superTypes: typeof filteredTypes = computed(() => {
-	const currentType = typeTree.value[String(props.entity.id) as keyof TypeTreeModel["type_tree"]];
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-	if (currentType == null) {
-		return [];
-	}
+	const currentType = typeTree.value[String(props.entity.id) as keyof TypeTreeModel["typeTree"]];
+
 	const hierarchy = currentType.root.map((entry) => {
-		return typeTree.value[String(entry) as keyof TypeTreeModel["type_tree"]];
+		return typeTree.value[String(entry) as keyof TypeTreeModel["typeTree"]];
 	});
 	const directParent = hierarchy.pop();
 	if (!directParent) return [];
@@ -271,14 +268,31 @@ watch(
 	},
 	{ immediate: true },
 );
+
+const datespans = computed(() => {
+	const datespans: Array<{ start: string | null; end: string | null }> = [];
+	if (props.entity.when == null) return datespans;
+	[props.entity.when].forEach((timespan) => {
+		const _start = createDateSpan(timespan.start);
+		const _end = createDateSpan(timespan.end);
+		const start = isNonEmptyString(_start) ? _start : null;
+		const end = isNonEmptyString(_end) ? _end : null;
+		if (start == null && end == null) return;
+		datespans.push({ start, end });
+	});
+
+	return datespans;
+});
 </script>
 
 <template>
 	<EntitySystemClass :system-class="entity.systemClass" />
-	<PageTitle>{{ entity.title }}</PageTitle>
+	<PageTitle class="mb-0">{{ entity.title }}</PageTitle>
+
+	<EntityBreadcrumbs :entity="entity" class="mb-5"></EntityBreadcrumbs>
 	<!-- @ts-expect FIXME: Incorrect information provided by openapi document. -->
 	<EntityAliases v-if="entity.aliases" :aliases="entity.aliases as unknown as Array<string>" />
-	<EntityTimespans v-if="entity.when" :timespans="[entity.when]" />
+	<EntityTimespans v-if="datespans.length > 0" :datespans="datespans" class="my-5" />
 
 	<div
 		v-if="isEmptyPrimaryDetails && isEmptyFurtherInformation && !isType"

@@ -15,7 +15,6 @@ const filteredRelations = computed(() => {
 		:key="`${entity.id} - ${key}`"
 		:title="key"
 		:relations="(rels ?? []).filter((r) => r != null)"
-		:show-on-map="false"
 		:entity="entity"
 	/>
 </template>

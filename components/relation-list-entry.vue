@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import * as turf from "@turf/turf";
 import { ClockIcon } from "lucide-vue-next";
 
 import type { PresentationViewModel, RelatedEntityModel } from "@/types/api";
@@ -57,6 +58,12 @@ const centroid = computed(() => {
 		props.relation.geometries.geometry?.type === "Point"
 	) {
 		return props.relation.geometries.geometry;
+	}
+	if (
+		props.relation.geometries?.type === "Feature" &&
+		props.relation.geometries.geometry?.type === "Polygon"
+	) {
+		return turf.center(turf.points(...props.relation.geometries.geometry.coordinates));
 	}
 	if (props.relation.geometries?.type === "FeatureCollection") {
 		return props.relation.geometries.features.find((a) => {
