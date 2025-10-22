@@ -79,15 +79,15 @@ const logos = project.footer.partner_logos;
 					<NuxtImg
 						:src="logo.light"
 						class="block h-8 w-auto object-contain dark:hidden"
-						:alt="logo.name"
+						alt=""
 						preload
-					></NuxtImg>
+					/>
 					<NuxtImg
 						:src="logo.dark ?? logo.light"
 						class="hidden h-8 w-auto object-contain dark:block"
-						:alt="logo.name"
+						alt=""
 						preload
-					></NuxtImg>
+					/>
 				</NuxtLink>
 			</div>
 		</div>
