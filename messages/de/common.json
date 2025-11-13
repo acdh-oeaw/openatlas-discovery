@@ -108,7 +108,8 @@
 	"EntitySidebar": {
 		"NextFeature": "Nächste Funktion",
 		"PreviousFeature": "Vorheriges Feature",
-		"copy": "Permalink",
+		"permalink": "Permalink",
+		"copy": "Permalink kopieren",
 		"copied": "Kopiert!",
 		"copiedMessage": "Der Permalink wurde erfolgreich auf das Clipboard kopiert.",
 		"download": "Download",

@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { ChevronLeftIcon, ChevronRightIcon, CopyIcon, DownloadIcon, XIcon } from "lucide-vue-next";
+import {
+	ChevronLeftIcon,
+	ChevronRightIcon,
+	CopyIcon,
+	DownloadIcon,
+	QuoteIcon,
+	XIcon,
+} from "lucide-vue-next";
 
 import { toast } from "@/components/ui/toast";
 import type { ExportEntityParams } from "@/composables/use-export-entity";
@@ -67,11 +74,17 @@ const nonEmptyRelations = computed(() => {
 	return filteredEntries.length > 0 ? Object.fromEntries(filteredEntries) : null;
 });
 
-function copyEntity() {
+const permaLink = computed(() => {
 	const fullUrl = window.location.href;
 	const baseUrl = fullUrl.split(route.path)[0];
 	if (baseUrl) {
-		return navigator.clipboard.writeText(`${baseUrl}/entity/${route.query.selection as string}`);
+		return `${baseUrl}/entity/${route.query.selection as string}`;
+	} else return null;
+});
+
+function copyEntity() {
+	if (permaLink.value) {
+		return navigator.clipboard.writeText(permaLink.value);
 	}
 	return null;
 }
@@ -127,21 +140,44 @@ async function exportEntity(format: ExportEntityParams["format"], extension: str
 						<TooltipProvider>
 							<Tooltip>
 								<TooltipTrigger>
-									<Button
-										variant="ghost"
-										class="h-full p-2"
-										@click="
-											() => {
-												toast.success(t('EntitySidebar.copied'), {
-													description: t('EntitySidebar.copiedMessage'),
-												});
-												copyEntity();
-											}
-										"
-									>
-										<span class="sr-only"> {{ t("EntitySidebar.copy") }}</span>
-										<CopyIcon :size="16" />
-									</Button>
+									<Popover>
+										<PopoverTrigger>
+											<Button variant="ghost" class="h-full p-2">
+												<span class="sr-only"> {{ t("EntitySidebar.permalink") }}</span>
+												<QuoteIcon :size="16" />
+											</Button>
+										</PopoverTrigger>
+										<PopoverContent>
+											<Label for="permaLink" class="pb-0.5 pl-0.5 text-xs text-muted-foreground">
+												{{ t("EntitySidebar.permalink") }}
+											</Label>
+											<div class="inline-flex gap-2">
+												<Input id="permaLink" :default-value="permaLink ?? ''" readonly />
+												<TooltipProvider>
+													<Tooltip>
+														<TooltipTrigger>
+															<Button
+																variant="ghost"
+																class="h-full p-2"
+																@click="
+																	() => {
+																		toast.success(t('EntitySidebar.copied'), {
+																			description: t('EntitySidebar.copiedMessage'),
+																		});
+																		copyEntity();
+																	}
+																"
+															>
+																<span class="sr-only"> {{ t("EntitySidebar.copy") }}</span>
+																<CopyIcon :size="16" />
+															</Button>
+														</TooltipTrigger>
+														<TooltipContent>{{ t("EntitySidebar.copy") }}</TooltipContent>
+													</Tooltip>
+												</TooltipProvider>
+											</div>
+										</PopoverContent>
+									</Popover>
 								</TooltipTrigger>
 								<TooltipContent>
 									<span>{{ t("EntitySidebar.copy") }}</span>
