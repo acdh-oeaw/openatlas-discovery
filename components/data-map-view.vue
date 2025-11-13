@@ -674,6 +674,7 @@ const filteredCustomIconEntries = computed(() => {
 				"
 				:category="searchFilters.category"
 				:search="searchFilters.search"
+				visualization-type="map"
 				@submit="onChangeSearchFilters"
 			/>
 		</div>

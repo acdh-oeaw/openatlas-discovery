@@ -42,7 +42,7 @@ const searchLabelId = "search-field";
 				:id="searchLabelId"
 				:default-value="props.search"
 				name="q"
-				:placeholder="t('SearchForm.search')"
+				:placeholder="t('SearchForm.networkSearch')"
 				type="search"
 			/>
 		</div>

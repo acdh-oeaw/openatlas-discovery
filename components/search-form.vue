@@ -6,6 +6,7 @@ import { categories, type Category } from "@/composables/use-get-search-results"
 export interface SearchFormData {
 	search: string;
 	category: Category;
+	visualizationType: string;
 }
 
 const props = defineProps<SearchFormData>();
@@ -66,7 +67,9 @@ const searchLabelId = "search-field";
 				:id="searchLabelId"
 				:default-value="props.search"
 				name="q"
-				:placeholder="t('SearchForm.search')"
+				:placeholder="
+					visualizationType === 'map' ? t('SearchForm.mapSearch') : t('SearchForm.search')
+				"
 				type="search"
 			/>
 		</div>

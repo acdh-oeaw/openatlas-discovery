@@ -220,6 +220,8 @@
 			"valueTypeID": "Werttyp-ID"
 		},
 		"search": "Suche",
+		"mapSearch": "Auf der Karte suchen",
+		"networkSearch": "Im Netzwerk suchen",
 		"select-filter": "Filter auswählen"
 	},
 	"SearchResultsTable": {

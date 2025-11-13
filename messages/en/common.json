@@ -220,6 +220,8 @@
 			"valueTypeID": "Value type ID"
 		},
 		"search": "Search",
+		"mapSearch": "Search the map",
+		"networkSearch": "Search the network",
 		"select-filter": "Select filter"
 	},
 	"SearchResultsTable": {
