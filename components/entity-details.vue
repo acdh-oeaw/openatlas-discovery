@@ -57,6 +57,41 @@ const combinedSystemClasses: ComputedRef<Array<[string, Array<AdditionalInfoType
 	},
 );
 
+const extendedSystemClasses = computed(() => {
+	const allowed = ["bibliography", "edition"];
+	const base = combinedSystemClasses.value.filter(([type]) => {
+		return type !== "references";
+	});
+
+	const referencesEntry = combinedSystemClasses.value.find(([type]) => {
+		return type === "references";
+	});
+
+	if (referencesEntry) {
+		const [, references] = referencesEntry;
+
+		const grouped: Record<string, Array<AdditionalInfoType>> = {};
+		for (const r of references) {
+			const systemClass = (r as AdditionalInfoType & { systemClass?: string }).systemClass;
+			if (!systemClass) continue;
+			if (!grouped[systemClass]) grouped[systemClass] = [];
+			grouped[systemClass].push(r);
+		}
+
+		for (const type of allowed) {
+			if (grouped[type]?.length) {
+				base.push([type, grouped[type]]);
+			}
+		}
+	}
+
+	base.sort(([typeA], [typeB]) => {
+		return typeA.localeCompare(typeB);
+	});
+
+	return base;
+});
+
 function getPath() {
 	if (route.path.includes("visualization")) {
 		return "visualization";
@@ -112,12 +147,12 @@ function getFilename(file: unknown) {
 </script>
 
 <template>
-	<div v-if="Object.keys(combinedSystemClasses).length > 0" class="mt-4">
+	<div v-if="Object.keys(extendedSystemClasses).length > 0" class="mt-4">
 		<h1 class="pb-4 font-semibold leading-none tracking-tight">{{ t("EntityPage.details") }}</h1>
 		<dl
 			class="grid gap-x-8 gap-y-4 sm:grid-cols-[repeat(auto-fill,minmax(min(20rem,100%),1fr))] sm:justify-start"
 		>
-			<div v-for="[relationType, relations] of combinedSystemClasses" :key="relationType">
+			<div v-for="[relationType, relations] of extendedSystemClasses" :key="relationType">
 				<dt class="text-xs font-medium uppercase tracking-wider text-muted-foreground">
 					{{ t(`SystemClassNames.${relationType}`) }}
 				</dt>
@@ -129,7 +164,7 @@ function getFilename(file: unknown) {
 							class="grid grid-cols-[1fr_auto] items-center py-1"
 						>
 							<NavLink
-								v-if="['files', 'references'].includes(relationType) && relation?.id"
+								v-if="['files', 'bibliography', 'edition'].includes(relationType) && relation?.id"
 								class="underline decoration-dotted hover:no-underline"
 								:href="{
 									path: `/${getPath()}`,
