@@ -134,6 +134,28 @@ pnpm run generate:reroute-index
 Now you can deploy the static files to a web server. The generated files are in the
 `.output/public/` directory.
 
+In case you are using a Debian based system with an Apache webserver you have to add this
+to the host configuration for permalinks to work. Adapt as needed.
+```bash
+<VirtualHost *:443>
+        ...
+        <IfModule mod_rewrite.c>
+                # Already localized? do nothing
+                RewriteCond %{REQUEST_URI} ^/(en|de)(/|$) [NC]
+                RewriteRule ^ - [L]
+
+                # Bypass static & API
+                RewriteCond %{REQUEST_URI} ^/(assets|dist|_nuxt|static|img|images|css|js|fonts|favicon\.ico|robots\.txt|sitemap\.xml|api)(/|$) [NC]
+                RewriteRule ^ - [L]
+
+                # Fallback to English
+                RewriteCond %{REQUEST_URI} ^/entity/([0-9]+)$
+                RewriteRule ^/entity/([0-9]+)$ /en/entity/%1 [R=302,L,QSA]
+        </IfModule>
+        ...
+</VirtualHost>
+```
+
 ---
 
 As a node.js server:
