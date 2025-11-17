@@ -37,6 +37,7 @@ interface AdditionalInfoType {
 	creator?: string;
 	licenseHolder?: string;
 	license?: string;
+	pages?: string;
 }
 
 const additionalInfo = computed(() => {
@@ -163,19 +164,32 @@ function getFilename(file: unknown) {
 							:key="index"
 							class="grid grid-cols-[1fr_auto] items-center py-1"
 						>
-							<NavLink
+							<div
 								v-if="['files', 'bibliography', 'edition'].includes(relationType) && relation?.id"
-								class="underline decoration-dotted hover:no-underline"
-								:href="{
-									path: `/${getPath()}`,
-									query: {
-										mode: currentMode,
-										selection: relation.id,
-									},
-								}"
 							>
-								{{ getFilename(relation) }}
-							</NavLink>
+								<NavLink
+									class="underline decoration-dotted hover:no-underline"
+									:href="{
+										path: `/${getPath()}`,
+										query: {
+											mode: currentMode,
+											selection: relation.id,
+										},
+									}"
+								>
+									{{ getFilename(relation) }}
+								</NavLink>
+								<span
+									v-if="
+										(relation.pages !== '' || relation.pages != null) &&
+										!['files'].includes(relationType)
+									"
+									class="text-xs text-muted-foreground"
+								>
+									<span> {{ relation.pages?.includes("-") ? ", pp." : ", p." }} </span>
+									{{ relation.pages }}
+								</span>
+							</div>
 							<NavLink
 								v-else-if="relation?.identifier"
 								class="underline decoration-dotted hover:no-underline"
