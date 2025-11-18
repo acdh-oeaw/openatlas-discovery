@@ -91,6 +91,7 @@
 		"egoNetwork": "Ego-Network",
 		"networkDepth": "Network-Depth",
 		"networkLegend": "Network-Legend",
+		"egoNetworkOrphan": "This entity has no connections.",
 		"sidebar": {
 			"toggle": "Toggle details for {title}"
 		},

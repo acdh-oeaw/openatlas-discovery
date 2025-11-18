@@ -11,6 +11,8 @@ const props = defineProps<{
 		title?: string;
 		url?: string;
 	}>;
+	height: number;
+	width: number;
 }>();
 
 const api = ref<CarouselApi>();
@@ -44,17 +46,17 @@ const currentImage = computed(() => {
 </script>
 
 <template>
-	<div class="relative">
-		<Carousel v-if="!show" @init-api="setApi">
+	<div :style="{ width: props.width + 'px', height: props.height + 'px' }">
+		<Carousel v-if="!show" class="relative flex size-full" @init-api="setApi">
 			<CarouselPrevious
 				v-if="props.images.length > 1"
 				class="z-20 ml-14 bg-white opacity-90 dark:bg-black"
 			/>
-			<CarouselContent>
-				<CarouselItem v-for="(image, index) of props.images" :key="index" class="h-full">
-					<Card class="pb-3">
-						<figure class="grid aspect-video h-full grid-rows-[1fr_auto] gap-y-1.5 overflow-hidden">
-							<div class="relative">
+			<CarouselContent class="size-full">
+				<CarouselItem v-for="(image, index) of props.images" :key="index" class="">
+					<Card class="relative flex size-full">
+						<figure class="relative grid size-full grid-rows-[1fr_auto] gap-y-1.5">
+							<div class="relative flex size-full">
 								<img alt="" class="absolute size-full object-contain" :src="image.url" />
 							</div>
 							<figcaption class="justify-self-center">{{ image.license }}</figcaption>

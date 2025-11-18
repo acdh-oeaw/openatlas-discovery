@@ -111,7 +111,9 @@ const container = "--container-width: 1536px;";
 
 		<AppHeader />
 		<ErrorBoundary>
-			<slot />
+			<TooltipProvider>
+				<slot />
+			</TooltipProvider>
 		</ErrorBoundary>
 		<AppFooter />
 

@@ -180,7 +180,7 @@ async function exportEntity(format: ExportEntityParams["format"], extension: str
 									</Popover>
 								</TooltipTrigger>
 								<TooltipContent>
-									<span>{{ t("EntitySidebar.copy") }}</span>
+									<span>{{ t("EntitySidebar.permalink") }}</span>
 								</TooltipContent>
 							</Tooltip>
 							<Tooltip>

@@ -16,12 +16,13 @@ const getRelationTitle = (relation: RelationType) => {
 const { getUnprefixedId } = useIdPrefix();
 const requestURL = useRequestURL();
 const t = useTranslations();
+const route = useRoute();
 
 const props = defineProps<{
 	entity: PresentationViewModel;
 }>();
 
-interface Image {
+export interface Image {
 	id: number;
 	IIIFManifest: string | undefined;
 	license: string | undefined;
@@ -113,7 +114,6 @@ interface Place {
 
 // TODO: For instances where there is no location set (at least for actors), make use of first and last event if no places are available
 const places = computed(() => {
-	console.log(props.entity);
 	return props.entity.relations?.place?.reduce((acc: Array<Place>, relatedPlace) => {
 		if (relatedPlace?.systemClass !== "object_location") return acc;
 		if (!relatedPlace.title || !relatedPlace.id || !relatedPlace.relationTypes) return acc;
@@ -170,6 +170,17 @@ const tabs = computed(() => {
 		});
 	}
 	return tabs;
+});
+
+const egoNetworkContainsOrphan = computed(() => {
+	const exclude = project.network.excludeSystemClasses;
+	const relations = props.entity.relations ?? {};
+
+	const validRelations = Object.entries(relations).filter(([key, value]) => {
+		return !exclude.includes(key) && Array.isArray(value) && value.length > 0;
+	});
+
+	return validRelations.length === 0;
 });
 
 const detailViewConfig = computed(() => {
@@ -283,6 +294,25 @@ const datespans = computed(() => {
 
 	return datespans;
 });
+
+const selectedTab = ref<number | string>("");
+
+watch(
+	() => {
+		return route.query.selection;
+	},
+	() => {
+		if (
+			tabs.value[0]?.id == null ||
+			(tabs.value[0]?.id === "ego-network" && egoNetworkContainsOrphan.value)
+		) {
+			selectedTab.value = "";
+			return;
+		}
+		selectedTab.value = tabs.value[0]?.id ?? "";
+	},
+	{ immediate: true },
+);
 </script>
 
 <template>
@@ -312,11 +342,38 @@ const datespans = computed(() => {
 			/>
 		</div>
 
-		<Tabs v-if="tabs.length > 0" v-model="defaultTab" :default-value="defaultTab">
+		<Tabs
+			v-if="tabs.length > 0"
+			:class="`${tabs[0]?.id === 'ego-network' && egoNetworkContainsOrphan ? '' : 'max-h-96'}`"
+			:model-value="selectedTab"
+			@update:model-value="
+				(id) => {
+					if (id === 'ego-network' && egoNetworkContainsOrphan) {
+						return;
+					}
+
+					selectedTab = id;
+				}
+			"
+		>
 			<TabsList>
-				<TabsTrigger v-for="tab of tabs" :key="tab.id" :value="tab.id">
-					{{ tab.label }}
-				</TabsTrigger>
+				<template v-for="tab of tabs" :key="tab.id">
+					<TabsTrigger
+						v-if="!(tab.id === 'ego-network' && egoNetworkContainsOrphan)"
+						:value="tab.id"
+					>
+						<span>{{ tab.label }}</span>
+					</TabsTrigger>
+
+					<Tooltip v-else>
+						<TooltipTrigger as-child>
+							<TabsTrigger :value="tab.id" class="cursor-default opacity-30" aria-disabled="true">
+								<span>{{ tab.label }}</span>
+							</TabsTrigger>
+						</TooltipTrigger>
+						<TooltipContent> {{ t("EntityPage.egoNetworkOrphan") }} </TooltipContent>
+					</Tooltip>
+				</template>
 			</TabsList>
 			<!-- TODO: keep map alive -->
 			<TabsContent v-for="tab of tabs" :key="tab.id" :value="tab.id">
@@ -337,6 +394,8 @@ const datespans = computed(() => {
 							v-if="tab.id === 'images' && images && images.length > 0"
 							class="overflow-hidden"
 							:images="images"
+							:height="height"
+							:width="width"
 						/>
 
 						<EntityTypeDistribution
