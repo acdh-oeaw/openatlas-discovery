@@ -225,7 +225,8 @@ const typeTree = computed(() => {
 
 const superTypes: typeof filteredTypes = computed(() => {
 	const currentType = typeTree.value[String(props.entity.id) as keyof TypeTreeModel["typeTree"]];
-
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+	if (!currentType) return [];
 	const hierarchy = currentType.root.map((entry) => {
 		return typeTree.value[String(entry) as keyof TypeTreeModel["typeTree"]];
 	});
