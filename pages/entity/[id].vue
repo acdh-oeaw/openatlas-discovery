@@ -131,7 +131,7 @@ const typesById = computed(() => {
 
 const egoNetworkContainsOrphan = computed(() => {
 	const exclude = project.network.excludeSystemClasses;
-	const relations = props.entity.relations ?? {};
+	const relations = entity.value?.relations ?? {};
 
 	const validRelations = Object.entries(relations).filter(([key, value]) => {
 		return !exclude.includes(key) && Array.isArray(value) && value.length > 0;
