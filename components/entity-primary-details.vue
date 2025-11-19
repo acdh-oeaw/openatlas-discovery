@@ -16,7 +16,6 @@ const getRelationTitle = (relation: RelationType) => {
 const { getUnprefixedId } = useIdPrefix();
 const requestURL = useRequestURL();
 const t = useTranslations();
-const route = useRoute();
 
 const props = defineProps<{
 	entity: PresentationViewModel;
@@ -133,16 +132,27 @@ const places = computed(() => {
 	}, []);
 });
 
-watchEffect(() => {
-	if (!places.value || places.value.length === 0) return;
-	const relTypes = places.value.map((place) => {
-		return place.relationType;
-	});
-	for (const type of relTypes) {
-		if (type) handledRelations.add(type);
-	}
-	emitHandledRelations([]);
-});
+watch(
+	() => {
+		return places.value;
+	},
+	(newPlaces) => {
+		if (!newPlaces || newPlaces.length === 0) return;
+
+		const relTypes = newPlaces.map((place) => {
+			return place.relationType;
+		});
+
+		for (const type of relTypes) {
+			if (type) handledRelations.add(type);
+		}
+
+		emitHandledRelations([]);
+	},
+	{ immediate: true },
+);
+
+const egoNetworkContainsOrphan = ref(true);
 
 const tabs = computed(() => {
 	const tabs = [];
@@ -170,17 +180,6 @@ const tabs = computed(() => {
 		});
 	}
 	return tabs;
-});
-
-const egoNetworkContainsOrphan = computed(() => {
-	const exclude = project.network.excludeSystemClasses;
-	const relations = props.entity.relations ?? {};
-
-	const validRelations = Object.entries(relations).filter(([key, value]) => {
-		return !exclude.includes(key) && Array.isArray(value) && value.length > 0;
-	});
-
-	return validRelations.length === 0;
 });
 
 const detailViewConfig = computed(() => {
@@ -270,17 +269,6 @@ const isType = computed(() => {
 	return props.entity.systemClass === "type";
 });
 
-const defaultTab = ref();
-watch(
-	() => {
-		return tabs.value;
-	},
-	() => {
-		defaultTab.value = tabs.value[0]?.id;
-	},
-	{ immediate: true },
-);
-
 const datespans = computed(() => {
 	const datespans: Array<{ start: string | null; end: string | null }> = [];
 	if (props.entity.when == null) return datespans;
@@ -300,9 +288,18 @@ const selectedTab = ref<number | string>("");
 
 watch(
 	() => {
-		return route.query.selection;
+		return props.entity;
 	},
 	() => {
+		if (props.entity.relations) {
+			const exclude = project.network.excludeSystemClasses;
+			const relations = props.entity.relations ?? {};
+			egoNetworkContainsOrphan.value =
+				Object.entries(relations).filter(([key, value]) => {
+					return !exclude.includes(key) && Array.isArray(value) && value.length > 0;
+				}).length === 0;
+		}
+
 		if (
 			tabs.value[0]?.id == null ||
 			(tabs.value[0]?.id === "ego-network" && egoNetworkContainsOrphan.value)
@@ -312,8 +309,16 @@ watch(
 		}
 		selectedTab.value = tabs.value[0]?.id ?? "";
 	},
-	{ immediate: true },
+	{ immediate: true, flush: "post" },
 );
+
+onMounted(async () => {
+	await nextTick();
+	if (tabs.value[0]?.id === "ego-network" && egoNetworkContainsOrphan.value) {
+		return;
+	}
+	selectedTab.value = tabs.value[0]?.id ?? "";
+});
 </script>
 
 <template>
