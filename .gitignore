@@ -35,7 +35,7 @@ dist
 /test-results/
 
 # generated api-client
-/lib/api-client/api.ts
+lib/api-client/api.ts
 
 # generated content
 /messages/*/crm.json

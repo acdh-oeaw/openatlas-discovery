@@ -2,13 +2,15 @@ import { useQuery } from "@tanstack/vue-query";
 
 import type { operations } from "@/lib/api-client/api";
 
-export interface GetEgoNetworkDataParams
-	extends NonNullable<operations["GetEgoNetworkVisualisation"]["parameters"]["query"]> {
+export interface GetEgoNetworkDataParams extends NonNullable<
+	operations["GetEgoNetworkVisualisation"]["parameters"]["query"]
+> {
 	id: number;
 }
 
-export interface GetEgoNetworkDataResponse
-	extends NonNullable<operations["GetEgoNetworkVisualisation"]["responses"]["200"]> {}
+export interface GetEgoNetworkDataResponse extends NonNullable<
+	operations["GetEgoNetworkVisualisation"]["responses"]["200"]
+> {}
 
 export function useGetEgoNetworkData(params: MaybeRef<GetEgoNetworkDataParams>) {
 	const api = useApiClient();

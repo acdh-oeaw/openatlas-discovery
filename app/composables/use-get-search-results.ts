@@ -95,8 +95,10 @@ export const searchFilterString = v.pipe(
 
 export type SearchFilter = v.InferOutput<typeof searchFilter>;
 
-export interface GetSearchResultsParams
-	extends Omit<NonNullable<operations["GetQuery"]["parameters"]["query"]>, "format" | "search"> {
+export interface GetSearchResultsParams extends Omit<
+	NonNullable<operations["GetQuery"]["parameters"]["query"]>,
+	"format" | "search"
+> {
 	/**
 	 * We only support the default "Linked Places" format. The various geojson formats supported by
 	 * the backend only exist for legacy usecases. Also, consistently using one format should

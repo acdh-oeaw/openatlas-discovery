@@ -2,11 +2,13 @@ import { useQuery } from "@tanstack/vue-query";
 
 import type { operations } from "@/lib/api-client/api";
 
-export interface GetNetworkDataParams
-	extends NonNullable<operations["GetNetworkVisualisation"]["parameters"]["query"]> {}
+export interface GetNetworkDataParams extends NonNullable<
+	operations["GetNetworkVisualisation"]["parameters"]["query"]
+> {}
 
-export interface GetNetworkDataResponse
-	extends NonNullable<operations["GetNetworkVisualisation"]["responses"]["200"]> {}
+export interface GetNetworkDataResponse extends NonNullable<
+	operations["GetNetworkVisualisation"]["responses"]["200"]
+> {}
 
 export function useGetNetworkData(params: MaybeRef<GetNetworkDataParams>) {
 	const api = useApiClient();

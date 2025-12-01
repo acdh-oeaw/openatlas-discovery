@@ -2,8 +2,7 @@
 import type { NuxtLinkProps } from "#app";
 
 export interface NavLinkProps
-	extends Omit<NuxtLinkProps, "href" | "to">,
-		Required<Pick<NuxtLinkProps, "href">> {}
+	extends Omit<NuxtLinkProps, "href" | "to">, Required<Pick<NuxtLinkProps, "href">> {}
 
 const props = defineProps<NavLinkProps>();
 

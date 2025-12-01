@@ -4,8 +4,9 @@ import { useCreateEntity } from "@/composables/use-create-entity";
 import type { operations } from "@/lib/api-client/api";
 import type { LinkedPlace } from "@/types/api";
 
-export interface GetSystemClassParams
-	extends NonNullable<operations["GetBySystemClass"]["parameters"]["path"]> {}
+export interface GetSystemClassParams extends NonNullable<
+	operations["GetBySystemClass"]["parameters"]["path"]
+> {}
 
 export type GetSystemClassQueryParams = operations["GetBySystemClass"]["parameters"]["query"];
 

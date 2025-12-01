@@ -46,6 +46,7 @@ async function initializeMirador() {
 	const windows = props.images.map((url) => {
 		return { manifestId: url };
 	});
+	console.log(Mirador);
 
 	miradorInstance.value =
 		Mirador.viewer({

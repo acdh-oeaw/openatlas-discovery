@@ -3,15 +3,16 @@ import { useQuery } from "@tanstack/vue-query";
 import type { operations, paths } from "@/lib/api-client/api";
 import type { PresentationViewModel } from "@/types/api";
 
-export interface GetEntityParams
-	extends NonNullable<operations["GetEntity"]["parameters"]["path"]> {}
+export interface GetEntityParams extends NonNullable<
+	operations["GetEntity"]["parameters"]["path"]
+> {}
 
-export interface GetEntityQueryParams
-	extends NonNullable<
-		paths["/entity_presentation_view/{entityId}"]["get"]["parameters"]["query"]
-	> {}
-export interface GetLinkedEntitiesParams
-	extends NonNullable<operations["GetEntitiesLinkedToEntity"]["parameters"]["path"]> {}
+export interface GetEntityQueryParams extends NonNullable<
+	paths["/entity_presentation_view/{entityId}"]["get"]["parameters"]["query"]
+> {}
+export interface GetLinkedEntitiesParams extends NonNullable<
+	operations["GetEntitiesLinkedToEntity"]["parameters"]["path"]
+> {}
 
 export type GetEntityResponse = PresentationViewModel;
 

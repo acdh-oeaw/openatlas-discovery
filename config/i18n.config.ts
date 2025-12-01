@@ -5,7 +5,7 @@ import type projectDe from "@/messages/de/project.json";
 import type en from "@/messages/en/common.json";
 import type projectEn from "@/messages/en/project.json";
 
-import { project } from "../config/project.config";
+import { project } from "./project.config";
 
 export const locales = ["de", "en"] as const;
 

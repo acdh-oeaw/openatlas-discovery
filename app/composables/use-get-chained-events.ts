@@ -7,8 +7,9 @@ export interface GetChainedEventsParams {
 	entityId: number | null;
 }
 
-export interface GetChainedEventsResponse
-	extends NonNullable<operations["GetChainedEvents"]["responses"]["200"]> {}
+export interface GetChainedEventsResponse extends NonNullable<
+	operations["GetChainedEvents"]["responses"]["200"]
+> {}
 
 export function useGetChainedEvents(params: MaybeRef<GetChainedEventsParams>) {
 	const api = useApiClient();

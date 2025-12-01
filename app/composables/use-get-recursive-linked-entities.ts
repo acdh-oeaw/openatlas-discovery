@@ -6,8 +6,9 @@ export interface GetLinkedEntitiesRecursiveParams {
 	entityId: number | null;
 }
 
-export interface GetLinkedEntitiesRecursiveResponse
-	extends NonNullable<operations["GetLinkedEntitiesByPropertyRecursive"]["responses"]["200"]> {}
+export interface GetLinkedEntitiesRecursiveResponse extends NonNullable<
+	operations["GetLinkedEntitiesByPropertyRecursive"]["responses"]["200"]
+> {}
 
 export function useGetLinkedEntitiesRecursive(params: MaybeRef<GetLinkedEntitiesRecursiveParams>) {
 	const api = useApiClient();
