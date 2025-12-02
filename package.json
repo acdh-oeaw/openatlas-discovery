@@ -118,6 +118,7 @@
 		"@acdh-oeaw/tsconfig": "^1.5.1",
 		"@nuxt/devtools": "^3.1.1",
 		"@playwright/test": "^1.57.0",
+		"@tailwindcss/postcss": "^4.1.17",
 		"@tanstack/eslint-plugin-query": "^5.91.2",
 		"@types/geojson": "^7946.0.16",
 		"@types/node": "^24.10.1",
