@@ -14,7 +14,7 @@ export function getGitInfo() {
 			tag,
 		};
 	} catch (error) {
-		log.error("Failed to get git info, using fallback values.");
+		log.error("Failed to get git info, using fallback values.", error);
 
 		return {
 			branchName: "development",

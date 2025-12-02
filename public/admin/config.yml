@@ -1769,22 +1769,24 @@ collections:
                 label: >-
                   Which system classes should this custom configuration apply to?
                 hint: >-
-                  If none is selected, this config will affect all system classes that do not have a
-                  dedicated config
+                  If none is selected, this config will affect all system
+                  classes that do not have a dedicated config
                 widget: select
                 multiple: true
                 options: *ref_0
                 default: []
               - name: primarySystemClasses
                 label: >-
-                  Configure which system classes should be highlighted in the detail view
+                  Configure which system classes should be highlighted in the
+                  detail view
                 widget: select
                 multiple: true
                 options: *ref_0
                 default: *ref_0
               - name: customOrdering
                 label: >-
-                  Which system classes should be at the top of the highlighted list?
+                  Which system classes should be at the top of the highlighted
+                  list?
                 widget: list
                 label_singular: Add a system class
                 summary: "{{ fields.systemClass }}"
@@ -1798,7 +1800,8 @@ collections:
                   required: true
               - name: furtherSystemClasses
                 label: >-
-                  Configure which system classes should be displayed in a simple list
+                  Configure which system classes should be displayed in a simple
+                  list
                 widget: select
                 multiple: true
                 options: *ref_0
@@ -1808,7 +1811,8 @@ collections:
                   - references
               - name: excludeTypeIds
                 label: >-
-                  Configure which type ids should be excluded from the detail view
+                  Configure which type ids should be excluded from the detail
+                  view
                 widget: list
                 default: []
           - name: map
@@ -1834,7 +1838,8 @@ collections:
 
               - name: mapDisplayedSystemClasses
                 label: >-
-                  Configure which system classes with coordinates are displayed on the map
+                  Configure which system classes with coordinates are displayed
+                  on the map
                 widget: select
                 multiple: true
                 options:
@@ -1886,7 +1891,8 @@ collections:
                         widget: color
                   - name: arcThickness
                     label: >-
-                      Configure if overlaying arcs should be displayed with thicker lines
+                      Configure if overlaying arcs should be displayed with
+                      thicker lines
                     widget: boolean
                     default: false
           - name: network
@@ -1895,7 +1901,8 @@ collections:
             fields:
               - name: excludeSystemClasses
                 label: >-
-                  Configure which system classes should be excluded from the network
+                  Configure which system classes should be excluded from the
+                  network
                 widget: select
                 multiple: true
                 options: *ref_0
@@ -2055,7 +2062,7 @@ collections:
             "heading-six",
             "bulleted-list",
             "numbered-list",
-            "quote",
+            "quote"
           ]
   - name: team
     label: Team

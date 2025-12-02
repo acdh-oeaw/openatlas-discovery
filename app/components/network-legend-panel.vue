@@ -27,8 +27,8 @@ const emit = defineEmits<{
 }>();
 
 const checkedSystemClasses = ref<Record<string, boolean>>({});
-let showLegend = ref(false);
-let showDepth = ref(false);
+const showLegend = ref(false);
+const showDepth = ref(false);
 
 watch(
 	() => {
@@ -203,7 +203,7 @@ watch(
 
 				<DropdownMenuContent
 					align="end"
-					class="absolute left-auto right-0 top-auto -mr-1 mt-12 min-w-fit transform-none"
+					class="absolute top-auto right-0 left-auto mt-12 -mr-1 min-w-fit transform-none"
 					portal-to="#ego-network-legend"
 				>
 					<DropdownMenuItem v-for="(x, index) in 5" :key="index">

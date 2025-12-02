@@ -127,7 +127,7 @@ function download(file: AdditionalInfoType) {
 			return response.blob();
 		})
 		.then((blob) => {
-			let blobUrl = window.URL.createObjectURL(blob);
+			const blobUrl = window.URL.createObjectURL(blob);
 			forceDownload(blobUrl, filename);
 		})
 		.catch((e: unknown) => {
@@ -149,12 +149,12 @@ function getFilename(file: unknown) {
 
 <template>
 	<div v-if="Object.keys(extendedSystemClasses).length > 0" class="mt-4">
-		<h1 class="pb-4 font-semibold leading-none tracking-tight">{{ t("EntityPage.details") }}</h1>
+		<h1 class="pb-4 leading-none font-semibold tracking-tight">{{ t("EntityPage.details") }}</h1>
 		<dl
 			class="grid gap-x-8 gap-y-4 sm:grid-cols-[repeat(auto-fill,minmax(min(20rem,100%),1fr))] sm:justify-start"
 		>
 			<div v-for="[relationType, relations] of extendedSystemClasses" :key="relationType">
-				<dt class="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+				<dt class="text-xs font-medium tracking-wider text-muted-foreground uppercase">
 					{{ t(`SystemClassNames.${relationType}`) }}
 				</dt>
 				<dd>

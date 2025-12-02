@@ -13,7 +13,7 @@ const { error, formItemId } = useFormField();
 	<Label
 		:class="
 			cn(
-				'block text-sm tracking-tight font-medium text-foreground text-left',
+				'block text-left text-sm font-medium tracking-tight text-foreground',
 				error && 'text-destructive',
 				$attrs.class ?? '',
 			)

@@ -2,7 +2,7 @@ name: Validate
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-validate
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 on:
   pull_request:
@@ -17,7 +17,7 @@ on:
 jobs:
   changes:
     name: Check changed files
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     outputs:
       src: ${{ steps.filter.outputs.src }}
@@ -44,29 +44,30 @@ jobs:
       fail-fast: true
       matrix:
         node-version: [24.x]
-        os: [ubuntu-latest]
+        os: [ubuntu-24.04]
+
+    env:
+      NUXT_PUBLIC_API_BASE_URL: "${{ vars.NUXT_PUBLIC_API_BASE_URL }}"
+      NUXT_PUBLIC_APP_BASE_URL: "http://localhost:3000"
+      NUXT_PUBLIC_DATABASE: "${{ vars.NUXT_PUBLIC_DATABASE }}"
+      NUXT_PUBLIC_OPENAPI_BASE_URL: "${{ vars.NUXT_PUBLIC_OPENAPI_BASE_URL }}"
+      NUXT_PUBLIC_REDMINE_ID: "${{ vars.SERVICE_ID }}"
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      # Necessary because `actions/setup-node` does not yet support `corepack`.
-      # @see https://github.com/actions/setup-node/issues/531
       - name: Install pnpm
         uses: pnpm/action-setup@v4
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
           cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        env:
-          NUXT_PUBLIC_API_BASE_URL: "${{ vars.NUXT_PUBLIC_API_BASE_URL }}"
-          NUXT_PUBLIC_DATABASE: "${{ vars.NUXT_PUBLIC_DATABASE }}"
-          NUXT_PUBLIC_OPENAPI_BASE_URL: "${{ vars.NUXT_PUBLIC_OPENAPI_BASE_URL }}"
 
       - name: Format
         run: pnpm run format:fix
@@ -101,19 +102,11 @@ jobs:
 
       - name: Build app
         run: pnpm run build
-        env:
-          NUXT_PUBLIC_API_BASE_URL: "${{ vars.NUXT_PUBLIC_API_BASE_URL }}"
-          NUXT_PUBLIC_APP_BASE_URL: "http://localhost:3000"
-          NUXT_PUBLIC_DATABASE: "${{ vars.NUXT_PUBLIC_DATABASE }}"
-          NUXT_PUBLIC_OPENAPI_BASE_URL: "${{ vars.NUXT_PUBLIC_OPENAPI_BASE_URL }}"
-          NUXT_PUBLIC_REDMINE_ID: "${{ vars.SERVICE_ID }}"
 
       - name: Run e2e tests
         run: pnpm run test:e2e
-        env:
-          NUXT_PUBLIC_APP_BASE_URL: "http://localhost:3000"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: always()
         with:
           name: playwright-report
@@ -125,7 +118,7 @@ jobs:
     # @see https://github.com/orgs/community/discussions/45058
     if: ${{ github.event_name == 'push' && !failure() && !cancelled() }}
     needs: [validate]
-    uses: ./.github/workflows/build-deploy.yml
+    uses: ./.github/workflows/build-deploy.yaml
     secrets: inherit
     # https://docs.github.com/en/actions/using-workflows/reusing-workflows#access-and-permissions
     permissions:

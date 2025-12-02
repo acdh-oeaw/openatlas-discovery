@@ -19,7 +19,6 @@ usePageMetadata({
 const route = useRoute();
 
 const currentMode = computed(() => {
-	console.log(route.query.mode);
 	return route.query.mode;
 });
 </script>

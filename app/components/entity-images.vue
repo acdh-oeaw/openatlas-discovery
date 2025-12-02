@@ -19,7 +19,7 @@ const api = ref<CarouselApi>();
 const current = ref(0);
 
 const t = useTranslations();
-let show = ref(false);
+const show = ref(false);
 
 function toggleIIIF() {
 	show.value = !show.value;
@@ -70,7 +70,7 @@ const currentImage = computed(() => {
 			/>
 		</Carousel>
 		<EntityMiradorViewer v-if="show && currentImage" :images="[currentImage]" />
-		<Toggle variant="iiif" class="absolute bottom-0 right-0 z-10 m-4" @click="toggleIIIF">
+		<Toggle variant="iiif" class="absolute right-0 bottom-0 z-10 m-4" @click="toggleIIIF">
 			{{ t("EntityPage.iiif") }}
 		</Toggle>
 	</div>

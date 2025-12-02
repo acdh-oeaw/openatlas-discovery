@@ -77,7 +77,7 @@ const currentMode = computed(() => {
 
 					<ContentRenderer
 						v-if="content.leadIn != null"
-						class="prose prose-lg max-w-3xl text-balance text-center"
+						class="prose prose-lg max-w-3xl text-center text-balance"
 						:value="content.leadIn"
 					>
 						<template #empty></template>
@@ -104,7 +104,7 @@ const currentMode = computed(() => {
 			<div>
 				<ContentRenderer
 					v-if="content != null"
-					class="prose mx-auto w-full max-w-3xl"
+					class="mx-auto prose w-full max-w-3xl"
 					:value="content"
 				>
 					<template #empty></template>

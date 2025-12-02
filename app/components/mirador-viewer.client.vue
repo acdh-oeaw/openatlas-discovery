@@ -38,7 +38,7 @@ function changeMode(mode: string) {
 // }
 const prevFullscreen = ref(false);
 
-let miradorInstance = ref<MiradorViewerInstance | null>(null);
+const miradorInstance = ref<MiradorViewerInstance | null>(null);
 
 async function initializeMirador() {
 	await nextTick();

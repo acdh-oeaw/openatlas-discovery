@@ -1,0 +1,12 @@
+# package manager lock file
+pnpm-lock.yaml
+pnpm-workspace.yaml
+
+# content
+/content
+
+# public assets
+/public
+
+# generated api client
+/app/lib/api-client/api.ts

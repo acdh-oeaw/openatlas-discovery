@@ -11,7 +11,7 @@ const props = defineProps<LabelProps & { class?: ClassValue }>();
 	<!-- eslint-disable-next-line vuejs-accessibility/label-has-for -->
 	<Label
 		v-bind="props"
-		:class="cn('block text-sm tracking-tight font-medium text-foreground text-left', props.class)"
+		:class="cn('block text-left text-sm font-medium tracking-tight text-foreground', props.class)"
 	>
 		<slot />
 	</Label>

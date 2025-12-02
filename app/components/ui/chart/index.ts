@@ -1,7 +1,7 @@
-export { default as ChartCrosshair } from "../../../../components/ui/chart/ChartCrosshair.vue";
-export { default as ChartLegend } from "../../../../components/ui/chart/ChartLegend.vue";
-export { default as ChartSingleTooltip } from "../../../../components/ui/chart/ChartSingleTooltip.vue";
-export { default as ChartTooltip } from "../../../../components/ui/chart/ChartTooltip.vue";
+export { default as ChartCrosshair } from "@/components/ui/chart/ChartCrosshair.vue";
+export { default as ChartLegend } from "@/components/ui/chart/ChartLegend.vue";
+export { default as ChartSingleTooltip } from "@/components/ui/chart/ChartSingleTooltip.vue";
+export { default as ChartTooltip } from "@/components/ui/chart/ChartTooltip.vue";
 
 export function defaultColors(count = 3) {
 	const quotient = Math.floor(count / 2);
@@ -9,6 +9,7 @@ export function defaultColors(count = 3) {
 
 	const primaryCount = quotient + remainder;
 	const secondaryCount = quotient;
+
 	return [
 		...Array.from(new Array(primaryCount).keys()).map((i) => {
 			return `hsl(var(--vis-primary-color) / ${String(1 - (1 / primaryCount) * i)})`;
@@ -19,4 +20,4 @@ export function defaultColors(count = 3) {
 	];
 }
 
-export * from "./interface";
+export type * from "./interface";

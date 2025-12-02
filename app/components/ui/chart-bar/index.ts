@@ -2,7 +2,7 @@
 
 import type { Spacing } from "@unovis/ts";
 
-export { default as BarChart } from "../../../../components/ui/chart-bar/BarChart.vue";
+export { default as BarChart } from "@/components/ui/chart-bar/BarChart.vue";
 
 type KeyOf<T extends Record<string, any>> = Extract<keyof T, string>;
 

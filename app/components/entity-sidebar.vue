@@ -117,7 +117,7 @@ async function exportEntity(format: ExportEntityParams["format"], extension: str
 <template>
 	<div v-if="entity != null && props.id != null">
 		<div
-			class="group z-20 mb-2 mr-2 flex h-full bg-white transition-all duration-300 ease-in-out"
+			class="group z-20 mr-2 mb-2 flex h-full bg-white transition-all duration-300 ease-in-out"
 			:style="
 				noTableSidebar
 					? {
@@ -230,7 +230,7 @@ async function exportEntity(format: ExportEntityParams["format"], extension: str
 				/>
 			</div>
 			<button
-				class="absolute left-full top-1/2 -z-10 block -translate-x-2 rounded-md bg-[hsl(var(--card))] py-2 pl-1 shadow-md"
+				class="absolute top-1/2 left-full -z-10 block -translate-x-2 rounded-md bg-[hsl(var(--card))] py-2 pl-1 shadow-md"
 				style="top: calc(50% - 40px)"
 				@click="expandedState = !expandedState"
 			>

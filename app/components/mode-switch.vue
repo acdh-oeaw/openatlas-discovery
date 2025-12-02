@@ -27,8 +27,8 @@ function getPath() {
 	return "";
 }
 
-let hasPlace = ref(true);
-let inNetwork = ref(true);
+const hasPlace = ref(true);
+const inNetwork = ref(true);
 
 const { data } = useGetEntity(
 	computed(() => {

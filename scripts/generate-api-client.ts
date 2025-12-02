@@ -40,7 +40,7 @@ async function generate() {
 		arrayLength: true,
 	});
 	const content = astToString(ast);
-	const folderPath = join(process.cwd(), "lib", "api-client");
+	const folderPath = join(process.cwd(), "app", "lib", "api-client");
 	await mkdir(folderPath, { recursive: true });
 	await writeFile(join(folderPath, "api.ts"), content, { encoding: "utf-8" });
 

@@ -46,7 +46,7 @@ useHead({
 				<div>
 					<ContentRenderer
 						v-if="content != null"
-						class="prose mx-auto w-full max-w-3xl text-center"
+						class="mx-auto prose w-full max-w-3xl text-center"
 						:value="content"
 					>
 						<template #empty></template>

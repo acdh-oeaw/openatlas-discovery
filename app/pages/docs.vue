@@ -39,7 +39,7 @@ function updateHashUrl() {
 watch(currentHash, () => {
 	const location = window.location.toString().split("#")[0];
 	if (location && currentHash.value)
-		history.replaceState(null, "", location + "#" + currentHash.value);
+		history.replaceState(null, "", `${location}#${currentHash.value}`);
 });
 onMounted(() => {
 	document.body.addEventListener("scroll", updateHashUrl);

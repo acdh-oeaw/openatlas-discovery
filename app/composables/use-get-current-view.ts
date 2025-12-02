@@ -1,12 +1,12 @@
-import { z } from "zod";
+import * as v from "valibot";
 
-const viewSchema = z.enum(["map", "network"]).catch("map");
+const viewSchema = v.fallback(v.picklist(["map", "network"]), "map");
 
 export function useGetCurrentView() {
 	const route = useRoute();
 
 	return computed(() => {
-		const view = viewSchema.parse(route.path.split("/").pop());
+		const view = v.parse(viewSchema, route.path.split("/").pop());
 		return view;
 	});
 }

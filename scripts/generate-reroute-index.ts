@@ -1,16 +1,16 @@
 import { log } from "@acdh-oeaw/lib";
 import fs from "fs";
 
-import { defaultLocale, localesMap } from "@/config/i18n.config";
+import { defaultLocale, locales } from "../app/config/i18n.config";
 
 log.info("Generating prerender index");
 
 const dir = "./.output/public/";
 
-if (Object.keys(localesMap).length <= 1) {
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+if (locales.length <= 1) {
 	log.info("Single or no locales found, skipping reroute index generation");
-}
-if (Object.keys(localesMap).length > 1) {
+} else {
 	log.info("Multiple locales found, generating reroute index");
 	const indexString = `<!DOCTYPE html>
 	<html>
@@ -23,6 +23,7 @@ if (Object.keys(localesMap).length > 1) {
 		fs.mkdirSync(dir, { recursive: true });
 	}
 
-	fs.writeFileSync(dir + "/index.html", indexString);
+	fs.writeFileSync(`${dir}/index.html`, indexString);
+
 	log.success("Reroute index generated");
 }

@@ -34,7 +34,7 @@ const datespans = computed(() => {
 				<dl class="flex grow-0 flex-col">
 					<div v-if="timespan.start != null" class="text-start">
 						<dt
-							class="mr-2 inline text-xs font-medium uppercase tracking-wider text-muted-foreground"
+							class="mr-2 inline text-xs font-medium tracking-wider text-muted-foreground uppercase"
 						>
 							{{ t("TimespansDisplay.start") }}
 						</dt>
@@ -42,7 +42,7 @@ const datespans = computed(() => {
 					</div>
 					<div v-if="timespan.end != null" class="text-start">
 						<dt
-							class="mr-2 inline text-xs font-medium uppercase tracking-wider text-muted-foreground"
+							class="mr-2 inline text-xs font-medium tracking-wider text-muted-foreground uppercase"
 						>
 							{{ t("TimespansDisplay.end") }}
 						</dt>

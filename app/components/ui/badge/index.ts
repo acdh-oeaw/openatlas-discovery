@@ -1,6 +1,6 @@
 import { variants } from "@/utils/styles";
 
-export { default as Badge } from "../../../../components/ui/badge/Badge.vue";
+export { default as Badge } from "@/components/ui/badge/Badge.vue";
 
 export const badgeVariants = variants({
 	base: "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",

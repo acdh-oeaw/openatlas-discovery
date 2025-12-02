@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { isNonEmptyString, keyByToMap } from "@acdh-oeaw/lib";
 import type { Geometry } from "geojson";
-import { z } from "zod";
+import * as v from "valibot";
 
 import EntityImages from "@/components/entity-images.vue";
 import type { Image } from "@/components/entity-primary-details.vue";
@@ -20,10 +20,10 @@ definePageMeta({
 	title: "EntityPage.meta.title",
 	middleware: "database-check",
 	validate(route) {
-		const paramsSchema = z.object({
-			id: z.coerce.number().int().positive(),
+		const paramsSchema = v.object({
+			id: v.pipe(v.unknown(), v.transform(Number), v.number(), v.integer(), v.minValue(1)),
 		});
-		return paramsSchema.safeParse(route.params).success;
+		return v.safeParse(paramsSchema, route.params).success;
 	},
 });
 
@@ -183,7 +183,7 @@ const features = computed(() => {
 					f.geometry = f.geometry.geometry;
 				}
 
-				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+				 
 				if (!f.geometry) return null;
 				if (
 					f.geometry.type === "Point" &&
@@ -246,7 +246,7 @@ watch(
 </script>
 
 <template>
-	<MainContent class="container relative grid grid-rows-[auto_auto_1fr] gap-4 py-8">
+	<MainContent class="relative container grid grid-rows-[auto_auto_1fr] gap-4 py-8">
 		<template v-if="entity != null">
 			<Card>
 				<CardHeader>
@@ -342,7 +342,7 @@ watch(
 					<div class="relative max-w-full">
 						<div
 							id="ego-network-legend"
-							class="absolute left-auto right-0 top-auto transform-none"
+							class="absolute top-auto right-0 left-auto transform-none"
 						></div>
 					</div>
 				</TabsContent>
@@ -357,7 +357,7 @@ watch(
 						class="grid gap-x-8 gap-y-4 sm:grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] sm:justify-start"
 					>
 						<div v-for="[relationType, relations] of nonEmptyRelations" :key="relationType">
-							<dt class="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+							<dt class="text-xs font-medium tracking-wider text-muted-foreground uppercase">
 								{{ t(`SystemClassNames.${relationType}`) }}
 							</dt>
 							<dd>

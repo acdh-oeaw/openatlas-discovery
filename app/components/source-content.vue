@@ -11,7 +11,7 @@ const { data } = useGetEntity(
 </script>
 
 <template>
-	<span class="block hyphens-auto text-justify">
+	<span class="block text-justify hyphens-auto">
 		{{ data?.description }}
 	</span>
 </template>

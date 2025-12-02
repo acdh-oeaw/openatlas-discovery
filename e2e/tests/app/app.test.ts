@@ -1,10 +1,14 @@
-import { createUrl } from "@acdh-oeaw/lib";
+import { assert, createUrl } from "@acdh-oeaw/lib";
 
 import { defaultLocale, locales } from "@/config/i18n.config";
-import { expect, test } from "@/e2e/lib/test";
+import { expect, test } from "~/e2e/lib/test";
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL!;
+assert(
+	process.env.NUXT_PUBLIC_APP_BASE_URL,
+	"Missing NUXT_PUBLIC_APP_BASE_URL environment variable.",
+);
+
+const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL;
 
 test.describe("app", () => {
 	if (process.env.NUXT_PUBLIC_BOTS !== "enabled") {
@@ -66,9 +70,9 @@ test.describe("app", () => {
 
 		expect(body.toString()).toEqual(
 			JSON.stringify({
-				name: i18n.t("Metadata.name"),
-				short_name: i18n.t("Metadata.shortName"),
-				description: i18n.t("Metadata.description"),
+				name: i18n.t("Manifest.name"),
+				short_name: i18n.t("Manifest.short-name"),
+				description: i18n.t("Manifest.description"),
 				start_url: "/",
 				display: "standalone",
 				background_color: "#fff",
@@ -151,5 +155,28 @@ test.describe("app", () => {
 			await indexPage.goto();
 			await expect(indexPage.page.locator("html")).toHaveAttribute("lang", locale);
 		}
+	});
+
+	test("should add aria-current attribute to nav links", async ({ createIndexPage }) => {
+		const { indexPage, i18n } = await createIndexPage(defaultLocale);
+		await indexPage.goto();
+
+		const homeLink = indexPage.page
+			.getByRole("navigation")
+			.getByRole("link", {
+				name: i18n.t("AppHeader.links.home"),
+			})
+			.first();
+		const imprintLink = indexPage.page.getByRole("navigation").getByRole("link", {
+			name: i18n.t("AppFooter.links.imprint"),
+		});
+
+		await expect(homeLink).toHaveAttribute("aria-current", "page");
+		await expect(imprintLink).not.toHaveAttribute("aria-current", "page");
+
+		await imprintLink.click();
+
+		await expect(homeLink).not.toHaveAttribute("aria-current", "page");
+		await expect(imprintLink).toHaveAttribute("aria-current", "page");
 	});
 });

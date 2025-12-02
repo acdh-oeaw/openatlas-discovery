@@ -224,7 +224,7 @@ const typeTree = computed(() => {
 
 const superTypes: typeof filteredTypes = computed(() => {
 	const currentType = typeTree.value[String(props.entity.id) as keyof TypeTreeModel["typeTree"]];
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+	 
 	if (!currentType) return [];
 	const hierarchy = currentType.root.map((entry) => {
 		return typeTree.value[String(entry) as keyof TypeTreeModel["typeTree"]];
@@ -332,7 +332,7 @@ onMounted(async () => {
 
 	<div
 		v-if="isEmptyPrimaryDetails && isEmptyFurtherInformation && !isType"
-		class="italic text-neutral-400"
+		class="text-neutral-400 italic"
 	>
 		{{ t("EntityPage.no-details") }}
 	</div>
@@ -414,7 +414,7 @@ onMounted(async () => {
 					<div class="relative max-w-full">
 						<div
 							id="ego-network-legend"
-							class="absolute left-auto right-0 top-auto transform-none"
+							class="absolute top-auto right-0 left-auto transform-none"
 						></div>
 					</div>
 				</div>

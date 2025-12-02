@@ -5,6 +5,7 @@ function getDetailViewConfig(entity: PresentationViewModel) {
 	let customConfig = project.detailView.find((entry) => {
 		return entry.affectedSystemClasses?.includes(entity.systemClass);
 	});
+	// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 	if (!customConfig)
 		customConfig = project.detailView.find((entry) => {
 			return !entry.affectedSystemClasses?.length;

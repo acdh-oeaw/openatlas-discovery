@@ -1,8 +1,6 @@
 import type { Page } from "@playwright/test";
 import type { ElementContext, Result, RunOptions } from "axe-core";
-import { checkA11y, configureAxe, getViolations, injectAxe } from "axe-playwright";
-
-import { axeConfig } from "@/config/axe.config";
+import { checkA11y, getViolations, injectAxe } from "axe-playwright";
 
 export interface AccessibilityScanner {
 	check: (params?: { selector?: ElementContext; skipFailures?: boolean }) => Promise<void>;
@@ -14,7 +12,6 @@ export interface AccessibilityScanner {
 
 export async function createAccessibilityScanner(page: Page): Promise<AccessibilityScanner> {
 	await injectAxe(page);
-	await configureAxe(page, axeConfig);
 
 	return {
 		check(params?: { selector?: ElementContext; skipFailures?: boolean }) {

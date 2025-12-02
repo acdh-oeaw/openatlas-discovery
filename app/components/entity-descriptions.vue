@@ -77,7 +77,7 @@ watch(
 <template>
 	<template v-if="descriptions.length > 0">
 		<template v-if="descriptions.length === 1">
-			<p class="whitespace-pre-line text-md">
+			<p class="text-md whitespace-pre-line">
 				<template v-for="(part, index) in processedNodes" :key="index">
 					<template v-if="typeof part === 'string'">
 						<br v-if="part === ''" />
@@ -142,7 +142,7 @@ watch(
 						:key="`desc-tab-trigger-${index}`"
 						:value="index.toString()"
 					>
-						<p class="max-w-20 overflow-hidden text-ellipsis text-nowrap">{{ description }}</p>
+						<p class="max-w-20 overflow-hidden text-nowrap text-ellipsis">{{ description }}</p>
 					</TabsTrigger>
 				</TabsList>
 				<TabsContent

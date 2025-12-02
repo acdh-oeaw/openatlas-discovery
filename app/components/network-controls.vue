@@ -41,7 +41,7 @@ function onClickControls(
 <template>
 	<aside
 		ref="container"
-		class="flex max-h-72 w-fit flex-row gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent bg-white px-4 py-2 text-sm shadow-md"
+		class="flex max-h-72 w-fit flex-row gap-2 overflow-x-hidden overflow-y-auto rounded-md border-2 border-transparent bg-white px-4 py-2 text-sm shadow-md"
 	>
 		{{ containerRef?.getAttribute("id") }}
 		<TooltipProvider>

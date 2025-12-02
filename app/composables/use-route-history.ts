@@ -5,7 +5,6 @@ export function useInitialVisit() {
 		hasVisited,
 		markVisited: () => {
 			hasVisited.value++;
-			console.log(hasVisited);
 		},
 	};
 }

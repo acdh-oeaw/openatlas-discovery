@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/unbound-method */
+
 import { createPreset as createDesignTokenPreset } from "@acdh-oeaw/tailwindcss-preset";
 import type { Config } from "tailwindcss";
 import createPlugin from "tailwindcss/plugin";
 
-import { project } from "./config/project.config";
+import { project } from "./app/config/project.config";
 
 const shadcnPlugin = createPlugin(
 	({ addBase }) => {
@@ -14,7 +16,7 @@ const shadcnPlugin = createPlugin(
 				"--vis-tooltip-shadow-color": "none !important",
 				"--vis-tooltip-backdrop-filter": "none !important",
 				"--vis-tooltip-padding": "none !important",
-				" --vis-primary-color": "var(--primary)",
+				"--vis-primary-color": "var(--primary)",
 				"--vis-secondary-color": "160 81% 40%",
 				"--vis-text-color": "var(--muted-foreground)",
 				"--background": "0 0% 100%",

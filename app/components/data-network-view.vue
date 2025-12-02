@@ -100,7 +100,7 @@ const entities = computed(() => {
 const showOrphans = ref(false);
 function emitControls(args: string) {
 	if (args === "fullscreen") {
-		let elem = document.getElementById("network-container");
+		const elem = document.getElementById("network-container");
 
 		if (!document.fullscreenElement && elem != null) {
 			elem.classList.add("bg-white", "dark:bg-black");
@@ -156,7 +156,7 @@ const isFullscreen = ref(false);
 			class="border"
 			:class="{ 'opacity-50 grayscale': isLoading }"
 		>
-			<div class="absolute bottom-0 right-0 z-10">
+			<div class="absolute right-0 bottom-0 z-10">
 				<NetworkControls
 					class="right-0 m-3 ml-auto bg-white/90"
 					:layout-running="isRunning"

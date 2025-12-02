@@ -12,13 +12,13 @@ const t = useTranslations();
 			<template v-for="(timespan, index) of datespans" :key="index">
 				<dl class="flex gap-12">
 					<div v-if="timespan.start != null">
-						<dt class="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+						<dt class="text-xs font-medium tracking-wider text-muted-foreground uppercase">
 							{{ t("TimespansDisplay.start") }}
 						</dt>
 						<dd>{{ timespan.start }}</dd>
 					</div>
 					<div v-if="timespan.end != null">
-						<dt class="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+						<dt class="text-xs font-medium tracking-wider text-muted-foreground uppercase">
 							{{ t("TimespansDisplay.end") }}
 						</dt>
 						<dd>{{ timespan.end }}</dd>

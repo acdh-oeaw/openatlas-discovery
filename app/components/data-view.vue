@@ -111,7 +111,7 @@ const entities = computed(() => {
 </script>
 
 <template>
-	<div class="container relative grid grid-rows-[auto_1fr] gap-4 p-8">
+	<div class="relative container grid grid-rows-[auto_1fr] gap-4 p-8">
 		<SearchForm
 			:category="searchFilters.category"
 			:search="searchFilters.search"

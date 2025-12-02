@@ -68,7 +68,7 @@ onServerPrefetch(async () => {
 
 				<ContentRenderer
 					v-if="content.leadIn != null"
-					class="prose prose-lg max-w-3xl text-balance text-center"
+					class="prose prose-lg max-w-3xl text-center text-balance"
 					:value="content.leadIn"
 				>
 					<template #empty></template>
@@ -93,7 +93,7 @@ onServerPrefetch(async () => {
 		<div>
 			<ContentRenderer
 				v-if="content != null && content.body.children.length > 0"
-				class="prose mx-auto w-full max-w-3xl px-8"
+				class="mx-auto prose w-full max-w-3xl px-8"
 				:value="content"
 			>
 				<template #empty></template>

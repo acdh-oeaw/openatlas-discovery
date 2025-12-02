@@ -16,7 +16,7 @@ import type { Locale } from "@/config/i18n.config";
 
 export default defineNuxtPlugin((nuxt) => {
 	const state = useState<DehydratedState | null>("vue-query");
-	// eslint-disable-next-line @typescript-eslint/ban-types
+	// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/consistent-indexed-object-style
 	const { t } = nuxt.$i18n as I18n<{ [K in Locale]: Messages }, {}, {}, Locale, false>["global"];
 
 	const queryClient = new QueryClient({
@@ -28,6 +28,7 @@ export default defineNuxtPlugin((nuxt) => {
 			},
 		},
 		queryCache: new QueryCache({
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			async onError(error) {
 				const message = await getErrorMessage(error);
 

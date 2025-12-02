@@ -12,7 +12,6 @@ const t = useTranslations();
 const env = useRuntimeConfig();
 
 const defaultLinks = computed<
-	// eslint-disable-next-line @typescript-eslint/ban-types
 	Record<"home" & (string & {}), { href: NavLinkProps["href"]; label: string }>
 >(() => {
 	if (env.public.database === "enabled") {
@@ -54,7 +53,7 @@ const { data: navigation, suspense } = useQuery({
 				$not: {
 					_path: {
 						$in: ["/", "/imprint"].map((pathname) => {
-							return "/" + prefix.join("/") + pathname;
+							return `/${prefix.join("/")}${pathname}`;
 						}),
 					},
 				},
@@ -82,7 +81,7 @@ const contentLinks = computed(() => {
 		pages.map((link) => {
 			return [
 				link._path,
-				{ href: { path: "/content" + link._path.slice(prefix.length) }, label: link.title },
+				{ href: { path: `/content${link._path.slice(prefix.length)}` }, label: link.title },
 			];
 		}),
 	) satisfies Record<string, { href: NavLinkProps["href"]; label: string }>;
