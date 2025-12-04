@@ -8,16 +8,16 @@ import type { TeamMember } from "@/types/content";
 const locale = useLocale();
 const t = useTranslations();
 
-const {
-	data: team,
-	error,
-	suspense,
-} = useQuery({
-	queryKey: ["team", locale] as const,
-	queryFn({ queryKey: [, locale] }) {
-		return queryContent<TeamMember>("team", locale).find();
-	},
-});
+const { data: team, error, suspense } = useQuery<Array<TeamMember> | null>({
+  queryKey: ["teamMembers", locale, "index"] as const,
+  queryFn: async () => {
+	const members = await queryCollection<TeamMember>("teamMembers")
+      .where("id", "LIKE", `teamMembers/team/${locale.value}/%`)
+      .all();
+
+    return members as Array<TeamMember> ?? null
+  },
+})
 useErrorMessage(error, {
 	notFound: t("TeamPage.error.not-found"),
 	unknown: t("TeamPage.error.unknown"),

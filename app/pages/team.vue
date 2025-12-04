@@ -3,11 +3,6 @@ import { noop } from "@acdh-oeaw/lib";
 import { useQuery } from "@tanstack/vue-query";
 
 import type { SystemPage } from "@/types/content";
-
-defineRouteRules({
-	prerender: true,
-});
-
 const locale = useLocale();
 const t = useTranslations();
 
@@ -15,16 +10,17 @@ usePageMetadata({
 	title: t("TeamPage.meta.title"),
 });
 
-const {
-	data: content,
-	error,
-	suspense,
-} = useQuery({
-	queryKey: ["system-pages", locale, "team"] as const,
-	queryFn({ queryKey: [, locale] }) {
-		return queryContent<SystemPage>("system-pages", locale, "team").findOne();
-	},
-});
+const { data: content, error, suspense } = useQuery<SystemPage | null>({
+  queryKey: computed(() => ["systemPages", locale.value, "team"]),
+  queryFn: async () => {
+    const id = `systemPages/system-pages/${locale.value}/team.md`
+    const page = await queryCollection("systemPages")
+      .where("id", "=", id)
+      .first()
+    return page as SystemPage ?? null
+  },
+})
+
 useErrorMessage(error, {
 	notFound: t("TeamPage.error.not-found"),
 	unknown: t("TeamPage.error.unknown"),
@@ -66,6 +62,7 @@ onServerPrefetch(async () => {
 					/>
 				</div>
 
+				<!-- FIXME: leadIn is type string now, cannot be rendered via ContentRenderer anymore-->
 				<ContentRenderer
 					v-if="content.leadIn != null"
 					class="prose prose-lg max-w-3xl text-center text-balance"
@@ -92,9 +89,9 @@ onServerPrefetch(async () => {
 
 		<div>
 			<ContentRenderer
-				v-if="content != null && content.body.children.length > 0"
+				v-if="content != null"
 				class="mx-auto prose w-full max-w-3xl px-8"
-				:value="content"
+				:value="content.body"
 			>
 				<template #empty></template>
 			</ContentRenderer>

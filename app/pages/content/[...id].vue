@@ -4,11 +4,6 @@ import { useQuery } from "@tanstack/vue-query";
 import { useTemplateRef } from "vue";
 
 import type { ContentPage } from "@/types/content";
-
-defineRouteRules({
-	prerender: true,
-});
-
 const locale = useLocale();
 const t = useTranslations();
 
@@ -28,7 +23,7 @@ const {
 } = useQuery({
 	queryKey: ["pages", locale, ...id.value] as const,
 	queryFn({ queryKey: [, locale, ...id] }) {
-		return queryContent<ContentPage>("pages", locale, ...id).findOne();
+		return queryCollection("pages").path(route.path).first();
 	},
 });
 useErrorMessage(error, {

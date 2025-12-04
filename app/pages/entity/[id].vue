@@ -3,16 +3,8 @@ import { isNonEmptyString, keyByToMap } from "@acdh-oeaw/lib";
 import type { Geometry } from "geojson";
 import * as v from "valibot";
 
-import EntityImages from "@/components/entity-images.vue";
-import type { Image } from "@/components/entity-primary-details.vue";
-import TooltipContent from "@/components/ui/tooltip/TooltipContent.vue";
-import TooltipTrigger from "@/components/ui/tooltip/TooltipTrigger.vue";
 import type { PresentationViewModel } from "@/types/api";
 import { hasCoordinates } from "@/utils/has-geojson-coordinates";
-
-// defineRouteRules({
-// 	prerender: true,
-// });
 
 const requestURL = useRequestURL();
 

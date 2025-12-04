@@ -1,32 +1,5 @@
-import type { MarkdownParsedContent } from "@nuxt/content/dist/runtime/types";
+import type { Collections } from "#content";
 
-export interface ContentPage extends MarkdownParsedContent {
-	title: string;
-	navigation: {
-		title: string;
-	};
-	toc: boolean;
-}
-
-export interface SystemPage extends MarkdownParsedContent {
-	title: string;
-	navigation: {
-		title: string;
-	};
-	image?: {
-		light: string;
-		dark: string;
-	};
-	leadIn: MarkdownParsedContent;
-	links?: Array<{
-		label: string;
-		href: string;
-	}>;
-}
-
-export interface TeamMember extends MarkdownParsedContent {
-	firstName?: string;
-	lastName: string;
-	academicTitle?: string;
-	image?: string;
-}
+export type SystemPage = Collections["systemPages"];
+export type TeamMember = Collections["teamMembers"];
+export type ContentPage = Collections["contentPages"];

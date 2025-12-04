@@ -1,17 +1,12 @@
 <script lang="ts" setup>
 import { project } from "@/config/project.config";
-
 const env = useRuntimeConfig();
 
-defineRouteRules({
-	prerender: true,
-});
-
-definePageMeta({
-	validate() {
-		return project.imprint !== "none" || env.public.specialImprint === "enabled";
-	},
-});
+// definePageMeta({
+// 	validate() {
+// 		return project.imprint !== "none" || env.public.specialImprint === "enabled";
+// 	},
+// });
 
 const t = useTranslations();
 
@@ -19,9 +14,10 @@ usePageMetadata({
 	title: t("ImprintPage.meta.title"),
 });
 
-if (project.imprint === "none") {
-	throw createError({ fatal: true, statusCode: 404, statusMessage: "Imprint page is disabled" });
+if (project.imprint === "none" && env.public.specialImprint !== "enabled") {
+  throw createError({ fatal: true, statusCode: 404, statusMessage: "Imprint page is disabled" });
 }
+
 </script>
 
 <template>

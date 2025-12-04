@@ -5,10 +5,6 @@ import { useQuery } from "@tanstack/vue-query";
 import { project } from "@/config/project.config";
 import type { SystemPage } from "@/types/content";
 
-defineRouteRules({
-	prerender: true,
-});
-
 const locale = useLocale();
 const t = useTranslations();
 const route = useRoute();
@@ -23,16 +19,20 @@ usePageMetadata({
 	title: t("IndexPage.meta.title"),
 });
 
-const {
-	data: content,
-	error,
-	suspense,
-} = useQuery({
-	queryKey: ["system-pages", locale, "index"] as const,
-	queryFn({ queryKey: [, locale] }) {
-		return queryContent<SystemPage>("system-pages", locale).findOne();
-	},
-});
+
+const { data: content, error, suspense } = useQuery<SystemPage | null>({
+  queryKey: computed(() => ["systemPages", locale.value, "index"]),
+  queryFn: async () => {
+    const id = `systemPages/system-pages/${locale.value}/index.md`
+    const page = await queryCollection("systemPages")
+      .where("id", "=", id)
+      .first()
+    return page as SystemPage ?? null
+  },
+})
+
+
+
 useErrorMessage(error, {
 	notFound: t("IndexPage.error.not-found"),
 	unknown: t("IndexPage.error.unknown"),
@@ -50,6 +50,7 @@ onServerPrefetch(async () => {
 const currentMode = computed(() => {
 	return route.query.mode;
 });
+
 </script>
 
 <template>
@@ -74,10 +75,11 @@ const currentMode = computed(() => {
 							:src="content.image?.dark"
 						/>
 					</div>
-
+					<!-- FIXME: leadIn is type string now, cannot be rendered via ContentRenderer anymore-->
 					<ContentRenderer
 						v-if="content.leadIn != null"
 						class="prose prose-lg max-w-3xl text-center text-balance"
+						unwrap="string"
 						:value="content.leadIn"
 					>
 						<template #empty></template>
@@ -105,7 +107,7 @@ const currentMode = computed(() => {
 				<ContentRenderer
 					v-if="content != null"
 					class="mx-auto prose w-full max-w-3xl"
-					:value="content"
+					:value="content.body"
 				>
 					<template #empty></template>
 				</ContentRenderer>

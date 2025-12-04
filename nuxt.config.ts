@@ -22,13 +22,14 @@ export default defineNuxtConfig({
 	compatibilityDate: "2025-01-01",
 	components: [{ path: "components", extensions: [".vue"], pathPrefix: false }],
 	content: {
-		// defaultLocale,
-		// locales: files,
-		// markdown: {
-		// 	toc: {
-		// 		depth: 5,
-		// 	},
-		// },
+		defaultLocale,
+		locales: files,
+		markdown: {
+			toc: {
+				depth: 5,
+			},
+		},
+		types: true,
 	},
 	css: [
 		"@fontsource-variable/inter/standard.css",
@@ -95,6 +96,7 @@ export default defineNuxtConfig({
 	nitro: {
 		compressPublicAssets: true,
 		prerender: {
+			crawlLinks: true,
 			routes: ["/manifest.webmanifest", "/robots.txt", "/sitemap.xml"],
 		},
 	},
