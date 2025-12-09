@@ -99,7 +99,6 @@ const props = defineProps<{
 	selectionBounds?: Array<[number, number]>;
 	currentSelectionId?: string;
 }>();
-
 const emit = defineEmits<{
 	(
 		event: "layer-click",
@@ -203,9 +202,10 @@ function initializeCustomIconLayer(key: string, reloadImage = false) {
 			clusterRadius: 10,
 		});
 
+	const modifiedIconName = props.customIcons[key].icon?.replaceAll("-", "");
 	//@ts-expect-error ensure iconName is a valid Lucide Icon
 	// eslint-disable-next-line import-x/namespace
-	const iconSVG = LucideIcons[props.customIcons[key].icon];
+	const iconSVG = LucideIcons[modifiedIconName];
 
 	const div = document.createElement("div");
 	div.innerHTML = iconSVG;

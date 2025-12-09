@@ -760,7 +760,9 @@ const filteredCustomIconEntries = computed(() => {
 											<div
 												v-if="entry.icon != null"
 												class="mr-2 size-6 scale-[0.7]"
-												v-html="LucideIcons[entry.icon as keyof typeof LucideIcons]"
+												v-html="
+													LucideIcons[entry.icon.replaceAll('-', '') as keyof typeof LucideIcons]
+												"
 											></div>
 											<span
 												>{{ entry.type?.label
