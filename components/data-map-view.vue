@@ -59,7 +59,7 @@ function onChangeSearchFilters(values: SearchFormData) {
 
 onMounted(() => {
 	setMovementId({ id: selection.value as unknown as string });
-	visibleIcons.value = Object.keys(customIconEntries.value);
+	filterIcons(Object.keys(customIconEntries.value));
 });
 
 const { data, isPending, isPlaceholderData } = useGetSearchResults(
@@ -204,7 +204,7 @@ const features = computed(() => {
 				//if (f.properties._id == feature.properties._id) return false;
 				if (f.geometry.type === "GeometryCollection") {
 					return f.geometry.geometries.some((geo) => {
-						assert(feature.geometry.type === "GeometryCollection");
+						assert(feature.geometry.type === "GeometryCollection", "1");
 						return (
 							geo.type === "Polygon" &&
 							feature.geometry.geometries.find((g) => {
@@ -278,7 +278,7 @@ const movements = computed(() => {
 		});
 
 	move.forEach((move) => {
-		assert(move.geometry.geometries);
+		assert(move.geometry.geometries, 2);
 	});
 
 	return move.map((entity) => {
@@ -479,10 +479,10 @@ function setCoordinates(entity: EntityFeature, coordinates: Ref<[number, number]
 			});
 			if (selectedMove?.geometry && "geometries" in selectedMove.geometry) {
 				selectionBounds.value = selectedMove.geometry.geometries.map((geo) => {
-					assert("coordinates" in geo);
+					assert("coordinates" in geo, "3");
 					return geo.coordinates as [number, number];
 				});
-				assert(selectionBounds.value);
+				assert(selectionBounds.value, "4");
 
 				const points = turf.points(selectionBounds.value);
 				coordinates.value = turf.center(points).geometry.coordinates as [number, number];
@@ -571,7 +571,7 @@ const linkedMovements = computed(() => {
 	let features = [currentMovement];
 
 	while (currentMovement.children && currentMovement.children.length > 0) {
-		assert(currentMovement.children[0]);
+		assert(currentMovement.children[0], "5");
 		features = features.concat(currentMovement.children);
 		currentMovement = currentMovement.children[0];
 	}
@@ -634,32 +634,36 @@ const customIconEntries = computed(() => {
 			}
 		}
 	});
-	console.log("custom entries: ", entries);
-	console.log("LucideIcons: ", LucideIcons);
 	return entries;
 });
 
-const visibleIcons = ref<Array<string>>([]);
-function toggleIcon(key: string) {
-	if (visibleIcons.value.includes(key))
-		visibleIcons.value = visibleIcons.value.filter((i) => {
-			return i !== key;
-		});
-	else {
-		visibleIcons.value.push(key);
-	}
-}
+const showMapLegendPanel = ref(true);
+const toggleMapLegendPanel = () => {
+	showMapLegendPanel.value = !showMapLegendPanel.value;
+};
 
-const filteredCustomIconEntries = computed(() => {
-	return Object.fromEntries(
+const filteredCustomIconEntries = ref<Record<string, CustomIconEntry>>({});
+
+function filterIcons(visibleIcons: Array<string>) {
+	filteredCustomIconEntries.value = Object.fromEntries(
 		Object.entries(customIconEntries.value).filter(([key, _]) => {
-			return visibleIcons.value.length === 0 || visibleIcons.value.includes(key);
+			return visibleIcons.length === 0 || visibleIcons.includes(key);
 		}),
 	);
-});
+}
 </script>
 
 <template>
+	<div
+		v-if="project.map.customIconConfig && project.map.customIconConfig.length > 0"
+		class="absolute flex z-50 p-1.5 top-0 right-0"
+	>
+		<MapLegendPanel
+			:iconData="customIconEntries"
+			:moveData="movements"
+			@visible-icons="filterIcons"
+		/>
+	</div>
 	<div :class="project.fullscreen ? 'relative grid' : 'relative grid grid-rows-[auto_1fr] gap-4'">
 		<div
 			:class="
@@ -721,59 +725,6 @@ const filteredCustomIconEntries = computed(() => {
 							<Toggle variant="iiif" @click="toggleMovements">
 								{{ $t("DataMapView.showMovement") }}
 							</Toggle>
-						</div>
-						<div v-if="project.map.customIconConfig && project.map.customIconConfig.length > 0">
-							<Popover>
-								<PopoverTrigger>
-									<TooltipProvider>
-										<Tooltip :disabled="Object.keys(customIconEntries).length > 0">
-											<TooltipTrigger>
-												<Button
-													variant="iiif"
-													class="group"
-													:disabled="Object.keys(customIconEntries).length === 0"
-													><FilterIcon :size="16"></FilterIcon> {{ $t("DataMapView.filter") }}
-													<Badge v-if="visibleIcons.length" variant="groupOutline">{{
-														visibleIcons.length
-													}}</Badge></Button
-												>
-											</TooltipTrigger>
-											<TooltipContent>{{ $t("DataMapView.no-icons") }}</TooltipContent>
-										</Tooltip>
-									</TooltipProvider>
-								</PopoverTrigger>
-								<PopoverContent side="top" class="w-auto">
-									<div class="">
-										<div class="text-xs text-muted-foreground">
-											{{ $t("DataMapView.icons") }}
-										</div>
-										<Toggle
-											v-for="[key, entry] in Object.entries(customIconEntries).sort(
-												(a, b) => a[1].type?.label?.localeCompare(b[1].type?.label ?? '') ?? 0,
-											)"
-											:key="entry.type?.identifier"
-											:pressed="visibleIcons.includes(key)"
-											class="group my-2 flex min-w-0 items-center text-left"
-											variant="iiif"
-											@click="() => toggleIcon(key)"
-										>
-											<div
-												v-if="entry.icon != null"
-												class="mr-2 size-6 scale-[0.7]"
-												v-html="
-													LucideIcons[entry.icon.replaceAll('-', '') as keyof typeof LucideIcons]
-												"
-											></div>
-											<span
-												>{{ entry.type?.label
-												}}<Badge variant="groupOutline" class="ml-4">{{
-													entry.entities.length
-												}}</Badge></span
-											>
-										</Toggle>
-									</div>
-								</PopoverContent>
-							</Popover>
 						</div>
 					</div>
 				</div>

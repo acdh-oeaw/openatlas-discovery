@@ -41,7 +41,7 @@ onScopeDispose(() => {
 		<SheetTrigger aria-label="Toggle navigation menu" class="cursor-default">
 			<MenuIcon class="mx-3 my-1.5 size-5" />
 		</SheetTrigger>
-		<SheetContent class="overflow-y-auto">
+		<SheetContent class="overflow-y-auto" :backdrop="true">
 			<SheetTitle class="sr-only">{{ props.title }}</SheetTitle>
 			<ul class="grid py-8" role="list">
 				<li v-for="(link, key) of filteredLinks" :key="key">

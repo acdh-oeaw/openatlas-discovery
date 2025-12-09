@@ -93,6 +93,7 @@
 		"pino-http": "^10.1.0",
 		"popmotion": "^11.0.5",
 		"radix-vue": "^1.8.5",
+		"reka-ui": "^2.6.1",
 		"satori": "^0.10.13",
 		"sigma": "^3.0.0-beta.23",
 		"tailwind-merge": "^2.3.0",

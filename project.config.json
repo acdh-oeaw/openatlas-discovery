@@ -1,111 +1,130 @@
 {
-	"logos": {
-		"light": "/assets/images/logo.svg",
-		"dark": "/assets/images/logo.svg",
-		"withTextLight": "/assets/images/logo-with-text-light.svg",
-		"withTextDark": "/assets/images/logo-with-text-dark.svg"
-	},
-	"imprint": "acdh-ch",
-	"network": {
-		"excludeSystemClasses": [
-			"type",
-			"reference_system",
-			"source_translation",
-			"source",
-			"bibliography",
-			"external_reference",
-			"administrative_unit",
-			"edition",
-			"type_tools",
-			"file",
-			"appellation"
-		]
-	},
-	"colors": {
-		"brand": "#b8cf5b",
-		"geojsonPoints": "#69c0ef",
-		"geojsonAreaCenterPoints": "#b8cf5b",
-		"geojsonMovement": "#D0031E"
-	},
-	"twitter": "@openatlas_eu",
-	"detailView": [
-		{
-			"primarySystemClasses": [
-				"acquisition",
-				"activity",
-				"actor_function",
-				"actor_relation",
-				"appellation",
-				"artifact",
-				"creation",
-				"event",
-				"feature",
-				"group",
-				"human_remains",
-				"involvement",
-				"modification",
-				"move",
-				"person",
-				"production",
-				"source",
-				"source_translation",
-				"stratigraphic_unit",
-				"place"
-			],
-			"furtherSystemClasses": ["files", "externalReferenceSystems", "references"],
-			"affectedSystemClasses": [
-				"acquisition",
-				"activity",
-				"actor_function",
-				"actor_relation",
-				"appellation",
-				"artifact",
-				"creation",
-				"event",
-				"feature",
-				"group",
-				"human_remains",
-				"involvement",
-				"modification",
-				"move",
-				"person",
-				"production",
-				"source",
-				"source_translation",
-				"stratigraphic_unit",
-				"place",
-				"type"
-			],
-			"customOrdering": [],
-			"excludeTypeIds": []
-		}
-	],
-	"footer": {
-		"partner_logos": []
-	},
-	"fullscreen": true,
-	"defaultLocale": "en",
-	"map": {
-		"startPage": false,
-		"mapDisplayedSystemClasses": ["place", "feature"],
-		"customIconConfig": [
-			{
-				"entityType": 22378,
-				"iconName": "Skull"
-			},
-			{
-				"entityType": 5083,
-				"iconName": "Skull"
-			}
-		],
-		"customMovementConfig": {
-			"colorConfig": [],
-			"arcThickness": false
-		},
-		"flyToZoom": 20,
-		"baseLayerURL": {
-			"light": "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
-			"dark": "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
-		}
-	}
+  "logos": {
+    "light": "/assets/images/logo.svg",
+    "dark": "/assets/images/logo.svg",
+    "withTextLight": "/assets/images/logo-with-text-light.svg",
+    "withTextDark": "/assets/images/logo-with-text-dark.svg"
+  },
+  "imprint": "acdh-ch",
+  "network": {
+    "excludeSystemClasses": [
+      "type",
+      "reference_system",
+      "source_translation",
+      "source",
+      "bibliography",
+      "external_reference",
+      "administrative_unit",
+      "edition",
+      "type_tools",
+      "file",
+      "appellation"
+    ]
+  },
+  "colors": {
+    "brand": "#b8cf5b",
+    "geojsonPoints": "#69c0ef",
+    "geojsonAreaCenterPoints": "#b8cf5b",
+    "geojsonMovement": "#D0031E"
+  },
+  "twitter": "@openatlas_eu",
+  "detailView": [
+    {
+      "primarySystemClasses": [
+        "acquisition",
+        "activity",
+        "actor_function",
+        "actor_relation",
+        "appellation",
+        "artifact",
+        "creation",
+        "event",
+        "feature",
+        "group",
+        "human_remains",
+        "involvement",
+        "modification",
+        "move",
+        "person",
+        "production",
+        "source",
+        "source_translation",
+        "stratigraphic_unit",
+        "place"
+      ],
+      "furtherSystemClasses": [
+        "files",
+        "externalReferenceSystems",
+        "references"
+      ],
+      "affectedSystemClasses": [
+        "acquisition",
+        "activity",
+        "actor_function",
+        "actor_relation",
+        "appellation",
+        "artifact",
+        "creation",
+        "event",
+        "feature",
+        "group",
+        "human_remains",
+        "involvement",
+        "modification",
+        "move",
+        "person",
+        "production",
+        "source",
+        "source_translation",
+        "stratigraphic_unit",
+        "place",
+        "type"
+      ],
+      "customOrdering": [],
+      "excludeTypeIds": []
+    }
+  ],
+  "footer": {
+    "partner_logos": []
+  },
+  "fullscreen": true,
+  "defaultLocale": "en",
+  "map": {
+    "startPage": false,
+    "mapDisplayedSystemClasses": [
+      "place",
+      "feature"
+    ],
+    "customIconConfig": [
+      {
+        "entityType": 64,
+        "iconName": "Building-2",
+        "color": "#34a8c3"
+      },
+      {
+        "entityType": 443,
+        "iconName": "Church",
+        "color": "#00a4bf"
+      },
+      {
+        "entityType": 766,
+        "iconName": "Castle",
+        "color": "#00656e"
+      }
+    ],
+    "customMovementConfig": {
+      "colorConfig": [
+        {
+          "entityType": 3004,
+          "color": "#820000"
+        }
+      ],
+      "arcThickness": false
+    },
+    "flyToZoom": 20,
+    "baseLayerURL": {
+      "light": "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      "dark": "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
+    }
+  }
 }

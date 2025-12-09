@@ -273,7 +273,7 @@ function init(initAfterThemeSwitch = false) {
 		//
 
 		const fullscreen = new FullscreenControl({});
-		map.addControl(fullscreen, "top-right");
+		map.addControl(fullscreen, "top-left");
 
 		//
 
@@ -588,8 +588,9 @@ watch(
 );
 
 function updateScopeOfCustomIconLayers() {
-	assert(context.map != null);
+	if (context.map == null) return;
 	const map = context.map;
+
 	for (const key in props.customIcons) {
 		if (!map.hasImage(`custom-icon-image-${key}`)) {
 			initializeCustomIconLayer(key);
