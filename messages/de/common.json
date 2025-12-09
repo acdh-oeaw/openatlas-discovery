@@ -91,6 +91,7 @@
 		"egoNetwork": "Ego-Netzwerk",
 		"networkDepth": "Netzwerk-Tiefe",
 		"networkLegend": "Netzwerk-Legende",
+		"egoNetworkOrphan": "Diese Entität hat keine Verbindungen.",
 		"sidebar": {
 			"toggle": "Details für {title} umschalten"
 		},
@@ -108,7 +109,8 @@
 	"EntitySidebar": {
 		"NextFeature": "Nächste Funktion",
 		"PreviousFeature": "Vorheriges Feature",
-		"copy": "Permalink",
+		"permalink": "Permalink",
+		"copy": "Permalink kopieren",
 		"copied": "Kopiert!",
 		"copiedMessage": "Der Permalink wurde erfolgreich auf das Clipboard kopiert.",
 		"download": "Download",

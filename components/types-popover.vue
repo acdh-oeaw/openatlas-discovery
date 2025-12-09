@@ -48,13 +48,14 @@ const currentMode = computed(() => {
 			<Breadcrumb>
 				<BreadcrumbList>
 					<BreadcrumbItem v-if="hierarchy[0]">
+						{{ (getPath(), currentMode) }}
 						<NavLink
 							v-if="hierarchy[0]?.identifier"
 							class="underline decoration-dotted hover:no-underline"
 							:href="{
-								path: `/${getPath()}`,
+								path: `${getPath() === '' ? '/visualization' : `/${getPath()}`}`,
 								query: {
-									mode: currentMode,
+									mode: currentMode == null ? 'table' : currentMode,
 									selection: getUnprefixedId(hierarchy[0]?.identifier),
 								},
 							}"
@@ -81,9 +82,9 @@ const currentMode = computed(() => {
 										v-if="hierarchyItem.identifier"
 										class="underline decoration-dotted hover:no-underline"
 										:href="{
-											path: `/${getPath()}`,
+											path: `${getPath() === '' ? '/visualization' : `/${getPath()}`}`,
 											query: {
-												mode: currentMode,
+												mode: currentMode == null ? 'table' : currentMode,
 												selection: getUnprefixedId(hierarchyItem.identifier),
 											},
 										}"
@@ -102,10 +103,10 @@ const currentMode = computed(() => {
 							v-if="hiddenHierarchy[0].identifier"
 							class="underline decoration-dotted hover:no-underline"
 							:href="{
-								path: `/${getPath()}`,
+								path: `${getPath() === '' ? '/visualization' : `/${getPath()}`}`,
 								query: {
-									mode: currentMode,
-									selection: getUnprefixedId(hiddenHierarchy[0].identifier),
+									mode: currentMode == null ? 'table' : currentMode,
+									selection: getUnprefixedId(hiddenHierarchy[0]?.identifier),
 								},
 							}"
 						>
@@ -121,9 +122,9 @@ const currentMode = computed(() => {
 							v-if="type?.id"
 							class="underline decoration-dotted hover:no-underline"
 							:href="{
-								path: `/${getPath()}`,
+								path: `${getPath() === '' ? '/visualization' : `/${getPath()}`}`,
 								query: {
-									mode: currentMode,
+									mode: currentMode == null ? 'table' : currentMode,
 									selection: String(type.id),
 								},
 							}"

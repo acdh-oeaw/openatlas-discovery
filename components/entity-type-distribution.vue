@@ -2,7 +2,7 @@
 import BarChart from "./ui/chart-bar/BarChart.vue";
 
 const router = useRouter();
-
+const locale = useLocale();
 const props = defineProps<{
 	id: number;
 	width: number;
@@ -37,8 +37,15 @@ function onBarClick(d: (typeof types.value)[0]) {
 	});
 	if (!entity) return;
 	const currentRoute = router.currentRoute.value; // get current route snapshot
-	const newQuery = { ...currentRoute.query, selection: entity.id }; // merge existing queries + new selection
 
+	if (currentRoute.query.mode == null) {
+		// if coming from permalink
+		const newPath = `/${locale.value}/visualization`;
+		const newQuery = { mode: "table", selection: entity.id };
+		void router.push({ path: newPath, query: newQuery });
+		return;
+	}
+	const newQuery = { ...currentRoute.query, selection: entity.id }; // merge existing queries + new selection
 	void router.push({ path: currentRoute.path, query: newQuery });
 }
 </script>

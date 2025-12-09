@@ -21,7 +21,7 @@ const props = defineProps<{
 	entity: PresentationViewModel;
 }>();
 
-interface Image {
+export interface Image {
 	id: number;
 	IIIFManifest: string | undefined;
 	license: string | undefined;
@@ -113,7 +113,6 @@ interface Place {
 
 // TODO: For instances where there is no location set (at least for actors), make use of first and last event if no places are available
 const places = computed(() => {
-	console.log(props.entity);
 	return props.entity.relations?.place?.reduce((acc: Array<Place>, relatedPlace) => {
 		if (relatedPlace?.systemClass !== "object_location") return acc;
 		if (!relatedPlace.title || !relatedPlace.id || !relatedPlace.relationTypes) return acc;
@@ -133,16 +132,27 @@ const places = computed(() => {
 	}, []);
 });
 
-watchEffect(() => {
-	if (!places.value || places.value.length === 0) return;
-	const relTypes = places.value.map((place) => {
-		return place.relationType;
-	});
-	for (const type of relTypes) {
-		if (type) handledRelations.add(type);
-	}
-	emitHandledRelations([]);
-});
+watch(
+	() => {
+		return places.value;
+	},
+	(newPlaces) => {
+		if (!newPlaces || newPlaces.length === 0) return;
+
+		const relTypes = newPlaces.map((place) => {
+			return place.relationType;
+		});
+
+		for (const type of relTypes) {
+			if (type) handledRelations.add(type);
+		}
+
+		emitHandledRelations([]);
+	},
+	{ immediate: true },
+);
+
+const egoNetworkContainsOrphan = ref(true);
 
 const tabs = computed(() => {
 	const tabs = [];
@@ -214,7 +224,8 @@ const typeTree = computed(() => {
 
 const superTypes: typeof filteredTypes = computed(() => {
 	const currentType = typeTree.value[String(props.entity.id) as keyof TypeTreeModel["typeTree"]];
-
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+	if (!currentType) return [];
 	const hierarchy = currentType.root.map((entry) => {
 		return typeTree.value[String(entry) as keyof TypeTreeModel["typeTree"]];
 	});
@@ -258,17 +269,6 @@ const isType = computed(() => {
 	return props.entity.systemClass === "type";
 });
 
-const defaultTab = ref();
-watch(
-	() => {
-		return tabs.value;
-	},
-	() => {
-		defaultTab.value = tabs.value[0]?.id;
-	},
-	{ immediate: true },
-);
-
 const datespans = computed(() => {
 	const datespans: Array<{ start: string | null; end: string | null }> = [];
 	if (props.entity.when == null) return datespans;
@@ -282,6 +282,42 @@ const datespans = computed(() => {
 	});
 
 	return datespans;
+});
+
+const selectedTab = ref<number | string>("");
+
+watch(
+	() => {
+		return props.entity;
+	},
+	() => {
+		if (props.entity.relations) {
+			const exclude = project.network.excludeSystemClasses;
+			const relations = props.entity.relations ?? {};
+			egoNetworkContainsOrphan.value =
+				Object.entries(relations).filter(([key, value]) => {
+					return !exclude.includes(key) && Array.isArray(value) && value.length > 0;
+				}).length === 0;
+		}
+
+		if (
+			tabs.value[0]?.id == null ||
+			(tabs.value[0]?.id === "ego-network" && egoNetworkContainsOrphan.value)
+		) {
+			selectedTab.value = "";
+			return;
+		}
+		selectedTab.value = tabs.value[0]?.id ?? "";
+	},
+	{ immediate: true, flush: "post" },
+);
+
+onMounted(async () => {
+	await nextTick();
+	if (tabs.value[0]?.id === "ego-network" && egoNetworkContainsOrphan.value) {
+		return;
+	}
+	selectedTab.value = tabs.value[0]?.id ?? "";
 });
 </script>
 
@@ -312,11 +348,38 @@ const datespans = computed(() => {
 			/>
 		</div>
 
-		<Tabs v-if="tabs.length > 0" v-model="defaultTab" :default-value="defaultTab">
+		<Tabs
+			v-if="tabs.length > 0"
+			:class="`${tabs[0]?.id === 'ego-network' && egoNetworkContainsOrphan ? '' : 'max-h-96'}`"
+			:model-value="selectedTab"
+			@update:model-value="
+				(id) => {
+					if (id === 'ego-network' && egoNetworkContainsOrphan) {
+						return;
+					}
+
+					selectedTab = id;
+				}
+			"
+		>
 			<TabsList>
-				<TabsTrigger v-for="tab of tabs" :key="tab.id" :value="tab.id">
-					{{ tab.label }}
-				</TabsTrigger>
+				<template v-for="tab of tabs" :key="tab.id">
+					<TabsTrigger
+						v-if="!(tab.id === 'ego-network' && egoNetworkContainsOrphan)"
+						:value="tab.id"
+					>
+						<span>{{ tab.label }}</span>
+					</TabsTrigger>
+
+					<Tooltip v-else>
+						<TooltipTrigger as-child>
+							<TabsTrigger :value="tab.id" class="cursor-default opacity-30" aria-disabled="true">
+								<span>{{ tab.label }}</span>
+							</TabsTrigger>
+						</TooltipTrigger>
+						<TooltipContent> {{ t("EntityPage.egoNetworkOrphan") }} </TooltipContent>
+					</Tooltip>
+				</template>
 			</TabsList>
 			<!-- TODO: keep map alive -->
 			<TabsContent v-for="tab of tabs" :key="tab.id" :value="tab.id">
@@ -337,6 +400,8 @@ const datespans = computed(() => {
 							v-if="tab.id === 'images' && images && images.length > 0"
 							class="overflow-hidden"
 							:images="images"
+							:height="height"
+							:width="width"
 						/>
 
 						<EntityTypeDistribution
