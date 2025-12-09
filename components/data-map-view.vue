@@ -10,7 +10,7 @@ import * as v from "valibot";
 import type { SearchFormData } from "@/components/search-form.vue";
 import type { EntityFeature } from "@/composables/use-create-entity";
 import { categories, operatorMap } from "@/composables/use-get-search-results";
-import type { CustomIconEntry } from "@/types/api";
+import type { CustomMapLegendEntry } from "@/types/api";
 import type { GeoJsonFeature } from "@/utils/create-geojson-feature";
 
 import { project } from "../config/project.config";
@@ -278,7 +278,7 @@ const movements = computed(() => {
 		});
 
 	move.forEach((move) => {
-		assert(move.geometry.geometries, 2);
+		assert(move.geometry.geometries);
 	});
 
 	return move.map((entity) => {
@@ -596,7 +596,7 @@ function setMovementId({ id }: { id: string | null }) {
 }
 
 const customIconEntries = computed(() => {
-	const entries: Record<string, CustomIconEntry> = {};
+	const entries: Record<string, CustomMapLegendEntry> = {};
 	entities.value.forEach((entity) => {
 		const foundType = entity.types?.findLast((type) => {
 			return project.map.customIconConfig.find((config) => {
@@ -609,7 +609,7 @@ const customIconEntries = computed(() => {
 				const configEntry = project.map.customIconConfig.find((config) => {
 					return String(config.entityType) === unprefixedType;
 				});
-				const customEntry: CustomIconEntry = {
+				const customEntry: CustomMapLegendEntry = {
 					type: foundType,
 					icon: configEntry?.iconName,
 					color: configEntry?.color,
@@ -637,12 +637,35 @@ const customIconEntries = computed(() => {
 	return entries;
 });
 
-const showMapLegendPanel = ref(true);
+const customMovementEntries = computed(() => {
+	const result: Record<string, CustomMapLegendEntry> = {};
+	project.map.customMovementConfig.colorConfig.forEach((config) => {
+		const matchingMovements = movements.value.filter((move) =>
+			move.properties.types?.find(
+				(t) => getUnprefixedId(t?.identifier) === String(config.entityType),
+			),
+		);
+		console.log(config, movements.value);
+		if (matchingMovements.length === 0) return;
+		const matchingType = matchingMovements[0]?.properties.types?.find(
+			(t) => getUnprefixedId(t?.identifier) === String(config.entityType),
+		);
+		assert(matchingType != null, "There must be a matching type");
+		result[String(config.entityType)] = {
+			type: matchingType,
+			color: config.color,
+			entities: matchingMovements,
+		};
+	});
+	console.log(result);
+	return result;
+});
+
 const toggleMapLegendPanel = () => {
 	showMapLegendPanel.value = !showMapLegendPanel.value;
 };
 
-const filteredCustomIconEntries = ref<Record<string, CustomIconEntry>>({});
+const filteredCustomIconEntries = ref<Record<string, CustomMapLegendEntry>>({});
 
 function filterIcons(visibleIcons: Array<string>) {
 	filteredCustomIconEntries.value = Object.fromEntries(
@@ -655,12 +678,16 @@ function filterIcons(visibleIcons: Array<string>) {
 
 <template>
 	<div
-		v-if="project.map.customIconConfig && project.map.customIconConfig.length > 0"
+		v-if="
+			project.map.customIconConfig &&
+			project.map.customIconConfig.length > 0 &&
+			(Object.keys(customIconEntries).length > 0 || Object.keys(customMovementEntries).length > 0)
+		"
 		class="absolute flex z-50 p-1.5 top-0 right-0"
 	>
 		<MapLegendPanel
 			:iconData="customIconEntries"
-			:moveData="movements"
+			:moveData="customMovementEntries"
 			@visible-icons="filterIcons"
 		/>
 	</div>

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { cn } from "@/utils/styles";
 
-const props = defineProps<{ class?: string; }>();
+const props = defineProps<{ class?: string }>();
 </script>
 
 <template>

@@ -52,6 +52,7 @@
 		"showMovement": "Bewegungen anzeigen",
 		"filter": "Filter",
 		"icons": "Symbole",
+		"featuredMovements": "Hervorgehobene Bewegungen",
 		"no-icons": "Keine Symbole auf der Karte vorhanden."
 	},
 	"DataView": {

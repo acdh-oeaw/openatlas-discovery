@@ -25,7 +25,7 @@ import { type GeoMapContext, geoMapContextKey } from "@/components/geo-map.conte
 import { initialViewState } from "@/config/geo-map.config";
 import { project } from "@/config/project.config";
 import type { components } from "@/lib/api-client/api";
-import type { CustomIconEntry } from "@/types/api";
+import type { CustomMapLegendEntry } from "@/types/api";
 import type { CustomGeoJsonFeature, GeoJsonFeature } from "@/utils/create-geojson-feature";
 
 const vsDeclaration = `
@@ -87,7 +87,7 @@ const supportOverlay = ref<mapbox.MapboxOverlay | null>(null);
 const polygonOverlay = ref<mapbox.MapboxOverlay | null>(null);
 const props = defineProps<{
 	features: Array<CustomGeoJsonFeature>;
-	customIcons: Record<string, CustomIconEntry>;
+	customIcons: Record<string, CustomMapLegendEntry>;
 	movements: Array<CustomGeoJsonFeature>;
 	events: Array<GeoJsonFeature>;
 	height: number;

@@ -15,10 +15,14 @@ import { cn, variants } from "@/utils/styles";
 interface SheetContentProps extends DialogContentProps {
 	side?: "bottom" | "left" | "right" | "top";
 	class?: string;
-	backdrop: boolean;
+	backdrop?: boolean;
+	closeButton?: boolean;
 }
 
-const props = defineProps<SheetContentProps>();
+const props = withDefaults(defineProps<SheetContentProps>(), {
+	backdrop: false,
+	closeButton: true,
+});
 
 const emits = defineEmits<DialogContentEmits>();
 
@@ -35,7 +39,7 @@ const sheetVariants = variants({
 			right:
 				"inset-y-0 right-0 h-full w-3/4  border-l border-border data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
 			legend:
-				"right-0 w-3/4 border-border data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
+				"right-0 w-3/4 max-h-fit border-border data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
 		},
 	},
 	defaultVariants: {
@@ -58,6 +62,7 @@ const sheetVariants = variants({
 
 			<DialogClose
 				class="absolute right-4 top-4 rounded-md p-0.5 transition-colors hover:bg-secondary"
+				v-if="props.closeButton"
 			>
 				<XIcon class="size-4 text-muted-foreground" />
 			</DialogClose>
