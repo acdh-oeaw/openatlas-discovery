@@ -25,7 +25,7 @@ import { type GeoMapContext, geoMapContextKey } from "@/components/geo-map.conte
 import { initialViewState } from "@/config/geo-map.config";
 import { project } from "@/config/project.config";
 import type { components } from "@/lib/api-client/api";
-import type { CustomIconEntry } from "@/types/api";
+import type { CustomMapLegendEntry } from "@/types/api";
 import type { CustomGeoJsonFeature, GeoJsonFeature } from "@/utils/create-geojson-feature";
 
 const vsDeclaration = `
@@ -87,7 +87,7 @@ const supportOverlay = ref<mapbox.MapboxOverlay | null>(null);
 const polygonOverlay = ref<mapbox.MapboxOverlay | null>(null);
 const props = defineProps<{
 	features: Array<CustomGeoJsonFeature>;
-	customIcons: Record<string, CustomIconEntry>;
+	customIcons: Record<string, CustomMapLegendEntry>;
 	movements: Array<CustomGeoJsonFeature>;
 	events: Array<GeoJsonFeature>;
 	height: number;
@@ -99,7 +99,6 @@ const props = defineProps<{
 	selectionBounds?: Array<[number, number]>;
 	currentSelectionId?: string;
 }>();
-
 const emit = defineEmits<{
 	(
 		event: "layer-click",
@@ -203,9 +202,10 @@ function initializeCustomIconLayer(key: string, reloadImage = false) {
 			clusterRadius: 10,
 		});
 
+	const modifiedIconName = props.customIcons[key]?.icon?.replaceAll("-", "");
 	//@ts-expect-error ensure iconName is a valid Lucide Icon
 	// eslint-disable-next-line import-x/namespace
-	const iconSVG = LucideIcons[props.customIcons[key].icon];
+	const iconSVG = LucideIcons[modifiedIconName];
 
 	const div = document.createElement("div");
 	div.innerHTML = iconSVG;
@@ -273,7 +273,7 @@ function init(initAfterThemeSwitch = false) {
 		//
 
 		const fullscreen = new FullscreenControl({});
-		map.addControl(fullscreen, "top-right");
+		map.addControl(fullscreen, "top-left");
 
 		//
 
@@ -588,8 +588,9 @@ watch(
 );
 
 function updateScopeOfCustomIconLayers() {
-	assert(context.map != null);
+	if (context.map == null) return;
 	const map = context.map;
+
 	for (const key in props.customIcons) {
 		if (!map.hasImage(`custom-icon-image-${key}`)) {
 			initializeCustomIconLayer(key);
@@ -887,7 +888,6 @@ function updateMovements() {
 	const groupedMovements = new Map<string, Array<CurvedMovementLine>>();
 	// Process the GeoJSON movements array to create curved lines
 
-	//curvedMovements.value =
 	props.movements.forEach((movement) => {
 		if (movement.geometry.type === "GeometryCollection") {
 			const geometries = movement.geometry.geometries;
@@ -1072,9 +1072,16 @@ function updateLayers(currentTime: number) {
 }
 
 function renderArcs() {
+	const filteredArcs = updatedCurvedMovements.value.filter((move) => {
+		return (
+			props.movements.find((m) => {
+				return move.id.includes(m.properties._id);
+			})?.properties.isDisplayed !== false
+		);
+	});
 	const layer = new CustomArcLayer({
 		id: "arc",
-		data: updatedCurvedMovements.value,
+		data: filteredArcs,
 		getSourcePosition: (d) => {
 			return d.coordinates[0];
 		},

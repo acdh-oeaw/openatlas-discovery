@@ -4,10 +4,10 @@
 	"license": "MIT",
 	"type": "module",
 	"engines": {
-		"node": "22.x",
-		"pnpm": "9.x"
+		"node": "24.x",
+		"pnpm": "10.x"
 	},
-	"packageManager": "pnpm@9.4.0",
+	"packageManager": "pnpm@10.4.0",
 	"scripts": {
 		"analyze": "nuxt analyze",
 		"build": "nuxt build --dotenv ./.env.local",
@@ -91,9 +91,9 @@
 		"nuxt-svgo": "4.0.11",
 		"openapi-typescript": "^7.0.0",
 		"pino-http": "^10.1.0",
-		"pnpm": "^9.4.0",
 		"popmotion": "^11.0.5",
 		"radix-vue": "^1.8.5",
+		"reka-ui": "^2.6.1",
 		"satori": "^0.10.13",
 		"sigma": "^3.0.0-beta.23",
 		"tailwind-merge": "^2.3.0",

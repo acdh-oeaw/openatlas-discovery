@@ -4,11 +4,11 @@ navigation: false
 image:
   light: /assets/images/hero-light.svg
   dark: /assets/images/hero-dark.svg
-leadIn: "Das ist eine Demo für [OpenAtlas
-  Discovery](https://github.com/craws/OpenAtlas-Discovery), eine
-  Präsentatiosseite für [OpenAtlas](https://openatlas.eu). Die Demodaten wurden
-  freundlicherweise bereitgestellt von: [THANADOS](https://thanados.net/) - Die
-  Anthropologische und Archäologische Datenbank von Sepulturen"
+leadIn:
+  "Das ist eine Demo für OpenAtlas Discovery, eine Präsentatiosseite für OpenAtlas. Die Demodaten
+  wurden freundlicherweise bereitgestellt von: [Mapping Medieval Conflict
+  (MEDCON)](https://www.oeaw.ac.at/imafo/das-institut/detail/mapping-medieval-conflicts). A digital
+  approach towards political dynamics in the pre-modern period."
 links:
   - label: Daten anzeigen
     href: /visualization?mode=table
@@ -16,14 +16,13 @@ links:
     href: /visualization?mode=map
 ---
 
-THANADOS (Die Anthropologische und Archäologische Datenbank von Sepulturen) beschäftigt sich mit der
-digitalen Sammlung und Darstellung frühmittelalterlicher Friedhöfe im heutigen Österreich.
+MEDCON wurde durch das go!digital-Programm der Österreichischen Akademie der Wissenschaften (ÖAW)
+finanziert und vom Oktober 2014 bis zum Mai 2017 am Institut für Mittelalterforschung der ÖAW
+durchgeführt. Das Projekt untersuchte unter der Leitung von Johannes Preiser-Kapeller die
+Erklärungskraft von Konzepten der sozialen und geographischen Netzwerkanalyse für Phänomene des
+politischen Konflikts in mittelalterlichen Gesellschaften.
 
-Innerhalb von THANADOS wurden bisher veröffentlichte Informationen zu frühmittelalterlichen
-Bestattungen digitalisiert und ins Englische übersetzt. Die Daten werden unter Verwendung des CIDOC
-CRM kartiert und online bereitgestellt. Die Informationen können über einen digitalen Katalog und
-eine interaktive Karte erkundet werden. Kartografische Visualisierungen sowie Diagramme und Grafiken
-werden dynamisch auf Basis realer archäologischer Forschungsdaten erstellt.
-
-Ziel ist es, einen Best-Practice-Ansatz zur Verbreitung archäologischer Quellen und Forschung im 21.
-Jahrhundert im Kontext der digitalen Geisteswissenschaften zu bieten.
+Die Daten, die in dieser Demo-Version präsentiert werden, stammen aus zwei Fallstudien von MEDCON,
+„Kaiser Friedrich III. und die Liga der Mailberger Koalition, 1451/52“ (durchgeführt durch Kornelia
+Holzner-Tobisch und Petra Heinicker) und „Fraktionen und Allianzen im Kampf von Maximilian I. um
+Burgund“ (Sonja Dünnebeil).

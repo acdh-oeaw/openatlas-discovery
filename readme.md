@@ -134,8 +134,9 @@ pnpm run generate:reroute-index
 Now you can deploy the static files to a web server. The generated files are in the
 `.output/public/` directory.
 
-In case you are using a Debian based system with an Apache webserver you have to add this
-to the host configuration for permalinks to work. Adapt as needed.
+In case you are using a Debian based system with an Apache webserver you have to add this to the
+host configuration for permalinks to work. Adapt as needed.
+
 ```bash
 <VirtualHost *:443>
         ...

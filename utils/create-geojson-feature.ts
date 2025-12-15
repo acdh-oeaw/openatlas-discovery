@@ -17,6 +17,7 @@ export interface CustomGeoJsonFeature extends GeoJsonFeature {
 		isDisplayed?: boolean;
 		otherFeatures?: Array<string>;
 		shapeType?: string;
+		types?: Array<NonNullable<EntityFeature["types"]>[0]>;
 	};
 }
 
@@ -31,6 +32,10 @@ export function createGeoJsonFeature(
 		geometry: geometry as GeoJsonFeature["geometry"],
 		properties: {
 			_id: "properties" in entity ? entity.properties._id : String(entity.id),
+			//@ts-expect-error union type is causing conflicts
+			types: (entity.types ?? []).filter((type) => {
+				return type != null;
+			}),
 		},
 	};
 }

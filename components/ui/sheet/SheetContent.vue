@@ -15,9 +15,14 @@ import { cn, variants } from "@/utils/styles";
 interface SheetContentProps extends DialogContentProps {
 	side?: "bottom" | "left" | "right" | "top";
 	class?: string;
+	backdrop?: boolean;
+	closeButton?: boolean;
 }
 
-const props = defineProps<SheetContentProps>();
+const props = withDefaults(defineProps<SheetContentProps>(), {
+	backdrop: false,
+	closeButton: true,
+});
 
 const emits = defineEmits<DialogContentEmits>();
 
@@ -33,6 +38,8 @@ const sheetVariants = variants({
 			left: "inset-y-0 left-0 h-full w-3/4 border-r border-border data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
 			right:
 				"inset-y-0 right-0 h-full w-3/4  border-l border-border data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
+			legend:
+				"right-0 w-3/4 max-h-fit border-border data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
 		},
 	},
 	defaultVariants: {
@@ -44,6 +51,7 @@ const sheetVariants = variants({
 <template>
 	<DialogPortal>
 		<DialogOverlay
+			v-if="props.backdrop"
 			class="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
 		/>
 		<DialogContent
@@ -53,6 +61,7 @@ const sheetVariants = variants({
 			<slot />
 
 			<DialogClose
+				v-if="props.closeButton"
 				class="absolute right-4 top-4 rounded-md p-0.5 transition-colors hover:bg-secondary"
 			>
 				<XIcon class="size-4 text-muted-foreground" />

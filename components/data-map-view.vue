@@ -2,15 +2,13 @@
 import { assert, keyByToMap } from "@acdh-oeaw/lib";
 import * as turf from "@turf/turf";
 import type { Feature } from "geojson";
-import * as LucideIcons from "lucide-static";
-import { FilterIcon } from "lucide-vue-next";
 import type { MapGeoJSONFeature } from "maplibre-gl";
 import * as v from "valibot";
 
 import type { SearchFormData } from "@/components/search-form.vue";
 import type { EntityFeature } from "@/composables/use-create-entity";
 import { categories, operatorMap } from "@/composables/use-get-search-results";
-import type { CustomIconEntry } from "@/types/api";
+import type { CustomMapLegendEntry } from "@/types/api";
 import type { GeoJsonFeature } from "@/utils/create-geojson-feature";
 
 import { project } from "../config/project.config";
@@ -59,7 +57,7 @@ function onChangeSearchFilters(values: SearchFormData) {
 
 onMounted(() => {
 	setMovementId({ id: selection.value as unknown as string });
-	visibleIcons.value = Object.keys(customIconEntries.value);
+	filterIcons(Object.keys(customIconEntries.value));
 });
 
 const { data, isPending, isPlaceholderData } = useGetSearchResults(
@@ -104,16 +102,14 @@ const entitiesById = computed(() => {
 });
 
 let show = ref(false);
-let showMovements = ref(false);
+let showMovements = computed(() => {
+	return Object.keys(filteredCustomMoveEntries.value).length > 0;
+});
 
 const movementId = ref<number | null>(null);
 
 function togglePolygons() {
 	show.value = !show.value;
-}
-
-function toggleMovements() {
-	showMovements.value = !showMovements.value;
 }
 
 const selection = computed(() => {
@@ -204,7 +200,7 @@ const features = computed(() => {
 				//if (f.properties._id == feature.properties._id) return false;
 				if (f.geometry.type === "GeometryCollection") {
 					return f.geometry.geometries.some((geo) => {
-						assert(feature.geometry.type === "GeometryCollection");
+						assert(feature.geometry.type === "GeometryCollection", "1");
 						return (
 							geo.type === "Polygon" &&
 							feature.geometry.geometries.find((g) => {
@@ -293,6 +289,10 @@ const movements = computed(() => {
 		);
 		if (customConfig != null) {
 			feature.properties.color = customConfig[1].color;
+			feature.properties.isDisplayed =
+				customConfig[1].entityType in filteredCustomMoveEntries.value;
+		} else {
+			feature.properties.isDisplayed = (-1) in filteredCustomMoveEntries.value;
 		}
 		return feature;
 	});
@@ -479,10 +479,10 @@ function setCoordinates(entity: EntityFeature, coordinates: Ref<[number, number]
 			});
 			if (selectedMove?.geometry && "geometries" in selectedMove.geometry) {
 				selectionBounds.value = selectedMove.geometry.geometries.map((geo) => {
-					assert("coordinates" in geo);
+					assert("coordinates" in geo, "3");
 					return geo.coordinates as [number, number];
 				});
-				assert(selectionBounds.value);
+				assert(selectionBounds.value, "4");
 
 				const points = turf.points(selectionBounds.value);
 				coordinates.value = turf.center(points).geometry.coordinates as [number, number];
@@ -571,7 +571,7 @@ const linkedMovements = computed(() => {
 	let features = [currentMovement];
 
 	while (currentMovement.children && currentMovement.children.length > 0) {
-		assert(currentMovement.children[0]);
+		assert(currentMovement.children[0], "5");
 		features = features.concat(currentMovement.children);
 		currentMovement = currentMovement.children[0];
 	}
@@ -596,7 +596,7 @@ function setMovementId({ id }: { id: string | null }) {
 }
 
 const customIconEntries = computed(() => {
-	const entries: Record<string, CustomIconEntry> = {};
+	const entries: Record<string, CustomMapLegendEntry> = {};
 	entities.value.forEach((entity) => {
 		const foundType = entity.types?.findLast((type) => {
 			return project.map.customIconConfig.find((config) => {
@@ -609,7 +609,7 @@ const customIconEntries = computed(() => {
 				const configEntry = project.map.customIconConfig.find((config) => {
 					return String(config.entityType) === unprefixedType;
 				});
-				const customEntry: CustomIconEntry = {
+				const customEntry: CustomMapLegendEntry = {
 					type: foundType,
 					icon: configEntry?.iconName,
 					color: configEntry?.color,
@@ -634,32 +634,76 @@ const customIconEntries = computed(() => {
 			}
 		}
 	});
-	console.log("custom entries: ", entries);
-	console.log("LucideIcons: ", LucideIcons);
 	return entries;
 });
-
-const visibleIcons = ref<Array<string>>([]);
-function toggleIcon(key: string) {
-	if (visibleIcons.value.includes(key))
-		visibleIcons.value = visibleIcons.value.filter((i) => {
-			return i !== key;
+const customMovementEntries = computed(() => {
+	const result: Record<string, CustomMapLegendEntry> = {};
+	project.map.customMovementConfig.colorConfig.forEach((config) => {
+		const matchingMovements = movements.value.filter((move) => {
+			return move.properties.types?.find((t) => {
+				return getUnprefixedId(t.identifier ?? "") === String(config.entityType);
+			});
 		});
-	else {
-		visibleIcons.value.push(key);
-	}
-}
+		if (matchingMovements.length === 0) return;
+		const matchingType = matchingMovements[0]?.properties.types?.find((t) => {
+			return getUnprefixedId(t.identifier ?? "") === String(config.entityType);
+		});
+		assert(matchingType != null, "There must be a matching type");
+		result[String(config.entityType)] = {
+			type: matchingType,
+			color: config.color,
+			entities: matchingMovements,
+		};
+	});
+	// add default entry to toggle "other movements"
+	result[-1] = {
+		type: {
+			label:
+				Object.keys(result).length > 0
+					? t("DataMapView.otherMovements")
+					: t("DataMapView.showMovement"),
+		},
+		entities: movements.value.filter((m) => {
+			return !Object.values(result)
+				.map((entry) => {
+					return entry.entities;
+				})
+				.flat()
+				.includes(m);
+		}),
+		color: project.colors.geojsonMovement,
+	};
+	return result;
+});
 
-const filteredCustomIconEntries = computed(() => {
-	return Object.fromEntries(
+const filteredCustomIconEntries = ref<Record<string, CustomMapLegendEntry>>({});
+const filteredCustomMoveEntries = ref<Record<string, CustomMapLegendEntry>>({});
+
+function filterIcons(visibleIcons: Array<string>) {
+	filteredCustomIconEntries.value = Object.fromEntries(
 		Object.entries(customIconEntries.value).filter(([key, _]) => {
-			return visibleIcons.value.length === 0 || visibleIcons.value.includes(key);
+			return visibleIcons.includes(key);
 		}),
 	);
-});
+}
+function filterMovements(visibleMoves: Array<string>) {
+	filteredCustomMoveEntries.value = Object.fromEntries(
+		Object.entries(customMovementEntries.value).filter(([key, _]) => {
+			return visibleMoves.includes(key);
+		}),
+	);
+}
 </script>
 
 <template>
+	<div class="absolute right-0 top-0 z-50 flex p-1.5">
+		<MapLegendPanel
+			:icon-data="customIconEntries"
+			:move-data="customMovementEntries"
+			@visible-icons="filterIcons"
+			@visible-moves="filterMovements"
+		/>
+	</div>
 	<div :class="project.fullscreen ? 'relative grid' : 'relative grid grid-rows-[auto_1fr] gap-4'">
 		<div
 			:class="
@@ -674,6 +718,7 @@ const filteredCustomIconEntries = computed(() => {
 				"
 				:category="searchFilters.category"
 				:search="searchFilters.search"
+				visualization-type="map"
 				@submit="onChangeSearchFilters"
 			/>
 		</div>
@@ -687,9 +732,7 @@ const filteredCustomIconEntries = computed(() => {
 				<div
 					class="max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent bg-white/90 p-2 text-sm font-medium shadow-md dark:bg-neutral-900"
 				>
-					<div
-						class="grid grid-cols-[auto_auto_auto_auto_1fr_auto] items-center gap-3 align-middle"
-					>
+					<div class="grid grid-cols-[auto_auto_auto_auto] items-center gap-3 align-middle">
 						<div class="grid grid-cols-[auto_1fr] gap-1">
 							<span
 								class="m-1.5 size-2 rounded-full"
@@ -715,62 +758,6 @@ const filteredCustomIconEntries = computed(() => {
 							<Toggle variant="iiif" @click="togglePolygons">
 								{{ $t("DataMapView.polygon") }}
 							</Toggle>
-						</div>
-						<div>
-							<Toggle variant="iiif" @click="toggleMovements">
-								{{ $t("DataMapView.showMovement") }}
-							</Toggle>
-						</div>
-						<div v-if="project.map.customIconConfig && project.map.customIconConfig.length > 0">
-							<Popover>
-								<PopoverTrigger>
-									<TooltipProvider>
-										<Tooltip :disabled="Object.keys(customIconEntries).length > 0">
-											<TooltipTrigger>
-												<Button
-													variant="iiif"
-													class="group"
-													:disabled="Object.keys(customIconEntries).length === 0"
-													><FilterIcon :size="16"></FilterIcon> {{ $t("DataMapView.filter") }}
-													<Badge v-if="visibleIcons.length" variant="groupOutline">{{
-														visibleIcons.length
-													}}</Badge></Button
-												>
-											</TooltipTrigger>
-											<TooltipContent>{{ $t("DataMapView.no-icons") }}</TooltipContent>
-										</Tooltip>
-									</TooltipProvider>
-								</PopoverTrigger>
-								<PopoverContent side="top" class="w-auto">
-									<div class="">
-										<div class="text-xs text-muted-foreground">
-											{{ $t("DataMapView.icons") }}
-										</div>
-										<Toggle
-											v-for="[key, entry] in Object.entries(customIconEntries).sort(
-												(a, b) => a[1].type?.label?.localeCompare(b[1].type?.label ?? '') ?? 0,
-											)"
-											:key="entry.type?.identifier"
-											:pressed="visibleIcons.includes(key)"
-											class="group my-2 flex min-w-0 items-center text-left"
-											variant="iiif"
-											@click="() => toggleIcon(key)"
-										>
-											<div
-												v-if="entry.icon != null"
-												class="mr-2 size-6 scale-[0.7]"
-												v-html="LucideIcons[entry.icon as keyof typeof LucideIcons]"
-											></div>
-											<span
-												>{{ entry.type?.label
-												}}<Badge variant="groupOutline" class="ml-4">{{
-													entry.entities.length
-												}}</Badge></span
-											>
-										</Toggle>
-									</div>
-								</PopoverContent>
-							</Popover>
 						</div>
 					</div>
 				</div>

@@ -115,6 +115,7 @@ const entities = computed(() => {
 		<SearchForm
 			:category="searchFilters.category"
 			:search="searchFilters.search"
+			visualization-type="table"
 			@submit="onChangeSearchFilters"
 		/>
 

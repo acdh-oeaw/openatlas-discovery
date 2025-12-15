@@ -462,22 +462,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/table_rows/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["GetTableRows"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/type_by_view_class/": {
         parameters: {
             query?: never;
@@ -1331,10 +1315,6 @@ export interface components {
             /** Format: int32 */
             type: number;
         };
-        TableRowModel: {
-            pagination: components["schemas"]["PaginationModel"];
-            results: Array<Array<string | null>>;
-        };
         TimeRangeModel: {
             end: {
                 comment: string | null;
@@ -1477,7 +1457,7 @@ export interface components {
          * @description Specify the format for the returned results.
          * @example lp
          */
-        format: "geojson-v2" | "geojson" | "lp" | "lpx" | "n3" | "nt" | "pretty-xml" | "table_row" | "turtle" | "xml";
+        format: "geojson-v2" | "geojson" | "lp" | "lpx" | "n3" | "nt" | "pretty-xml" | "turtle" | "xml";
         /** @description Filters the geometries to be included in the response. The default is 'gisAll'. */
         geometry: Array<"gisAll" | "gisLineAll" | "gisPointAll" | "gisPointSibling" | "gisPointSubs" | "gisPointSupers" | "gisPolygonAll">;
         /**
@@ -2844,124 +2824,6 @@ export interface operations {
                 headers: Record<string, unknown>;
                 content: {
                     "application/json": components["schemas"]["SystemClassCountModel"];
-                };
-            };
-            /** @description Something went wrong. Please consult the error message. */
-            404: {
-                headers: Record<string, unknown>;
-                content?: never;
-            };
-        };
-    };
-    GetTableRows: {
-        parameters: {
-            query?: {
-                /** @description The entity IDs to be requested. */
-                entities?: components["parameters"]["entities"];
-                /**
-                 * @description Retrieve entities based on the specified view classes.
-                 * @example actor
-                 */
-                view_classes?: components["parameters"]["view_classes"];
-                /** @description Retrieve entities based on the specified system classes */
-                system_classes?: components["parameters"]["system_classes"];
-                /**
-                 * @description Retrieve entities based on the specified CIDOC classes.
-                 * @example E18
-                 */
-                cidoc_classes?: components["parameters"]["cidoc_classes"];
-                /** @description The entity IDs for which all linked entities will be retrieved. */
-                linked_entities?: components["parameters"]["linked_entities"];
-                /** @description Download results */
-                download?: components["parameters"]["download"];
-                /** @description Show integer count of how many entities would the result give back */
-                count?: components["parameters"]["count"];
-                /** @description Will calculate the centerpoint for all polygons and linestrings and *add* them to geometries */
-                centroid?: components["parameters"]["centroid"];
-                /** @description Select which keys should not be displayed. This can improve performance */
-                show?: components["parameters"]["show"];
-                /**
-                 * @description Choose one column to sort the results by. Default value is name.
-                 * @example name
-                 */
-                column?: components["parameters"]["column"];
-                /**
-                 * @description Sorting result ascending or descending of the given column. Default value is asc.
-                 * @example asc
-                 */
-                sort?: components["parameters"]["sort"];
-                /** @description Search query for specific results.
-                 *
-                 *      **Filterable categories**
-                 *
-                 *      entityName, entityDescription, entityAliases, entityCidocClass, entitySystemClass, entityID, typeID, valueTypeID, typeIDWithSubs, typeName, beginFrom, beginTo, endFrom, endTo, relationToID
-                 *
-                 *      **Values**
-                 *
-                 *      Values has to be a list of items. The items can be either a string, an integer or a tuple (see Notes). Strings need to be marked with “” or ‘’, while integers does not allow this.
-                 *
-                 *      *Notes*:
-                 *      The category valueTypeID can search for values of a type ID. But it takes one or more two valued Tuple as list entry: (x,y). x is the type id and y is the searched value. This can be an int or a float, e.g: `{"operator":"lesserThan","values":[(3142,543.3)],"logicalOperator":"and"}`
-                 *      The date categories (beginFrom, beginTo, endFrom, endTo) only allow *one* value in the **values** field and it has to be formated the following way: YYYY-MM-DD. Month and day values need to filled up with 0, e.g. 800-01-01
-                 *
-                 *      **Compare operators**
-                 *
-                 *      equal, notEqual, like (1), greaterThan (2), greaterThanEqual (2), lesserThan (2)
-                 *
-                 *     The compare operators work like the mathematical operators. equal x=y, notEqual x!=y, greaterThan x>y , greaterThanEqual x>=y, lesserThan x<y, lesserThanEqual x<=y. The like operator searches for occurrence of the string, so a match can also occur in the middle of a word.
-                 *
-                 *     (1)Only for string based categories
-                 *
-                 *     (2)Only for beginFrom, beginTo, endFrom, endTo, valueTypeID
-                 *
-                 *     **Logical operators**
-                 *
-                 *     Not mandatory, OR is the default value. Logical operators handles, if the values are treated as OR or AND.
-                 *
-                 *      The following table outlines the supported operations for each field:
-                 *
-                 *     |                  | equal     | notEqual  | like      | greaterThan | greaterThanEqual | lesserThan | lesserThanEqual |
-                 *     |------------------|-----------|-----------|-----------|-------------|------------------|------------|-----------------|
-                 *     | entityName       |     x      |     x      |    x       |             |                  |            |                 |
-                 *     | entityDescription|      x     |      x     |      x     |             |                  |            |                 |
-                 *     | entityAliases    |      x     |      x     |     x      |             |                  |            |                 |
-                 *     | entityCidocClass |      x     |      x     |      x     |             |                  |            |                 |
-                 *     | entitySystemClass|      x     |      x     |     x      |             |                  |            |                 |
-                 *     | typeName         |       x    |      x     |     x      |             |                  |            |                 |
-                 *     | entityID         |       x    |      x     |           |             |                  |            |                 |
-                 *     | typeID           |      x     |       x    |           |             |                  |            |                 |
-                 *     | valueTypeID      |      x     |      x     |           |      x       |    x              |    x        |      x           |
-                 *     | typeIDWithSubs   |      x     |       x    |           |             |                  |            |                 |
-                 *     | relationToID     |      x     |      x     |           |             |                  |            |                 |
-                 *     | beginFrom        |      x     |      x     |           |      x       |        x          |     x       |      x           |
-                 *     | beginTo          |      x     |      x     |           |      x       |          x        |      x      |       x          |
-                 *     | endFrom          |      x     |      x     |           |       x      |         x         |       x     |       x          |
-                 *     | endTo            |      x     |      x     |           |       x      |       x           |       x     |      x           |
-                 *
-                 *      */
-                search?: components["parameters"]["search"];
-                /** @description Starts the result set at the specified entity ID. */
-                first?: components["parameters"]["first"];
-                /** @description Starts the result set after the specified entity ID. */
-                last?: components["parameters"]["last"];
-                /** @description Specifies the page number to retrieve in a paginated result set. */
-                page?: components["parameters"]["page"];
-                /** @description Limits the number of entities returned in the response. A lower value may improve performance. The default is 20. Set to 0 to return all available entities. */
-                limit?: components["parameters"]["limit"];
-                /** @description Filter results to include only entities with the specified type ID or those linked to it. */
-                type_id?: components["parameters"]["type_id"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: Record<string, unknown>;
-                content: {
-                    "application/ld+json": components["schemas"]["TableRowModel"];
                 };
             };
             /** @description Something went wrong. Please consult the error message. */

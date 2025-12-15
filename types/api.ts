@@ -56,7 +56,7 @@ export type RelatedEntityModel = components["schemas"]["RelatedEntityModel"];
 
 export type File = NonNullable<components["schemas"]["PresentationViewModel"]["files"]>[0];
 
-export interface CustomIconEntry {
+export interface CustomMapLegendEntry {
 	type: NonNullable<EntityFeature["types"]>[0] | undefined;
 	icon?: string;
 	color?: string;
