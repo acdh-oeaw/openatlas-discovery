@@ -2,8 +2,6 @@
 import { assert, keyByToMap } from "@acdh-oeaw/lib";
 import * as turf from "@turf/turf";
 import type { Feature } from "geojson";
-import * as LucideIcons from "lucide-static";
-import { FilterIcon } from "lucide-vue-next";
 import type { MapGeoJSONFeature } from "maplibre-gl";
 import * as v from "valibot";
 
@@ -640,16 +638,16 @@ const customIconEntries = computed(() => {
 const customMovementEntries = computed(() => {
 	const result: Record<string, CustomMapLegendEntry> = {};
 	project.map.customMovementConfig.colorConfig.forEach((config) => {
-		const matchingMovements = movements.value.filter((move) =>
-			move.properties.types?.find(
-				(t) => getUnprefixedId(t?.identifier) === String(config.entityType),
-			),
-		);
+		const matchingMovements = movements.value.filter((move) => {
+			return move.properties.types?.find((t) => {
+				return getUnprefixedId(t.identifier ?? "") === String(config.entityType);
+			});
+		});
 		console.log(config, movements.value);
 		if (matchingMovements.length === 0) return;
-		const matchingType = matchingMovements[0]?.properties.types?.find(
-			(t) => getUnprefixedId(t?.identifier) === String(config.entityType),
-		);
+		const matchingType = matchingMovements[0]?.properties.types?.find((t) => {
+			return getUnprefixedId(t.identifier ?? "") === String(config.entityType);
+		});
 		assert(matchingType != null, "There must be a matching type");
 		result[String(config.entityType)] = {
 			type: matchingType,
@@ -661,16 +659,12 @@ const customMovementEntries = computed(() => {
 	return result;
 });
 
-const toggleMapLegendPanel = () => {
-	showMapLegendPanel.value = !showMapLegendPanel.value;
-};
-
 const filteredCustomIconEntries = ref<Record<string, CustomMapLegendEntry>>({});
 
 function filterIcons(visibleIcons: Array<string>) {
 	filteredCustomIconEntries.value = Object.fromEntries(
 		Object.entries(customIconEntries.value).filter(([key, _]) => {
-			return visibleIcons.length === 0 || visibleIcons.includes(key);
+			return visibleIcons.includes(key);
 		}),
 	);
 }
@@ -683,11 +677,11 @@ function filterIcons(visibleIcons: Array<string>) {
 			project.map.customIconConfig.length > 0 &&
 			(Object.keys(customIconEntries).length > 0 || Object.keys(customMovementEntries).length > 0)
 		"
-		class="absolute flex z-50 p-1.5 top-0 right-0"
+		class="absolute right-0 top-0 z-50 flex p-1.5"
 	>
 		<MapLegendPanel
-			:iconData="customIconEntries"
-			:moveData="customMovementEntries"
+			:icon-data="customIconEntries"
+			:move-data="customMovementEntries"
 			@visible-icons="filterIcons"
 		/>
 	</div>
