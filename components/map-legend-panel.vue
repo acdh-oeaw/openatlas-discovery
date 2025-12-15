@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import type { CustomMapLegendEntry } from "@/types/api";
 import * as LucideIcons from "lucide-static";
 import { ChevronLeftIcon, ChevronRightIcon, SplineIcon } from "lucide-vue-next";
 
-const t = useTranslations();
+import type { CustomMapLegendEntry } from "@/types/api";
+
+// const t = useTranslations();
 
 const props = defineProps<{
 	iconData: Record<string, CustomMapLegendEntry>;
@@ -27,17 +28,18 @@ function toggleIcon(key: string) {
 }
 
 watch(
-	() => {
-		return visibleIcons.value;
-	},
+	visibleIcons,
 	() => {
 		emit("visible-icons", visibleIcons.value);
 	},
+	{ deep: true },
 );
 
 onMounted(() => {
 	visibleIcons.value = Object.keys(props.iconData);
-	setTimeout(() => (expandedState.value = true), 500);
+	setTimeout(() => {
+		return (expandedState.value = true);
+	}, 500);
 });
 
 const expandedState = ref(false);
@@ -48,20 +50,20 @@ function toggleExpandedState() {
 
 <template>
 	<div
-		class="fixed top-20 inset-y-0 right-0 z-50 max-w-1/4 max-h-fit bg-none transition-transform ease-in-out duration-500"
+		class="max-w-1/4 fixed inset-y-0 right-0 top-20 z-50 max-h-fit bg-none transition-transform duration-500 ease-in-out"
 		:class="expandedState ? 'translate-x-0' : 'translate-x-full'"
 	>
 		<button
-			class="-ml-8 absolute w-8 right-full top-2 -z-10 block rounded-l-md bg-[hsl(var(--card))] py-2 px-1 shadow-md"
-			@click="toggleExpandedState"
+			class="absolute right-full top-2 -z-10 -ml-8 block w-8 rounded-l-md bg-[hsl(var(--card))] px-1 py-2 shadow-md"
 			:class="expandedState ? 'translate-x-2' : 'translate-x-0'"
+			@click="toggleExpandedState"
 		>
 			<ChevronRightIcon class="size-8" :class="{ block: expandedState, hidden: !expandedState }" />
 			<ChevronLeftIcon class="size-8" :class="{ hidden: expandedState, block: !expandedState }" />
 		</button>
 		<div>
 			<aside
-				class="flex gap-2 overflow-x-auto rounded-b-md rounded-tr-md border-2 border-transparent bg-white m-2 text-sm shadow-md p-2"
+				class="m-2 flex gap-2 overflow-x-auto rounded-r-md border-2 border-transparent bg-white p-2 text-sm shadow-md"
 			>
 				<div class="inline-flex">
 					<Tabs default-value="icons">
