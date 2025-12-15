@@ -4,7 +4,7 @@ import { ChevronLeftIcon, ChevronRightIcon, SplineIcon } from "lucide-vue-next";
 
 import type { CustomMapLegendEntry } from "@/types/api";
 
-// const t = useTranslations();
+const t = useTranslations();
 
 const props = defineProps<{
 	iconData: Record<string, CustomMapLegendEntry>;
@@ -16,7 +16,7 @@ const emit = defineEmits<{
 }>();
 
 const visibleIcons = ref<Array<string>>(Object.keys(props.iconData));
-const visibleMoves = ref<Array<string>>(Object.keys(props.moveData));
+const visibleMoves = ref<Array<string>>([]);
 
 function toggleIcon(key: string) {
 	if (visibleIcons.value.includes(key))
@@ -54,7 +54,7 @@ watch(
 
 onMounted(() => {
 	visibleIcons.value = Object.keys(props.iconData);
-	visibleMoves.value = Object.keys(props.moveData);
+	// visibleMoves.value = Object.keys(props.moveData);
 	setTimeout(() => {
 		return (expandedState.value = true);
 	}, 500);
@@ -94,7 +94,7 @@ function toggleExpandedState() {
 							</TabsTrigger>
 						</TabsList>
 						<TabsContent value="icons">
-							<div class="max-h-48 overflow-auto">
+							<div v-if="Object.keys(props.iconData).length > 0" class="max-h-48 overflow-auto">
 								<Toggle
 									v-for="[key, entry] in Object.entries(props.iconData).sort(
 										(a, b) => a[1].type?.label?.localeCompare(b[1].type?.label ?? '') ?? 0,
@@ -122,16 +122,19 @@ function toggleExpandedState() {
 									>
 								</Toggle>
 							</div>
+							<div v-else class="text-xs text-muted-foreground">
+								{{ t("DataMapView.no-icons") }}
+							</div>
 						</TabsContent>
 						<TabsContent value="movements">
-							<div class="max-h-48 overflow-auto">
+							<div v-if="Object.keys(props.moveData).length > 0" class="max-h-48 overflow-auto">
 								<Toggle
 									v-for="[key, entry] in Object.entries(props.moveData).sort(
 										(a, b) => a[1].type?.label?.localeCompare(b[1].type?.label ?? '') ?? 0,
 									)"
 									:key="entry.type?.identifier"
 									:pressed="visibleMoves.includes(key)"
-									class="group my-2 flex min-w-0 items-center text-left"
+									class="group my-2 flex min-w-0 items-center text-left capitalize"
 									variant="legend"
 									:custom-background-color="entry.color"
 									@click="() => toggleMove(key)"
@@ -149,6 +152,9 @@ function toggleExpandedState() {
 										}}</Badge></span
 									>
 								</Toggle>
+							</div>
+							<div v-else class="text-xs text-muted-foreground">
+								{{ t("DataMapView.no-moves") }}
 							</div>
 						</TabsContent>
 					</Tabs>

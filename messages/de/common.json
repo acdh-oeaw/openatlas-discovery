@@ -50,10 +50,12 @@
 		"polygon": "Flächen anzeigen",
 		"movement": "Bewegung",
 		"showMovement": "Bewegungen anzeigen",
+		"otherMovements": "andere Bewegungen",
 		"filter": "Filter",
 		"icons": "Symbole",
 		"featuredMovements": "Hervorgehobene Bewegungen",
-		"no-icons": "Keine Symbole auf der Karte vorhanden."
+		"no-icons": "Keine Symbole auf der Karte vorhanden.",
+		"no-moves": "Keine Bewegungen auf der Karte vorhanden."
 	},
 	"DataView": {
 		"nothing-found": "Keine Einträge zu dieser Suche."

@@ -102,16 +102,14 @@ const entitiesById = computed(() => {
 });
 
 let show = ref(false);
-let showMovements = ref(false);
+let showMovements = computed(() => {
+	return Object.keys(filteredCustomMoveEntries.value).length > 0;
+});
 
 const movementId = ref<number | null>(null);
 
 function togglePolygons() {
 	show.value = !show.value;
-}
-
-function toggleMovements() {
-	showMovements.value = !showMovements.value;
 }
 
 const selection = computed(() => {
@@ -293,6 +291,8 @@ const movements = computed(() => {
 			feature.properties.color = customConfig[1].color;
 			feature.properties.isDisplayed =
 				customConfig[1].entityType in filteredCustomMoveEntries.value;
+		} else {
+			feature.properties.isDisplayed = (-1) in filteredCustomMoveEntries.value;
 		}
 		return feature;
 	});
@@ -655,7 +655,24 @@ const customMovementEntries = computed(() => {
 			entities: matchingMovements,
 		};
 	});
-	console.log(result);
+	// add default entry to toggle "other movements"
+	result[-1] = {
+		type: {
+			label:
+				Object.keys(result).length > 0
+					? t("DataMapView.otherMovements")
+					: t("DataMapView.showMovement"),
+		},
+		entities: movements.value.filter((m) => {
+			return !Object.values(result)
+				.map((entry) => {
+					return entry.entities;
+				})
+				.flat()
+				.includes(m);
+		}),
+		color: project.colors.geojsonMovement,
+	};
 	return result;
 });
 
@@ -679,14 +696,7 @@ function filterMovements(visibleMoves: Array<string>) {
 </script>
 
 <template>
-	<div
-		v-if="
-			project.map.customIconConfig &&
-			project.map.customIconConfig.length > 0 &&
-			(Object.keys(customIconEntries).length > 0 || Object.keys(customMovementEntries).length > 0)
-		"
-		class="absolute right-0 top-0 z-50 flex p-1.5"
-	>
+	<div class="absolute right-0 top-0 z-50 flex p-1.5">
 		<MapLegendPanel
 			:icon-data="customIconEntries"
 			:move-data="customMovementEntries"
@@ -722,9 +732,7 @@ function filterMovements(visibleMoves: Array<string>) {
 				<div
 					class="max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent bg-white/90 p-2 text-sm font-medium shadow-md dark:bg-neutral-900"
 				>
-					<div
-						class="grid grid-cols-[auto_auto_auto_auto_1fr_auto] items-center gap-3 align-middle"
-					>
+					<div class="grid grid-cols-[auto_auto_auto_auto] items-center gap-3 align-middle">
 						<div class="grid grid-cols-[auto_1fr] gap-1">
 							<span
 								class="m-1.5 size-2 rounded-full"
@@ -749,11 +757,6 @@ function filterMovements(visibleMoves: Array<string>) {
 						<div>
 							<Toggle variant="iiif" @click="togglePolygons">
 								{{ $t("DataMapView.polygon") }}
-							</Toggle>
-						</div>
-						<div>
-							<Toggle variant="iiif" @click="toggleMovements">
-								{{ $t("DataMapView.showMovement") }}
 							</Toggle>
 						</div>
 					</div>
