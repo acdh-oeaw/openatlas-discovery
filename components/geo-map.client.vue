@@ -202,7 +202,7 @@ function initializeCustomIconLayer(key: string, reloadImage = false) {
 			clusterRadius: 10,
 		});
 
-	const modifiedIconName = props.customIcons[key].icon?.replaceAll("-", "");
+	const modifiedIconName = props.customIcons[key]?.icon?.replaceAll("-", "");
 	//@ts-expect-error ensure iconName is a valid Lucide Icon
 	// eslint-disable-next-line import-x/namespace
 	const iconSVG = LucideIcons[modifiedIconName];
@@ -888,7 +888,6 @@ function updateMovements() {
 	const groupedMovements = new Map<string, Array<CurvedMovementLine>>();
 	// Process the GeoJSON movements array to create curved lines
 
-	//curvedMovements.value =
 	props.movements.forEach((movement) => {
 		if (movement.geometry.type === "GeometryCollection") {
 			const geometries = movement.geometry.geometries;
@@ -1073,9 +1072,16 @@ function updateLayers(currentTime: number) {
 }
 
 function renderArcs() {
+	const filteredArcs = updatedCurvedMovements.value.filter((move) => {
+		return (
+			props.movements.find((m) => {
+				return move.id.includes(m.properties._id);
+			})?.properties.isDisplayed !== false
+		);
+	});
 	const layer = new CustomArcLayer({
 		id: "arc",
-		data: updatedCurvedMovements.value,
+		data: filteredArcs,
 		getSourcePosition: (d) => {
 			return d.coordinates[0];
 		},

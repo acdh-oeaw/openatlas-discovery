@@ -291,6 +291,8 @@ const movements = computed(() => {
 		);
 		if (customConfig != null) {
 			feature.properties.color = customConfig[1].color;
+			feature.properties.isDisplayed =
+				customConfig[1].entityType in filteredCustomMoveEntries.value;
 		}
 		return feature;
 	});
@@ -634,7 +636,6 @@ const customIconEntries = computed(() => {
 	});
 	return entries;
 });
-
 const customMovementEntries = computed(() => {
 	const result: Record<string, CustomMapLegendEntry> = {};
 	project.map.customMovementConfig.colorConfig.forEach((config) => {
@@ -643,7 +644,6 @@ const customMovementEntries = computed(() => {
 				return getUnprefixedId(t.identifier ?? "") === String(config.entityType);
 			});
 		});
-		console.log(config, movements.value);
 		if (matchingMovements.length === 0) return;
 		const matchingType = matchingMovements[0]?.properties.types?.find((t) => {
 			return getUnprefixedId(t.identifier ?? "") === String(config.entityType);
@@ -660,11 +660,19 @@ const customMovementEntries = computed(() => {
 });
 
 const filteredCustomIconEntries = ref<Record<string, CustomMapLegendEntry>>({});
+const filteredCustomMoveEntries = ref<Record<string, CustomMapLegendEntry>>({});
 
 function filterIcons(visibleIcons: Array<string>) {
 	filteredCustomIconEntries.value = Object.fromEntries(
 		Object.entries(customIconEntries.value).filter(([key, _]) => {
 			return visibleIcons.includes(key);
+		}),
+	);
+}
+function filterMovements(visibleMoves: Array<string>) {
+	filteredCustomMoveEntries.value = Object.fromEntries(
+		Object.entries(customMovementEntries.value).filter(([key, _]) => {
+			return visibleMoves.includes(key);
 		}),
 	);
 }
@@ -683,6 +691,7 @@ function filterIcons(visibleIcons: Array<string>) {
 			:icon-data="customIconEntries"
 			:move-data="customMovementEntries"
 			@visible-icons="filterIcons"
+			@visible-moves="filterMovements"
 		/>
 	</div>
 	<div :class="project.fullscreen ? 'relative grid' : 'relative grid grid-rows-[auto_1fr] gap-4'">

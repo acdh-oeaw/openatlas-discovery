@@ -12,10 +12,11 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-	(e: "visible-icons", visibleIcons: Array<string>): void;
+	(e: "visible-icons" | "visible-moves", visible: Array<string>): void;
 }>();
 
 const visibleIcons = ref<Array<string>>(Object.keys(props.iconData));
+const visibleMoves = ref<Array<string>>(Object.keys(props.moveData));
 
 function toggleIcon(key: string) {
 	if (visibleIcons.value.includes(key))
@@ -26,6 +27,15 @@ function toggleIcon(key: string) {
 		visibleIcons.value.push(key);
 	}
 }
+function toggleMove(key: string) {
+	if (visibleMoves.value.includes(key))
+		visibleMoves.value = visibleMoves.value.filter((i) => {
+			return i !== key;
+		});
+	else {
+		visibleMoves.value.push(key);
+	}
+}
 
 watch(
 	visibleIcons,
@@ -34,9 +44,17 @@ watch(
 	},
 	{ deep: true },
 );
+watch(
+	visibleMoves,
+	() => {
+		emit("visible-moves", visibleMoves.value);
+	},
+	{ deep: true },
+);
 
 onMounted(() => {
 	visibleIcons.value = Object.keys(props.iconData);
+	visibleMoves.value = Object.keys(props.moveData);
 	setTimeout(() => {
 		return (expandedState.value = true);
 	}, 500);
@@ -105,10 +123,10 @@ function toggleExpandedState() {
 									(a, b) => a[1].type?.label?.localeCompare(b[1].type?.label ?? '') ?? 0,
 								)"
 								:key="entry.type?.identifier"
-								:pressed="visibleIcons.includes(key)"
+								:pressed="visibleMoves.includes(key)"
 								class="group my-2 flex min-w-0 items-center text-left"
 								variant="iiif"
-								@click="() => toggleIcon(key)"
+								@click="() => toggleMove(key)"
 							>
 								<SplineIcon :style="{ color: entry.color }" class="size-6 scale-[0.7]"></SplineIcon>
 								<span
