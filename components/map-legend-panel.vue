@@ -81,7 +81,7 @@ function toggleExpandedState() {
 		</button>
 		<div>
 			<aside
-				class="m-2 flex gap-2 overflow-x-auto rounded-r-md border-2 border-transparent bg-white p-2 text-sm shadow-md"
+				class="m-2 flex gap-2 overflow-x-auto rounded-r-md border-2 border-transparent bg-card p-2 text-sm shadow-md dark:bg-primary-foreground"
 			>
 				<div class="inline-flex">
 					<Tabs default-value="icons">
@@ -94,48 +94,62 @@ function toggleExpandedState() {
 							</TabsTrigger>
 						</TabsList>
 						<TabsContent value="icons">
-							<Toggle
-								v-for="[key, entry] in Object.entries(props.iconData).sort(
-									(a, b) => a[1].type?.label?.localeCompare(b[1].type?.label ?? '') ?? 0,
-								)"
-								:key="entry.type?.identifier"
-								:pressed="visibleIcons.includes(key)"
-								class="group my-2 flex min-w-0 items-center text-left"
-								variant="iiif"
-								@click="() => toggleIcon(key)"
-							>
-								<div
-									v-if="entry.icon != null"
-									class="mr-2 size-6 scale-[0.7]"
-									v-html="LucideIcons[entry.icon.replaceAll('-', '') as keyof typeof LucideIcons]"
-								></div>
-								<span
-									>{{ entry.type?.label
-									}}<Badge variant="groupOutline" class="ml-4">{{
-										entry.entities.length
-									}}</Badge></span
+							<div class="max-h-48 overflow-auto">
+								<Toggle
+									v-for="[key, entry] in Object.entries(props.iconData).sort(
+										(a, b) => a[1].type?.label?.localeCompare(b[1].type?.label ?? '') ?? 0,
+									)"
+									:key="entry.type?.identifier"
+									:pressed="visibleIcons.includes(key)"
+									class="group my-2 flex min-w-0 items-center text-left"
+									variant="legend"
+									:custom-background-color="entry.color"
+									@click="() => toggleIcon(key)"
 								>
-							</Toggle>
+									<div
+										v-if="entry.icon != null"
+										:style="{
+											'--customColor': entry.color,
+										}"
+										class="mr-2 size-6 scale-[0.7] text-[var(--customColor)] group-hover:text-primary-foreground group-data-[state=on]:text-primary-foreground dark:text-white dark:group-hover:text-white dark:group-data-[state=on]:text-white"
+										v-html="LucideIcons[entry.icon.replaceAll('-', '') as keyof typeof LucideIcons]"
+									></div>
+									<span
+										>{{ entry.type?.label
+										}}<Badge variant="groupOutline" class="ml-4">{{
+											entry.entities.length
+										}}</Badge></span
+									>
+								</Toggle>
+							</div>
 						</TabsContent>
 						<TabsContent value="movements">
-							<Toggle
-								v-for="[key, entry] in Object.entries(props.moveData).sort(
-									(a, b) => a[1].type?.label?.localeCompare(b[1].type?.label ?? '') ?? 0,
-								)"
-								:key="entry.type?.identifier"
-								:pressed="visibleMoves.includes(key)"
-								class="group my-2 flex min-w-0 items-center text-left"
-								variant="iiif"
-								@click="() => toggleMove(key)"
-							>
-								<SplineIcon :style="{ color: entry.color }" class="size-6 scale-[0.7]"></SplineIcon>
-								<span
-									>{{ entry.type?.label
-									}}<Badge variant="groupOutline" class="ml-4">{{
-										entry.entities.length
-									}}</Badge></span
+							<div class="max-h-48 overflow-auto">
+								<Toggle
+									v-for="[key, entry] in Object.entries(props.moveData).sort(
+										(a, b) => a[1].type?.label?.localeCompare(b[1].type?.label ?? '') ?? 0,
+									)"
+									:key="entry.type?.identifier"
+									:pressed="visibleMoves.includes(key)"
+									class="group my-2 flex min-w-0 items-center text-left"
+									variant="legend"
+									:custom-background-color="entry.color"
+									@click="() => toggleMove(key)"
 								>
-							</Toggle>
+									<SplineIcon
+										:style="{
+											'--customColor': entry.color,
+										}"
+										:class="`size-6 scale-[0.7] text-[var(--customColor)] group-hover:text-primary-foreground group-data-[state=on]:text-primary-foreground dark:text-white dark:group-data-[state=on]:text-white dark:group-hover:text-white`"
+									></SplineIcon>
+									<span
+										>{{ entry.type?.label
+										}}<Badge variant="groupOutline" class="ml-4">{{
+											entry.entities.length
+										}}</Badge></span
+									>
+								</Toggle>
+							</div>
 						</TabsContent>
 					</Tabs>
 				</div>

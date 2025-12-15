@@ -12,6 +12,7 @@ const props = withDefaults(
 			class?: HTMLAttributes["class"];
 			variant?: ToggleVariants["variant"];
 			size?: ToggleVariants["size"];
+			customBackgroundColor?: string;
 		}
 	>(),
 	{
@@ -34,7 +35,13 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
 </script>
 
 <template>
-	<Toggle v-bind="forwarded" :class="cn(toggleVariants({ variant, size }), props.class)">
+	<Toggle
+		v-bind="forwarded"
+		:class="cn(toggleVariants({ variant, size }), props.class)"
+		:style="{
+			'--customBackgroundColor': props.customBackgroundColor,
+		}"
+	>
 		<slot />
 	</Toggle>
 </template>
