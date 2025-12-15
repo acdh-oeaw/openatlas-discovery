@@ -61,8 +61,8 @@ const sheetVariants = variants({
 			<slot />
 
 			<DialogClose
-				class="absolute right-4 top-4 rounded-md p-0.5 transition-colors hover:bg-secondary"
 				v-if="props.closeButton"
+				class="absolute right-4 top-4 rounded-md p-0.5 transition-colors hover:bg-secondary"
 			>
 				<XIcon class="size-4 text-muted-foreground" />
 			</DialogClose>

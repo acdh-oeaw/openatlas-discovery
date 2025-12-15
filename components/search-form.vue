@@ -6,7 +6,7 @@ import { categories, type Category } from "@/composables/use-get-search-results"
 export interface SearchFormData {
 	search: string;
 	category: Category;
-	visualizationType: string;
+	visualizationType?: string;
 }
 
 const props = defineProps<SearchFormData>();

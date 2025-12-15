@@ -32,7 +32,10 @@ export function createGeoJsonFeature(
 		geometry: geometry as GeoJsonFeature["geometry"],
 		properties: {
 			_id: "properties" in entity ? entity.properties._id : String(entity.id),
-			types: (entity.types ?? []).filter((type) => type != null),
+			//@ts-expect-error union type is causing conflicts
+			types: (entity.types ?? []).filter((type) => {
+				return type != null;
+			}),
 		},
 	};
 }
