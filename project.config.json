@@ -90,32 +90,16 @@
 		"mapDisplayedSystemClasses": ["place", "feature"],
 		"customIconConfig": [
 			{
-				"entityType": 64,
-				"iconName": "Building-2",
-				"color": "#34a8c3"
+				"entityType": 22378,
+				"iconName": "Skull"
 			},
 			{
-				"entityType": 443,
-				"iconName": "Church",
-				"color": "#00a4bf"
-			},
-			{
-				"entityType": 766,
-				"iconName": "Castle",
-				"color": "#00656e"
+				"entityType": 5083,
+				"iconName": "Skull"
 			}
 		],
 		"customMovementConfig": {
-			"colorConfig": [
-				{
-					"entityType": 3004,
-					"color": "#820000"
-				},
-				{
-					"entityType": 430,
-					"color": "#008200"
-				}
-			],
+			"colorConfig": [],
 			"arcThickness": false
 		},
 		"flyToZoom": 20,
