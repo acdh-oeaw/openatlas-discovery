@@ -175,7 +175,6 @@ const features = computed(() => {
 					f.geometry = f.geometry.geometry;
 				}
 
-				 
 				if (!f.geometry) return null;
 				if (
 					f.geometry.type === "Point" &&

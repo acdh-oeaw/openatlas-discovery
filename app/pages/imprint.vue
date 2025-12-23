@@ -15,9 +15,8 @@ usePageMetadata({
 });
 
 if (project.imprint === "none" && env.public.specialImprint !== "enabled") {
-  throw createError({ fatal: true, statusCode: 404, statusMessage: "Imprint page is disabled" });
+	throw createError({ fatal: true, statusCode: 404, statusMessage: "Imprint page is disabled" });
 }
-
 </script>
 
 <template>

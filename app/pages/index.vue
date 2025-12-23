@@ -19,19 +19,18 @@ usePageMetadata({
 	title: t("IndexPage.meta.title"),
 });
 
-
-const { data: content, error, suspense } = useQuery<SystemPage | null>({
-  queryKey: computed(() => ["systemPages", locale.value, "index"]),
-  queryFn: async () => {
-    const id = `systemPages/system-pages/${locale.value}/index.md`
-    const page = await queryCollection("systemPages")
-      .where("id", "=", id)
-      .first()
-    return page as SystemPage ?? null
-  },
-})
-
-
+const {
+	data: content,
+	error,
+	suspense,
+} = useQuery<SystemPage | null>({
+	queryKey: computed(() => ["systemPages", locale.value, "index"]),
+	queryFn: async () => {
+		const id = `systemPages/system-pages/${locale.value}/index.md`;
+		const page = await queryCollection("systemPages").where("id", "=", id).first();
+		return (page as SystemPage) ?? null;
+	},
+});
 
 useErrorMessage(error, {
 	notFound: t("IndexPage.error.not-found"),
@@ -50,7 +49,6 @@ onServerPrefetch(async () => {
 const currentMode = computed(() => {
 	return route.query.mode;
 });
-
 </script>
 
 <template>

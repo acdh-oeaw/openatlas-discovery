@@ -10,16 +10,18 @@ usePageMetadata({
 	title: t("TeamPage.meta.title"),
 });
 
-const { data: content, error, suspense } = useQuery<SystemPage | null>({
-  queryKey: computed(() => ["systemPages", locale.value, "team"]),
-  queryFn: async () => {
-    const id = `systemPages/system-pages/${locale.value}/team.md`
-    const page = await queryCollection("systemPages")
-      .where("id", "=", id)
-      .first()
-    return page as SystemPage ?? null
-  },
-})
+const {
+	data: content,
+	error,
+	suspense,
+} = useQuery<SystemPage | null>({
+	queryKey: computed(() => ["systemPages", locale.value, "team"]),
+	queryFn: async () => {
+		const id = `systemPages/system-pages/${locale.value}/team.md`;
+		const page = await queryCollection("systemPages").where("id", "=", id).first();
+		return (page as SystemPage) ?? null;
+	},
+});
 
 useErrorMessage(error, {
 	notFound: t("TeamPage.error.not-found"),

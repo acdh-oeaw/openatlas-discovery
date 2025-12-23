@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { noop } from "@acdh-oeaw/lib";
 import { useQuery } from "@tanstack/vue-query";
+
 import type { NavLinkProps } from "@/components/nav-link.vue";
 import { project } from "@/config/project.config";
 import type { ContentPage } from "@/types/content";
@@ -44,33 +45,31 @@ const defaultLinks = computed<
 });
 
 const { data: navigation, suspense } = useQuery<Array<ContentPage>>({
-  queryKey: ["content-navigation", locale.value] as const,
-  queryFn: async ({ queryKey: [, locale] }) => {
-    // const prefix = `pages/${locale}`; 
+	queryKey: ["content-navigation", locale.value] as const,
+	queryFn: async ({ queryKey: [, locale] }) => {
+		// const prefix = `pages/${locale}`;
 
-    // const excludedPaths = ["/", "/imprint"].map((pathname) => `/${prefix}${pathname}`);
+		// const excludedPaths = ["/", "/imprint"].map((pathname) => `/${prefix}${pathname}`);
 
-    // const pagesQuery = queryCollection("contentPages")
-    //   .path(`/${prefix}/`) 
-    //   .where({
-    //     $not: {
-    //       _path: { $in: excludedPaths },
-    //     },
-    //   });
+		// const pagesQuery = queryCollection("contentPages")
+		//   .path(`/${prefix}/`)
+		//   .where({
+		//     $not: {
+		//       _path: { $in: excludedPaths },
+		//     },
+		//   });
 
-    // // Return navigation structure
-    // return queryCollectionNavigation(pagesQuery);
+		// // Return navigation structure
+		// return queryCollectionNavigation(pagesQuery);
 
-	const allNavigation = await queryCollectionNavigation("contentPages");
-	console.log(allNavigation);
-	
-    const prefix = `contentPages/pages/${locale}`;
-    const excludedPaths = ["/", "/imprint"].map((p) => `${prefix}${p}`);
+		const allNavigation = await queryCollectionNavigation("contentPages");
 
-    return allNavigation.filter((page) => !excludedPaths.includes(page._path as string));
-  },
-  });
+		const prefix = `contentPages/pages/${locale}`;
+		const excludedPaths = ["/", "/imprint"].map((p) => `${prefix}${p}`);
 
+		return allNavigation.filter((page) => !excludedPaths.includes(page._path as string));
+	},
+});
 
 onServerPrefetch(async () => {
 	/**
@@ -88,15 +87,14 @@ const contentLinks = computed(() => {
 
 	const prefix = ["", "pages", locale.value].join("/");
 
-	console.log(pages, prefix)
 	return Object.fromEntries(
-    pages
-      .filter((link): link is typeof link & { _path: string } => typeof link._path === "string")
-      .map((link) => [
-        link._path,
-        { href: { path: `/content${link._path.slice(prefix.length)}` }, label: link.title },
-      ])
-  ) satisfies Record<string, { href: NavLinkProps["href"]; label: string }>
+		pages
+			.filter((link): link is typeof link & { _path: string } => typeof link._path === "string")
+			.map((link) => [
+				link._path,
+				{ href: { path: `/content${link._path.slice(prefix.length)}` }, label: link.title },
+			]),
+	) satisfies Record<string, { href: NavLinkProps["href"]; label: string }>;
 });
 
 const links = computed(() => {

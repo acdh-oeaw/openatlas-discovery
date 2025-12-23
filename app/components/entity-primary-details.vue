@@ -224,7 +224,7 @@ const typeTree = computed(() => {
 
 const superTypes: typeof filteredTypes = computed(() => {
 	const currentType = typeTree.value[String(props.entity.id) as keyof TypeTreeModel["typeTree"]];
-	 
+
 	if (!currentType) return [];
 	const hierarchy = currentType.root.map((entry) => {
 		return typeTree.value[String(entry) as keyof TypeTreeModel["typeTree"]];
