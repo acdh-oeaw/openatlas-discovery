@@ -117,7 +117,7 @@ async function exportEntity(format: ExportEntityParams["format"], extension: str
 <template>
 	<div v-if="entity != null && props.id != null">
 		<div
-			class="group z-20 mr-2 mb-2 flex h-full bg-white transition-all duration-300 ease-in-out"
+			class="group z-20 mr-2 mb-2 flex h-full transition-all duration-300 ease-in-out"
 			:style="
 				noTableSidebar
 					? {

@@ -3,6 +3,7 @@ import { noop } from "@acdh-oeaw/lib";
 import { useQuery } from "@tanstack/vue-query";
 
 import type { SystemPage } from "@/types/content";
+
 const locale = useLocale();
 const t = useTranslations();
 
@@ -65,13 +66,13 @@ onServerPrefetch(async () => {
 				</div>
 
 				<!-- FIXME: leadIn is type string now, cannot be rendered via ContentRenderer anymore-->
-				<ContentRenderer
+				<!-- <ContentRenderer
 					v-if="content.leadIn != null"
 					class="prose prose-lg max-w-3xl text-center text-balance"
 					:value="content.leadIn"
 				>
 					<template #empty></template>
-				</ContentRenderer>
+				</ContentRenderer> -->
 
 				<div class="flex items-center gap-6">
 					<Button v-for="(link, key) of content.links" :key="key" as-child variant="default">

@@ -74,14 +74,14 @@ const currentMode = computed(() => {
 						/>
 					</div>
 					<!-- FIXME: leadIn is type string now, cannot be rendered via ContentRenderer anymore-->
-					<ContentRenderer
+					<!-- <ContentRenderer
 						v-if="content.leadIn != null"
 						class="prose prose-lg max-w-3xl text-center text-balance"
 						unwrap="string"
 						:value="content.leadIn"
 					>
 						<template #empty></template>
-					</ContentRenderer>
+					</ContentRenderer> -->
 
 					<div v-if="env.public.database === 'enabled'">
 						<div class="flex items-center gap-6">

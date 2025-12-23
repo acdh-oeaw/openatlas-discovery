@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { createUrl, isNonEmptyString } from "@acdh-oeaw/lib";
+import { addTrailingSlash, createUrl, isNonEmptyString } from "@acdh-oeaw/lib";
 import type { WebSite, WithContext } from "schema-dts";
 
 import { project } from "@/config/project.config";
@@ -22,8 +22,7 @@ useHead({
 		lang: computed(() => {
 			return locale.value;
 		}),
-		// TODO: move to tailwind config
-		style: `--color-brand: ${project.colors.brand}; --color-brand-foreground: ${project.colors.brandContrast};`,
+		style: `--brand: ${project.colors.brand};`,
 	},
 	titleTemplate: computed(() => {
 		return ["%s", t("Metadata.name")].join(" | ");
@@ -83,10 +82,7 @@ useHead({
 
 			scripts.push({
 				type: "",
-				innerHTML: createAnalyticsScript(
-					baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`,
-					env.public.matomoId,
-				),
+				innerHTML: createAnalyticsScript(addTrailingSlash(baseUrl), env.public.matomoId),
 			});
 		}
 
