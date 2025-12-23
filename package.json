@@ -113,7 +113,6 @@
 		"@acdh-oeaw/eslint-config-vue": "^2.0.15",
 		"@acdh-oeaw/prettier-config": "^2.0.1",
 		"@acdh-oeaw/stylelint-config": "^2.3.2",
-		"@acdh-oeaw/tailwindcss-preset": "^0.0.22",
 		"@acdh-oeaw/tsconfig": "^1.5.1",
 		"@nuxt/devtools": "^3.1.1",
 		"@nuxt/eslint": "^1.11.0",
