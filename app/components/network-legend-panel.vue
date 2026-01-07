@@ -126,8 +126,8 @@ watch(
 	<aside
 		:class="
 			!props.isEgoNetwork
-				? `flex max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent bg-white px-4 py-2 text-sm shadow-md`
-				: `flex gap-2 overflow-x-auto rounded-md border-2 border-transparent bg-white m-2 text-sm shadow-md`
+				? `flex max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent bg-white/90 dark:bg-neutral-900 px-4 py-2 text-sm shadow-md`
+				: `flex gap-2 overflow-x-auto rounded-md border-2 border-transparent bg-white/90 dark:bg-neutral-900 m-2 text-sm shadow-md`
 		"
 	>
 		<div v-if="!props.isEgoNetwork" class="inline-flex">
