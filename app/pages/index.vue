@@ -28,6 +28,14 @@ const {
 	queryFn: async () => {
 		const id = `systemPages/system-pages/${locale.value}/index.md`;
 		const page = await queryCollection("systemPages").where("id", "=", id).first();
+
+		if (page?.leadIn && typeof page.leadIn === "string") {
+			const parsed = await parseMarkdown(page.leadIn);
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			page.leadIn = parsed.body as any;
+
+		}
+
 		return (page as SystemPage) ?? null;
 	},
 });
@@ -73,15 +81,14 @@ const currentMode = computed(() => {
 							:src="content.image?.dark"
 						/>
 					</div>
-					<!-- FIXME: leadIn is type string now, cannot be rendered via ContentRenderer anymore-->
-					<!-- <ContentRenderer
+					<ContentRenderer
 						v-if="content.leadIn != null"
 						class="prose prose-lg max-w-3xl text-center text-balance"
 						unwrap="string"
 						:value="content.leadIn"
 					>
 						<template #empty></template>
-					</ContentRenderer> -->
+					</ContentRenderer>
 
 					<div v-if="env.public.database === 'enabled'">
 						<div class="flex items-center gap-6">

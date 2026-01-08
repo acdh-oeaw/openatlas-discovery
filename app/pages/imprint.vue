@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { project } from "@/config/project.config";
+
 const env = useRuntimeConfig();
 
 // definePageMeta({

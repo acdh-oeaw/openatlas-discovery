@@ -24,6 +24,7 @@ const searchFiltersSchema = v.object({
 	search: v.fallback(v.string(), ""),
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const entitySelectionSchema = v.object({
 	selection: v.fallback(v.string(), ""),
 });
@@ -413,7 +414,6 @@ interface onLayerClickParams {
 }
 
 function onLayerClick({ features, targetCoordinates }: onLayerClickParams) {
-	console.log("Layer click", features);
 	const entitiesMap = new Map<string, EntityFeature>();
 
 	features.forEach((feature) => {
@@ -788,7 +788,7 @@ function filterMovements(visibleMoves: Array<string>) {
 					<article
 						v-for="entity of popover.entities"
 						:key="entity.properties._id"
-						class="grid gap-1 font-body text-xs"
+						class="grid gap-1 text-xs"
 					>
 						<strong class="font-medium">
 							<NavLink
@@ -802,7 +802,7 @@ function filterMovements(visibleMoves: Array<string>) {
 						</strong>
 						<dl
 							v-if="entity.when?.timespans != null && entity.when.timespans.length > 0"
-							class="grid grid-cols-[auto_auto] justify-start gap-x-6 gap-y-1 pl-[18px] text-2xs text-neutral-600"
+							class="grid grid-cols-[auto_auto] justify-start gap-x-6 gap-y-1 pl-[18px] text-xs text-neutral-600"
 						>
 							<template v-for="(timespan, index) of entity.when.timespans" :key="index">
 								<template v-if="timespan.start?.earliest != null || timespan.start?.latest != null">

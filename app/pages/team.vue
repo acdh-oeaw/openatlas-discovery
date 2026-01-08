@@ -20,6 +20,13 @@ const {
 	queryFn: async () => {
 		const id = `systemPages/system-pages/${locale.value}/team.md`;
 		const page = await queryCollection("systemPages").where("id", "=", id).first();
+
+		if (page?.leadIn && typeof page.leadIn === "string") {
+			const parsed = await parseMarkdown(page.leadIn);
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			page.leadIn = parsed.body as any;
+		}
+
 		return (page as SystemPage) ?? null;
 	},
 });
@@ -65,14 +72,13 @@ onServerPrefetch(async () => {
 					/>
 				</div>
 
-				<!-- FIXME: leadIn is type string now, cannot be rendered via ContentRenderer anymore-->
-				<!-- <ContentRenderer
+				<ContentRenderer
 					v-if="content.leadIn != null"
 					class="prose prose-lg max-w-3xl text-center text-balance"
 					:value="content.leadIn"
 				>
 					<template #empty></template>
-				</ContentRenderer> -->
+				</ContentRenderer>
 
 				<div class="flex items-center gap-6">
 					<Button v-for="(link, key) of content.links" :key="key" as-child variant="default">

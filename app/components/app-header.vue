@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { noop } from "@acdh-oeaw/lib";
 import { useQuery } from "@tanstack/vue-query";
 
 import type { NavLinkProps } from "@/components/nav-link.vue";
@@ -44,57 +43,38 @@ const defaultLinks = computed<
 	};
 });
 
-const { data: navigation, suspense } = useQuery<Array<ContentPage>>({
-	queryKey: ["content-navigation", locale.value] as const,
+const { data: navigation } = useQuery<Array<ContentPage>>({
+	queryKey: computed(() => ["contentNavigation", locale.value]),
 	queryFn: async ({ queryKey: [, locale] }) => {
-		// const prefix = `pages/${locale}`;
+		const prefix = `/pages/${locale}`;
+		const allNavigation = await queryCollectionNavigation("contentPages").where(
+			"path",
+			"LIKE",
+			`${prefix}%`,
+		);
 
-		// const excludedPaths = ["/", "/imprint"].map((pathname) => `/${prefix}${pathname}`);
-
-		// const pagesQuery = queryCollection("contentPages")
-		//   .path(`/${prefix}/`)
-		//   .where({
-		//     $not: {
-		//       _path: { $in: excludedPaths },
-		//     },
-		//   });
-
-		// // Return navigation structure
-		// return queryCollectionNavigation(pagesQuery);
-
-		const allNavigation = await queryCollectionNavigation("contentPages");
-
-		const prefix = `contentPages/pages/${locale}`;
 		const excludedPaths = ["/", "/imprint"].map((p) => `${prefix}${p}`);
 
 		return allNavigation.filter((page) => !excludedPaths.includes(page._path as string));
 	},
 });
 
-onServerPrefetch(async () => {
-	/**
-	 * Delegate errors to the client, to avoid displaying error page with status code 500.
-	 *
-	 * @see https://github.com/TanStack/query/issues/6606
-	 * @see https://github.com/TanStack/query/issues/5976
-	 */
-	await suspense().catch(noop);
-});
-
 const contentLinks = computed(() => {
-	const pages = navigation.value?.at(0)?.children?.at(0)?.children;
-	if (pages == null) return {};
+	const pages = navigation.value?.[0]?.children?.[0]?.children ?? [];
+	if (!pages || pages.length === 0) return {};
 
 	const prefix = ["", "pages", locale.value].join("/");
 
-	return Object.fromEntries(
-		pages
-			.filter((link): link is typeof link & { _path: string } => typeof link._path === "string")
-			.map((link) => [
-				link._path,
-				{ href: { path: `/content${link._path.slice(prefix.length)}` }, label: link.title },
-			]),
-	) satisfies Record<string, { href: NavLinkProps["href"]; label: string }>;
+	const linksObj: Record<string, { href: NavLinkProps["href"]; label: string }> = {};
+
+	for (const link of pages) {
+		if (typeof link.path !== "string" || typeof link.title !== "string") continue;
+		linksObj[link.path] = {
+			href: { path: `/content${link.path.slice(prefix.length)}` },
+			label: link.title,
+		};
+	}
+	return linksObj;
 });
 
 const links = computed(() => {
@@ -128,7 +108,6 @@ const links = computed(() => {
 				<div class="hidden lg:flex">
 					<AppNavigationMenu :label="t('AppHeader.navigation-main')" :links="links" />
 				</div>
-
 				<div class="ml-auto flex items-center gap-4">
 					<ColorSchemeSwitcher />
 					<LocaleSwitcher v-if="locales.length > 1" />

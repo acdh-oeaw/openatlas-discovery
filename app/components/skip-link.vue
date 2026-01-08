@@ -16,7 +16,7 @@ const route = useRoute();
 
 <template>
 	<NuxtLink
-		class="rounded fixed -translate-y-full bg-background px-4 py-3 text-foreground transition focus:translate-y-0"
+		class="fixed -translate-y-full rounded bg-background px-4 py-3 text-foreground transition focus:translate-y-0"
 		:href="{ query: route.query, hash: `#${props.targetId}` }"
 		@click="onClick"
 	>

@@ -3,7 +3,6 @@ import { noop } from "@acdh-oeaw/lib";
 import { useQuery } from "@tanstack/vue-query";
 import { useTemplateRef } from "vue";
 
-import type { ContentPage } from "@/types/content";
 const locale = useLocale();
 const t = useTranslations();
 
@@ -22,8 +21,11 @@ const {
 	suspense,
 } = useQuery({
 	queryKey: ["pages", locale, ...id.value] as const,
-	queryFn({ queryKey: [, locale, ...id] }) {
-		return queryCollection("pages").path(route.path).first();
+	queryFn: async ({ queryKey: [, locale, ...id] }) => {
+		const prefix = `contentPages/pages/${locale}/${id[0]}.md`;
+
+		const fetchedContent = await queryCollection("contentPages").where("id", "=", prefix).first();
+		return fetchedContent;
 	},
 });
 useErrorMessage(error, {
@@ -40,10 +42,7 @@ onServerPrefetch(async () => {
 	await suspense().catch(noop);
 });
 
-// @ts-expect-error Incorrect upstream types.
-useContentHead(content);
-
-const contentRef = useTemplateRef("content");
+const contentRef = useTemplateRef("pageContent");
 const currentHash = ref<string | undefined>();
 function updateHashUrl() {
 	// eslint-disable-next-line  @typescript-eslint/ban-ts-comment
@@ -87,7 +86,12 @@ onUnmounted(() => {
 					<div>
 						<PageTitle>{{ content?.title }}</PageTitle>
 					</div>
-					<ContentRenderer v-if="content != null" ref="content" class="prose" :value="content">
+					<ContentRenderer
+						v-if="content != null"
+						ref="pageContent"
+						class="prose"
+						:value="content.body"
+					>
 						<template #empty></template>
 					</ContentRenderer>
 				</div>
