@@ -3,6 +3,7 @@ import { isNonEmptyString, keyByToMap } from "@acdh-oeaw/lib";
 import type { Geometry } from "geojson";
 import * as v from "valibot";
 
+import type { Image } from "@/components/entity-primary-details.vue";
 import type { PresentationViewModel } from "@/types/api";
 import { hasCoordinates } from "@/utils/has-geojson-coordinates";
 
