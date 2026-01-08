@@ -50,7 +50,6 @@ const emits = defineEmits<{
 }>();
 
 function onBarClick(d: Data) {
-	console.log("click: ", d);
 	emits("onBarClick", d);
 }
 

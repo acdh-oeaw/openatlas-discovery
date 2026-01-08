@@ -319,7 +319,6 @@ function edgeReducer() {
 }
 
 onScopeDispose(() => {
-	console.log("dispose network!");
 	context.renderer?.kill();
 	layout.kill();
 	context.graph.clear();

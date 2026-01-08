@@ -34,6 +34,7 @@ function template(d: any, i: number, elements: Array<HTMLElement | SVGElement>) 
 				return { ...legendReference, value: valueFormatter(value) };
 			});
 			const TooltipComponent = props.customTooltip ?? ChartTooltip;
+			// eslint-disable-next-line vue/one-component-per-file, vue/component-api-style
 			createApp(TooltipComponent, { title: d[props.index], data: omittedData }).mount(componentDiv);
 			wm.set(d, componentDiv.innerHTML);
 			return componentDiv.innerHTML;
@@ -51,6 +52,7 @@ function template(d: any, i: number, elements: Array<HTMLElement | SVGElement>) 
 			];
 			const componentDiv = document.createElement("div");
 			const TooltipComponent = props.customTooltip ?? ChartTooltip;
+			// eslint-disable-next-line vue/one-component-per-file, vue/component-api-style
 			createApp(TooltipComponent, { title: d[props.index], data: omittedData }).mount(componentDiv);
 			wm.set(d, componentDiv.innerHTML);
 			return componentDiv.innerHTML;

@@ -39,7 +39,7 @@ function extractMetadata() {
 					text: mark.textContent ?? "",
 					meta,
 				});
-			} catch (e) {
+			} catch {
 				result.push(mark.textContent ?? "");
 			}
 		} else {
@@ -77,7 +77,7 @@ watch(
 <template>
 	<template v-if="descriptions.length > 0">
 		<template v-if="descriptions.length === 1">
-			<p class="text-md whitespace-pre-line">
+			<p class="text-base whitespace-pre-line">
 				<template v-for="(part, index) in processedNodes" :key="index">
 					<template v-if="typeof part === 'string'">
 						<br v-if="part === ''" />
@@ -151,7 +151,7 @@ watch(
 					:value="index.toString()"
 				>
 					<Card class="p-4">
-						<p class="text-md">{{ description }}</p>
+						<p class="text-base">{{ description }}</p>
 					</Card>
 				</TabsContent>
 			</Tabs>

@@ -68,11 +68,11 @@ function toggleExpandedState() {
 
 <template>
 	<div
-		class="max-w-1/4 fixed inset-y-0 right-0 top-20 z-50 max-h-fit bg-none transition-transform duration-500 ease-in-out"
+		class="fixed inset-y-0 top-20 right-0 z-50 max-h-fit max-w-1/4 bg-none transition-transform duration-500 ease-in-out"
 		:class="expandedState ? 'translate-x-0' : 'translate-x-full'"
 	>
 		<button
-			class="absolute right-full top-2 -z-10 -ml-8 block w-8 rounded-l-md bg-[hsl(var(--card))] px-1 py-2 shadow-md"
+			class="absolute top-2 right-full -z-10 -ml-8 block w-8 rounded-l-md bg-[hsl(var(--card))] px-1 py-2 shadow-md"
 			:class="expandedState ? 'translate-x-2' : 'translate-x-0'"
 			@click="toggleExpandedState"
 		>

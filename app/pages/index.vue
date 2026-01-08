@@ -33,7 +33,6 @@ const {
 			const parsed = await parseMarkdown(page.leadIn);
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			page.leadIn = parsed.body as any;
-
 		}
 
 		return (page as SystemPage) ?? null;

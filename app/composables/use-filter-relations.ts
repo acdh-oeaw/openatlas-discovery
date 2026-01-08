@@ -56,13 +56,11 @@ export const useFilterRelations = (
 									relationTypes: [relationType],
 								};
 							}) ?? [];
-					console.log("Mapped: ", mappedRelation, relation);
 					return [...acc, ...mappedRelation];
 				}, []);
 				return [key, test] as [string, Relations];
 			})
-			.filter(([key, rels]) => {
-				if (rels.length <= 0) console.log("Filtering: ", key, rels);
+			.filter(([_key, rels]) => {
 				return rels.length > 0;
 			}),
 	);

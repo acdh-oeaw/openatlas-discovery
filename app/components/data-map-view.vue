@@ -102,8 +102,8 @@ const entitiesById = computed(() => {
 	});
 });
 
-let show = ref(false);
-let showMovements = computed(() => {
+const show = ref(false);
+const showMovements = computed(() => {
 	return Object.keys(filteredCustomMoveEntries.value).length > 0;
 });
 
@@ -258,7 +258,7 @@ const movements = computed(() => {
 				return geo.locationId && to?.relationTo?.endsWith(geo.locationId);
 			});
 
-			let featureClone = {
+			const featureClone = {
 				...feature,
 				geometry: {
 					...feature.geometry,
@@ -279,7 +279,7 @@ const movements = computed(() => {
 	});
 
 	return move.map((entity) => {
-		let feature = createGeoJsonFeature(entity);
+		const feature = createGeoJsonFeature(entity);
 
 		const customConfig = Object.entries(project.map.customMovementConfig.colorConfig).findLast(
 			(entry) => {
@@ -317,7 +317,7 @@ const events = computed(() => {
 		.map((feature) => {
 			assert(feature.geometry, "Feature has no geometry");
 			assert("geometries" in feature.geometry, "Feature has no geometries");
-			let featureClone = {
+			const featureClone = {
 				...feature,
 				geometry: {
 					...feature.geometry,
@@ -334,7 +334,7 @@ const events = computed(() => {
 		});
 
 	const mappedEvents = event.map((entity) => {
-		let feature = createGeoJsonFeature(entity);
+		const feature = createGeoJsonFeature(entity);
 		const customConfig = Object.entries(project.map.customMovementConfig.colorConfig).findLast(
 			(entry) => {
 				return entity.types?.find((type) => {
@@ -537,7 +537,7 @@ watchEffect(() => {
 		// should there be two popups? --> make popups array / more rendered components??
 		if (detailEntity) {
 			setCoordinates(detailEntity, detailSelectionCoordinates);
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+			 
 			if (detailSelectionCoordinates.value === undefined) return;
 			popover.value = {
 				coordinates: detailSelectionCoordinates.value,
@@ -696,7 +696,7 @@ function filterMovements(visibleMoves: Array<string>) {
 </script>
 
 <template>
-	<div class="absolute right-0 top-0 z-50 flex p-1.5">
+	<div class="absolute top-0 right-0 z-50 flex p-1.5">
 		<MapLegendPanel
 			:icon-data="customIconEntries"
 			:move-data="customMovementEntries"
@@ -730,7 +730,7 @@ function filterMovements(visibleMoves: Array<string>) {
 		>
 			<div class="absolute bottom-0 z-10 mb-2 flex w-full justify-center">
 				<div
-					class="max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent bg-white/90 p-2 text-sm font-medium shadow-md dark:bg-neutral-900"
+					class="max-h-72 gap-2 overflow-x-hidden overflow-y-auto rounded-md border-2 border-transparent bg-white/90 p-2 text-sm font-medium shadow-md dark:bg-neutral-900"
 				>
 					<div class="grid grid-cols-[auto_auto_auto_auto] items-center gap-3 align-middle">
 						<div class="grid grid-cols-[auto_1fr] gap-1">

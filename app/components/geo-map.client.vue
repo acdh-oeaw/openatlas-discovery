@@ -155,10 +155,7 @@ watch(mapStyle, () => {
 	context.map.setStyle(mapStyle.value);
 	// context.map?.setStyle({ ...context.map.getStyle(), sprite: mapStyle.value });
 	void context.map.once("idle", () => {
-		console.log(context.map?.getStyle().sprite);
-		console.log("Style loaded");
 		init(true);
-		console.log(context.map?.getLayersOrder());
 	});
 });
 
@@ -178,7 +175,9 @@ async function create() {
 		style: mapStyle.value,
 		zoom: initialViewState.zoom,
 		maxPitch: 85,
-		antialias: true,
+		canvasContextAttributes: {
+			antialias: true,
+		},
 	});
 
 	context.map = map;
@@ -186,7 +185,6 @@ async function create() {
 	map.on("load", () => {
 		init(false);
 	});
-	console.log("created", props);
 }
 
 function initializeCustomIconLayer(key: string, reloadImage = false) {
@@ -204,7 +202,7 @@ function initializeCustomIconLayer(key: string, reloadImage = false) {
 
 	const modifiedIconName = props.customIcons[key]?.icon?.replaceAll("-", "");
 	//@ts-expect-error ensure iconName is a valid Lucide Icon
-	// eslint-disable-next-line import-x/namespace
+
 	const iconSVG = LucideIcons[modifiedIconName];
 
 	const div = document.createElement("div");
@@ -691,7 +689,7 @@ function updatePolygons() {
 		polygonOverlay.value = new mapbox.MapboxOverlay({ interleaved: true });
 
 	if (props.hasPolygons) {
-		let polygonLayer = new GeoJsonLayer<CustomGeoJsonFeature>({
+		const polygonLayer = new GeoJsonLayer<CustomGeoJsonFeature>({
 			id: "deck-polygons",
 			data: polygonData.value.features.filter((f) => {
 				return f.properties.shapeType === "area";

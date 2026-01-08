@@ -36,6 +36,7 @@ export function useGetLinkedEntitiesRecursive(params: MaybeRef<GetLinkedEntities
 				},
 				signal,
 			});
+
 			return { ...response.results };
 		},
 		enabled: computed(() => {

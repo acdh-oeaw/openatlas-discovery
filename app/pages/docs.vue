@@ -48,8 +48,6 @@ onMounted(() => {
 onUnmounted(() => {
 	document.body.removeEventListener("scroll", updateHashUrl);
 });
-
-console.log(content.value);
 </script>
 
 <template>

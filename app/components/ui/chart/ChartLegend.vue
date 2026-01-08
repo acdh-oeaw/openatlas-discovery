@@ -5,7 +5,7 @@ import { nextTick, onMounted, ref } from "vue";
 
 import { buttonVariants } from "@/components/ui/button";
 
-const props = withDefaults(defineProps<{ items: Array<BulletLegendItemInterface> }>(), {
+const props = withDefaults(defineProps<{ items?: Array<BulletLegendItemInterface> }>(), {
 	items: () => {
 		return [];
 	},

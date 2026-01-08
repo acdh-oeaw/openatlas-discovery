@@ -17,8 +17,6 @@ const props = withDefaults(
 );
 const emits = defineEmits<DropdownMenuContentEmits>();
 
-console.log(props.portalTo);
-
 const forwarded = useForwardPropsEmits(props, emits);
 </script>
 

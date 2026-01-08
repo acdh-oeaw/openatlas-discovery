@@ -43,8 +43,6 @@ watch(
 		/** Clear previous graph data. */
 		graph.clear();
 
-		console.log("entity ego network data: ", props.networkData);
-
 		if (props.networkData.length <= 0) return;
 
 		props.networkData.forEach((element) => {

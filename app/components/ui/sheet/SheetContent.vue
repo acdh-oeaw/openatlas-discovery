@@ -52,7 +52,7 @@ const sheetVariants = variants({
 	<DialogPortal>
 		<DialogOverlay
 			v-if="props.backdrop"
-			class="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+			class="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
 		/>
 		<DialogContent
 			:class="cn(sheetVariants({ side: props.side }), props.class)"
@@ -62,7 +62,7 @@ const sheetVariants = variants({
 
 			<DialogClose
 				v-if="props.closeButton"
-				class="absolute right-4 top-4 rounded-md p-0.5 transition-colors hover:bg-secondary"
+				class="absolute top-4 right-4 rounded-md p-0.5 transition-colors hover:bg-secondary"
 			>
 				<XIcon class="size-4 text-muted-foreground" />
 			</DialogClose>

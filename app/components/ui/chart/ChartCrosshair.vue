@@ -7,7 +7,7 @@ import { ChartTooltip } from ".";
 
 const props = withDefaults(
 	defineProps<{
-		colors: Array<string>;
+		colors?: Array<string>;
 		index: string;
 		items: Array<BulletLegendItemInterface>;
 		customTooltip?: Component;
@@ -39,6 +39,7 @@ function template(d: any) {
 			});
 		const TooltipComponent = props.customTooltip ?? ChartTooltip;
 		if (d[props.index] == null) return "";
+		// eslint-disable-next-line vue/component-api-style
 		createApp(TooltipComponent, { title: d[props.index].toString(), data: omittedData }).mount(
 			componentDiv,
 		);

@@ -53,7 +53,6 @@ const additionalInfo = computed(() => {
 const combinedSystemClasses: ComputedRef<Array<[string, Array<AdditionalInfoType>]>> = computed(
 	() => {
 		const res = [...additionalInfo.value, ...relationsByType.value];
-		console.log("all system classes for entity details: ", res);
 		return res;
 	},
 );
