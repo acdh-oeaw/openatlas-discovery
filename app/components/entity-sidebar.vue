@@ -230,7 +230,7 @@ async function exportEntity(format: ExportEntityParams["format"], extension: str
 				/>
 			</div>
 			<button
-				class="absolute top-1/2 left-full -z-10 block -translate-x-2 rounded-md bg-[hsl(var(--card))] py-2 pl-1 shadow-md"
+				class="absolute top-1/2 left-full -z-10 block -translate-x-2 rounded-md bg-card py-2 pl-1 shadow-md"
 				style="top: calc(50% - 40px)"
 				@click="expandedState = !expandedState"
 			>

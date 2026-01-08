@@ -72,7 +72,7 @@ function toggleExpandedState() {
 		:class="expandedState ? 'translate-x-0' : 'translate-x-full'"
 	>
 		<button
-			class="absolute top-2 right-full -z-10 -ml-8 block w-8 rounded-l-md bg-[hsl(var(--card))] px-1 py-2 shadow-md"
+			class="absolute top-2 right-full -z-10 -ml-8 block w-8 rounded-l-md bg-card px-1 py-2 shadow-md"
 			:class="expandedState ? 'translate-x-2' : 'translate-x-0'"
 			@click="toggleExpandedState"
 		>

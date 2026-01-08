@@ -79,37 +79,37 @@ onUnmounted(() => {
 
 <template>
 	<MainContent class="container w-full py-8">
-		<div>
-			<div class="mx-auto grid w-full grid-cols-1 gap-x-10 xl:grid-cols-[1fr_48rem_1fr]">
-				<div></div>
+		<div
+			class="mx-auto grid w-full grid-cols-1 justify-items-center gap-x-10 xl:grid-cols-[1fr_48rem_1fr]"
+		>
+			<div></div>
+			<div>
 				<div>
-					<div>
-						<PageTitle>{{ content?.title }}</PageTitle>
-					</div>
-					<ContentRenderer
-						v-if="content != null"
-						ref="pageContent"
-						class="prose"
-						:value="content.body"
-					>
-						<template #empty></template>
-					</ContentRenderer>
+					<PageTitle>{{ content?.title }}</PageTitle>
 				</div>
-				<aside
-					v-if="content?.toc && content?.body.toc && content.body.toc.links.length > 0"
-					class="sticky top-24 hidden max-h-fit text-xs text-neutral-500 xl:block"
+				<ContentRenderer
+					v-if="content != null"
+					ref="pageContent"
+					class="prose"
+					:value="content.body"
 				>
-					<h2 class="text-xs font-bold uppercase">{{ t("ContentPage.table-of-contents") }}</h2>
-					<ol ref="toc" class="ml-0">
-						<TocEntry
-							v-for="link in content?.body.toc?.links"
-							:key="link.id"
-							:entry="link"
-							:current-hash="currentHash"
-						></TocEntry>
-					</ol>
-				</aside>
+					<template #empty></template>
+				</ContentRenderer>
 			</div>
+			<aside
+				v-if="content?.toc && content?.body.toc && content.body.toc.links.length > 0"
+				class="sticky top-24 hidden max-h-fit text-xs text-neutral-500 xl:block"
+			>
+				<h2 class="text-xs font-bold uppercase">{{ t("ContentPage.table-of-contents") }}</h2>
+				<ol ref="toc" class="ml-0">
+					<TocEntry
+						v-for="link in content?.body.toc?.links"
+						:key="link.id"
+						:entry="link"
+						:current-hash="currentHash"
+					></TocEntry>
+				</ol>
+			</aside>
 		</div>
 	</MainContent>
 </template>
