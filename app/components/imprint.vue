@@ -2,8 +2,6 @@
 import { noop } from "@acdh-oeaw/lib";
 import { useQuery } from "@tanstack/vue-query";
 
-import type { ContentPage } from "@/types/content";
-
 const locale = useLocale();
 const t = useTranslations();
 
@@ -14,7 +12,7 @@ const {
 } = useQuery({
 	queryKey: ["imprint", locale] as const,
 	queryFn({ queryKey: [, locale] }) {
-		return queryContent<ContentPage>("pages", locale, "imprint").findOne();
+		return queryContent("pages", locale, "imprint").findOne();
 	},
 });
 useErrorMessage(error, {

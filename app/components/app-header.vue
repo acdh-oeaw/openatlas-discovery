@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/vue-query";
 
 import type { NavLinkProps } from "@/components/nav-link.vue";
 import { project } from "@/config/project.config";
-import type { ContentPage } from "@/types/content";
 
 const locale = useLocale();
 const t = useTranslations();
@@ -44,7 +43,7 @@ const defaultLinks = computed<
 	};
 });
 
-const { data: navigation, suspense } = useQuery<Array<ContentPage>>({
+const { data: navigation, suspense } = useQuery({
 	queryKey: computed(() => ["contentNavigation", locale.value]),
 	queryFn: async ({ queryKey: [, locale] }) => {
 		const prefix = `/pages/${locale}`;

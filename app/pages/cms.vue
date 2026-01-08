@@ -1,14 +1,12 @@
 <script lang="ts" setup>
 import { useQuery } from "@tanstack/vue-query";
 
-import type { ContentPage } from "@/types/content";
-
 const locale = useLocale();
 
 const { data: content } = useQuery({
 	queryKey: ["cms-intro", locale, "intro"] as const,
 	queryFn({ queryKey: [, locale, ...id] }) {
-		return queryContent<ContentPage>("cms-intro", locale, ...id).findOne();
+		return queryContent("cms-intro", locale, ...id).findOne();
 	},
 });
 

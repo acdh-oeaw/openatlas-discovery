@@ -2,15 +2,13 @@
 import { useQuery } from "@tanstack/vue-query";
 import { useTemplateRef } from "vue";
 
-import type { ContentPage } from "@/types/content";
-
 const locale = useLocale();
 
 const t = useTranslations();
 const { data: content } = useQuery({
 	queryKey: ["docs", locale, "documentation"] as const,
 	queryFn({ queryKey: [, locale, ...id] }) {
-		return queryContent<ContentPage>("docs", locale, ...id).findOne();
+		return queryContent("docs", locale, ...id).findOne();
 	},
 });
 

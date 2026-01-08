@@ -5,10 +5,10 @@ import projectEn from "~/i18n/messages/en/project.json";
 
 const locale = "en";
 
+// @ts-expect-error Unknown property `__cms__`.
 const { t } = createI18n({
 	legacy: false,
 	locale,
-	// @ts-expect-error Unknown property `__cms__`.
 	messages: { en: { ...en, ...projectEn } },
 }).global;
 

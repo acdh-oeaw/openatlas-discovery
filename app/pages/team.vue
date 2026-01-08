@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { noop } from "@acdh-oeaw/lib";
+import type { MDCRoot } from "@nuxtjs/mdc";
 import { useQuery } from "@tanstack/vue-query";
-
-import type { SystemPage } from "@/types/content";
 
 const locale = useLocale();
 const t = useTranslations();
@@ -15,7 +14,7 @@ const {
 	data: content,
 	error,
 	suspense,
-} = useQuery<SystemPage | null>({
+} = useQuery({
 	queryKey: computed(() => ["systemPages", locale.value, "team"]),
 	queryFn: async () => {
 		const id = `systemPages/system-pages/${locale.value}/team.md`;
@@ -27,7 +26,8 @@ const {
 			page.leadIn = parsed.body as any;
 		}
 
-		return (page as SystemPage) ?? null;
+		const _page = page as typeof page & { leadIn: MDCRoot };
+		return _page ?? null;
 	},
 });
 

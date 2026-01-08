@@ -22,14 +22,13 @@ export default defineNuxtConfig({
 	compatibilityDate: "2025-01-01",
 	components: [{ path: "components", extensions: [".vue"], pathPrefix: false }],
 	content: {
-		defaultLocale,
-		locales: files,
-		markdown: {
-			toc: {
-				depth: 5,
+		build: {
+			markdown: {
+				toc: {
+					depth: 5,
+				},
 			},
 		},
-		types: true,
 	},
 	css: [
 		"@fontsource-variable/inter/standard.css",

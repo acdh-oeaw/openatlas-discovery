@@ -3,8 +3,6 @@ import { isNonEmptyString, noop } from "@acdh-oeaw/lib";
 import { useQuery } from "@tanstack/vue-query";
 import { User2Icon as UserIcon } from "lucide-vue-next";
 
-import type { TeamMember } from "@/types/content";
-
 const locale = useLocale();
 const t = useTranslations();
 
@@ -12,14 +10,14 @@ const {
 	data: team,
 	error,
 	suspense,
-} = useQuery<Array<TeamMember> | null>({
+} = useQuery({
 	queryKey: ["teamMembers", locale, "index"] as const,
 	queryFn: async () => {
-		const members = await queryCollection<TeamMember>("teamMembers")
+		const members = await queryCollection("teamMembers")
 			.where("id", "LIKE", `teamMembers/team/${locale.value}/%`)
 			.all();
 
-		return (members as Array<TeamMember>) ?? null;
+		return members ?? null;
 	},
 });
 useErrorMessage(error, {
@@ -47,7 +45,7 @@ const sorted = computed(() => {
 <template>
 	<template v-if="sorted">
 		<ul class="grid grid-cols-2 gap-8 py-4" role="list">
-			<li v-for="member of sorted" :key="member._id">
+			<li v-for="member of sorted" :key="member.id">
 				<article class="prose prose-sm">
 					<div
 						class="not-prose relative grid size-20 place-items-center overflow-hidden rounded-full border-2 border-foreground"
