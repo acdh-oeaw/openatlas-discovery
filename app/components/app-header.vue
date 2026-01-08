@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { noop } from "@acdh-oeaw/lib";
 import { useQuery } from "@tanstack/vue-query";
 
 import type { NavLinkProps } from "@/components/nav-link.vue";
@@ -43,7 +44,7 @@ const defaultLinks = computed<
 	};
 });
 
-const { data: navigation } = useQuery<Array<ContentPage>>({
+const { data: navigation, suspense } = useQuery<Array<ContentPage>>({
 	queryKey: computed(() => ["contentNavigation", locale.value]),
 	queryFn: async ({ queryKey: [, locale] }) => {
 		const prefix = `/pages/${locale}`;
@@ -55,12 +56,25 @@ const { data: navigation } = useQuery<Array<ContentPage>>({
 
 		const excludedPaths = ["/", "/imprint"].map((p) => `${prefix}${p}`);
 
-		return allNavigation.filter((page) => !excludedPaths.includes(page._path as string));
+		const filtered = allNavigation.filter((page) => !excludedPaths.includes(page._path as string));
+
+		return filtered;
 	},
+});
+
+onServerPrefetch(async () => {
+	/**
+	 * Delegate errors to the client, to avoid displaying error page with status code 500.
+	 *
+	 * @see https://github.com/TanStack/query/issues/6606
+	 * @see https://github.com/TanStack/query/issues/5976
+	 */
+	await suspense().catch(noop);
 });
 
 const contentLinks = computed(() => {
 	const pages = navigation.value?.[0]?.children?.[0]?.children ?? [];
+
 	if (!pages || pages.length === 0) return {};
 
 	const prefix = ["", "pages", locale.value].join("/");
