@@ -537,7 +537,7 @@ watchEffect(() => {
 		// should there be two popups? --> make popups array / more rendered components??
 		if (detailEntity) {
 			setCoordinates(detailEntity, detailSelectionCoordinates);
-			 
+
 			if (detailSelectionCoordinates.value === undefined) return;
 			popover.value = {
 				coordinates: detailSelectionCoordinates.value,
