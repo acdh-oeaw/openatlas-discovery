@@ -46,6 +46,20 @@ circular.assign(context.graph);
 const router = useRouter();
 const route = useRoute();
 
+function getCssVar(name: string) {
+	return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function updateSigmaTheme() {
+	if (!context.renderer) return;
+
+	context.renderer.setSetting("labelColor", {
+		color: getCssVar("--foreground"),
+	});
+
+	context.renderer.refresh();
+}
+
 function handleNetworkControls(eventType: string) {
 	switch (eventType) {
 		case "toggleRenderer":
@@ -103,6 +117,7 @@ let hoverTimeOut: ReturnType<typeof setTimeout>;
 
 const state = ref<State>({});
 const layout = new FA2LayoutSupervisor(context.graph, { settings: layoutOptions });
+const observer = new MutationObserver(updateSigmaTheme);
 
 const disabledNodeColor = networkConfig.colors.disabledNodeColor;
 
@@ -211,6 +226,13 @@ watch(
 onMounted(async () => {
 	layout.start();
 
+	observer.observe(document.documentElement, {
+		attributes: true,
+		attributeFilter: ["data-ui-color-scheme"],
+	});
+
+	updateSigmaTheme(); // initial sync
+
 	// await the layout algorithm so the initial circular layout does not flash for a sec
 	await new Promise((r) => {
 		return setTimeout(r, 100);
@@ -222,6 +244,9 @@ onMounted(async () => {
 	context.renderer = new Sigma(context.graph, container, {
 		minCameraRatio: 0.1,
 		maxCameraRatio: 10,
+		labelColor: {
+			color: getCssVar("--foreground"),
+		},
 	});
 
 	context.camera = context.renderer.getCamera();
@@ -324,6 +349,7 @@ onScopeDispose(() => {
 	context.graph.clear();
 	context.renderer = null;
 	context.camera = null;
+	observer.disconnect();
 });
 </script>
 
