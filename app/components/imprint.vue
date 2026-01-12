@@ -4,15 +4,23 @@ import { useQuery } from "@tanstack/vue-query";
 
 const locale = useLocale();
 const t = useTranslations();
+const route = useRoute();
+
+const id = computed(() => {
+	const segments = route.path.split("/").filter(Boolean); // ["de", "imprint"]
+	return segments[segments.length - 1];
+});
 
 const {
 	data: content,
 	error,
 	suspense,
 } = useQuery({
-	queryKey: ["imprint", locale] as const,
-	queryFn({ queryKey: [, locale] }) {
-		return queryContent("pages", locale, "imprint").findOne();
+	queryKey: ["pages", locale, id] as const,
+	queryFn: async ({ queryKey: [, locale, ...id] }) => {
+		const prefix = `contentPages/pages/${locale}/${id[0]}.md`;
+		const fetchedContent = await queryCollection("contentPages").where("id", "=", prefix).first();
+		return fetchedContent;
 	},
 });
 useErrorMessage(error, {
@@ -31,7 +39,7 @@ onServerPrefetch(async () => {
 </script>
 
 <template>
-	<ContentRenderer v-if="content != null" class="prose" :value="content">
+	<ContentRenderer v-if="content != null" class="prose" :value="content.body">
 		<template #empty></template>
 	</ContentRenderer>
 </template>

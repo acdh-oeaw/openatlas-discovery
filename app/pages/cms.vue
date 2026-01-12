@@ -1,13 +1,34 @@
 <script lang="ts" setup>
-import { useQuery } from "@tanstack/vue-query";
+import { noop, useQuery } from "@tanstack/vue-query";
 
 const locale = useLocale();
+const t = useTranslations();
 
-const { data: content } = useQuery({
+const {
+	data: content,
+	error,
+	suspense,
+} = useQuery({
 	queryKey: ["cms-intro", locale, "intro"] as const,
-	queryFn({ queryKey: [, locale, ...id] }) {
-		return queryContent("cms-intro", locale, ...id).findOne();
+	async queryFn({ queryKey: [, locale] }) {
+		const id = `cmsIntro/cms-intro/${locale}/intro.md`;
+
+		const fetchedContent = await queryCollection("cmsIntro").where("id", "=", id).first();
+		return fetchedContent;
 	},
+});
+useErrorMessage(error, {
+	notFound: t("ContentPage.error.not-found"),
+	unknown: t("ContentPage.error.unknown"),
+});
+onServerPrefetch(async () => {
+	/**
+	 * Delegate errors to the client, to avoid displaying error page with status code 500.
+	 *
+	 * @see https://github.com/TanStack/query/issues/6606
+	 * @see https://github.com/TanStack/query/issues/5976
+	 */
+	await suspense().catch(noop);
 });
 
 useHead({

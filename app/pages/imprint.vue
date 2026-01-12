@@ -21,7 +21,7 @@ if (project.imprint === "none" && env.public.specialImprint !== "enabled") {
 </script>
 
 <template>
-	<MainContent class="container max-w-3xl py-8">
+	<MainContent class="container mx-auto max-w-3xl py-8">
 		<div>
 			<PageTitle>{{ t("ImprintPage.title") }}</PageTitle>
 		</div>

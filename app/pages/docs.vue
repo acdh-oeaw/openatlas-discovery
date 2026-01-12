@@ -1,15 +1,33 @@
 <script lang="ts" setup>
-import { useQuery } from "@tanstack/vue-query";
+import { noop, useQuery } from "@tanstack/vue-query";
 import { useTemplateRef } from "vue";
 
 const locale = useLocale();
 
 const t = useTranslations();
-const { data: content } = useQuery({
+const {
+	data: content,
+	error,
+	suspense,
+} = useQuery({
 	queryKey: ["docs", locale, "documentation"] as const,
-	queryFn({ queryKey: [, locale, ...id] }) {
-		return queryContent("docs", locale, ...id).findOne();
+	queryFn({ queryKey: [, locale] }) {
+		const id = `docs/docs/${locale}/documentation.md`;
+		return queryCollection("docs").where("id", "=", id).first();
 	},
+});
+useErrorMessage(error, {
+	notFound: t("ContentPage.error.not-found"),
+	unknown: t("ContentPage.error.unknown"),
+});
+onServerPrefetch(async () => {
+	/**
+	 * Delegate errors to the client, to avoid displaying error page with status code 500.
+	 *
+	 * @see https://github.com/TanStack/query/issues/6606
+	 * @see https://github.com/TanStack/query/issues/5976
+	 */
+	await suspense().catch(noop);
 });
 
 useHead({
@@ -60,7 +78,7 @@ onUnmounted(() => {
 					v-if="content != null"
 					ref="content"
 					class="prose max-w-3xl"
-					:value="content"
+					:value="content.body"
 				>
 					<template #empty></template>
 				</ContentRenderer>
