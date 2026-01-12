@@ -1,0 +1,15 @@
+onlyBuiltDependencies:
+  - "@intlify/vue-i18n-bridge"
+  - "@intlify/vue-router-bridge"
+  - "@parcel/watcher"
+  - better-sqlite3
+  - esbuild
+  - maplibre-gl
+  - sharp
+  - simple-git-hooks
+  - unrs-resolver
+  - vue-demi
+
+shellEmulator: true
+
+strictDepBuilds: true

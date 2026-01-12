@@ -1,9 +1,8 @@
 import { createUrl } from "@acdh-oeaw/lib";
 
 import { locales } from "@/config/i18n.config";
-import { expect, test } from "@/e2e/lib/test";
+import { expect, test } from "~/e2e/lib/test";
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL!;
 
 test.describe("i18n", () => {
@@ -87,15 +86,15 @@ test.describe("i18n", () => {
 
 				const links = await page.locator('link[rel="alternate"]').evaluateAll((elements) => {
 					return elements.map((element) => {
-						return element.outerHTML;
+						return [element.getAttribute("hreflang"), element.getAttribute("href")];
 					});
 				});
 
 				expect(links).toEqual(
 					expect.arrayContaining([
-						`<link id="i18n-alt-de" rel="alternate" href="${createAbsoluteUrl(`/de${pathname}`)}" hreflang="de">`,
-						`<link id="i18n-alt-en" rel="alternate" href="${createAbsoluteUrl(`/en${pathname}`)}" hreflang="en">`,
-						`<link id="i18n-xd" rel="alternate" href="${createAbsoluteUrl(`/en${pathname}`)}" hreflang="x-default">`,
+						["de", createAbsoluteUrl(`/de${pathname}`)],
+						["en", createAbsoluteUrl(`/en${pathname}`)],
+						["x-default", createAbsoluteUrl(`/en${pathname}`)],
 					]),
 				);
 			}

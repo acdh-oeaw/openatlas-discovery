@@ -1,17 +1,18 @@
 {
 	"name": "Nuxt",
-	"image": "ghcr.io/acdh-oeaw/devcontainer-frontend:22",
+	"image": "ghcr.io/acdh-oeaw/devcontainer-frontend:24",
+	"runArgs": ["--add-host=host.docker.internal:host-gateway"],
 	"customizations": {
 		"vscode": {
 			"extensions": [
 				"bradlc.vscode-tailwindcss",
 				"dbaeumer.vscode-eslint",
 				"editorconfig.editorconfig",
-				"esbenp.prettier-vscode",
 				"lokalise.i18n-ally",
 				"mikestead.dotenv",
 				"ms-playwright.playwright",
 				"nuxt.mdc",
+				"prettier.prettier-vscode",
 				"stylelint.vscode-stylelint",
 				"vue.volar"
 			]

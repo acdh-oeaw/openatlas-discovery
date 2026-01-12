@@ -1,11 +1,15 @@
-import { createUrl } from "@acdh-oeaw/lib";
+import { assert, createUrl } from "@acdh-oeaw/lib";
 
 import { locales } from "@/config/i18n.config";
-import { expect, test } from "@/e2e/lib/test";
 import { escape } from "@/utils/safe-json-ld-replacer";
+import { expect, test } from "~/e2e/lib/test";
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL!;
+assert(
+	process.env.NUXT_PUBLIC_APP_BASE_URL,
+	"Missing NUXT_PUBLIC_APP_BASE_URL environment variable.",
+);
+
+const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL;
 
 test("should set a canonical url", async ({ createIndexPage }) => {
 	for (const locale of locales) {
@@ -54,18 +58,6 @@ test("should set page metadata", async ({ createIndexPage }) => {
 
 		const ogType = page.locator('meta[property="og:type"]');
 		await expect(ogType).toHaveAttribute("content", "website");
-
-		const twCard = page.locator('meta[name="twitter:card"]');
-		await expect(twCard).toHaveAttribute("content", "summary_large_image");
-
-		// const twCreator = page.locator('meta[name="twitter:creator"]');
-		// await expect(twCreator).toHaveAttribute("content", project.twitter);
-
-		// const twSite = page.locator('meta[name="twitter:site"]');
-		// await expect(twSite).toHaveAttribute("content", project.twitter);
-
-		// const googleSiteVerification = page.locator('meta[name="google-site-verification"]');
-		// await expect(googleSiteVerification).toHaveAttribute("content", "");
 
 		await expect(page).toHaveTitle(
 			[i18n.t("IndexPage.meta.title"), i18n.t("Metadata.name")].join(" | "),

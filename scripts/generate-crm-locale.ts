@@ -22,7 +22,7 @@
  * 		}
  * 	}
  */
-// FIXME: mocca will fix it in taiwan.
+
 /* eslint-disable */
 
 import { mkdir, writeFile } from "node:fs/promises";
@@ -32,8 +32,8 @@ import * as v from "valibot";
 import { assert, log } from "@acdh-oeaw/lib";
 import createApiClient from "@stefanprobst/openapi-client";
 
-import { defaultLocale, locales } from "@/config/i18n.config";
-import type { paths } from "@/lib/api-client/api";
+import { defaultLocale, locales } from "../app/config/i18n.config";
+import type { paths } from "../app/lib/api-client/api";
 
 const schema = v.object({
 	NUXT_PUBLIC_DATABASE: v.optional(v.picklist(["enabled", "disabled"]), "enabled"),

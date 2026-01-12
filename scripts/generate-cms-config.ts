@@ -1,9 +1,10 @@
 /* eslint-disable*/
 //@ts-ignore
 
-import fs from "fs";
-import YAML from "yaml";
+import * as fs from "node:fs";
+
 import { log } from "@acdh-oeaw/lib";
+import YAML from "yaml";
 
 const jsonData = JSON.parse(fs.readFileSync("public/assets/icons/icons.json", "utf8"));
 const template = fs.readFileSync("public/admin/config.yml", "utf8");

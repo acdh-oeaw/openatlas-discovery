@@ -1,23 +1,15 @@
 import { fileURLToPath } from "node:url";
 
-import { defaultLocale, localesMap } from "./config/i18n.config";
+import tailwindcss from "@tailwindcss/vite";
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+import { defaultLocale, files } from "./app/config/i18n.config";
+
 const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL!;
 
 export default defineNuxtConfig({
-	vite: {
-		resolve: {
-			alias: {
-				// Force Unovis (and your code) to use the modern d3-geo
-				"@unovis/ts/node_modules/d3-geo": require.resolve("d3-geo"),
-				"d3-geo": require.resolve("d3-geo"),
-			},
-		},
-	},
-
 	alias: {
-		"@": fileURLToPath(new URL("./", import.meta.url)),
+		"@": fileURLToPath(new URL("./app/", import.meta.url)),
+		"~": fileURLToPath(new URL("./", import.meta.url)),
 	},
 	app: {
 		layoutTransition: false,
@@ -27,28 +19,32 @@ export default defineNuxtConfig({
 		classSuffix: "",
 		dataValue: "ui-color-scheme",
 	},
-	components: [{ path: "@/components", extensions: [".vue"], pathPrefix: false }],
+	compatibilityDate: "2025-01-01",
+	components: [{ path: "components", extensions: [".vue"], pathPrefix: false }],
 	content: {
-		defaultLocale,
-		locales: Object.keys(localesMap),
-		markdown: {
-			toc: {
-				depth: 5,
+		build: {
+			markdown: {
+				toc: {
+					depth: 5,
+				},
 			},
 		},
 	},
 	css: [
 		"@fontsource-variable/inter/standard.css",
-		"tailwindcss/tailwind.css",
+		"@fontsource-variable/inter/standard-italic.css",
 		"@/styles/index.css",
 	],
 	devtools: {
 		enabled: true,
 	},
-	experimental: {
-		componentIslands: {
-			selectiveClient: true,
+	eslint: {
+		config: {
+			autoInit: false,
+			standalone: false,
 		},
+	},
+	experimental: {
 		defaults: {
 			useAsyncData: {
 				deep: false,
@@ -58,13 +54,6 @@ export default defineNuxtConfig({
 			},
 		},
 		inlineRouteRules: true,
-	},
-	features: {
-		/** @see https://github.com/nuxt/nuxt/issues/21821 */
-		inlineStyles: false,
-	},
-	future: {
-		compatibilityVersion: 4,
 	},
 	/**
 	 * FIXME: some dependency does not properly clean up,
@@ -85,36 +74,29 @@ export default defineNuxtConfig({
 		detectBrowserLanguage: {
 			redirectOn: "root",
 		},
-		langDir: "./messages",
-		lazy: true,
-		locales: Object.values(localesMap),
+		experimental: {
+			typedOptionsAndMessages: "default",
+		},
+		langDir: "messages",
+		locales: files,
 		strategy: "prefix",
-		vueI18n: "./i18n.config.ts",
 	},
 	imports: {
-		dirs: ["./config/"],
+		dirs: ["@/config/"],
 	},
 	modules: [
 		"@nuxt/content",
+		"@nuxt/eslint",
 		"@nuxt/image",
 		"@nuxtjs/color-mode",
 		"@nuxtjs/i18n",
 		"@vueuse/nuxt",
-		"nuxt-svgo",
 	],
-	svgo: {
-		defaultImport: "component",
-		autoImportPath: "./assets/icons/",
-	},
 	nitro: {
 		compressPublicAssets: true,
 		prerender: {
+			crawlLinks: true,
 			routes: ["/manifest.webmanifest", "/robots.txt", "/sitemap.xml"],
-		},
-	},
-	postcss: {
-		plugins: {
-			tailwindcss: {},
 		},
 	},
 	runtimeConfig: {
@@ -140,9 +122,28 @@ export default defineNuxtConfig({
 		// https://github.com/nuxt/nuxt/issues/14816#issuecomment-1484918081
 		tsConfig: {
 			compilerOptions: {
+				baseUrl: ".",
 				paths: {
-					"@/*": ["./*"],
+					"@/*": ["./app/*"],
+					"~/*": ["./*"],
 				},
+			},
+			include: [
+				"../*.config.ts",
+				"../i18n/*.config.ts",
+				"../e2e/**/*.ts",
+				"../scripts/**/*.ts",
+				"../server/**/*.ts",
+			],
+		},
+	},
+	vite: {
+		plugins: [tailwindcss()],
+		resolve: {
+			alias: {
+				/** Force Unovis (and your code) to use the modern d3-geo. */
+				"@unovis/ts/node_modules/d3-geo": require.resolve("d3-geo"),
+				"d3-geo": require.resolve("d3-geo"),
 			},
 		},
 	},

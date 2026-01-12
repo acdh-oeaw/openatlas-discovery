@@ -1,5 +1,5 @@
 import { locales } from "@/config/i18n.config";
-import { expect, test } from "@/e2e/lib/test";
+import { expect, test } from "~/e2e/lib/test";
 
 test.describe("index page", () => {
 	test("should have document title", async ({ createIndexPage }) => {
@@ -26,12 +26,31 @@ test.describe("index page", () => {
 		}
 	});
 
-	test.skip("should not have visible changes", async ({ createIndexPage }) => {
-		for (const locale of locales) {
-			const { indexPage } = await createIndexPage(locale);
-			await indexPage.goto();
+	// eslint-disable-next-line playwright/no-skipped-test
+	test.describe.skip("should not have visible changes", () => {
+		test.use({ colorScheme: "light" });
 
-			await expect(indexPage.page).toHaveScreenshot();
-		}
+		test("in light mode", async ({ createIndexPage }) => {
+			for (const locale of locales) {
+				const { indexPage } = await createIndexPage(locale);
+				await indexPage.goto();
+
+				await expect(indexPage.page).toHaveScreenshot();
+			}
+		});
+	});
+
+	// eslint-disable-next-line playwright/no-skipped-test
+	test.describe.skip("should not have visible changes", () => {
+		test.use({ colorScheme: "dark" });
+
+		test("in dark mode", async ({ createIndexPage }) => {
+			for (const locale of locales) {
+				const { indexPage } = await createIndexPage(locale);
+				await indexPage.goto();
+
+				await expect(indexPage.page).toHaveScreenshot();
+			}
+		});
 	});
 });

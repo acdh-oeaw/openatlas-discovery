@@ -13,7 +13,11 @@ WORKDIR /app
 
 USER node
 
-COPY --chown=node:node .npmrc package.json pnpm-lock.yaml ./
+COPY --chown=node:node .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# COPY --chown=node:node ./patches ./patches
+
+ENV CI=true
+ENV SKIP_INSTALL_SIMPLE_GIT_HOOKS=1
 
 RUN pnpm fetch
 
@@ -37,6 +41,8 @@ RUN pnpm install --frozen-lockfile --offline
 
 ENV NODE_ENV=production
 
+# to mount secrets which need to be available at build time
+# @see https://docs.docker.com/build/building/secrets/
 RUN pnpm run build
 
 # serve

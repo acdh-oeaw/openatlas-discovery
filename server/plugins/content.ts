@@ -1,4 +1,4 @@
-/* eslint-disable require-atomic-updates, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable require-atomic-updates, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
 
 import { isNonEmptyString } from "@acdh-oeaw/lib";
 import { parseMarkdown } from "@nuxtjs/mdc/runtime";
@@ -12,6 +12,7 @@ export default defineNitroPlugin((nitroApp) => {
 	nitroApp.hooks.hook("content:file:afterParse", async (file) => {
 		if (file._path.startsWith("/system-pages/") && file._id.endsWith(".md")) {
 			if (isNonEmptyString(file.leadIn)) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				file.leadIn = await parseMarkdown(file.leadIn);
 			}
 		}

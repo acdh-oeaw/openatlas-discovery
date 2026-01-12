@@ -13,6 +13,7 @@ node_modules/
 
 # caches
 .eslintcache
+.prettiercache
 .stylelintcache
 *.tsbuildinfo
 
@@ -25,6 +26,7 @@ node_modules/
 
 # nuxt.js
 dist
+.cache/
 .data/
 .nuxt/
 .nitro/
@@ -37,7 +39,7 @@ dist
 /test-results/
 
 # generated api-client
-/lib/api-client/api.ts
+/app/lib/api-client/api.ts
 
 # generated content
 /messages/*/crm.json

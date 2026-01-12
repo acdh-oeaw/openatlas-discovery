@@ -1,8 +1,8 @@
 import { locales } from "@/config/i18n.config";
-import { expect, test } from "@/e2e/lib/test";
+import { expect, test } from "~/e2e/lib/test";
 
 test.describe("imprint page", () => {
-	test.skip("should have document title", async ({ createImprintPage }) => {
+	test("should have document title", async ({ createImprintPage }) => {
 		for (const locale of locales) {
 			const { i18n, imprintPage } = await createImprintPage(locale);
 			await imprintPage.goto();
@@ -13,7 +13,7 @@ test.describe("imprint page", () => {
 		}
 	});
 
-	test.skip("should have imprint text", async ({ createImprintPage }) => {
+	test("should have imprint text", async ({ createImprintPage }) => {
 		const imprints = {
 			de: "Offenlegung",
 			en: "Legal disclosure",
@@ -27,7 +27,7 @@ test.describe("imprint page", () => {
 		}
 	});
 
-	test.skip("should not have any automatically detectable accessibility issues", async ({
+	test("should not have any automatically detectable accessibility issues", async ({
 		createAccessibilityScanner,
 		createImprintPage,
 	}) => {
@@ -40,12 +40,31 @@ test.describe("imprint page", () => {
 		}
 	});
 
-	test.skip("should not have visible changes", async ({ createImprintPage }) => {
-		for (const locale of locales) {
-			const { imprintPage } = await createImprintPage(locale);
-			await imprintPage.goto();
+	// eslint-disable-next-line playwright/no-skipped-test
+	test.describe.skip("should not have visible changes", () => {
+		test.use({ colorScheme: "light" });
 
-			await expect(imprintPage.page).toHaveScreenshot();
-		}
+		test("in light mode", async ({ createImprintPage }) => {
+			for (const locale of locales) {
+				const { imprintPage } = await createImprintPage(locale);
+				await imprintPage.goto();
+
+				await expect(imprintPage.page).toHaveScreenshot();
+			}
+		});
+	});
+
+	// eslint-disable-next-line playwright/no-skipped-test
+	test.describe.skip("should not have visible changes", () => {
+		test.use({ colorScheme: "dark" });
+
+		test("in dark mode", async ({ createImprintPage }) => {
+			for (const locale of locales) {
+				const { imprintPage } = await createImprintPage(locale);
+				await imprintPage.goto();
+
+				await expect(imprintPage.page).toHaveScreenshot();
+			}
+		});
 	});
 });
