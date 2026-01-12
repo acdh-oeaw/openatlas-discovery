@@ -54,8 +54,11 @@ const { data: navigation, suspense } = useQuery({
 		);
 
 		const excludedPaths = ["/", "/imprint"].map((p) => `${prefix}${p}`);
-
-		const filtered = allNavigation.filter((page) => !excludedPaths.includes(page._path as string));
+		const filtered = allNavigation.map((page) =>
+			page.children?.flatMap((child) => {
+				return child.children?.filter((e) => !excludedPaths.includes(e.path as string));
+			}),
+		);
 
 		return filtered;
 	},
@@ -72,7 +75,7 @@ onServerPrefetch(async () => {
 });
 
 const contentLinks = computed(() => {
-	const pages = navigation.value?.[0]?.children?.[0]?.children ?? [];
+	const pages = navigation.value?.at(0) ?? [];
 
 	if (!pages || pages.length === 0) return {};
 
@@ -81,7 +84,7 @@ const contentLinks = computed(() => {
 	const linksObj: Record<string, { href: NavLinkProps["href"]; label: string }> = {};
 
 	for (const link of pages) {
-		if (typeof link.path !== "string" || typeof link.title !== "string") continue;
+		if (typeof link?.path !== "string" || typeof link.title !== "string") continue;
 		linksObj[link.path] = {
 			href: { path: `/content${link.path.slice(prefix.length)}` },
 			label: link.title,
