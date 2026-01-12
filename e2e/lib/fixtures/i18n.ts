@@ -8,11 +8,15 @@ export type I18n = _I18n<Record<Locale, Messages>, {}, {}, Locale, false>["globa
 
 export async function createI18n(_page: Page, locale = defaultLocale): Promise<I18n> {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-	const _messages = await import(`~/i18n/messages/${locale}/common.json`, {
+	const common = await import(`~/i18n/messages/${locale}/common.json`, {
+		with: { type: "json" },
+	});
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+	const project = await import(`~/i18n/messages/${locale}/project.json`, {
 		with: { type: "json" },
 	});
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-	const messages = _messages.default as Messages;
+	const messages = { ...common.default, ...project.default } as Messages;
 
 	// @ts-expect-error Only messages for single locale provided.
 	return _createI18n({ legacy: false, locale, messages: { [locale]: messages } }).global;

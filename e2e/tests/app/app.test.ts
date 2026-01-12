@@ -70,9 +70,9 @@ test.describe("app", () => {
 
 		expect(body.toString()).toEqual(
 			JSON.stringify({
-				name: i18n.t("Manifest.name"),
-				short_name: i18n.t("Manifest.short-name"),
-				description: i18n.t("Manifest.description"),
+				name: i18n.t("Metadata.name"),
+				short_name: i18n.t("Metadata.shortName"),
+				description: i18n.t("Metadata.description"),
 				start_url: "/",
 				display: "standalone",
 				background_color: "#fff",

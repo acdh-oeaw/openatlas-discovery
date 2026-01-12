@@ -57,7 +57,7 @@ test.describe("i18n", () => {
 		await expect(page).toHaveURL("/de/imprint");
 		await expect(page.getByRole("heading", { name: i18nDe.t("ImprintPage.title") })).toBeVisible();
 		await expect(page).toHaveTitle(
-			[i18nDe.t("ImprintPage.meta.title"), i18nDe.t("DefaultLayout.meta.title")].join(" | "),
+			[i18nDe.t("ImprintPage.meta.title"), i18nDe.t("Metadata.name")].join(" | "),
 		);
 
 		await page
@@ -69,7 +69,7 @@ test.describe("i18n", () => {
 		await expect(page).toHaveURL("/en/imprint");
 		await expect(page.getByRole("heading", { name: i18nEn.t("ImprintPage.title") })).toBeVisible();
 		await expect(page).toHaveTitle(
-			[i18nEn.t("ImprintPage.meta.title"), i18nEn.t("DefaultLayout.meta.title")].join(" | "),
+			[i18nEn.t("ImprintPage.meta.title"), i18nEn.t("Metadata.name")].join(" | "),
 		);
 	});
 

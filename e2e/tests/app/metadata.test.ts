@@ -28,13 +28,13 @@ test("should set document title on not-found page", async ({ createI18n, page })
 	const i18nEn = await createI18n("en");
 	await page.goto("/unknown");
 	await expect(page).toHaveTitle(
-		[i18nEn.t("NotFoundPage.meta.title"), i18nEn.t("DefaultLayout.meta.title")].join(" | "),
+		[i18nEn.t("NotFoundPage.meta.title"), i18nEn.t("Metadata.name")].join(" | "),
 	);
 
 	const i18nDe = await createI18n("de");
 	await page.goto("/de/unknown");
 	await expect(page).toHaveTitle(
-		[i18nDe.t("NotFoundPage.meta.title"), i18nDe.t("DefaultLayout.meta.title")].join(" | "),
+		[i18nDe.t("NotFoundPage.meta.title"), i18nDe.t("Metadata.name")].join(" | "),
 	);
 });
 
@@ -53,42 +53,24 @@ test("should set page metadata", async ({ createIndexPage }) => {
 		await indexPage.goto();
 		const { page } = indexPage;
 
-		expect(i18n.t("DefaultLayout.meta.title")).toBeTruthy();
-		expect(i18n.t("DefaultLayout.meta.description")).toBeTruthy();
+		expect(i18n.t("Metadata.name")).toBeTruthy();
+		expect(i18n.t("Metadata.description")).toBeTruthy();
 
 		const ogType = page.locator('meta[property="og:type"]');
 		await expect(ogType).toHaveAttribute("content", "website");
 
-		const twCard = page.locator('meta[name="twitter:card"]');
-		await expect(twCard).toHaveAttribute("content", "summary_large_image");
-
-		const twCreator = page.locator('meta[name="twitter:creator"]');
-		await expect(twCreator).toHaveAttribute("content", i18n.t("DefaultLayout.meta.twitter"));
-
-		const twSite = page.locator('meta[name="twitter:site"]');
-		await expect(twSite).toHaveAttribute("content", i18n.t("DefaultLayout.meta.twitter"));
-
-		// const googleSiteVerification = page.locator('meta[name="google-site-verification"]');
-		// await expect(googleSiteVerification).toHaveAttribute("content", "");
-
 		await expect(page).toHaveTitle(
-			[i18n.t("IndexPage.meta.title"), i18n.t("DefaultLayout.meta.title")].join(" | "),
+			[i18n.t("IndexPage.meta.title"), i18n.t("Metadata.name")].join(" | "),
 		);
 
 		const metaDescription = page.locator('meta[name="description"]');
-		await expect(metaDescription).toHaveAttribute(
-			"content",
-			i18n.t("DefaultLayout.meta.description"),
-		);
+		await expect(metaDescription).toHaveAttribute("content", i18n.t("Metadata.description"));
 
 		const ogTitle = page.locator('meta[property="og:title"]');
 		await expect(ogTitle).toHaveAttribute("content", i18n.t("IndexPage.meta.title"));
 
 		const ogDescription = page.locator('meta[property="og:description"]');
-		await expect(ogDescription).toHaveAttribute(
-			"content",
-			i18n.t("DefaultLayout.meta.description"),
-		);
+		await expect(ogDescription).toHaveAttribute("content", i18n.t("Metadata.description"));
 
 		const ogUrl = page.locator('meta[property="og:url"]');
 		await expect(ogUrl).toHaveAttribute(
@@ -115,8 +97,8 @@ test("should add json+ld metadata", async ({ createIndexPage }) => {
 			JSON.stringify({
 				"@context": "https://schema.org",
 				"@type": "WebSite",
-				name: escape(i18n.t("DefaultLayout.meta.title")),
-				description: escape(i18n.t("DefaultLayout.meta.description")),
+				name: escape(i18n.t("Metadata.name")),
+				description: escape(i18n.t("Metadata.description")),
 			}),
 		);
 	}

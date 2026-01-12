@@ -8,7 +8,7 @@ test.describe("index page", () => {
 			await indexPage.goto();
 
 			await expect(indexPage.page).toHaveTitle(
-				[i18n.t("IndexPage.meta.title"), i18n.t("DefaultLayout.meta.title")].join(" | "),
+				[i18n.t("IndexPage.meta.title"), i18n.t("Metadata.name")].join(" | "),
 			);
 		}
 	});
