@@ -48,7 +48,6 @@ const currentMode = computed(() => {
 			<Breadcrumb>
 				<BreadcrumbList>
 					<BreadcrumbItem v-if="hierarchy[0]">
-						{{ (getPath(), currentMode) }}
 						<NavLink
 							v-if="hierarchy[0]?.identifier"
 							class="underline decoration-dotted hover:no-underline"

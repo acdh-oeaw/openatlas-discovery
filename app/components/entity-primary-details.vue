@@ -337,7 +337,7 @@ onMounted(async () => {
 		{{ t("EntityPage.no-details") }}
 	</div>
 	<div v-else-if="!isEmptyPrimaryDetails || isType" class="relative flex max-w-full flex-col gap-4">
-		<EntityDescriptions :descriptions="[entity?.description ?? '']" />
+		<EntityDescriptions v-if="entity.description" :descriptions="[entity?.description ?? '']" />
 
 		<!-- Types -->
 		<div class="flex flex-row flex-wrap gap-1">

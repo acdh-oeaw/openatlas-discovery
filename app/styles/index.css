@@ -211,8 +211,7 @@
 
 @utility container {
 	width: 100%;
-	max-width: 87.5rem;
-	margin-inline: auto;
+	max-width: 100%;
 	padding: 2rem;
 }
 
