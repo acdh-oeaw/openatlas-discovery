@@ -147,7 +147,7 @@ const selectorsBar = computed(() => {
 				:tick-format="xFormatter ?? ((v: number) => data[v]?.[index])"
 				:grid-line="false"
 				:tick-line="false"
-				tick-text-color="hsl(var(--vis-text-color))"
+				tick-text-color="var(--muted-foreground)"
 				:tick-text-angle="45"
 				:num-ticks="data.length"
 			/>
@@ -163,7 +163,7 @@ const selectorsBar = computed(() => {
 						class: 'text-muted',
 					},
 				}"
-				tick-text-color="hsl(var(--vis-text-color))"
+				tick-text-color="var(--muted-foreground)"
 			/>
 
 			<slot />
