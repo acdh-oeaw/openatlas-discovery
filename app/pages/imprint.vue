@@ -28,6 +28,6 @@ if (project.imprint === "none" && env.public.specialImprint !== "enabled") {
 
 		<ImprintSpecial v-if="env.public.specialImprint === 'enabled'" />
 		<Imprint v-else-if="project.imprint === 'custom'" />
-		<ImprintAcdhCh v-else-if="project.imprint === 'acdh-ch'" />
+		<ImprintAcdhCh v-else-if="project.imprint === 'acdh'" />
 	</MainContent>
 </template>

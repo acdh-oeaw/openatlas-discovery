@@ -1,4 +1,4 @@
-site_url: https://openatlas-discovery-demo.acdh-ch-dev.oeaw.ac.at
+site_url: https://openatlas-discovery-demo.acdh-dev.oeaw.ac.at
 logo_url: /icon.svg
 load_config_file: true
 local_backend: true
@@ -6,7 +6,7 @@ backend:
   name: github
   repo: acdh-oeaw/openatlas-discovery
   branch: develop
-  base_url: https://openatlas-discovery-demo.acdh-ch-dev.oeaw.ac.at
+  base_url: https://openatlas-discovery-demo.acdh-dev.oeaw.ac.at
   auth_endpoint: /api/oauth/authorize
   auth_scope: repo
   squash_merges: true
@@ -1925,8 +1925,8 @@ collections:
                 label: No imprint
               - value: custom
                 label: Use custom imprint page
-              - value: acdh-ch
-                label: Use ACDH-CH imprint
+              - value: acdh
+                label: Use ACDH imprint
           - name: twitter
             label: Twitter
             required: false

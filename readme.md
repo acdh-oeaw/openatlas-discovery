@@ -2,7 +2,7 @@
 
 OpenAtlas Discovery is a presentation website for [OpenAtlas](https://openatlas.eu) projects.
 
-A demo website is deplyed at <https://openatlas-discovery-demo.acdh-ch-dev.oeaw.ac.at>.
+A demo website is deplyed at <https://openatlas-discovery-demo.acdh-dev.oeaw.ac.at>.
 
 ## Content management (CMS)
 
@@ -65,7 +65,7 @@ Environment variables:
 - `NUXT_PUBLIC_BOTS`: Set this to "enabled" to allow web crawlers like the Google bot to index this
   website.
 
-- `NUXT_PUBLIC_REDMINE_ID`: Needed when using the ACDH-CH imprint service for the imprint page.
+- `NUXT_PUBLIC_REDMINE_ID`: Needed when using the ACDH imprint service for the imprint page.
 
 ### Install dependencies
 

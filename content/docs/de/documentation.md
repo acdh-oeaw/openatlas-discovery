@@ -31,7 +31,7 @@ können Sie:
   Website, sowie ein Logo mit und ohne Text, bereitzustellen. (Natürlich können Sie auch einfach
   dasselbe Logo in allen Kategorien hochladen 😉)
 - ein _Impressum_ auf Ihrer Website hinzufügen (falls Sie ein/e Kooperationspartner/in von
-  acdh-ch-oeaw sind, zögern Sie nicht, das acdh-ch-Impressum zu verwenden, ansonsten können Sie Ihre
+  acdh-oeaw sind, zögern Sie nicht, das acdh-Impressum zu verwenden, ansonsten können Sie Ihre
   [eigene Impressumsseite](#erstellen-einer-benutzerdefinierten-impressumsseite) hinzufügen)
 - den _Twitter_-Account Ihres Projekts hinzufügen, um Metadaten für Webcrawler bereitzustellen (mehr
   Sichtbarkeit, hurra!)

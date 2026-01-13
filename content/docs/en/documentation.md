@@ -28,8 +28,8 @@ The **Config**-Collection beholds the overall _Project Config_. Here you can :
 - upload your project's _logo_ - here is prefered to provide logo's for the light and dark mode of
   the website and a logo with and without text. (of course you can also just upload the same logo in
   all the categories :wink:)
-- add an _imprint_ to your website (if you are an acdh-ch-oeaw cooperation partner, don't hesitate
-  to use the acdh-ch-imprint, otherwise you can add your
+- add an _imprint_ to your website (if you are an acdh-oeaw cooperation partner, don't hesitate
+  to use the acdh-imprint, otherwise you can add your
   [own imprint page](#creating-a-custom-imprint-page))
 - add your project's _twitter_-account to provide metadata to web-crawlers (more exposure, hooray!)
 

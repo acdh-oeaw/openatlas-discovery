@@ -61,7 +61,7 @@ const schema = v.object({
 		),
 	}),
 	fullscreen: v.boolean(),
-	imprint: v.picklist(["acdh-ch", "custom", "none"]),
+	imprint: v.picklist(["acdh", "custom", "none"]),
 	logos: v.object({
 		light: v.string(),
 		dark: v.string(),
