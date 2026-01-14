@@ -90,13 +90,15 @@ const currentMode = computed(() => {
 
 <template>
 	<MainContent class="s:py-16 container grid p-8">
+		<h1 class="sr-only">
+			{{ content?.title ?? t("IndexPage.meta.title") }}
+		</h1>
 		<div v-if="!project.map.startPage">
 			<div v-if="content != null">
 				<div v-if="content.title !== 'OpenAtlas Discovery'">
 					<template v-if="content.leadIn != null">
 						<div class="container grid place-items-center gap-8 p-8 sm:py-16">
 							<div>
-								<h1 class="sr-only">{{ content.title }}</h1>
 								<NuxtImg
 									v-if="content.image?.light != null"
 									alt=""
@@ -148,7 +150,6 @@ const currentMode = computed(() => {
 					<div class="grid grid-cols-2 gap-16">
 						<div class="grid w-fit gap-4 pb-4">
 							<div>
-								<h1 class="sr-only">{{ content.title }}</h1>
 								<NuxtImg
 									v-if="content.image?.light != null"
 									alt=""
@@ -211,7 +212,10 @@ const currentMode = computed(() => {
 								]"
 								class="relative flex size-full"
 							>
-								<CarouselPrevious class="z-20 ml-14 bg-white opacity-90 dark:bg-black" />
+								<CarouselPrevious
+									aria-label="Previous slide"
+									class="z-20 ml-14 bg-white opacity-90 dark:bg-black"
+								/>
 								<CarouselContent class="size-full">
 									<CarouselItem v-for="(image, index) of images" :key="index" class="">
 										<Card class="relative flex size-full">
@@ -234,6 +238,7 @@ const currentMode = computed(() => {
 								</CarouselContent>
 								<CarouselNext
 									v-if="images.length > 1"
+									aria-label="Next slide"
 									class="z-20 mr-14 bg-white opacity-90 dark:bg-black"
 								/>
 							</Carousel>
