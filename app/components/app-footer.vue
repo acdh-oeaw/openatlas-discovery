@@ -21,8 +21,13 @@ const logos = project.footer.partner_logos;
 <template>
 	<footer class="border-t opacity-80">
 		<div
-			class="container grid gap-4 py-6 text-sm sm:items-center"
-			:class="logos && logos.length > 0 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'"
+			:class="[
+				!project.map.startPage
+					? `container grid gap-4 py-6 text-sm sm:items-center`
+					: `grid gap-4 px-8 py-6 text-sm sm:items-center`,
+
+				logos && logos.length > 0 ? 'sm:grid-cols-3' : 'sm:grid-cols-2',
+			]"
 		>
 			<div class="sm:justify-self-start">
 				<I18nT keypath="AppFooter.with-love">

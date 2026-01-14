@@ -42,7 +42,7 @@ Die Kartenansicht bietet viele Funktionen:
 
 ## Weitere Informationen
 
-* Entdecken Sie einige Projekte, die OpenAtlas Discovery nutzen:\
+* Entdecken Sie Projekte, die OpenAtlas Discovery nutzen:\
   https://openatlas.eu/projects
 * Erfahren Sie mehr über OpenAtlas: \
   https://openatlas.eu/

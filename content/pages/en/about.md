@@ -61,11 +61,11 @@ displayed, and even focus on specific subsets of their data.
 
 ## Further Information
 
-* Explore some projects which are using OpenAtlas Discovery:
+* Explore projects which are using OpenAtlas Discovery:
   https://openatlas.eu/projects
 * Learn more about OpenAtlas: \
   https://openatlas.eu/
 * Collaborate with us:\
   https://openatlas.eu/cooperation
-* Seen a bug? Report it here:\
+* Found a bug? Report it here:\
   https://redmine.openatlas.eu/projects/openatlas-discovery/issues

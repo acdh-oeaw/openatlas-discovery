@@ -2,8 +2,8 @@
 title: OpenAtlas Discovery
 navigation: false
 image:
-  light: /assets/images/hero-light.svg
-  dark: /assets/images/hero-dark.svg
+  light: /assets/images/logo-with-text-light.svg
+  dark: /assets/images/logo-with-text-dark.svg
 leadIn: >-
   OpenAtlas Discovery is a presentation site template for a database system
   called OpenAtlas that is used by various Digital Humanities projects from

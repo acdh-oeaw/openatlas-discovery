@@ -158,7 +158,7 @@ const isFullscreen = ref(false);
 		>
 			<div class="absolute right-0 bottom-0 z-10">
 				<NetworkControls
-					class="right-0 m-3 ml-auto bg-white/90"
+					class="right-0 m-3 ml-auto"
 					:layout-running="isRunning"
 					:is-fullscreen="isFullscreen"
 					:show-orphans="showOrphans"
@@ -166,7 +166,7 @@ const isFullscreen = ref(false);
 				/>
 				<NetworkLegendPanel
 					v-if="height && width"
-					class="m-3 bg-white/90"
+					class="m-3"
 					:system-classes="relevantSystemClasses"
 					:excluded-classes="searchFilters.excludeSystemClasses"
 					:allow-filtering="true"

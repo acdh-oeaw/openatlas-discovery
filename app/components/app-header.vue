@@ -103,7 +103,13 @@ const links = computed(() => {
 
 <template>
 	<header class="border-b">
-		<div class="container flex items-center gap-4 py-4">
+		<div
+			:class="
+				!project.map.startPage
+					? `container flex items-center gap-4 py-4`
+					: `flex items-center gap-4 py-4 px-8`
+			"
+		>
 			<NavLink class="flex shrink-0" :href="links.home.href">
 				<span class="sr-only">{{ links.home.label }}</span>
 				<NuxtImg

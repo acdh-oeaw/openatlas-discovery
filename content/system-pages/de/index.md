@@ -2,8 +2,8 @@
 title: OpenAtlas Discovery
 navigation: false
 image:
-  light: /assets/images/hero-light.svg
-  dark: /assets/images/hero-dark.svg
+  light: /assets/images/logo-with-text-light.svg
+  dark: /assets/images/logo-with-text-dark.svg
 leadIn: >-
   OpenAtlas Discovery ist ein Template für eine Präsentationswebsite des
   Datenbanksystems OpenAtlas, das von verschiedenen Digital Humanities Projekten
@@ -18,10 +18,12 @@ leadIn: >-
 
   **Entdecken Sie unsere Visualisierungen hier:**
 links:
-  - label: Daten anzeigen
+  - label: Datentabelle
     href: /visualization?mode=table
-  - label: Karte anzeigen
+  - label: Karte
     href: /visualization?mode=map
+  - label: Netzwerk
+    href: /visualization?mode=network
 ---
 Die Daten, die in dieser Demo-Version präsentiert werden, wurden freundlicherweise bereitgestellt von: [Mapping Medieval Conflict (MEDCON)](<>). A digital approach towards political dynamics in the pre-modern period.
 
