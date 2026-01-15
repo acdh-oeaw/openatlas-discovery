@@ -82,33 +82,34 @@ onUnmounted(() => {
 <template>
 	<MainContent class="container w-full py-8">
 		<div class="mx-auto w-full min-w-0">
-			<!-- Mobile TOC Toggle -->
-			<div
-				v-if="content?.toc && content?.body.toc && content.body.toc.links.length > 0"
-				class="mb-4 lg:hidden"
-			>
-				<button
-					class="text-sm font-semibold text-neutral-500 uppercase hover:text-neutral-700 dark:hover:text-neutral-300"
-					@click="isTocOpen = !isTocOpen"
-				>
-					{{ t("ContentPage.table-of-contents") }} {{ isTocOpen ? "−" : "+" }}
-				</button>
-				<ol v-if="isTocOpen" ref="toc" class="mt-2 ml-0 text-xs text-neutral-500">
-					<TocEntry
-						v-for="link in content?.body.toc?.links"
-						:key="link.id"
-						:entry="link"
-						:current-hash="currentHash"
-					></TocEntry>
-				</ol>
-			</div>
-
 			<div class="grid w-full grid-cols-1 gap-x-10 lg:grid-cols-[1fr_48rem_1fr]">
 				<div class="hidden lg:block"></div>
 				<div class="min-w-0">
 					<div>
 						<PageTitle>{{ content?.title }}</PageTitle>
 					</div>
+
+					<!-- Mobile/Tablet TOC Toggle -->
+					<div
+						v-if="content?.toc && content?.body.toc && content.body.toc.links.length > 0"
+						class="mb-4 lg:hidden"
+					>
+						<button
+							class="text-sm font-semibold text-neutral-500 uppercase hover:text-neutral-700 dark:hover:text-neutral-300"
+							@click="isTocOpen = !isTocOpen"
+						>
+							{{ t("ContentPage.table-of-contents") }}
+						</button>
+						<ol v-if="isTocOpen" ref="toc" class="mt-2 ml-0 text-xs text-neutral-500">
+							<TocEntry
+								v-for="link in content?.body.toc?.links"
+								:key="link.id"
+								:entry="link"
+								:current-hash="currentHash"
+							></TocEntry>
+						</ol>
+					</div>
+
 					<ContentRenderer
 						v-if="content != null"
 						ref="pageContent"
