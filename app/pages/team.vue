@@ -49,64 +49,66 @@ onServerPrefetch(async () => {
 <template>
 	<MainContent class="container py-8">
 		<template v-if="content != null && content.leadIn != null">
-			<div class="grid place-items-center gap-8 p-8 sm:py-16">
-				<div>
-					<h1 class="sr-only">{{ content.title }}</h1>
-					<NuxtImg
-						v-if="content.image?.light != null"
-						alt=""
-						class="block h-80 w-full max-w-3xl object-contain dark:hidden"
-						preload
-						:src="content.image?.light"
-						:width="768"
-						:height="320"
-					/>
-					<NuxtImg
-						v-if="content.image?.dark != null"
-						alt=""
-						class="hidden h-80 w-full max-w-3xl object-contain dark:block"
-						preload
-						:src="content.image?.dark"
-						:width="768"
-						:height="320"
-					/>
-				</div>
+			<div class="mx-auto w-full max-w-3xl">
+				<div class="grid place-items-center gap-8 sm:p-8 sm:py-16">
+					<div>
+						<h1 class="sr-only">{{ content.title }}</h1>
+						<NuxtImg
+							v-if="content.image?.light != null"
+							alt=""
+							class="block h-80 w-full max-w-3xl object-contain dark:hidden"
+							preload
+							:src="content.image?.light"
+							:width="768"
+							:height="320"
+						/>
+						<NuxtImg
+							v-if="content.image?.dark != null"
+							alt=""
+							class="hidden h-80 w-full max-w-3xl object-contain dark:block"
+							preload
+							:src="content.image?.dark"
+							:width="768"
+							:height="320"
+						/>
+					</div>
 
-				<ContentRenderer
-					v-if="content.leadIn != null"
-					class="prose prose-lg max-w-3xl text-center text-balance"
-					:value="content.leadIn"
-				>
-					<template #empty></template>
-				</ContentRenderer>
+					<ContentRenderer
+						v-if="content.leadIn != null"
+						class="prose prose-lg max-w-3xl text-center text-balance"
+						:value="content.leadIn"
+					>
+						<template #empty></template>
+					</ContentRenderer>
 
-				<div class="flex items-center gap-6">
-					<Button v-for="(link, key) of content.links" :key="key" as-child variant="default">
-						<NavLink :href="link.href">
-							{{ link.label }}
-						</NavLink>
-					</Button>
+					<div class="flex items-center gap-6">
+						<Button v-for="(link, key) of content.links" :key="key" as-child variant="default">
+							<NavLink :href="link.href">
+								{{ link.label }}
+							</NavLink>
+						</Button>
+					</div>
 				</div>
 			</div>
 		</template>
 
 		<template v-else-if="content != null">
-			<div class="mx-auto w-full max-w-3xl px-8">
+			<div class="mx-auto w-full max-w-3xl">
 				<PageTitle>{{ content?.title }}</PageTitle>
 			</div>
 		</template>
 
-		<div>
+		<div class="mx-auto w-full max-w-3xl">
 			<ContentRenderer
 				v-if="content != null"
-				class="mx-auto prose w-full max-w-3xl px-8"
+				class="prose w-full"
 				:value="content.body"
 			>
 				<template #empty></template>
 			</ContentRenderer>
 		</div>
 
-		<section class="mx-auto w-full max-w-3xl p-8">
+		<section class="mx-auto w-full max-w-3xl">
 			<h2 class="sr-only">{{ t("TeamPage.team-members") }}</h2>
 			<TeamMembersList />
 		</section>

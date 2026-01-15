@@ -90,14 +90,11 @@ router.afterEach((to, from) => {
 	trackPageView(to, from);
 });
 
-const fullscreen = "--container-width: ;";
-const container = "--container-width: 1536px;";
 </script>
 
 <template>
 	<div
-		class="grid min-h-full grid-rows-[auto_1fr_auto]"
-		:style="project.fullscreen ? fullscreen : container"
+		class="grid min-h-full w-full grid-rows-[auto_1fr_auto]"
 	>
 		<SkipLink target-id="main-content">{{ t("DefaultLayout.skip-to-main-content") }}</SkipLink>
 
