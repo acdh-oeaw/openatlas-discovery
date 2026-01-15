@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CirclePauseIcon, CirclePlayIcon, EllipsisIcon, LayersIcon } from "lucide-vue-next";
+import { CirclePauseIcon, CirclePlayIcon, FunnelIcon, LayersIcon } from "lucide-vue-next";
 
 import type { NetworkSearchData } from "@/components/data-network-view.vue";
 import { networkConfig } from "@/config/network-visualisation.config";
@@ -120,6 +120,21 @@ watch(
 		showLegend.value = false;
 	},
 );
+
+const isMobile = ref(false);
+
+onMounted(() => {
+	isMobile.value = window.innerWidth <= 1024;
+
+	const onResize = () => {
+		isMobile.value = window.innerWidth <= 1024;
+	};
+	window.addEventListener("resize", onResize);
+
+	onBeforeUnmount(() => {
+		window.removeEventListener("resize", onResize);
+	});
+});
 </script>
 
 <template>
@@ -127,11 +142,11 @@ watch(
 		<aside
 			:class="
 				!props.isEgoNetwork
-					? `flex max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent bg-white/90 dark:bg-neutral-900 px-4 py-2 text-sm shadow-md`
+					? `flex max-h-full lg:max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent lg:bg-white/90 lg:dark:bg-neutral-900 px-0 lg:px-4 py-2 text-sm lg:shadow-md`
 					: `flex gap-2 overflow-x-auto rounded-md border-2 border-transparent bg-white/90 dark:bg-neutral-900 m-2 text-sm shadow-md`
 			"
 		>
-			<div v-if="!props.isEgoNetwork" class="inline-flex">
+			<div v-if="!props.isEgoNetwork && !isMobile" class="inline-flex">
 				<div
 					v-for="el in props.systemClasses"
 					:key="el"
@@ -154,6 +169,37 @@ watch(
 						<span v-else class="self-center"> {{ el }}</span>
 					</div>
 				</div>
+			</div>
+			<div v-if="!props.isEgoNetwork && isMobile">
+				<Popover>
+					<PopoverTrigger as-child>
+						<Button variant="ghost" size="icon">
+							<FunnelIcon :size="20" />
+							<span class="sr-only">{{ t("EntityPage.networkLegend") }}</span>
+						</Button>
+					</PopoverTrigger>
+
+					<PopoverContent class="max-h-64 w-fit space-y-2 overflow-y-auto p-2">
+						<div v-for="el in props.systemClasses" :key="el" class="flex items-center gap-2 px-4">
+							<input
+								:id="el"
+								v-model="checkedSystemClasses[el]"
+								:checked="checkedSystemClasses[el]"
+								type="checkbox"
+								name="systemClassCheckbox"
+								:style="`accent-color: ${systemClassColors[el as keyof typeof systemClassColors] ? systemClassColors[el as keyof typeof systemClassColors] : '#666'}`"
+								@change="onSubmit()"
+							/>
+							<span
+								:style="{
+									color: systemClassColors[el as keyof typeof systemClassColors] ?? '#666',
+								}"
+							>
+								{{ labels[el as keyof typeof labels] ?? el }}
+							</span>
+						</div>
+					</PopoverContent>
+				</Popover>
 			</div>
 			<div v-else class="p-1">
 				<TooltipProvider>

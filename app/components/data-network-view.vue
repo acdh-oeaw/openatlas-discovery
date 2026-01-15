@@ -142,7 +142,7 @@ const isFullscreen = ref(false);
 			<NetworkSearchForm
 				:class="
 					project.fullscreen
-						? 'absolute z-10 bg-white/90 dark:bg-neutral-900 max-w-full lg:max-w-[min(800px,49%)] w-full m-3 rounded-md p-6 shadow-md'
+						? 'absolute z-10 bg-white/90 dark:bg-neutral-900/90 max-w-full lg:max-w-[min(800px,49%)] w-full m-3 rounded-md p-6 shadow-md'
 						: ''
 				"
 				:search="searchFilters.search"
@@ -156,9 +156,11 @@ const isFullscreen = ref(false);
 			class="border"
 			:class="{ 'opacity-50 grayscale': isLoading }"
 		>
-			<div class="absolute right-0 bottom-0 z-10">
+			<div
+				class="absolute right-0 bottom-0 z-10 m-2 flex rounded-md bg-white/90 shadow-md lg:m-0 lg:hidden lg:bg-none lg:shadow-none dark:bg-neutral-900/90 lg:dark:bg-none"
+			>
 				<NetworkControls
-					class="right-0 m-3 ml-auto"
+					class="right-0 m-3 ml-auto hidden lg:flex"
 					:layout-running="isRunning"
 					:is-fullscreen="isFullscreen"
 					:show-orphans="showOrphans"
@@ -166,11 +168,21 @@ const isFullscreen = ref(false);
 				/>
 				<NetworkLegendPanel
 					v-if="height && width"
-					class="m-3"
+					class="m-0 lg:m-3"
 					:system-classes="relevantSystemClasses"
 					:excluded-classes="searchFilters.excludeSystemClasses"
 					:allow-filtering="true"
 					@submit="onChangeSearchFilters"
+				/>
+
+				<div class="my-3 border-l border-foreground/40"></div>
+
+				<NetworkMobileControls
+					class="flex lg:hidden"
+					:layout-running="isRunning"
+					:is-fullscreen="isFullscreen"
+					:show-orphans="showOrphans"
+					@network-control-event="(args) => emitControls(args)"
 				/>
 			</div>
 			<DataGraph

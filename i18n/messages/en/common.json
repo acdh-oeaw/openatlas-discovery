@@ -178,6 +178,7 @@
 		"title": "Network Visualization",
 		"work-in-progress": "The database is currently work in progress.",
 		"controls": {
+			"title": "Netzwerk Einstellungen",
 			"start": "Play",
 			"pause": "Pause",
 			"zoomIn": "Zoom in",
