@@ -32,7 +32,7 @@ const searchLabelId = "search-field";
 
 <template>
 	<form
-		class="grid w-full grid-cols-[15fr_1fr] items-end gap-x-4 py-4"
+		class="w-full py-4 lg:grid lg:grid-cols-[15fr_1fr] lg:items-end lg:gap-x-4"
 		role="search"
 		@submit.prevent="onSubmit"
 	>
@@ -47,7 +47,7 @@ const searchLabelId = "search-field";
 			/>
 		</div>
 
-		<Button type="submit">
+		<Button type="submit" class="hidden lg:flex">
 			<SearchIcon aria-hidden="true" class="size-4 shrink-0" />
 			{{ t("SearchForm.search") }}
 		</Button>

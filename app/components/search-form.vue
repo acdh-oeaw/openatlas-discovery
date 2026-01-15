@@ -35,14 +35,14 @@ const searchLabelId = "search-field";
 
 <template>
 	<form
-		class="grid w-full grid-cols-[auto_1fr_auto] items-end gap-x-4 py-4"
+		class="grid w-full grid-cols-[auto_1fr] items-end gap-2 py-4 lg:grid-cols-[auto_1fr_auto] lg:gap-x-4"
 		role="search"
 		@submit.prevent="onSubmit"
 	>
 		<div class="grid gap-y-1">
 			<!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
 			<Select name="category" :default-value="props.category">
-				<SelectTrigger :aria-label="t('SearchForm.filter')" class="min-w-48">
+				<SelectTrigger :aria-label="t('SearchForm.filter')" class="lg:min-w-48">
 					<SelectValue :placeholder="t('SearchForm.select-filter')" />
 				</SelectTrigger>
 				<SelectContent>
@@ -74,7 +74,7 @@ const searchLabelId = "search-field";
 			/>
 		</div>
 
-		<Button type="submit">
+		<Button type="submit" class="hidden lg:flex">
 			<SearchIcon aria-hidden="true" class="size-4 shrink-0" />
 			{{ t("SearchForm.search") }}
 		</Button>
