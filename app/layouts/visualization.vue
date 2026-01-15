@@ -39,14 +39,17 @@ watch(
 const isMobile = ref(false);
 
 onMounted(() => {
+	isMobile.value = window.innerWidth <= 1024;
+
 	watch(
 		() => drawerOpen.value,
 		(open) => {
-			document.body.style.overflow = open ? "hidden" : "";
+			if (isMobile.value) {
+				document.body.style.overflow = open ? "hidden" : "";
+			}
 		},
 		{ immediate: true },
 	);
-	isMobile.value = window.innerWidth <= 1024;
 
 	const onResize = () => {
 		isMobile.value = window.innerWidth <= 1024;
