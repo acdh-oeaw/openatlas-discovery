@@ -17,8 +17,12 @@ const labels = computed(() => {
 		<DropdownMenu>
 			<DropdownMenuTrigger as-child>
 				<Button class="gap-2" size="icon" variant="ghost">
-					<span class="sr-only">{{ t("LocaleSwitcher.switch-locale", { locale: labels.of(currentLocale) }) }}</span>
-					<span aria-hidden="true" class="text-sm font-medium">{{ currentLocale.toUpperCase() }}</span>
+					<span class="sr-only">{{
+						t("LocaleSwitcher.switch-locale", { locale: labels.of(currentLocale) })
+					}}</span>
+					<span aria-hidden="true" class="text-sm font-medium">{{
+						currentLocale.toUpperCase()
+					}}</span>
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent>
@@ -37,7 +41,6 @@ const labels = computed(() => {
 		</DropdownMenu>
 	</div>
 
-	<!-- Desktop: Text Links -->
 	<div class="hidden items-center gap-2 lg:flex">
 		<template v-for="(locale, index) of locales" :key="locale">
 			<span v-if="index !== 0" class="opacity-80">|</span>

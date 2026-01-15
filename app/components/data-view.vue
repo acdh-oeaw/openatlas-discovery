@@ -120,7 +120,7 @@ const entities = computed(() => {
 		/>
 
 		<div
-			class="relative isolate grid size-full overflow-y-auto"
+			class="relative isolate box-border grid size-full overflow-y-auto"
 			:class="{ 'opacity-50 grayscale': isLoading }"
 		>
 			<div v-if="entities.length > 0" class="grid content-start gap-8">

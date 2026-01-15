@@ -383,7 +383,7 @@ onMounted(async () => {
 			</TabsList>
 			<!-- TODO: keep map alive -->
 			<TabsContent v-for="tab of tabs" :key="tab.id" :value="tab.id">
-				<div class="relative max-w-full">
+				<div class="relative w-full">
 					<VisualisationContainer
 						id="ego-network"
 						v-slot="{ height, width }"
