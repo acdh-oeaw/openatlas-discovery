@@ -157,7 +157,7 @@ const isFullscreen = ref(false);
 			:class="{ 'opacity-50 grayscale': isLoading }"
 		>
 			<div
-				class="absolute right-0 bottom-0 z-10 m-2 flex rounded-md bg-white/90 shadow-md lg:m-0 lg:hidden lg:bg-none lg:shadow-none dark:bg-neutral-900/90 lg:dark:bg-none"
+				class="absolute right-0 bottom-0 z-10 m-2 rounded-md bg-white/90 shadow-md lg:m-0 lg:bg-none lg:shadow-none dark:bg-neutral-900/90 lg:dark:bg-none"
 			>
 				<NetworkControls
 					class="right-0 m-3 ml-auto hidden lg:flex"
@@ -175,10 +175,10 @@ const isFullscreen = ref(false);
 					@submit="onChangeSearchFilters"
 				/>
 
-				<div class="my-3 border-l border-foreground/40"></div>
+				<div class="mx-2 block border-b border-foreground/40 lg:hidden"></div>
 
 				<NetworkMobileControls
-					class="flex lg:hidden"
+					class="ml-0.5 flex lg:hidden"
 					:layout-running="isRunning"
 					:is-fullscreen="isFullscreen"
 					:show-orphans="showOrphans"

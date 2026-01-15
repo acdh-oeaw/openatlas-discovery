@@ -142,7 +142,7 @@ onMounted(() => {
 		<aside
 			:class="
 				!props.isEgoNetwork
-					? `flex max-h-full lg:max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent lg:bg-white/90 lg:dark:bg-neutral-900 px-0 lg:px-4 py-2 text-sm lg:shadow-md`
+					? `flex max-h-full lg:max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent lg:bg-white/90 lg:dark:bg-neutral-900 px-0 lg:px-4 lg:py-2 text-sm lg:shadow-md`
 					: `flex gap-2 overflow-x-auto rounded-md border-2 border-transparent bg-white/90 dark:bg-neutral-900 m-2 text-sm shadow-md`
 			"
 		>
@@ -201,7 +201,7 @@ onMounted(() => {
 					</PopoverContent>
 				</Popover>
 			</div>
-			<div v-else class="p-1">
+			<div v-if="props.isEgoNetwork" class="p-1">
 				<TooltipProvider>
 					<Tooltip>
 						<TooltipTrigger>
