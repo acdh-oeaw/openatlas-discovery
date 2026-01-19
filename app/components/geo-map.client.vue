@@ -98,7 +98,13 @@ const props = defineProps<{
 	currentSelectionCoordinates?: [number, number];
 	selectionBounds?: Array<[number, number]>;
 	currentSelectionId?: string;
+	isMobile: boolean;
 }>();
+
+const scaleCtrl = shallowRef<ScaleControl | null>(null);
+const navCtrl = shallowRef<NavigationControl | null>(null);
+const fullscreenCtrl = shallowRef<FullscreenControl | null>(null);
+
 const emit = defineEmits<{
 	(
 		event: "layer-click",
@@ -147,6 +153,24 @@ const context: GeoMapContext = {
 	map: null,
 };
 
+function setupControls() {
+	assert(context.map != null);
+	const map = context.map;
+
+	if (scaleCtrl.value) map.removeControl(scaleCtrl.value);
+	if (navCtrl.value) map.removeControl(navCtrl.value);
+	if (fullscreenCtrl.value) map.removeControl(fullscreenCtrl.value);
+
+	scaleCtrl.value = new ScaleControl({});
+	map.addControl(scaleCtrl.value, "bottom-left");
+
+	navCtrl.value = new NavigationControl({});
+	map.addControl(navCtrl.value, props.isMobile ? "bottom-left" : "top-left");
+
+	fullscreenCtrl.value = new FullscreenControl({});
+	map.addControl(fullscreenCtrl.value, props.isMobile ? "bottom-left" : "top-left");
+}
+
 watch(mapStyle, () => {
 	assert(context.map != null);
 	// const oldLayers = context.map?.getLayersOrder().map((layer) => {
@@ -158,6 +182,14 @@ watch(mapStyle, () => {
 		init(true);
 	});
 });
+
+watch(
+	() => props.isMobile,
+	() => {
+		if (!context.map) return;
+		setupControls();
+	},
+);
 
 onMounted(create);
 onScopeDispose(dispose);
@@ -265,18 +297,7 @@ function init(initAfterThemeSwitch = false) {
 
 	//
 	if (!initAfterThemeSwitch) {
-		const nav = new NavigationControl({});
-		map.addControl(nav, "top-left");
-
-		//
-
-		const fullscreen = new FullscreenControl({});
-		map.addControl(fullscreen, "top-left");
-
-		//
-
-		const scale = new ScaleControl({});
-		map.addControl(scale, "bottom-left");
+		setupControls();
 	}
 
 	//

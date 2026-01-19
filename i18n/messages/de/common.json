@@ -165,6 +165,7 @@
 		"switch-locale": "Zu {locale} wechseln"
 	},
 	"MapPage": {
+		"mapLegend": "Karten-Legende",
 		"meta": {
 			"title": "Karte"
 		},

@@ -5,6 +5,7 @@ import type { Feature } from "geojson";
 import type { MapGeoJSONFeature } from "maplibre-gl";
 import * as v from "valibot";
 
+import MapAdvancedLegendPanel from "@/components/map-advanced-legend-panel.vue";
 import type { SearchFormData } from "@/components/search-form.vue";
 import type { EntityFeature } from "@/composables/use-create-entity";
 import { categories, operatorMap } from "@/composables/use-get-search-results";
@@ -18,6 +19,8 @@ const route = useRoute();
 const t = useTranslations();
 
 const { getUnprefixedId } = useIdPrefix();
+
+const isMobile = ref(false);
 
 const searchFiltersSchema = v.object({
 	category: v.fallback(v.picklist(categories), "entityName"),
@@ -59,6 +62,17 @@ function onChangeSearchFilters(values: SearchFormData) {
 onMounted(() => {
 	setMovementId({ id: selection.value as unknown as string });
 	filterIcons(Object.keys(customIconEntries.value));
+
+	isMobile.value = window.innerWidth <= 1024;
+
+	const onResize = () => {
+		isMobile.value = window.innerWidth <= 1024;
+	};
+	window.addEventListener("resize", onResize);
+
+	onBeforeUnmount(() => {
+		window.removeEventListener("resize", onResize);
+	});
 });
 
 const { data, isPending, isPlaceholderData } = useGetSearchResults(
@@ -696,14 +710,25 @@ function filterMovements(visibleMoves: Array<string>) {
 </script>
 
 <template>
-	<div class="absolute top-0 right-0 z-50 flex p-1.5">
-		<MapLegendPanel
+	<MapLegendPanel
+		class="z-50 pb-7 lg:pb-0"
+		:movements="movements"
+		:areas="centerpoints"
+		:locations="points"
+		:is-mobile="isMobile"
+		@toggle-polygons="togglePolygons"
+	/>
+
+	<div class="absolute right-0 bottom-0 z-49 flex pb-20 lg:top-0 lg:z-50 lg:pb-0">
+		<MapAdvancedLegendPanel
 			:icon-data="customIconEntries"
 			:move-data="customMovementEntries"
+			:is-mobile="isMobile"
 			@visible-icons="filterIcons"
 			@visible-moves="filterMovements"
 		/>
 	</div>
+
 	<div :class="project.fullscreen ? 'relative grid' : 'relative grid grid-rows-[auto_1fr] gap-4'">
 		<div
 			:class="
@@ -728,41 +753,6 @@ function filterMovements(visibleMoves: Array<string>) {
 			class="border"
 			:class="{ 'opacity-50 grayscale': isLoading }"
 		>
-			<div class="absolute bottom-0 z-10 mb-2 flex w-full justify-center">
-				<div
-					class="max-h-72 gap-2 overflow-x-hidden overflow-y-auto rounded-md border-2 border-transparent bg-white/90 p-2 text-sm font-medium shadow-md dark:bg-neutral-900"
-				>
-					<div class="grid grid-cols-[auto_auto_auto_auto] items-center gap-3 align-middle">
-						<div class="grid grid-cols-[auto_1fr] gap-1">
-							<span
-								class="m-1.5 size-2 rounded-full"
-								:style="`background-color: ${project.colors.geojsonPoints}`"
-							></span>
-							{{ $t("DataMapView.point") }} ({{ points.length }})
-						</div>
-						<div class="grid grid-cols-[auto_1fr] gap-1">
-							<span
-								class="m-1.5 size-2 rounded-full"
-								:style="`background-color: ${project.colors.geojsonAreaCenterPoints}`"
-							></span>
-							{{ $t("DataMapView.centerpoint") }} ({{ centerpoints.length }})
-						</div>
-						<div class="grid grid-cols-[auto_1fr] gap-1">
-							<span
-								class="m-1.5 size-2 rounded-full"
-								:style="`background-color: ${project.colors.geojsonMovement}`"
-							></span>
-							{{ $t("DataMapView.movement") }} ({{ movements.length }})
-						</div>
-						<div>
-							<Toggle variant="iiif" @click="togglePolygons">
-								{{ $t("DataMapView.polygon") }}
-							</Toggle>
-						</div>
-					</div>
-				</div>
-			</div>
-
 			<GeoMap
 				v-if="height && width"
 				:features="features"
@@ -777,6 +767,7 @@ function filterMovements(visibleMoves: Array<string>) {
 				:current-selection-coordinates="detailSelectionCoordinates || selectionCoordinates"
 				:selection-bounds="selectionBounds"
 				:current-selection-id="String(selection)"
+				:is-mobile="isMobile"
 				@layer-click="onLayerClick"
 				@movement-hovered="setMovementId"
 			>
