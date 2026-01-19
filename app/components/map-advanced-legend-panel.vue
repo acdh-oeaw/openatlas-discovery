@@ -166,7 +166,7 @@ function toggleExpandedState() {
 	</div>
 	<div v-if="props.isMobile" class="p-2 text-sm">
 		<Popover>
-			<PopoverTrigger as-child class="bg-white/90 dark:bg-neutral-900/90">
+			<PopoverTrigger as-child class="bg-white/90 shadow-md dark:bg-neutral-900/90">
 				<Button variant="ghost" size="icon">
 					<FunnelIcon :size="20" />
 					<span class="sr-only">{{ t("MapPage.mapLegend") }}</span>

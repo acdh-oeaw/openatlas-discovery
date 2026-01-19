@@ -156,9 +156,7 @@ const isFullscreen = ref(false);
 			class="border"
 			:class="{ 'opacity-50 grayscale': isLoading }"
 		>
-			<div
-				class="absolute right-0 bottom-0 z-10 m-2 rounded-md bg-white/90 shadow-md lg:m-0 lg:bg-none lg:shadow-none dark:bg-neutral-900/90 lg:dark:bg-none"
-			>
+			<div class="absolute right-0 bottom-0 z-10 m-2 lg:m-0">
 				<NetworkControls
 					class="right-0 m-3 ml-auto hidden lg:flex"
 					:layout-running="isRunning"
@@ -168,14 +166,12 @@ const isFullscreen = ref(false);
 				/>
 				<NetworkLegendPanel
 					v-if="height && width"
-					class="m-0 lg:m-3"
+					class="m-0 mb-2 lg:m-3"
 					:system-classes="relevantSystemClasses"
 					:excluded-classes="searchFilters.excludeSystemClasses"
 					:allow-filtering="true"
 					@submit="onChangeSearchFilters"
 				/>
-
-				<div class="mx-2 block border-b border-foreground/40 lg:hidden"></div>
 
 				<NetworkMobileControls
 					class="ml-0.5 flex lg:hidden"

@@ -142,7 +142,7 @@ onMounted(() => {
 		<aside
 			:class="
 				!props.isEgoNetwork
-					? `flex max-h-full lg:max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent lg:bg-white/90 lg:dark:bg-neutral-900 px-0 lg:px-4 lg:py-2 text-sm lg:shadow-md`
+					? `flex max-h-full lg:max-h-72 overflow-y-auto overflow-x-hidden rounded-md border-transparent bg-white/90 dark:bg-neutral-900 p-0 lg:px-4 lg:py-2 text-sm shadow-md`
 					: `flex gap-2 overflow-x-auto rounded-md border-2 border-transparent bg-white/90 dark:bg-neutral-900 m-2 text-sm shadow-md`
 			"
 		>
@@ -174,12 +174,12 @@ onMounted(() => {
 				<Popover>
 					<PopoverTrigger as-child>
 						<Button variant="ghost" size="icon">
-							<FunnelIcon :size="20" />
+							<FunnelIcon class="ml-0.5 p-0" :size="20" />
 							<span class="sr-only">{{ t("EntityPage.networkLegend") }}</span>
 						</Button>
 					</PopoverTrigger>
 
-					<PopoverContent class="max-h-64 w-fit space-y-2 overflow-y-auto p-2">
+					<PopoverContent class="mr-2 max-h-64 w-fit space-y-2 overflow-y-auto p-2">
 						<div v-for="el in props.systemClasses" :key="el" class="flex items-center gap-2 px-4">
 							<input
 								:id="el"

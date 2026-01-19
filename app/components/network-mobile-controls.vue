@@ -39,14 +39,14 @@ function onClickControls(
 <template>
 	<div class="relative z-30">
 		<Popover>
-			<PopoverTrigger>
+			<PopoverTrigger class="rounded-md bg-white/90 shadow-md dark:bg-neutral-900/90">
 				<Button variant="ghost" size="icon">
 					<SettingsIcon :size="20" />
 					<span class="sr-only">{{ t("NetworkPage.controls.title") }}</span>
 				</Button>
 			</PopoverTrigger>
 
-			<PopoverContent class="content-fit space-y-2 p-2">
+			<PopoverContent class="content-fit mr-2 space-y-2 p-2">
 				<Button
 					variant="ghost"
 					size="icon"
