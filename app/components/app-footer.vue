@@ -19,12 +19,12 @@ const logos = project.footer.partner_logos;
 </script>
 
 <template>
-	<footer class="border-t opacity-80">
+	<footer class="w-full border-t pt-4 opacity-80">
 		<div
 			:class="[
 				!project.map.startPage
-					? `container grid gap-4 py-6 text-sm sm:items-center`
-					: `grid gap-4 px-8 py-6 text-sm sm:items-center`,
+					? `grid items-start gap-4 text-sm lg:container lg:items-center lg:py-6`
+					: `grid gap-4 p-0 text-sm lg:items-center lg:px-8 lg:py-6`,
 
 				logos && logos.length > 0 ? 'sm:grid-cols-3' : 'sm:grid-cols-2',
 			]"
@@ -71,7 +71,7 @@ const logos = project.footer.partner_logos;
 				</ul>
 			</nav>
 
-			<div v-if="logos && logos.length > 0" class="-my-2 ml-auto flex gap-7">
+			<div v-if="logos && logos.length > 0" class="flex gap-7 lg:-my-2 lg:ml-auto">
 				<NuxtLink
 					v-for="logo in logos"
 					:key="logo.name"

@@ -41,19 +41,24 @@ onScopeDispose(() => {
 		<SheetTrigger aria-label="Toggle navigation menu" class="cursor-default">
 			<MenuIcon class="mx-3 my-1.5 size-5" />
 		</SheetTrigger>
-		<SheetContent class="overflow-y-auto" :backdrop="true">
+		<SheetContent class="max-h-full min-h-0 overflow-y-auto" :backdrop="true">
 			<SheetTitle class="sr-only">{{ props.title }}</SheetTitle>
-			<ul class="grid py-8" role="list">
-				<li v-for="(link, key) of filteredLinks" :key="key">
-					<NavLink
-						class="flex py-2 font-medium opacity-80 transition-opacity hover:opacity-100 focus-visible:opacity-100"
-						:href="link.href"
-						@click="close"
-					>
-						{{ link.label }}
-					</NavLink>
-				</li>
-			</ul>
+			<div class="grid h-full grid-rows-[auto_1fr] items-end">
+				<ul class="grid overflow-auto py-8" role="list">
+					<li v-for="(link, key) of filteredLinks" :key="key">
+						<NavLink
+							class="flex py-2 font-medium opacity-80 transition-opacity hover:opacity-100 focus-visible:opacity-100"
+							:href="link.href"
+							@click="close"
+						>
+							{{ link.label }}
+						</NavLink>
+					</li>
+				</ul>
+				<div class="flex justify-start">
+					<AppFooter />
+				</div>
+			</div>
 		</SheetContent>
 	</Sheet>
 </template>

@@ -90,12 +90,24 @@ router.afterEach((to, from) => {
 	trackPageView(to, from);
 });
 
+const isMobile = ref(false);
+
+onMounted(() => {
+	isMobile.value = window.innerWidth <= 1024;
+
+	const onResize = () => {
+		isMobile.value = window.innerWidth <= 1024;
+	};
+	window.addEventListener("resize", onResize);
+
+	onBeforeUnmount(() => {
+		window.removeEventListener("resize", onResize);
+	});
+});
 </script>
 
 <template>
-	<div
-		class="grid min-h-full w-full grid-rows-[auto_1fr_auto]"
-	>
+	<div class="grid min-h-full w-full grid-rows-[auto_1fr_auto]">
 		<SkipLink target-id="main-content">{{ t("DefaultLayout.skip-to-main-content") }}</SkipLink>
 
 		<AppHeader />
@@ -104,7 +116,7 @@ router.afterEach((to, from) => {
 				<slot />
 			</TooltipProvider>
 		</ErrorBoundary>
-		<AppFooter />
+		<AppFooter v-if="!isMobile" />
 
 		<Toaster position="bottom-right" />
 	</div>
