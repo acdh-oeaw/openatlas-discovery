@@ -9,7 +9,6 @@ const t = useTranslations();
 const props = defineProps<{
 	iconData: Record<string, CustomMapLegendEntry>;
 	moveData: Record<string, CustomMapLegendEntry>;
-	isMobile: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -69,8 +68,7 @@ function toggleExpandedState() {
 
 <template>
 	<div
-		v-if="!props.isMobile"
-		class="fixed inset-y-0 top-20 right-0 z-50 max-h-fit max-w-1/4 bg-none transition-transform duration-500 ease-in-out"
+		class="fixed inset-y-0 top-20 right-0 z-50 hidden max-h-fit max-w-1/4 bg-none transition-transform duration-500 ease-in-out lg:flex"
 		:class="expandedState ? 'translate-x-0' : 'translate-x-full'"
 	>
 		<button
@@ -164,7 +162,7 @@ function toggleExpandedState() {
 			</aside>
 		</div>
 	</div>
-	<div v-if="props.isMobile" class="p-2 text-sm">
+	<div class="flex p-2 text-sm lg:hidden">
 		<Popover>
 			<PopoverTrigger as-child class="bg-white/90 shadow-md dark:bg-neutral-900/90">
 				<Button variant="ghost" size="icon">

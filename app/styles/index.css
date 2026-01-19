@@ -51,10 +51,6 @@
 
 	:root {
 		--font-body: "Inter Variable", system-ui, sans-serif;
-		--vueuse-safe-area-top: 0px !important;
-		--vueuse-safe-area-right: 0px !important;
-		--vueuse-safe-area-bottom: 0px !important;
-		--vueuse-safe-area-left: 0px !important;
 	}
 
 	:root,

@@ -39,7 +39,15 @@ watch(
 const isMobile = ref(false);
 
 onMounted(() => {
-	isMobile.value = window.innerWidth <= 1024;
+	const mq = window.matchMedia("(max-width: 1024px)");
+
+	isMobile.value = mq.matches;
+
+	const handler = (e: MediaQueryListEvent) => {
+		isMobile.value = e.matches;
+	};
+
+	mq.addEventListener("change", handler);
 
 	watch(
 		() => drawerOpen.value,
@@ -51,13 +59,8 @@ onMounted(() => {
 		{ immediate: true },
 	);
 
-	const onResize = () => {
-		isMobile.value = window.innerWidth <= 1024;
-	};
-	window.addEventListener("resize", onResize);
-
 	onBeforeUnmount(() => {
-		window.removeEventListener("resize", onResize);
+		mq.removeEventListener("change", handler);
 		document.body.style.overflow = "";
 	});
 });

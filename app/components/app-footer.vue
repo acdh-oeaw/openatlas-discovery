@@ -19,7 +19,7 @@ const logos = project.footer.partner_logos;
 </script>
 
 <template>
-	<footer class="w-full border-t pt-4 opacity-80">
+	<footer class="w-full border-t pt-4 opacity-80 lg:p-0">
 		<div
 			:class="[
 				!project.map.startPage

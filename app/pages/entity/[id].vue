@@ -315,6 +315,7 @@ watch(
 								:show-movements="false"
 								:multiple-movements="null"
 								:custom-icons="{}"
+								:is-mobile="false"
 							/>
 							<!-- use toRaw() to unwrap reactive proxy for deck.gl-->
 						</div>

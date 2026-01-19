@@ -63,15 +63,18 @@ onMounted(() => {
 	setMovementId({ id: selection.value as unknown as string });
 	filterIcons(Object.keys(customIconEntries.value));
 
-	isMobile.value = window.innerWidth <= 1024;
+	const mq = window.matchMedia("(max-width: 1024px)");
 
-	const onResize = () => {
-		isMobile.value = window.innerWidth <= 1024;
+	isMobile.value = mq.matches;
+
+	const handler = (e: MediaQueryListEvent) => {
+		isMobile.value = e.matches;
 	};
-	window.addEventListener("resize", onResize);
+
+	mq.addEventListener("change", handler);
 
 	onBeforeUnmount(() => {
-		window.removeEventListener("resize", onResize);
+		mq.removeEventListener("change", handler);
 	});
 });
 
@@ -715,7 +718,6 @@ function filterMovements(visibleMoves: Array<string>) {
 		:movements="movements"
 		:areas="centerpoints"
 		:locations="points"
-		:is-mobile="isMobile"
 		@toggle-polygons="togglePolygons"
 	/>
 
@@ -723,7 +725,6 @@ function filterMovements(visibleMoves: Array<string>) {
 		<MapAdvancedLegendPanel
 			:icon-data="customIconEntries"
 			:move-data="customMovementEntries"
-			:is-mobile="isMobile"
 			@visible-icons="filterIcons"
 			@visible-moves="filterMovements"
 		/>

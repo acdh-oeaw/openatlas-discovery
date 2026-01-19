@@ -89,21 +89,6 @@ useHead({
 router.afterEach((to, from) => {
 	trackPageView(to, from);
 });
-
-const isMobile = ref(false);
-
-onMounted(() => {
-	isMobile.value = window.innerWidth <= 1024;
-
-	const onResize = () => {
-		isMobile.value = window.innerWidth <= 1024;
-	};
-	window.addEventListener("resize", onResize);
-
-	onBeforeUnmount(() => {
-		window.removeEventListener("resize", onResize);
-	});
-});
 </script>
 
 <template>
@@ -116,7 +101,7 @@ onMounted(() => {
 				<slot />
 			</TooltipProvider>
 		</ErrorBoundary>
-		<AppFooter v-if="!isMobile" />
+		<AppFooter class="hidden lg:block" />
 
 		<Toaster position="bottom-right" />
 	</div>
