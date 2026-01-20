@@ -60,10 +60,6 @@
 		isolation: isolate;
 	}
 
-	html {
-		scrollbar-gutter: stable;
-	}
-
 	* {
 		border-color: var(--border);
 		outline-color: color-mix(in oklab, var(--ring) 50%, transparent);
