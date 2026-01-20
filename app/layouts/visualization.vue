@@ -25,21 +25,69 @@ const sidebar = useTemplateRef<typeof EntitySidebar>("sidebar");
 const sidebarOpen = computed(() => {
 	return sidebar.value?.openState;
 });
+
+const drawerOpen = ref(false);
+
+watch(
+	() => id.value,
+	(newId) => {
+		drawerOpen.value = newId != null;
+	},
+	{ immediate: true },
+);
+
+const isMobile = ref(false);
+
+onMounted(() => {
+	const mq = window.matchMedia("(max-width: 1024px)");
+
+	isMobile.value = mq.matches;
+
+	const handler = (e: MediaQueryListEvent) => {
+		isMobile.value = e.matches;
+	};
+
+	mq.addEventListener("change", handler);
+
+	watch(
+		() => drawerOpen.value,
+		(open) => {
+			if (isMobile.value) {
+				document.body.style.overflow = open ? "hidden" : "";
+			}
+		},
+		{ immediate: true },
+	);
+
+	onBeforeUnmount(() => {
+		mq.removeEventListener("change", handler);
+		document.body.style.overflow = "";
+	});
+});
 </script>
 
 <template>
 	<NuxtLayout name="default">
 		<MainContent class="relative h-full">
-			<template v-if="id != null && currentMode !== 'table'">
+			<EntityMobileDrawer
+				v-if="isMobile && id != null"
+				:id="id"
+				class="lg:hidden"
+				:mode="currentMode"
+				:open="drawerOpen"
+				@update:open="drawerOpen = $event"
+			/>
+
+			<template v-if="!isMobile && id != null && currentMode !== 'table'">
 				<EntitySidebar :id="id" :no-table-sidebar="true" :mode="currentMode" />
 			</template>
 			<div
 				class="relative grid h-full grid-cols-[0px_1fr] transition-all delay-150 ease-in-out data-[sidepanel]:grid-cols-[25vw_1fr]"
-				:data-sidepanel="id != null && currentMode === 'table' ? 'true' : undefined"
+				:data-sidepanel="!isMobile && id != null && currentMode === 'table' ? 'true' : undefined"
 			>
 				<div class="grid h-full" :class="{ 'z-10': sidebarOpen }">
 					<EntitySidebar
-						v-if="id != null && currentMode === 'table'"
+						v-if="!isMobile && id != null && currentMode === 'table'"
 						:id="id"
 						ref="sidebar"
 						:mode="currentMode"
@@ -50,7 +98,7 @@ const sidebarOpen = computed(() => {
 				<div
 					v-else
 					class="transition-all delay-0"
-					:class="{ 'ml-[calc(-25vw+1.5rem)]': id != null && !sidebarOpen }"
+					:class="{ 'ml-[calc(-25vw+1.5rem)]': id != null && !sidebarOpen && !isMobile }"
 				>
 					<slot></slot>
 				</div>

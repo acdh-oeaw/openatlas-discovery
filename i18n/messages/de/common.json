@@ -165,6 +165,7 @@
 		"switch-locale": "Zu {locale} wechseln"
 	},
 	"MapPage": {
+		"mapLegend": "Karten-Legende",
 		"meta": {
 			"title": "Karte"
 		},
@@ -178,6 +179,7 @@
 		"title": "Netzwerk-Visualisierung",
 		"work-in-progress": "Die Datenbank ist derzeit im Aufbau.",
 		"controls": {
+			"title": "Netzwerk Einstellungen",
 			"start": "Abspielen",
 			"pause": "Pausieren",
 			"zoomIn": "Vergrößeren",

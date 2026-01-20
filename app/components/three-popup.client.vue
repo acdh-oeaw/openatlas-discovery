@@ -9,8 +9,6 @@ const props = defineProps<{
 	coordinates: [number, number];
 }>();
 
-console.log("entered");
-
 const emit = defineEmits<{
 	(event: "close"): void;
 }>();
@@ -50,15 +48,11 @@ onMounted(async () => {
 	assert(elementRef.value != null);
 	assert(map != null);
 
-	console.log("entered & initialized");
-
 	const customLayer = {
 		id: "3d-popup",
 		type: "custom" as const,
 		renderingMode: "3d" as const,
 		onAdd(map: GeoMap, gl: WebGLRenderingContext) {
-			console.log("onAdd function entered");
-			console.log("Creating Threebox instance", gl.getSupportedExtensions());
 			try {
 				Object.defineProperty(map, "version", {
 					get: function () {
@@ -69,7 +63,6 @@ onMounted(async () => {
 			} catch (error) {
 				console.error(error);
 			}
-			console.log("threebox created", window.tb);
 
 			const obj = window.tb.label({ htmlElement: elementRef.value, alwaysVisible: true });
 

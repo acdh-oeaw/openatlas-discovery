@@ -89,7 +89,7 @@ const currentMode = computed(() => {
 </script>
 
 <template>
-	<MainContent class="s:py-16 container grid p-8">
+	<MainContent class="container py-8">
 		<h1 class="sr-only">
 			{{ content?.title ?? t("IndexPage.meta.title") }}
 		</h1>
@@ -97,7 +97,7 @@ const currentMode = computed(() => {
 			<div v-if="content != null">
 				<div v-if="content.title !== 'OpenAtlas Discovery'">
 					<template v-if="content.leadIn != null">
-						<div class="container grid place-items-center gap-8 p-8 sm:py-16">
+						<div class="mx-auto grid w-full max-w-3xl place-items-center gap-8 sm:p-8 sm:py-16">
 							<div>
 								<NuxtImg
 									v-if="content.image?.light != null"
@@ -140,66 +140,67 @@ const currentMode = computed(() => {
 						</div>
 					</template>
 
-					<div>
-						<ContentRenderer class="mx-auto prose w-full max-w-3xl" :value="content.body">
+					<div class="mx-auto w-full max-w-3xl">
+						<ContentRenderer class="prose w-full" :value="content.body">
 							<template #empty></template>
 						</ContentRenderer>
 					</div>
 				</div>
 				<div v-else>
-					<div class="grid grid-cols-2 gap-16">
-						<div class="grid w-fit gap-4 pb-4">
-							<div>
-								<NuxtImg
-									v-if="content.image?.light != null"
-									alt=""
-									class="mb-4 block h-60 w-full max-w-3xl object-contain object-left dark:hidden"
-									preload
-									:src="content.image?.light"
-								/>
-								<NuxtImg
-									v-if="content.image?.dark != null"
-									alt=""
-									class="mb-4 hidden h-60 w-full max-w-3xl object-contain object-left dark:block"
-									preload
-									:src="content.image?.dark"
-								/>
-							</div>
-							<ContentRenderer
-								v-if="content.leadIn != null"
-								class="max-w-3xlr prose prose-lg"
-								unwrap="string"
-								:value="content.leadIn"
-							>
-								<template #empty></template>
-							</ContentRenderer>
-
-							<div v-if="env.public.database === 'enabled'">
-								<div class="flex items-center gap-6">
-									<Button
-										v-for="(link, key) of content.links"
-										:key="key"
-										as-child
-										variant="default"
-									>
-										<NavLink :href="link.href">
-											{{ link.label }}
-										</NavLink>
-									</Button>
+					<div class="mx-auto w-full max-w-full">
+						<div class="grid min-w-0 grid-rows-[1fr_auto] lg:grid-cols-2 lg:grid-rows-1 lg:gap-16">
+							<div class="grid min-w-0 gap-4 pb-4">
+								<div>
+									<NuxtImg
+										v-if="content.image?.light != null"
+										alt=""
+										class="mb-4 block w-full max-w-3xl object-contain object-left lg:h-60 dark:hidden"
+										preload
+										:src="content.image?.light"
+									/>
+									<NuxtImg
+										v-if="content.image?.dark != null"
+										alt=""
+										class="mb-4 hidden w-full max-w-3xl object-contain object-left lg:h-60 dark:block"
+										preload
+										:src="content.image?.dark"
+									/>
 								</div>
-							</div>
-
-							<div class="mt-6 w-full border dark:border-foreground/40"></div>
-							<div>
 								<ContentRenderer
-									class="prose prose-sm w-full max-w-3xl opacity-75"
-									:value="content.body"
+									v-if="content.leadIn != null"
+									class="prose prose-lg"
+									unwrap="string"
+									:value="content.leadIn"
 								>
 									<template #empty></template>
 								</ContentRenderer>
+
+								<div v-if="env.public.database === 'enabled'">
+									<div class="flex items-center gap-6">
+										<Button
+											v-for="(link, key) of content.links"
+											:key="key"
+											as-child
+											variant="default"
+										>
+											<NavLink :href="link.href">
+												{{ link.label }}
+											</NavLink>
+										</Button>
+									</div>
+								</div>
+
+								<div class="mt-6 w-full border dark:border-foreground/40"></div>
+								<div>
+									<ContentRenderer
+										class="prose prose-sm w-full max-w-3xl opacity-75"
+										:value="content.body"
+									>
+										<template #empty></template>
+									</ContentRenderer>
+								</div>
 							</div>
-						</div>
-						<div>
+							<div class="min-w-0">
 							<Carousel
 								:opts="{ loop: true }"
 								:plugins="[
@@ -210,7 +211,7 @@ const currentMode = computed(() => {
 										stopOnInteraction: false,
 									}),
 								]"
-								class="relative flex size-full"
+								class="relative flex h-100 w-full lg:size-full"
 							>
 								<CarouselPrevious
 									aria-label="Previous slide"
@@ -223,10 +224,10 @@ const currentMode = computed(() => {
 												<div class="relative flex size-full">
 													<img alt="" class="absolute size-full object-cover" :src="image.url" />
 												</div>
-												<figcaption class="grid-row grid w-full place-items-center text-sm">
+												<figcaption class="grid w-full grid-rows-2 place-items-center text-sm">
 													<div>{{ image.license }}</div>
 													<NavLink
-														class="flex items-center underline decoration-dotted transition hover:no-underline focus-visible:no-underline"
+														class="flex items-center text-center underline decoration-dotted transition hover:no-underline focus-visible:no-underline"
 														:external="true"
 														:href="image.link"
 														>{{ image.link }}</NavLink
@@ -242,6 +243,7 @@ const currentMode = computed(() => {
 									class="z-20 mr-14 bg-white opacity-90 dark:bg-black"
 								/>
 							</Carousel>
+						</div>
 						</div>
 					</div>
 				</div>

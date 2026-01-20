@@ -12,16 +12,39 @@ const labels = computed(() => {
 </script>
 
 <template>
-	<div class="flex items-center gap-2">
+	<!-- Mobile: Dropdown Menu -->
+	<div class="lg:hidden">
+		<DropdownMenu>
+			<DropdownMenuTrigger as-child>
+				<Button class="gap-2" size="icon" variant="ghost">
+					<span class="sr-only">{{
+						t("LocaleSwitcher.switch-locale", { locale: labels.of(currentLocale) })
+					}}</span>
+					<span aria-hidden="true" class="text-sm font-medium">{{
+						currentLocale.toUpperCase()
+					}}</span>
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent>
+				<DropdownMenuItem
+					v-for="locale of locales"
+					:key="locale"
+					@click="
+						() => {
+							setLocale(locale);
+						}
+					"
+				>
+					{{ labels.of(locale) }}
+				</DropdownMenuItem>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	</div>
+
+	<div class="hidden items-center gap-2 lg:flex">
 		<template v-for="(locale, index) of locales" :key="locale">
 			<span v-if="index !== 0" class="opacity-80">|</span>
 
-			<!--
-				`@nuxtjs/i18n` does not update the locale cookie on route change, so we need to
-				call `setLocale` explicitly.
-
-				@see https://i18n.nuxtjs.org/guide/lang-switcher
-			 -->
 			<NuxtLink
 				v-if="locale !== currentLocale"
 				class="opacity-80 transition-opacity hover:opacity-100 focus-visible:opacity-100"

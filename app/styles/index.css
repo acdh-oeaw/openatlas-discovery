@@ -231,6 +231,12 @@
 		--tw-prose-pre-bg: var(--color-neutral-800);
 		--tw-prose-th-borders: var(--color-neutral-300);
 		--tw-prose-td-borders: var(--color-neutral-200);
+
+		overflow-wrap: break-word;
+	}
+
+	.prose a {
+		overflow-wrap: break-word;
 	}
 
 	[data-ui-color-scheme="dark"] .prose {

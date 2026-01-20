@@ -98,7 +98,13 @@ const props = defineProps<{
 	currentSelectionCoordinates?: [number, number];
 	selectionBounds?: Array<[number, number]>;
 	currentSelectionId?: string;
+	isMobile: boolean;
 }>();
+
+const scaleCtrl = shallowRef<ScaleControl | null>(null);
+const navCtrl = shallowRef<NavigationControl | null>(null);
+const fullscreenCtrl = shallowRef<FullscreenControl | null>(null);
+
 const emit = defineEmits<{
 	(
 		event: "layer-click",
@@ -147,6 +153,24 @@ const context: GeoMapContext = {
 	map: null,
 };
 
+function setupControls() {
+	assert(context.map != null);
+	const map = context.map;
+
+	if (scaleCtrl.value) map.removeControl(scaleCtrl.value);
+	if (navCtrl.value) map.removeControl(navCtrl.value);
+	if (fullscreenCtrl.value) map.removeControl(fullscreenCtrl.value);
+
+	scaleCtrl.value = new ScaleControl({});
+	map.addControl(scaleCtrl.value, "bottom-left");
+
+	navCtrl.value = new NavigationControl({});
+	map.addControl(navCtrl.value, props.isMobile ? "bottom-left" : "top-left");
+
+	fullscreenCtrl.value = new FullscreenControl({});
+	map.addControl(fullscreenCtrl.value, props.isMobile ? "bottom-left" : "top-left");
+}
+
 watch(mapStyle, () => {
 	assert(context.map != null);
 	// const oldLayers = context.map?.getLayersOrder().map((layer) => {
@@ -158,6 +182,14 @@ watch(mapStyle, () => {
 		init(true);
 	});
 });
+
+watch(
+	() => props.isMobile,
+	() => {
+		if (!context.map) return;
+		setupControls();
+	},
+);
 
 onMounted(create);
 onScopeDispose(dispose);
@@ -265,18 +297,7 @@ function init(initAfterThemeSwitch = false) {
 
 	//
 	if (!initAfterThemeSwitch) {
-		const nav = new NavigationControl({});
-		map.addControl(nav, "top-left");
-
-		//
-
-		const fullscreen = new FullscreenControl({});
-		map.addControl(fullscreen, "top-left");
-
-		//
-
-		const scale = new ScaleControl({});
-		map.addControl(scale, "bottom-left");
+		setupControls();
 	}
 
 	//
@@ -685,47 +706,50 @@ const polygonData = computed(() => {
 function updatePolygons() {
 	assert(context.map != null);
 	const sourcePolygonsId = "polygon-data";
+	const rawPolygonData = toRaw(polygonData.value.features);
 	if (polygonOverlay.value === null)
 		polygonOverlay.value = new mapbox.MapboxOverlay({ interleaved: true });
 
 	if (props.hasPolygons) {
-		const polygonLayer = new GeoJsonLayer<CustomGeoJsonFeature>({
-			id: "deck-polygons",
-			data: polygonData.value.features.filter((f) => {
-				return f.properties.shapeType === "area";
-			}),
-			// props from GeoJsonLayer
-			getFillColor: hexToRgb(colors.areaCenterPoints) ?? [0, 0, 0],
-			getLineColor: [0, 0, 0, 0],
-			getLineWidth: 10,
+		const polygonLayer = markRaw(
+			new GeoJsonLayer<CustomGeoJsonFeature>({
+				id: "deck-polygons",
+				data: rawPolygonData.filter((f) => {
+					return f.properties.shapeType === "area";
+				}),
+				// props from GeoJsonLayer
+				getFillColor: hexToRgb(colors.areaCenterPoints) ?? [0, 0, 0],
+				getLineColor: [0, 0, 0, 0],
+				getLineWidth: 10,
 
-			//@ts-expect-error these properties are introduced by FillStyleExtension
-			fillPatternAtlas:
-				"https://raw.githubusercontent.com/visgl/deck.gl/master/examples/layer-browser/data/pattern.png",
-			fillPatternMapping:
-				"https://raw.githubusercontent.com/visgl/deck.gl/master/examples/layer-browser/data/pattern.json",
-			getFillPattern: () => {
-				return "hatch-1x";
-			},
-			getFillPatternScale: (d: CustomGeoJsonFeature) => {
-				if (d.geometry.type === "GeometryCollection") {
-					const polygon = d.geometry.geometries.find((geo) => {
-						return geo.type === "Polygon";
-					});
-					if (polygon) {
-						const area = turf.area(polygon);
-						let scale = 0.2 * Math.log10(area) - 0.5;
-						if (area > 10 ** 6) scale = Math.log10(area) * 0.5;
-						return Math.max(scale, 0.05);
+				//@ts-expect-error these properties are introduced by FillStyleExtension
+				fillPatternAtlas:
+					"https://raw.githubusercontent.com/visgl/deck.gl/master/examples/layer-browser/data/pattern.png",
+				fillPatternMapping:
+					"https://raw.githubusercontent.com/visgl/deck.gl/master/examples/layer-browser/data/pattern.json",
+				getFillPattern: () => {
+					return "hatch-1x";
+				},
+				getFillPatternScale: (d: CustomGeoJsonFeature) => {
+					if (d.geometry.type === "GeometryCollection") {
+						const polygon = d.geometry.geometries.find((geo) => {
+							return geo.type === "Polygon";
+						});
+						if (polygon) {
+							const area = turf.area(polygon);
+							let scale = 0.2 * Math.log10(area) - 0.5;
+							if (area > 10 ** 6) scale = Math.log10(area) * 0.5;
+							return Math.max(scale, 0.05);
+						}
 					}
-				}
-				return 0.5;
-			},
-			getFillPatternOffset: [0, 0],
+					return 0.5;
+				},
+				getFillPatternOffset: [0, 0],
 
-			// Define extensions
-			extensions: [new FillStyleExtension({ pattern: true })],
-		});
+				// Define extensions
+				extensions: [new FillStyleExtension({ pattern: true })],
+			}),
+		);
 
 		// Add/update the layer
 		polygonOverlay.value.setProps({

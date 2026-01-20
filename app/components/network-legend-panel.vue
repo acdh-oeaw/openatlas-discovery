@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CirclePauseIcon, CirclePlayIcon, EllipsisIcon, LayersIcon } from "lucide-vue-next";
+import { CirclePauseIcon, CirclePlayIcon, FunnelIcon, LayersIcon } from "lucide-vue-next";
 
 import type { NetworkSearchData } from "@/components/data-network-view.vue";
 import { networkConfig } from "@/config/network-visualisation.config";
@@ -123,11 +123,11 @@ watch(
 </script>
 
 <template>
-	<div>
+	<div class="hidden lg:flex">
 		<aside
 			:class="
 				!props.isEgoNetwork
-					? `flex max-h-72 gap-2 overflow-y-auto overflow-x-hidden rounded-md border-2 border-transparent bg-white/90 dark:bg-neutral-900 px-4 py-2 text-sm shadow-md`
+					? `flex max-h-72 overflow-y-auto overflow-x-hidden rounded-md border-transparent bg-white/90 dark:bg-neutral-900 px-4 py-2 mb-2 mr-3 text-sm shadow-md`
 					: `flex gap-2 overflow-x-auto rounded-md border-2 border-transparent bg-white/90 dark:bg-neutral-900 m-2 text-sm shadow-md`
 			"
 		>
@@ -155,7 +155,7 @@ watch(
 					</div>
 				</div>
 			</div>
-			<div v-else class="p-1">
+			<div v-if="props.isEgoNetwork" class="p-1">
 				<TooltipProvider>
 					<Tooltip>
 						<TooltipTrigger>
@@ -266,5 +266,40 @@ watch(
 				</Card>
 			</div>
 		</Teleport>
+	</div>
+	<div
+		class="mb-2 flex max-h-full overflow-x-hidden overflow-y-auto rounded-md border-transparent bg-white/90 p-0 text-sm shadow-md lg:hidden dark:bg-neutral-900"
+	>
+		<div v-if="!props.isEgoNetwork">
+			<Popover>
+				<PopoverTrigger as-child>
+					<Button variant="ghost" size="icon">
+						<FunnelIcon class="ml-0.5 p-0" :size="20" />
+						<span class="sr-only">{{ t("EntityPage.networkLegend") }}</span>
+					</Button>
+				</PopoverTrigger>
+
+				<PopoverContent class="mr-2 max-h-64 w-fit space-y-2 overflow-y-auto p-2 text-sm">
+					<div v-for="el in props.systemClasses" :key="el" class="flex items-center gap-2 px-4">
+						<input
+							:id="el"
+							v-model="checkedSystemClasses[el]"
+							:checked="checkedSystemClasses[el]"
+							type="checkbox"
+							name="systemClassCheckbox"
+							:style="`accent-color: ${systemClassColors[el as keyof typeof systemClassColors] ? systemClassColors[el as keyof typeof systemClassColors] : '#666'}`"
+							@change="onSubmit()"
+						/>
+						<span
+							:style="{
+								color: systemClassColors[el as keyof typeof systemClassColors] ?? '#666',
+							}"
+						>
+							{{ labels[el as keyof typeof labels] ?? el }}
+						</span>
+					</div>
+				</PopoverContent>
+			</Popover>
+		</div>
 	</div>
 </template>

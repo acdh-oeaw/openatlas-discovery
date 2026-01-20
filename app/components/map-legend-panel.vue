@@ -1,165 +1,90 @@
 <script setup lang="ts">
-import * as LucideIcons from "lucide-static";
-import { ChevronLeftIcon, ChevronRightIcon, SplineIcon } from "lucide-vue-next";
-
-import type { CustomMapLegendEntry } from "@/types/api";
+import { EllipsisIcon } from "lucide-vue-next";
 
 const t = useTranslations();
-
 const props = defineProps<{
-	iconData: Record<string, CustomMapLegendEntry>;
-	moveData: Record<string, CustomMapLegendEntry>;
+	movements: Array<CustomGeoJsonFeature>;
+	areas: Array<CustomGeoJsonFeature>;
+	locations: Array<CustomGeoJsonFeature>;
 }>();
 
 const emit = defineEmits<{
-	(e: "visible-icons" | "visible-moves", visible: Array<string>): void;
+	(event: "toggle-polygons"): void;
 }>();
-
-const visibleIcons = ref<Array<string>>(Object.keys(props.iconData));
-const visibleMoves = ref<Array<string>>([]);
-
-function toggleIcon(key: string) {
-	if (visibleIcons.value.includes(key))
-		visibleIcons.value = visibleIcons.value.filter((i) => {
-			return i !== key;
-		});
-	else {
-		visibleIcons.value.push(key);
-	}
-}
-function toggleMove(key: string) {
-	if (visibleMoves.value.includes(key))
-		visibleMoves.value = visibleMoves.value.filter((i) => {
-			return i !== key;
-		});
-	else {
-		visibleMoves.value.push(key);
-	}
-}
-
-watch(
-	visibleIcons,
-	() => {
-		emit("visible-icons", visibleIcons.value);
-	},
-	{ deep: true },
-);
-watch(
-	visibleMoves,
-	() => {
-		emit("visible-moves", visibleMoves.value);
-	},
-	{ deep: true },
-);
-
-onMounted(() => {
-	visibleIcons.value = Object.keys(props.iconData);
-	// visibleMoves.value = Object.keys(props.moveData);
-	setTimeout(() => {
-		return (expandedState.value = true);
-	}, 500);
-});
-
-const expandedState = ref(false);
-function toggleExpandedState() {
-	expandedState.value = !expandedState.value;
-}
 </script>
 
 <template>
-	<div
-		class="fixed inset-y-0 top-20 right-0 z-50 max-h-fit max-w-1/4 bg-none transition-transform duration-500 ease-in-out"
-		:class="expandedState ? 'translate-x-0' : 'translate-x-full'"
-	>
-		<button
-			class="absolute top-2 right-full -z-10 -ml-8 block w-8 rounded-l-md bg-card px-1 py-2 shadow-md"
-			:class="expandedState ? 'translate-x-2' : 'translate-x-0'"
-			@click="toggleExpandedState"
+	<div class="absolute right-0 bottom-0 z-10 mb-2 flex hidden w-full justify-center lg:flex">
+		<div
+			class="max-h-72 gap-2 overflow-x-hidden overflow-y-auto rounded-md border-2 border-transparent bg-white/90 p-2 text-sm font-medium shadow-md dark:bg-neutral-900"
 		>
-			<ChevronRightIcon class="size-8" :class="{ block: expandedState, hidden: !expandedState }" />
-			<ChevronLeftIcon class="size-8" :class="{ hidden: expandedState, block: !expandedState }" />
-		</button>
-		<div>
-			<aside
-				class="m-2 flex gap-2 overflow-x-auto rounded-r-md border-2 border-transparent bg-card p-2 text-sm shadow-md dark:bg-primary-foreground"
-			>
-				<div class="inline-flex">
-					<Tabs default-value="icons">
-						<TabsList>
-							<TabsTrigger value="icons" class="text-xs">
-								{{ $t("DataMapView.icons") }}
-							</TabsTrigger>
-							<TabsTrigger value="movements" class="text-xs">
-								{{ $t("DataMapView.featuredMovements") }}
-							</TabsTrigger>
-						</TabsList>
-						<TabsContent value="icons">
-							<div v-if="Object.keys(props.iconData).length > 0" class="max-h-48 overflow-auto">
-								<Toggle
-									v-for="[key, entry] in Object.entries(props.iconData).sort(
-										(a, b) => a[1].type?.label?.localeCompare(b[1].type?.label ?? '') ?? 0,
-									)"
-									:key="entry.type?.identifier"
-									:pressed="visibleIcons.includes(key)"
-									class="group my-2 flex min-w-0 items-center text-left"
-									variant="legend"
-									:custom-background-color="entry.color"
-									@click="() => toggleIcon(key)"
-								>
-									<div
-										v-if="entry.icon != null"
-										:style="{
-											'--customColor': entry.color,
-										}"
-										class="mr-2 size-6 scale-[0.7] text-[var(--customColor)] group-hover:text-primary-foreground group-data-[state=on]:text-primary-foreground dark:text-white dark:group-hover:text-white dark:group-data-[state=on]:text-white"
-										v-html="LucideIcons[entry.icon.replaceAll('-', '') as keyof typeof LucideIcons]"
-									></div>
-									<span
-										>{{ entry.type?.label
-										}}<Badge variant="groupOutline" class="ml-4">{{
-											entry.entities.length
-										}}</Badge></span
-									>
-								</Toggle>
-							</div>
-							<div v-else class="text-xs text-muted-foreground">
-								{{ t("DataMapView.no-icons") }}
-							</div>
-						</TabsContent>
-						<TabsContent value="movements">
-							<div v-if="Object.keys(props.moveData).length > 0" class="max-h-48 overflow-auto">
-								<Toggle
-									v-for="[key, entry] in Object.entries(props.moveData).sort(
-										(a, b) => a[1].type?.label?.localeCompare(b[1].type?.label ?? '') ?? 0,
-									)"
-									:key="entry.type?.identifier"
-									:pressed="visibleMoves.includes(key)"
-									class="group my-2 flex min-w-0 items-center text-left capitalize"
-									variant="legend"
-									:custom-background-color="entry.color"
-									@click="() => toggleMove(key)"
-								>
-									<SplineIcon
-										:style="{
-											'--customColor': entry.color,
-										}"
-										:class="`size-6 scale-[0.7] text-[var(--customColor)] group-hover:text-primary-foreground group-data-[state=on]:text-primary-foreground dark:text-white dark:group-data-[state=on]:text-white dark:group-hover:text-white`"
-									></SplineIcon>
-									<span
-										>{{ entry.type?.label
-										}}<Badge variant="groupOutline" class="ml-4">{{
-											entry.entities.length
-										}}</Badge></span
-									>
-								</Toggle>
-							</div>
-							<div v-else class="text-xs text-muted-foreground">
-								{{ t("DataMapView.no-moves") }}
-							</div>
-						</TabsContent>
-					</Tabs>
+			<div class="grid grid-cols-[auto_auto_auto_auto] items-center gap-3 align-middle">
+				<div class="grid grid-cols-[auto_1fr] gap-1">
+					<span
+						class="m-1.5 size-2 rounded-full"
+						:style="`background-color: ${project.colors.geojsonPoints}`"
+					></span>
+					{{ $t("DataMapView.point") }} ({{ props.locations.length }})
 				</div>
-			</aside>
+				<div class="grid grid-cols-[auto_1fr] gap-1">
+					<span
+						class="m-1.5 size-2 rounded-full"
+						:style="`background-color: ${project.colors.geojsonAreaCenterPoints}`"
+					></span>
+					{{ $t("DataMapView.centerpoint") }} ({{ props.areas.length }})
+				</div>
+				<div class="grid grid-cols-[auto_1fr] gap-1">
+					<span
+						class="m-1.5 size-2 rounded-full"
+						:style="`background-color: ${project.colors.geojsonMovement}`"
+					></span>
+					{{ $t("DataMapView.movement") }} ({{ props.movements.length }})
+				</div>
+				<div>
+					<Toggle variant="iiif" @click="emit('toggle-polygons')">
+						{{ $t("DataMapView.polygon") }}
+					</Toggle>
+				</div>
+			</div>
 		</div>
+	</div>
+	<div class="absolute right-0 bottom-0 z-50 mb-9 justify-end p-2 lg:hidden">
+		<Popover>
+			<PopoverTrigger as-child class="bg-white/90 shadow-md dark:bg-neutral-900/90">
+				<Button variant="ghost" size="icon">
+					<EllipsisIcon :size="20" />
+					<span class="sr-only">{{ t("MapPage.mapLegend") }}</span>
+				</Button>
+			</PopoverTrigger>
+
+			<PopoverContent side="top" class="mr-2 max-h-64 w-fit space-y-2 overflow-y-auto p-3 text-sm">
+				<div class="grid grid-cols-[auto_1fr] gap-1">
+					<span
+						class="m-1.5 size-2 rounded-full"
+						:style="`background-color: ${project.colors.geojsonPoints}`"
+					></span>
+					{{ $t("DataMapView.point") }} ({{ props.locations.length }})
+				</div>
+				<div class="grid grid-cols-[auto_1fr] gap-1">
+					<span
+						class="m-1.5 size-2 rounded-full"
+						:style="`background-color: ${project.colors.geojsonAreaCenterPoints}`"
+					></span>
+					{{ $t("DataMapView.centerpoint") }} ({{ props.areas.length }})
+				</div>
+				<div class="grid grid-cols-[auto_1fr] gap-1">
+					<span
+						class="m-1.5 size-2 rounded-full"
+						:style="`background-color: ${project.colors.geojsonMovement}`"
+					></span>
+					{{ $t("DataMapView.movement") }} ({{ props.movements.length }})
+				</div>
+				<div>
+					<Toggle variant="iiif" @click="emit('toggle-polygons')">
+						{{ $t("DataMapView.polygon") }}
+					</Toggle>
+				</div>
+			</PopoverContent>
+		</Popover>
 	</div>
 </template>

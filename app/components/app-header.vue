@@ -106,7 +106,7 @@ const links = computed(() => {
 		<div
 			:class="
 				!project.map.startPage
-					? `container flex items-center gap-4 py-4`
+					? `container w-full flex items-center gap-4 py-4`
 					: `flex items-center gap-4 py-4 px-8`
 			"
 		>
@@ -114,26 +114,26 @@ const links = computed(() => {
 				<span class="sr-only">{{ links.home.label }}</span>
 				<NuxtImg
 					alt=""
-					class="mr-6 block h-18 w-44 object-contain object-left lg:size-12 dark:hidden"
+					class="mr-3 block h-10 w-24 object-contain object-left sm:mr-4 sm:h-12 sm:w-28 md:mr-6 md:h-14 md:w-32 lg:size-12 dark:hidden"
 					preload
 					:src="project.logos.light"
 				/>
 				<NuxtImg
 					alt=""
-					class="mr-6 hidden h-18 w-44 object-contain object-left lg:size-12 dark:block"
+					class="mr-3 hidden h-10 w-24 object-contain object-left sm:mr-4 sm:h-12 sm:w-28 md:mr-6 md:h-14 md:w-32 lg:size-12 dark:block"
 					preload
 					:src="project.logos.dark"
 				/>
 			</NavLink>
 
-			<div class="flex flex-1 items-center justify-between gap-4">
+			<div class="flex min-w-0 flex-1 items-center justify-between gap-2 lg:gap-4">
 				<div class="hidden lg:flex">
 					<AppNavigationMenu :label="t('AppHeader.navigation-main')" :links="links" />
 				</div>
-				<div class="ml-auto flex items-center gap-4">
+				<div class="ml-auto flex items-center gap-2 lg:gap-4">
 					<ColorSchemeSwitcher />
 					<LocaleSwitcher v-if="locales.length > 1" />
-					<nav :aria-label="t('AppHeader.navigation-main')" class="flex shrink-0 lg:hidden">
+					<nav :aria-label="t('AppHeader.navigation-main')" class="flex min-w-0 shrink-0 lg:hidden">
 						<AppNavigationMobileMenu :title="t('AppHeader.navigation-menu')" :links="links" />
 					</nav>
 				</div>
