@@ -53,10 +53,17 @@ function getCssVar(name: string) {
 function updateSigmaTheme() {
 	if (!context.renderer) return;
 
-	context.renderer.setSetting("labelColor", {
-		color: getCssVar("--foreground"),
-	});
+	const foreground = getCssVar("--foreground");
 
+	context.graph.nodes().forEach((node) => {
+		// Only update nodes that are NOT highlighted or hovered
+		if (
+			!state.value.selectedNodes?.some((el) => el.id === node) &&
+			node !== state.value.hoveredNode
+		) {
+			context.graph.setNodeAttribute(node, "labelColor", foreground);
+		}
+	});
 	context.renderer.refresh();
 }
 
