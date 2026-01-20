@@ -141,6 +141,7 @@ function setSearchHighlight(searchNode: string) {
 			state.value.selectedNodes = results;
 			state.value.selectedNodes.forEach((el) => {
 				context.graph.setNodeAttribute(el.id, "highlighted", true);
+				context.graph.setNodeAttribute(el.id, "labelColor", "#000000");
 			});
 		}
 	}
@@ -191,6 +192,7 @@ watch(
 					state.value.selectedNodes = results;
 					state.value.selectedNodes.forEach((el) => {
 						context.graph.setNodeAttribute(el.id, "highlighted", true);
+						context.graph.setNodeAttribute(el.id, "labelColor", "#000000");
 					});
 				}
 			}
@@ -245,9 +247,19 @@ onMounted(async () => {
 		minCameraRatio: 0.1,
 		maxCameraRatio: 10,
 		labelColor: {
+			attribute: "labelColor",
 			color: getCssVar("--foreground"),
 		},
 	});
+
+	context.graph.nodes().forEach((node) => {
+		context.graph.setNodeAttribute(node, "labelColor", getCssVar("--foreground"));
+	});
+
+	if (props.detailNode) {
+		context.graph.setNodeAttribute(props.detailNode, "labelColor", "#000000");
+		context.graph.setNodeAttribute(props.detailNode, "highlighted", true);
+	}
 
 	context.camera = context.renderer.getCamera();
 
@@ -260,10 +272,8 @@ onMounted(async () => {
 	});
 
 	context.renderer.on("enterNode", ({ node }) => {
+		context.graph.setNodeAttribute(node, "labelColor", "#000000");
 		hoverTimeOut = setTimeout(() => {
-			// context.graph.nodes().forEach((el) => {
-			// 	context.graph.removeNodeAttribute(el, "highlighted");
-			// });
 			setHoveredNode(node);
 			nodeReducer();
 			edgeReducer();
@@ -271,6 +281,13 @@ onMounted(async () => {
 	});
 
 	context.renderer.on("leaveNode", () => {
+		context.graph.nodes().forEach((n) => {
+			if (state.value.selectedNodes?.some((el) => el.id === n)) {
+				context.graph.setNodeAttribute(n, "labelColor", "#000000");
+			} else {
+				context.graph.setNodeAttribute(n, "labelColor", getCssVar("--foreground"));
+			}
+		});
 		clearTimeout(hoverTimeOut);
 		setHoveredNode(undefined);
 	});
