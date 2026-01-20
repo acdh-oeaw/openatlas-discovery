@@ -2,6 +2,7 @@
 import { addTrailingSlash, createUrl, isNonEmptyString } from "@acdh-oeaw/lib";
 import type { WebSite, WithContext } from "schema-dts";
 
+import Toaster from "@/components/ui/toast/Toaster.vue";
 import { project } from "@/config/project.config";
 
 const env = useRuntimeConfig();

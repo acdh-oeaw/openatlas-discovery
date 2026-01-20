@@ -33,6 +33,7 @@ export default defineNuxtConfig({
 	css: [
 		"@fontsource-variable/inter/standard.css",
 		"@fontsource-variable/inter/standard-italic.css",
+		"vue-sonner/style.css",
 		"@/styles/index.css",
 	],
 	devtools: {
