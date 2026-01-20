@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { CirclePauseIcon, CirclePlayIcon, FunnelIcon, LayersIcon } from "lucide-vue-next";
+import {
+	CirclePauseIcon,
+	CirclePlayIcon,
+	EllipsisIcon,
+	FunnelIcon,
+	LayersIcon,
+} from "lucide-vue-next";
 
 import type { NetworkSearchData } from "@/components/data-network-view.vue";
 import { networkConfig } from "@/config/network-visualisation.config";
@@ -123,11 +129,11 @@ watch(
 </script>
 
 <template>
-	<div class="hidden lg:flex">
+	<div>
 		<aside
 			:class="
 				!props.isEgoNetwork
-					? `flex max-h-72 overflow-y-auto overflow-x-hidden rounded-md border-transparent bg-white/90 dark:bg-neutral-900 px-4 py-2 mb-2 mr-3 text-sm shadow-md`
+					? `lg:flex hidden max-h-72 overflow-y-auto overflow-x-hidden rounded-md border-transparent bg-white/90 dark:bg-neutral-900 px-4 py-2 mb-2 mr-3 text-sm shadow-md`
 					: `flex gap-2 overflow-x-auto rounded-md border-2 border-transparent bg-white/90 dark:bg-neutral-900 m-2 text-sm shadow-md`
 			"
 		>
