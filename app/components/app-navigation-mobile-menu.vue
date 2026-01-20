@@ -56,7 +56,7 @@ onScopeDispose(() => {
 					</li>
 				</ul>
 				<div class="flex justify-start">
-					<AppFooter />
+					<AppFooter @close="close" />
 				</div>
 			</div>
 		</SheetContent>

@@ -7,6 +7,10 @@ import { project } from "@/config/project.config";
 const t = useTranslations();
 const env = useRuntimeConfig();
 
+const emit = defineEmits<{
+	(event: "close"): void;
+}>();
+
 const links = computed(() => {
 	if (project.imprint === "none") return null;
 
@@ -64,6 +68,7 @@ const logos = project.footer.partner_logos;
 						<NavLink
 							class="decoration-dotted underline-offset-4 hover:underline focus-visible:underline"
 							:href="link.href"
+							@click="emit('close')"
 						>
 							{{ link.label }}
 						</NavLink>
