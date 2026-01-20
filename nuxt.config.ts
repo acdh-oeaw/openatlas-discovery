@@ -72,7 +72,7 @@ export default defineNuxtConfig({
 		baseUrl,
 		defaultLocale,
 		detectBrowserLanguage: {
-			redirectOn: "root",
+			redirectOn: "no prefix",
 		},
 		experimental: {
 			typedOptionsAndMessages: "default",
