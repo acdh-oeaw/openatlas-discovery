@@ -17,6 +17,7 @@ function getFilteredRelations(entity: PresentationViewModel) {
 	const detailViewConfig = getDetailViewConfig(entity);
 	const res: Record<string, Array<RelatedEntityModel>> = {};
 	for (const relation in entity.relations) {
+		if (relation === "types") continue;
 		if (
 			!detailViewConfig?.primarySystemClasses ||
 			detailViewConfig.primarySystemClasses.includes(relation)
@@ -24,6 +25,7 @@ function getFilteredRelations(entity: PresentationViewModel) {
 			res[relation] = entity.relations[relation as keyof PresentationViewModel["relations"]];
 	}
 	for (const otherKey in entity) {
+		if (otherKey === "types") continue;
 		if (
 			!detailViewConfig?.primarySystemClasses ||
 			detailViewConfig.primarySystemClasses.includes(otherKey)
