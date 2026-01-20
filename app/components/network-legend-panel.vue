@@ -120,21 +120,6 @@ watch(
 		showLegend.value = false;
 	},
 );
-
-const isMobile = ref(false);
-
-onMounted(() => {
-	isMobile.value = window.innerWidth <= 1024;
-
-	const onResize = () => {
-		isMobile.value = window.innerWidth <= 1024;
-	};
-	window.addEventListener("resize", onResize);
-
-	onBeforeUnmount(() => {
-		window.removeEventListener("resize", onResize);
-	});
-});
 </script>
 
 <template>
@@ -146,7 +131,7 @@ onMounted(() => {
 					: `flex gap-2 overflow-x-auto rounded-md border-2 border-transparent bg-white/90 dark:bg-neutral-900 m-2 text-sm shadow-md`
 			"
 		>
-			<div v-if="!props.isEgoNetwork && !isMobile" class="inline-flex">
+			<div v-if="!props.isEgoNetwork" class="inline-flex">
 				<div
 					v-for="el in props.systemClasses"
 					:key="el"
@@ -285,7 +270,7 @@ onMounted(() => {
 	<div
 		class="mb-2 flex max-h-full overflow-x-hidden overflow-y-auto rounded-md border-transparent bg-white/90 p-0 text-sm shadow-md lg:hidden dark:bg-neutral-900"
 	>
-		<div v-if="!props.isEgoNetwork && isMobile">
+		<div v-if="!props.isEgoNetwork">
 			<Popover>
 				<PopoverTrigger as-child>
 					<Button variant="ghost" size="icon">

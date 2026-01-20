@@ -98,17 +98,19 @@ const nonEmptyRelations = computed(() => {
 const isClosed = ref(false);
 
 let timer: ReturnType<typeof setTimeout> | null = null;
+let timer2: ReturnType<typeof setTimeout> | null = null;
 
 function closeDrawer(afterClose?: () => void) {
-	isClosed.value = true; // triggers slide-down
+	isClosed.value = true;
 	timer = setTimeout(() => {
-		emit("update:open", false); // removes from DOM
+		emit("update:open", false);
 		if (afterClose) afterClose();
-	}, 500); // match Tailwind duration-500
+	}, 500);
 }
 
 onScopeDispose(() => {
 	if (timer) clearTimeout(timer);
+	if (timer2) clearTimeout(timer2);
 });
 
 watch(
@@ -117,7 +119,7 @@ watch(
 		if (newVal) {
 			isClosed.value = true;
 			nextTick(() => {
-				setTimeout(() => {
+				timer2 = setTimeout(() => {
 					isClosed.value = false;
 				}, 0);
 			});
