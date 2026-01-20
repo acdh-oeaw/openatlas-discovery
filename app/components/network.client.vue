@@ -169,46 +169,31 @@ watch(
 );
 
 watch(
-	() => {
-		return props.detailNode;
-	},
+	() => props.detailNode,
 	(detailNode) => {
+		// Reset all nodes first
+		context.graph.nodes().forEach((node) => {
+			context.graph.setNodeAttribute(node, "highlighted", false);
+			context.graph.setNodeAttribute(node, "labelColor", getCssVar("--foreground"));
+		});
+
 		if (detailNode) {
-			context.graph.nodes().forEach((el) => {
-				context.graph.removeNodeAttribute(el, "highlighted");
-			});
-
-			if (detailNode) {
-				const results = context.graph
-					.nodes()
-					.map((n) => {
-						return { id: n, label: context.graph.getNodeAttribute(n, "id") as string };
-					})
-					.filter(({ id }) => {
-						return id === detailNode;
-					});
-
-				if (results.length === 1) {
-					state.value.selectedNodes = results;
-					state.value.selectedNodes.forEach((el) => {
-						context.graph.setNodeAttribute(el.id, "highlighted", true);
-						context.graph.setNodeAttribute(el.id, "labelColor", "#000000");
-					});
-				}
-			}
+			// Highlight the new detail node
+			context.graph.setNodeAttribute(detailNode, "highlighted", true);
+			context.graph.setNodeAttribute(detailNode, "labelColor", "#000000");
+			state.value.selectedNodes = [
+				{ id: detailNode, label: context.graph.getNodeAttribute(detailNode, "label") },
+			];
+		} else {
 			// If the query is empty, then we reset the selectedNode
-			else {
-				state.value.selectedNodes = undefined;
-			}
-
-			// Refresh rendering
-			// You can directly call `renderer.refresh()`, but if you need performances
-			// you can provide some options to the refresh method.
-			// In this case, we don't touch the graph data so we can skip its reindexation
-			context.renderer?.refresh({
-				skipIndexation: true,
-			});
+			state.value.selectedNodes = undefined;
 		}
+
+		// Refresh rendering
+		// You can directly call `renderer.refresh()`, but if you need performances
+		// you can provide some options to the refresh method.
+		// In this case, we don't touch the graph data so we can skip its reindexation
+		context.renderer?.refresh();
 	},
 	{ immediate: true, deep: true },
 );
