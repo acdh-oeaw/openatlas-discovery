@@ -2,7 +2,7 @@
 
 OpenAtlas Discovery is a presentation website for [OpenAtlas](https://openatlas.eu) projects.
 
-A demo website is deplyed at <https://openatlas-discovery-demo.acdh-dev.oeaw.ac.at>.
+A demo website is deployed at <https://openatlas-discovery-demo.acdh-dev.oeaw.ac.at>.
 
 ## Content management (CMS)
 
@@ -11,7 +11,8 @@ content changes to the website repository on GitHub. All content is stored in pl
 or json), and can also be edited directly with your favourite text editor.
 
 - "Config" collection: Main configuration file for the website. Allows setting default locale, brand
-  colors, logos. Saves to [`project.config.json`](project.config.json).
+  colors, logos, visualization configuration, custom detail views. Saves to
+  [`project.config.json`](project.config.json).
 - "Metadata" collection: Project metadata which needs translation in all suppoted languages. Saves
   to [`messages/:locale/project.json`](messages/en/project.json).
 - "Pages" collection: Custom content pages. Saves to [`content/pages/*.md`](content/pages).
