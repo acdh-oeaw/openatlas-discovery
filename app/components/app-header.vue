@@ -106,21 +106,21 @@ const links = computed(() => {
 		<div
 			:class="
 				!project.map.startPage
-					? `container w-full flex items-center gap-4 py-4`
-					: `flex items-center gap-4 py-4 px-8`
+					? `container w-full flex items-center gap-4 py-2`
+					: `flex items-center gap-4 py-2 px-8`
 			"
 		>
 			<NavLink class="flex shrink-0" :href="links.home.href">
 				<span class="sr-only">{{ links.home.label }}</span>
 				<NuxtImg
 					alt=""
-					class="mr-3 block h-10 w-24 object-contain object-left sm:mr-4 sm:h-12 sm:w-28 md:mr-6 md:h-14 md:w-32 lg:size-12 dark:hidden"
+					class="mr-3 block h-full w-44 object-contain object-left sm:mr-4 md:mr-6 dark:hidden"
 					preload
 					:src="project.logos.light"
 				/>
 				<NuxtImg
 					alt=""
-					class="mr-3 hidden h-10 w-24 object-contain object-left sm:mr-4 sm:h-12 sm:w-28 md:mr-6 md:h-14 md:w-32 lg:size-12 dark:block"
+					class="mr-3 hidden h-full w-44 object-contain object-left sm:mr-4 md:mr-6 dark:block"
 					preload
 					:src="project.logos.dark"
 				/>
