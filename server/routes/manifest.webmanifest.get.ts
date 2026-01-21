@@ -1,11 +1,10 @@
 import { createI18n } from "vue-i18n";
 
-import de from "@/messages/de/common.json";
-import projectDe from "@/messages/de/project.json";
+import de from "~/i18n/messages/de/common.json";
+import projectDe from "~/i18n/messages/de/project.json";
 
 const locale = "de";
 
-// @ts-expect-error Unknown property `__cms__`.
 const { t } = createI18n({
 	legacy: false,
 	locale,

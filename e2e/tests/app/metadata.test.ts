@@ -1,7 +1,6 @@
 import { assert, createUrl } from "@acdh-oeaw/lib";
 
 import { locales } from "@/config/i18n.config";
-import { expect, test } from "@/e2e/lib/test";
 import { ensureTrailingSlash } from "@/utils/ensure-trailing-slash";
 import { escape } from "@/utils/safe-json-ld-replacer";
 import { expect, test } from "~/e2e/lib/test";
