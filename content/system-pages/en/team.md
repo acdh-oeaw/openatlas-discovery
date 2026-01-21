@@ -3,7 +3,10 @@ title: Team
 navigation:
   title: Team
 ---
-Fugiat duis anim mollit sit nulla do dolore dolor eu veniam cupidatat anim. Cillum enim non
-reprehenderit proident eu tempor est adipisicing cupidatat amet. Ex esse sunt minim qui cupidatat
-adipisicing. Eiusmod aliquip magna dolore dolore ipsum reprehenderit sit cupidatat non sint eu
-dolor.
+♡ Special thanks go to these individuals who have supported us on our journey to make OpenAtlas Discovery the powerful app it is today:
+
+* Katharina Wünsche
+* Moritz "Mocca" Großfurtner
+* Stefan Probst
+
+Further information can be found at [openatlas.eu](https://openatlas.eu)

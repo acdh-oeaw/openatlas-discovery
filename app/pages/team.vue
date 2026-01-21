@@ -98,19 +98,20 @@ onServerPrefetch(async () => {
 			</div>
 		</template>
 
-		<div class="mx-auto w-full max-w-3xl">
-			<ContentRenderer
-				v-if="content != null"
-				class="prose w-full"
-				:value="content.body"
-			>
-				<template #empty></template>
-			</ContentRenderer>
-		</div>
-
 		<section class="mx-auto w-full max-w-3xl">
 			<h2 class="sr-only">{{ t("TeamPage.team-members") }}</h2>
 			<TeamMembersList />
 		</section>
+
+		<hr
+			v-if="content != null && content.body != null"
+			class="mb-6 flex border-b border-foreground/30 lg:hidden"
+		/>
+
+		<div class="mx-auto w-full max-w-3xl">
+			<ContentRenderer v-if="content != null" class="prose prose-sm w-full" :value="content.body">
+				<template #empty></template>
+			</ContentRenderer>
+		</div>
 	</MainContent>
 </template>

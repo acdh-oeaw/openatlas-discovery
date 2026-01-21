@@ -1989,14 +1989,17 @@ collections:
             label: Hero image (light mode)
             i18n: true
             widget: image
+            required: false
           - name: dark
             label: Hero image (dark mode)
             i18n: true
             widget: image
+            required: false
       - name: leadIn
         label: Hero lead-in
         i18n: true
         widget: markdown
+        required: false
         modes:
           - rich_text
       - name: links
@@ -2099,3 +2102,8 @@ collections:
         widget: markdown
         modes:
           - rich_text
+      - name: isLead
+        label: Highlight as Team Lead
+        i18n: duplicate
+        widget: boolean
+        default: false

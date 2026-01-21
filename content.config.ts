@@ -21,6 +21,7 @@ export default defineContentConfig({
 				lastName: z.string(),
 				academicTitle: z.string().optional(),
 				image: z.string().optional(),
+				isLead: z.boolean().default(false),
 			}),
 		}),
 		contentPages: defineCollection({
