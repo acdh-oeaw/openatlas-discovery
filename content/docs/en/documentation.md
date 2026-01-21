@@ -28,6 +28,27 @@ The **Config**-Collection beholds the overall _Project Config_. Here you can :
 - upload your project's _logo_ - here is prefered to provide logo's for the light and dark mode of
   the website and a logo with and without text. (of course you can also just upload the same logo in
   all the categories :wink:)
+- add _cooperation logos_ to the footer of the website
+- edit the detailed view of the entities:
+	- You can select _system classes_ to which the custom detailed view should be applied
+	- You can configure which related _system classes_ should be highlighted
+	- Which related _system class_ should be at the top
+	- Which related _system classes_ should be shown in a simple display (not highlighted)
+	- Which entities should not be shown at all by _type ID_
+- configure the map:
+	- The _map_ can be selected as the start page for the website, in which case there is no longer an index page.
+	- The _base layer URLs_ for the map can be changed (this changes it's appearance)
+	- _System classes_ can be specified to be displayed on the map (the entities need coordinates for this)
+	- The _zoom level_ used to zoom in on entities can be changed.
+- add Icons (symbols) for specific type IDs to the map:
+	- The _type ID_.
+	- The _symbol_. (selection from [Lucide Icons](https://lucide.dev/))
+	- The _color_.
+- configure the movement visualization:
+	- Entities can be highlighted by _type ID_ using color.
+	- _Overlapping movements_ can be drawn more strongly to highlight areas with dense activity.
+- configure the network:
+	- _System classes_ can be excluded from the network.
 - add an _imprint_ to your website (if you are an acdh-oeaw cooperation partner, don't hesitate
   to use the acdh-imprint, otherwise you can add your
   [own imprint page](#creating-a-custom-imprint-page))
@@ -96,3 +117,4 @@ When creating a new team member you can
 - provide the academic title of the member
 - upload an photo (it will be displayed in a profile picture style / circle)
 - add a short biography of the member
+- mark the member as a lead (this will highlight them in the list)
