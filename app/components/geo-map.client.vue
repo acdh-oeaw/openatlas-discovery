@@ -325,7 +325,7 @@ function init(initAfterThemeSwitch = false) {
 			paint: {
 				"circle-color": colors.areaCenterPoints,
 				"circle-opacity": ["case", ["==", ["get", "isDisplayed"], true], 1, 0],
-				"circle-radius": 6,
+				"circle-radius": props.isMobile ? 12 : 6,
 			},
 		});
 	//
@@ -338,7 +338,7 @@ function init(initAfterThemeSwitch = false) {
 			paint: {
 				"circle-color": colors.points,
 				"circle-opacity": ["case", ["==", ["get", "isDisplayed"], true], 1, 0],
-				"circle-radius": 6,
+				"circle-radius": props.isMobile ? 12 : 6,
 			},
 		});
 
@@ -359,7 +359,7 @@ function init(initAfterThemeSwitch = false) {
 							"#808080",
 						]
 					: ["coalesce", ["get", "color"], colors.movement],
-				"circle-radius": 6,
+				"circle-radius": props.isMobile ? 12 : 6,
 				"circle-opacity": [
 					"case",
 					// if isDisplayed is false -> 0
@@ -443,7 +443,8 @@ function init(initAfterThemeSwitch = false) {
 			const dy = event.point.y - screenPoint.y;
 			const dist = Math.sqrt(dx * dx + dy * dy);
 
-			return dist <= 6;
+			const clickTolerance = props.isMobile ? 20 : 6;
+			return dist <= clickTolerance;
 		});
 
 		if (preciseFeatures.length > 0) {
@@ -554,7 +555,7 @@ watch(
 					source: { type: "geojson", data: createFeatureCollection(source) },
 					paint: {
 						"circle-color": ["coalesce", ["get", "color"], colors.movement],
-						"circle-radius": 6,
+						"circle-radius": props.isMobile ? 12 : 6,
 						"circle-opacity": [
 							"case",
 							// if isDisplayed is false -> 0
