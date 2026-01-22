@@ -56,8 +56,7 @@ The map view has a lot of features to offer:
 
 This view highlights connections between entities, making relationships in the dataset immediately visible.
 Connections are automatically highlighted, which makes navigation and exploration more intuitive for users.
-The view can be customized using the CMS to configure colors, decide which entity types should be \
-displayed, and even focus on specific subsets of their data.
+The view can be customized using the CMS to configure colors, decide which entity types should be displayed, and even focus on specific subsets of their data.
 
 ## Further Information
 

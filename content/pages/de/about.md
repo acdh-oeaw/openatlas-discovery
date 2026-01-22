@@ -40,6 +40,14 @@ Die Kartenansicht bietet viele Funktionen:
 * Zusätzlich können **Icons** für bestimmte Entitäten verwendet werden, um diese hervorzuheben und der Karte mehr Kontext und Erkennbarkeit zu verleihen. All dies lässt sich einfach über das CMS konfigurieren, ohne den Code zu verändern.
 * Wir unterstützen auch die **Darstellung von bestimmten als auch unbestimmten Flächen**. In einem unserer archäologischen Partnerprojekte stellen die Flächen beispielsweise Gräber auf einem Friedhof dar. Der genaue Standort der Kirche ist ungewiss, daher wird sie als hellerer, skizzierter Bereich visualisiert, der den möglichen Bereich angibt, in dem das Gebäude gestanden haben könnte, und nicht als feste Position.
 
+### Die Netzwerkvisualisierung
+
+Diese Ansicht hebt Verbindungen zwischen Entitäten hervor und macht Beziehungen im Datensatz sofort sichtbar.
+Verbindungen werden hervorgehoben, was die Navigation und Erkundung für Benutzer:innen intuitiver macht.
+
+Die Ansicht kann mithilfe des CMS angepasst werden, um Farben zu konfigurieren, zu entscheiden, welche Entitätstypen angezeigt werden sollen,
+und sogar den Fokus auf bestimmte Teilmengen der Daten zu legen.
+
 ## Weitere Informationen
 
 * Entdecken Sie Projekte, die OpenAtlas Discovery nutzen:\
