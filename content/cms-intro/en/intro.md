@@ -5,7 +5,7 @@ image:
   dark: /assets/images/hero-dark.svg
 links:
   - label: Admin-Login
-    href: /admin
+    href: /admin/index.html
     external: true
   - label: Docs
     href: /docs
