@@ -15,7 +15,7 @@
 		"dev:cms": "decap-server",
 		"format:check": "prettier . --cache --cache-location ./.prettiercache --check",
 		"format:fix": "pnpm run format:check --write",
-		"generate": "run-s generate:server",
+		"generate": "NUXT_PUBLIC_GIT_CURRENT_TAG=$(git tag --merged HEAD --sort=-v:refname | head -n1) run-s generate:server",
 		"generate:api-client": "dotenv -c -- tsx ./scripts/generate-api-client.ts",
 		"generate:crm-messages": "dotenv -c -- tsx ./scripts/generate-crm-locale.ts",
 		"generate:server": "nuxt generate --dotenv ./.env.local",

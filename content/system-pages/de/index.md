@@ -25,6 +25,6 @@ links:
   - label: Netzwerk
     href: /visualization?mode=network
 ---
-Die Daten, die in dieser Demo-Version präsentiert werden, wurden freundlicherweise bereitgestellt von: [Mapping Medieval Conflict (MEDCON)](<>). A digital approach towards political dynamics in the pre-modern period.
+Die Daten, die in dieser Demo-Version präsentiert werden, wurden freundlicherweise bereitgestellt von: [Mapping Medieval Conflict (MEDCON)](https://www.oeaw.ac.at/imafo/das-institut/detail/mapping-medieval-conflicts). A digital approach towards political dynamics in the pre-modern period.
 
 Die Daten stammen aus zwei Fallstudien von MEDCON, „Kaiser Friedrich III. und die Liga der Mailberger Koalition, 1451/52“ (durchgeführt durch Kornelia Holzner-Tobisch und Petra Heinicker) und „Fraktionen und Allianzen im Kampf von Maximilian I. um Burgund“ (Sonja Dünnebeil).
