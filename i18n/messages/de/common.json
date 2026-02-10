@@ -190,7 +190,11 @@
 			"download": "Netzwerk-Graph herunterladen",
 			"show-orphans": "Einzelne Knoten anzeigen",
 			"hide-orphans": "Einzelne Knoten verbergen"
-		}
+		},
+		"warning": "Achtung!",
+		"no-selection-node": "Die ausgewählte Entität ist nicht im Netzwerk vorhanden.",
+		"orphan-info": "Die ausgewählte Entität hat keine Verbindungen!",
+		"orphan-enable-show": "Aktivieren Sie in der Kontrollbar, dass einzelne Knoten angezeigt werden sollen."
 	},
 	"NotFoundPage": {
 		"meta": {

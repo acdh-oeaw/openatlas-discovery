@@ -10,6 +10,7 @@ const props = defineProps<{
 	searchNode: string;
 	detailNode?: string;
 	showOrphans: boolean;
+	isMobile?: boolean;
 }>();
 
 const graph = new Graph();
@@ -102,6 +103,7 @@ function getNodeColor(nodeClass: string) {
 		:search-node="props.searchNode"
 		:detail-node="props.detailNode"
 		:show-orphans="props.showOrphans"
+		:is-mobile="isMobile"
 		network-container-id="network-view"
 	/>
 </template>

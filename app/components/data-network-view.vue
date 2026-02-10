@@ -34,6 +34,24 @@ const searchFiltersSchema = v.object({
 	),
 });
 
+const isMobile = ref(false);
+
+onMounted(() => {
+	const mq = window.matchMedia("(max-width: 1024px)");
+
+	isMobile.value = mq.matches;
+
+	const handler = (e: MediaQueryListEvent) => {
+		isMobile.value = e.matches;
+	};
+
+	mq.addEventListener("change", handler);
+
+	onBeforeUnmount(() => {
+		mq.removeEventListener("change", handler);
+	});
+});
+
 const searchFilters = computed(() => {
 	if (route.query.systemClasses) {
 		normalizeQuery(route.query.systemClasses);

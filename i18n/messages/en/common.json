@@ -190,7 +190,11 @@
 			"download": "Download network-graph",
 			"show-orphans": "Show single nodes",
 			"hide-orphans": "Hide single nodes"
-		}
+		},
+		"warning": "Attention!",
+		"no-selection-node": "The selected entity is not displayed in the network.",
+		"orphan-info": "The selected entity has no connections!",
+		"orphan-enable-show": "Activate in the controll bar the 'show single nodes' option to display it."
 	},
 	"NotFoundPage": {
 		"meta": {

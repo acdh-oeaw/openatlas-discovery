@@ -7,8 +7,10 @@ import { type Camera, Sigma } from "sigma";
 import type { EdgeDisplayData, NodeDisplayData } from "sigma/types";
 import { onMounted, ref } from "vue";
 
+import { toast } from "@/components/ui/toast";
 import { layoutOptions, networkConfig } from "@/config/network-visualisation.config";
 
+const t = useTranslations();
 interface State {
 	hoveredNode?: string;
 
@@ -21,13 +23,19 @@ interface State {
 	// State derived from hovered node:
 	hoveredNeighbors?: Set<string>;
 }
-const props = defineProps<{
-	graph: Graph;
-	searchNode?: string;
-	detailNode?: string;
-	showOrphans: boolean;
-	networkContainerId: string;
-}>();
+const props = withDefaults(
+	defineProps<{
+		graph: Graph;
+		searchNode?: string;
+		detailNode?: string;
+		showOrphans: boolean;
+		networkContainerId: string;
+		isMobile?: boolean;
+	}>(),
+	{
+		isMobile: false,
+	},
+);
 
 interface NetworkContext {
 	graph: Graph;
@@ -166,6 +174,11 @@ function setSearchHighlight(searchNode: string) {
 	});
 }
 
+function isOrphan(id: string) {
+	const neighbors = context.graph.neighbors(id).filter((n) => n !== id);
+	return neighbors.length === 0;
+}
+
 watch(
 	() => {
 		return props.showOrphans;
@@ -178,6 +191,7 @@ watch(
 watch(
 	() => props.detailNode,
 	(detailNode) => {
+		if (!context.renderer) return;
 		// Reset all nodes first
 		context.graph.nodes().forEach((node) => {
 			context.graph.setNodeAttribute(node, "highlighted", false);
@@ -186,11 +200,33 @@ watch(
 
 		if (detailNode) {
 			// Highlight the new detail node
+			if (!context.graph.hasNode(detailNode) && !props.isMobile) {
+				toast.warning(t("NetworkPage.warning"), {
+					description: t("NetworkPage.no-selection-node"),
+				});
+
+				state.value.selectedNodes = undefined;
+				state.value.hoveredNode = undefined;
+				state.value.hoveredNeighbors = undefined;
+
+				nodeReducer();
+				edgeReducer();
+				context.renderer?.refresh();
+				return;
+			}
+
 			context.graph.setNodeAttribute(detailNode, "highlighted", true);
 			context.graph.setNodeAttribute(detailNode, "labelColor", "#000000");
 			state.value.selectedNodes = [
 				{ id: detailNode, label: context.graph.getNodeAttribute(detailNode, "label") },
 			];
+
+			//show toast if orphan and showOrphans is false
+			if (!props.showOrphans && isOrphan(detailNode)) {
+				toast.info(t("NetworkPage.orphan-info"), {
+					description: t("NetworkPage.orphan-enable-show"),
+				});
+			}
 		} else {
 			// If the query is empty, then we reset the selectedNode
 			state.value.selectedNodes = undefined;
@@ -248,9 +284,20 @@ onMounted(async () => {
 		context.graph.setNodeAttribute(node, "labelColor", getCssVar("--foreground"));
 	});
 
-	if (props.detailNode) {
+	if (props.detailNode && context.graph.hasNode(props.detailNode)) {
 		context.graph.setNodeAttribute(props.detailNode, "labelColor", "#000000");
 		context.graph.setNodeAttribute(props.detailNode, "highlighted", true);
+
+		if (!props.showOrphans && isOrphan(props.detailNode) && !props.isMobile) {
+			toast.info(t("NetworkPage.orphan-info"), {
+				description: t("NetworkPage.orphan-enable-show"),
+			});
+		}
+	} else if (props.detailNode && !context.graph.hasNode(props.detailNode) && !props.isMobile) {
+		await nextTick();
+		toast.warning(t("NetworkPage.warning"), {
+			description: t("NetworkPage.no-selection-node"),
+		});
 	}
 
 	context.camera = context.renderer.getCamera();
