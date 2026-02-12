@@ -48,7 +48,12 @@ onServerPrefetch(async () => {
 
 <template>
 	<MainContent class="container py-8">
-		<template v-if="content != null && content.leadIn != null">
+		<template
+			v-if="
+				content != null &&
+				(content.leadIn || content.image?.light != null || content.image?.dark != null)
+			"
+		>
 			<div class="mx-auto w-full max-w-3xl">
 				<div class="grid place-items-center gap-8 sm:p-8 sm:py-16">
 					<div>
