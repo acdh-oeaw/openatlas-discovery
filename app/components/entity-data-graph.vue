@@ -9,6 +9,7 @@ import type { NetworkEntity } from "@/types/api";
 const props = defineProps<{
 	networkData: NetworkEntity;
 	currentDepth: number;
+	entityId?: string;
 }>();
 
 const emit = defineEmits<{
@@ -16,6 +17,7 @@ const emit = defineEmits<{
 }>();
 
 const graph = new Graph();
+const graphHasLoaded = ref(false);
 
 const { entityColors } = networkConfig.colors;
 const defaultColor = networkConfig.colors.entityDefaultColor;
@@ -41,6 +43,8 @@ watch(
 	},
 	() => {
 		/** Clear previous graph data. */
+		graphHasLoaded.value = false;
+
 		graph.clear();
 
 		if (props.networkData.length <= 0) return;
@@ -70,6 +74,8 @@ watch(
 		});
 
 		void nextTick(() => {
+			graphHasLoaded.value = true;
+
 			if (network.value && !network.value.isRunning)
 				network.value?.handleNetworkControls("toggleRenderer");
 		});
@@ -102,7 +108,9 @@ const network = useTemplateRef<NetworkTemplateRef>("networkClient");
 		v-if="graph.size > 0"
 		ref="networkClient"
 		:graph="graph"
+		:detail-node="entityId"
 		:show-orphans="false"
+		:graph-has-loaded="graphHasLoaded"
 		network-container-id="ego-network"
 	/>
 </template>

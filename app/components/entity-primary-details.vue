@@ -393,6 +393,7 @@ onMounted(async () => {
 							v-if="tab.id === 'ego-network' && height && width && egoNetworkData"
 							:network-data="egoNetworkData ?? []"
 							:current-depth="depth"
+							:entity-id="String(props.entity.id)"
 							@change-depth="(val) => updateDepth(val)"
 						/>
 

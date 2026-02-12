@@ -31,6 +31,7 @@ const props = withDefaults(
 		showOrphans: boolean;
 		networkContainerId: string;
 		isMobile?: boolean;
+		graphHasLoaded?: boolean;
 	}>(),
 	{
 		isMobile: false,
@@ -189,54 +190,22 @@ watch(
 );
 
 watch(
+	() => {
+		return props.graphHasLoaded;
+	},
+	() => {
+		if (props.graphHasLoaded) {
+			setHighlightedNode(props.detailNode);
+		}
+	},
+	{ immediate: true },
+);
+
+watch(
 	() => props.detailNode,
 	(detailNode) => {
-		if (!context.renderer) return;
-		// Reset all nodes first
-		context.graph.nodes().forEach((node) => {
-			context.graph.setNodeAttribute(node, "highlighted", false);
-			context.graph.setNodeAttribute(node, "labelColor", getCssVar("--foreground"));
-		});
-
-		if (detailNode) {
-			// Highlight the new detail node
-			if (!context.graph.hasNode(detailNode) && !props.isMobile) {
-				toast.warning(t("NetworkPage.warning"), {
-					description: t("NetworkPage.no-selection-node"),
-				});
-
-				state.value.selectedNodes = undefined;
-				state.value.hoveredNode = undefined;
-				state.value.hoveredNeighbors = undefined;
-
-				nodeReducer();
-				edgeReducer();
-				context.renderer?.refresh();
-				return;
-			}
-
-			context.graph.setNodeAttribute(detailNode, "highlighted", true);
-			context.graph.setNodeAttribute(detailNode, "labelColor", "#000000");
-			state.value.selectedNodes = [
-				{ id: detailNode, label: context.graph.getNodeAttribute(detailNode, "label") },
-			];
-
-			//show toast if orphan and showOrphans is false
-			if (!props.showOrphans && isOrphan(detailNode)) {
-				toast.info(t("NetworkPage.orphan-info"), {
-					description: t("NetworkPage.orphan-enable-show"),
-				});
-			}
-		} else {
-			// If the query is empty, then we reset the selectedNode
-			state.value.selectedNodes = undefined;
-		}
-
-		// Refresh rendering
-		// You can directly call `renderer.refresh()`, but if you need performances
-		// you can provide some options to the refresh method.
-		// In this case, we don't touch the graph data so we can skip its reindexation
-		context.renderer?.refresh();
+		if (props.networkContainerId === "ego-network") return;
+		setHighlightedNode(detailNode);
 	},
 	{ immediate: true, deep: true },
 );
@@ -345,6 +314,56 @@ function setHoveredNode(node?: string) {
 	}
 
 	// Refresh rendering:
+	context.renderer?.refresh();
+}
+
+function setHighlightedNode(detailNode: string | undefined) {
+	if (!context.renderer || !context.graph) return;
+
+	// Reset all nodes first
+	context.graph.nodes().forEach((node) => {
+		context.graph.setNodeAttribute(node, "highlighted", false);
+		context.graph.setNodeAttribute(node, "labelColor", getCssVar("--foreground"));
+	});
+
+	if (detailNode) {
+		// Highlight the new detail node
+		if (!context.graph.hasNode(detailNode) && !props.isMobile) {
+			toast.warning(t("NetworkPage.warning"), {
+				description: t("NetworkPage.no-selection-node"),
+			});
+
+			state.value.selectedNodes = undefined;
+			state.value.hoveredNode = undefined;
+			state.value.hoveredNeighbors = undefined;
+
+			nodeReducer();
+			edgeReducer();
+			context.renderer?.refresh();
+			return;
+		}
+
+		context.graph.setNodeAttribute(detailNode, "highlighted", true);
+		context.graph.setNodeAttribute(detailNode, "labelColor", "#000000");
+		state.value.selectedNodes = [
+			{ id: detailNode, label: context.graph.getNodeAttribute(detailNode, "label") },
+		];
+
+		//show toast if orphan and showOrphans is false
+		if (!props.showOrphans && isOrphan(detailNode)) {
+			toast.info(t("NetworkPage.orphan-info"), {
+				description: t("NetworkPage.orphan-enable-show"),
+			});
+		}
+	} else {
+		// If the query is empty, then we reset the selectedNode
+		state.value.selectedNodes = undefined;
+	}
+
+	// Refresh rendering
+	// You can directly call `renderer.refresh()`, but if you need performances
+	// you can provide some options to the refresh method.
+	// In this case, we don't touch the graph data so we can skip its reindexation
 	context.renderer?.refresh();
 }
 
