@@ -31,12 +31,14 @@ system_classes: &ref_0
   - activity
   - actor_function
   - actor_relation
+  - edition
+  - administrative_unit
   - appellation
   - artifact
-  - creation
+  - bibliography
   - event
   - feature
-  - files
+  - file
   - group
   - human_remains
   - involvement
@@ -45,7 +47,10 @@ system_classes: &ref_0
   - person
   - place
   - production
-  - references
+  - external_reference
+  - type
+  - type_tools
+  - reference_system
   - source
   - source_translation
   - stratigraphic_unit
@@ -1905,6 +1910,7 @@ collections:
                   network
                 widget: select
                 multiple: true
+                required: false
                 options: *ref_0
                 default:
                   - type
