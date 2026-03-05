@@ -2,7 +2,7 @@
 
 OpenAtlas Discovery is a presentation website for [OpenAtlas](https://openatlas.eu) projects.
 
-A demo website is deployed at <https://openatlas-discovery-demo.acdh-dev.oeaw.ac.at>.
+A demo website is deployed at <https://discovery-demo.openatlas.eu>.
 
 ## Content management (CMS)
 
