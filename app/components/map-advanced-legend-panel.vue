@@ -52,13 +52,16 @@ watch(
 	{ deep: true },
 );
 
-onMounted(() => {
-	visibleIcons.value = Object.keys(props.iconData);
-	// visibleMoves.value = Object.keys(props.moveData);
-	setTimeout(() => {
+watch(() => {
+	return props.iconData;
+}, () => {
+	if(props.iconData) {
+		visibleIcons.value = Object.keys(props.iconData);
+		setTimeout(() => {
 		return (expandedState.value = true);
 	}, 500);
-});
+	}
+})
 
 const expandedState = ref(false);
 function toggleExpandedState() {
