@@ -16,8 +16,9 @@ const toggleFullscreen = () => {
 	}
 };
 </script>
+
 <template>
-	<div class="relative h-full" ref="screenRef">
+	<div ref="screenRef" class="relative h-full">
 		<Button
 			size="icon"
 			class="absolute z-5 right-0 m-5 bg-white hover:bg-neutral-200"

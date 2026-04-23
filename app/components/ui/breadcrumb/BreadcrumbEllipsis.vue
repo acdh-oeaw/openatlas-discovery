@@ -13,7 +13,7 @@ const props = defineProps<{
 	<span
 		role="presentation"
 		aria-hidden="true"
-		:class="cn('flex h-9 w-9 items-center justify-center', props.class)"
+		:class="cn('flex size-9 items-center justify-center', props.class)"
 	>
 		<slot>
 			<EllipsisIcon class="size-4" />

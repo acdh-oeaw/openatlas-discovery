@@ -26,8 +26,8 @@ export function useGetEntity(
 		queryKey: ["entity", params, query] as const,
 		async queryFn({ queryKey, signal }) {
 			const [, params] = queryKey;
-			const typedParams: GetEntityParams = params as GetEntityParams;
-			const _typedParams: GetLinkedEntitiesParams = params as GetLinkedEntitiesParams;
+			const typedParams: GetEntityParams = params;
+			const _typedParams: GetLinkedEntitiesParams = params;
 
 			const entity = api.GET("/entity_presentation_view/{entityId}", {
 				params: {

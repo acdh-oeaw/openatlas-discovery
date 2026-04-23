@@ -93,7 +93,7 @@ const selectorsBar = computed(() => {
 
 <template>
 	<div
-		:class="cn('flex h-full w-full flex-col items-end', $attrs.class ?? '')"
+		:class="cn('flex size-full flex-col items-end', $attrs.class ?? '')"
 		:style="{ width: props.width + 'px', height: props.height + 'px' }"
 	>
 		<ChartLegend

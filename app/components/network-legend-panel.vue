@@ -133,8 +133,8 @@ watch(
 		<aside
 			:class="
 				!props.isEgoNetwork
-					? `lg:flex hidden max-h-72 overflow-y-auto overflow-x-hidden rounded-md border-transparent bg-white/90 dark:bg-neutral-900 px-4 py-2 mb-2 mr-3 text-sm shadow-md`
-					: `flex gap-2 overflow-x-auto rounded-md border-2 border-transparent bg-white/90 dark:bg-neutral-900 m-2 text-sm shadow-md`
+					? `hidden max-h-72 overflow-y-auto overflow-x-hidden rounded-md border-transparent bg-white/90 px-4 py-2 mb-2 mr-3 text-sm shadow-md lg:flex dark:bg-neutral-900`
+					: `flex gap-2 overflow-x-auto rounded-md border-2 border-transparent bg-white/90 m-2 text-sm shadow-md dark:bg-neutral-900`
 			"
 		>
 			<div v-if="!props.isEgoNetwork" class="inline-flex">

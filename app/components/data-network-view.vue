@@ -160,7 +160,7 @@ const isFullscreen = ref(false);
 			<NetworkSearchForm
 				:class="
 					project.fullscreen
-						? 'absolute z-10 bg-white/90 dark:bg-neutral-900/90 max-w-full lg:max-w-[min(800px,49%)] w-full m-3 rounded-md p-6 shadow-md'
+						? 'absolute z-10 bg-white/90 max-w-full w-full m-3 rounded-md p-6 shadow-md dark:bg-neutral-900/90 lg:max-w-[min(800px,49%)]'
 						: ''
 				"
 				:search="searchFilters.search"

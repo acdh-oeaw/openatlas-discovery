@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import * as THREE from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 const router = useRouter();
 const route = useRoute();
@@ -10,21 +10,21 @@ const route = useRoute();
 const canvasRef = ref<HTMLCanvasElement | undefined>(undefined);
 const isLoading = ref(true);
 
-let scene = new THREE.Scene();
+const scene = new THREE.Scene();
 let camera: THREE.PerspectiveCamera;
 let renderer: THREE.WebGLRenderer;
 let controls: OrbitControls;
-const placedHotspots: THREE.Mesh[] = [];
+const placedHotspots: Array<THREE.Mesh> = [];
 
 let hoveredHotspot: THREE.Mesh | null = null;
 
-type HotspotData = {
+interface HotspotData {
 	id: string;
 	position: [number, number, number];
 	entityId: string;
-};
+}
 
-const hotspotData: HotspotData[] = [];
+const hotspotData: Array<HotspotData> = [];
 const mouse = new THREE.Vector2();
 const raycaster = new THREE.Raycaster();
 
@@ -190,7 +190,7 @@ function createHotspot() {
 	return mesh;
 }
 
-function createHotspots(data: HotspotData[]) {
+function createHotspots(data: Array<HotspotData>) {
 	data.forEach((item) => {
 		const hotspot = createHotspot();
 

@@ -18,10 +18,10 @@ const props = withDefaults(
 		v-bind="props"
 		:class="[
 			cn(
-				'flex h-9 w-full items-center justify-between gap-x-1.5 rounded-md border border-input bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-sm ring-offset-background focus:ring-1 focus:ring-ring focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-muted-foreground [&>span]:min-w-0 [&>span]:truncate',
+				'flex h-9 w-full items-center justify-between gap-x-1.5 rounded-md border border-input bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-sm ring-offset-background focus:ring-1 focus:ring-ring focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 data-placeholder:text-muted-foreground [&>span]:min-w-0 [&>span]:truncate',
 				props.class,
 			),
-			props.invalid ? 'ring-2 !ring-destructive data-[placeholder]:!text-destructive' : '',
+			props.invalid ? 'ring-2 ring-destructive! data-placeholder:text-destructive!' : '',
 		]"
 	>
 		<slot />

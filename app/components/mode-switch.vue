@@ -82,10 +82,10 @@ function entityInNetwork(entity: PresentationViewModel) {
 					<div
 						:class="
 							props.currentMode === 'map'
-								? 'bg-brand/90 text-white hover:bg-brand/90 p-1.5 rounded-md'
+								? 'bg-brand/90 text-white p-1.5 rounded-md hover:bg-brand/90'
 								: !hasPlace
 									? 'rounded-md text-neutral-300 p-2'
-									: 'hover:bg-accent hover:text-accent-foreground rounded-md p-2 text-black dark:text-white'
+									: 'rounded-md p-2 text-black hover:bg-accent hover:text-accent-foreground dark:text-white'
 						"
 					>
 						<NavLink
@@ -116,10 +116,10 @@ function entityInNetwork(entity: PresentationViewModel) {
 					<div
 						:class="
 							props.currentMode === 'network'
-								? 'bg-brand/90 text-white hover:bg-brand/90 p-1.5 rounded-md'
+								? 'bg-brand/90 text-white p-1.5 rounded-md hover:bg-brand/90'
 								: !inNetwork
 									? 'rounded-md text-neutral-300 p-2'
-									: 'hover:bg-accent hover:text-accent-foreground rounded-md p-2 text-black dark:text-white'
+									: 'rounded-md p-2 text-black hover:bg-accent hover:text-accent-foreground dark:text-white'
 						"
 					>
 						<NavLink
@@ -150,8 +150,8 @@ function entityInNetwork(entity: PresentationViewModel) {
 					<div
 						:class="
 							props.currentMode === 'table'
-								? 'bg-brand/90 text-white hover:bg-brand/90 p-1.5 rounded-md'
-								: 'hover:bg-accent hover:text-accent-foreground rounded-md p-2 text-black dark:text-white'
+								? 'bg-brand/90 text-white p-1.5 rounded-md hover:bg-brand/90'
+								: 'rounded-md p-2 text-black hover:bg-accent hover:text-accent-foreground dark:text-white'
 						"
 					>
 						<NavLink

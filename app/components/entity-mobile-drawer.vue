@@ -141,7 +141,7 @@ watch(
 			class="fixed inset-x-0 bottom-0 z-100 flex h-full transform flex-col overflow-y-auto border-t bg-background shadow-lg transition-transform duration-500 ease-in-out"
 			:class="{ 'translate-y-0': !isClosed, 'translate-y-full': isClosed }"
 		>
-			<div class="inset-x-0 bottom-0 h-full w-full overflow-y-auto p-0">
+			<div class="inset-x-0 bottom-0 size-full overflow-y-auto p-0">
 				<div class="flex w-full max-w-full flex-col px-4 pt-4">
 					<div class="ml-auto flex items-center justify-between gap-2">
 						<!-- in the current mobile layout there is no mode switch because the drawer will be filling the whole page 
@@ -224,7 +224,7 @@ watch(
 								</Tooltip>
 							</TooltipProvider>
 							<Button
-								class="rounded p-2 hover:bg-gray-100"
+								class="rounded-sm p-2 hover:bg-gray-100"
 								aria-label="Close"
 								variant="transparent"
 								@click="clearSelection"

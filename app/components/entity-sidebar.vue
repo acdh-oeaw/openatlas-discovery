@@ -132,7 +132,7 @@ async function exportEntity(format: ExportEntityParams["format"], extension: str
 			"
 		>
 			<div
-				class="relative size-full max-h-full grow basis-full overflow-y-auto rounded-lg border bg-card px-6 py-4 text-card-foreground shadow"
+				class="relative size-full max-h-full grow basis-full overflow-y-auto rounded-lg border bg-card px-6 py-4 text-card-foreground shadow-sm"
 			>
 				<div class="float-right flex flex-row items-center gap-2">
 					<div class="flex flex-row items-center">

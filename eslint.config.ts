@@ -21,8 +21,8 @@ const configs = defineConfig(
 	tailwindcssConfig,
 	{
 		settings: {
-			tailwindcss: {
-				config: resolve("./app/styles/index.css"),
+			"better-tailwindcss": {
+				entryPoint: resolve("./app/styles/index.css"),
 			},
 		},
 	},
