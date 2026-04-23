@@ -32,6 +32,7 @@ const currentMode = computed(() => {
 			<DataMapView v-if="currentMode === 'map'" />
 			<DataNetworkView v-if="currentMode === 'network'" />
 			<DataView v-if="currentMode === 'table'"></DataView>
+			<DataPharmacyView v-if="currentMode === 'pharmacy'"></DataPharmacyView>
 			<DataImageView v-if="currentMode === 'images'"></DataImageView>
 		</ErrorBoundary>
 	</MainContent>

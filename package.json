@@ -4,7 +4,7 @@
 	"license": "MIT",
 	"type": "module",
 	"engines": {
-		"node": "24.x"
+		"node": "25.x"
 	},
 	"packageManager": "pnpm@10.28.0",
 	"scripts": {
@@ -82,9 +82,11 @@
 		"graphology": "^0.26.0",
 		"graphology-layout": "^0.6.1",
 		"graphology-layout-forceatlas2": "^0.10.1",
+		"lil-gui": "^0.21.0",
 		"lucide-static": "^0.555.0",
 		"lucide-vue-next": "^0.555.0",
 		"maplibre-gl": "^5.16.0",
+		"meshoptimizer": "^1.1.1",
 		"mirador": "^4.0.0",
 		"nuxt": "^4.2.1",
 		"openapi-typescript": "^7.10.1",

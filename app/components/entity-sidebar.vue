@@ -21,11 +21,15 @@ const props = defineProps<{
 	noTableSidebar: boolean;
 }>();
 
-const { data } = useGetEntity(
+const { data, isPending } = useGetEntity(
 	computed(() => {
 		return { entityId: props.id };
 	}),
 );
+
+const isLoading = computed(() => {
+	return isPending.value;
+});
 
 const entity = computed(() => {
 	return data.value;
@@ -115,7 +119,7 @@ async function exportEntity(format: ExportEntityParams["format"], extension: str
 </script>
 
 <template>
-	<div v-if="entity != null && props.id != null">
+	<div v-if="props.id != null">
 		<div
 			class="group z-20 mr-2 mb-2 flex h-full transition-all duration-300 ease-in-out"
 			:style="
@@ -217,17 +221,22 @@ async function exportEntity(format: ExportEntityParams["format"], extension: str
 						><XIcon class="size-4"></XIcon
 					></Button>
 				</div>
-				<EntityPrimaryDetails :entity="entity" @handled-relations="updateHandledRelations" />
+				<Centered v-if="isLoading" class="pointer-events-none">
+					<LoadingIndicator class="text-neutral-200" size="lg" />
+				</Centered>
+				<div v-if="entity != null && !isLoading">
+					<EntityPrimaryDetails :entity="entity" @handled-relations="updateHandledRelations" />
 
-				<slot name="custom-details" />
-				<!-- <component v-if="hasCustomDetails" v-bind:is="entityDetailsDict" bind:entity-data /> -->
+					<slot name="custom-details" />
+					<!-- <component v-if="hasCustomDetails" v-bind:is="entityDetailsDict" bind:entity-data /> -->
 
-				<EntityDetails
-					:handled-relations="handledRelations"
-					:relations="nonEmptyRelations ?? {}"
-					:entity="entity"
-					class="rounded-md border px-4 py-3 text-sm"
-				/>
+					<EntityDetails
+						:handled-relations="handledRelations"
+						:relations="nonEmptyRelations ?? {}"
+						:entity="entity"
+						class="rounded-md border px-4 py-3 text-sm"
+					/>
+				</div>
 			</div>
 			<button
 				class="absolute top-1/2 left-full -z-10 block -translate-x-2 rounded-md bg-card py-2 pl-1 shadow-md"
@@ -242,7 +251,7 @@ async function exportEntity(format: ExportEntityParams["format"], extension: str
 					class="ml-auto size-8"
 					:class="{ hidden: expandedState, block: !expandedState }"
 				/>
-				<span class="sr-only">{{ t("EntityPage.sidebar.toggle", { title: entity.title }) }}</span>
+				<span class="sr-only">{{ t("EntityPage.sidebar.toggle") }}</span>
 			</button>
 		</div>
 	</div>

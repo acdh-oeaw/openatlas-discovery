@@ -31,6 +31,10 @@ const defaultLinks = computed<
 				href: { path: "/visualization", query: { mode: "table" } },
 				label: t("AppHeader.links.data"),
 			},
+			pharmacy: {
+				href: { path: "/visualization", query: { mode: "pharmacy" } },
+				label: t("AppHeader.links.pharmacy"),
+			},
 			team: { href: { path: "/team" }, label: t("AppHeader.links.team") },
 		};
 	}
