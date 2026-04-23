@@ -64,7 +64,7 @@ onMounted(() => {
 	 */
 	// Base camera
 	camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100);
-	camera.position.set(-4.09, 2.79, -1.14);
+	camera.position.set(-4.09, 3.36, -1.14); // 2.79
 	scene.add(camera);
 
 	// Load Model

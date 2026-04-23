@@ -20,13 +20,13 @@ const toggleFullscreen = () => {
 	<div class="relative h-full" ref="screenRef">
 		<Button
 			size="icon"
-			class="absolute z-5 m-5 bg-white hover:bg-neutral-200"
+			class="absolute z-5 right-0 m-5 bg-white hover:bg-neutral-200"
 			@click="toggleFullscreen"
 		>
 			<ExpandIcon v-if="!isFullscreen" class="text-black/90" />
 			<ShrinkIcon v-else class="text-black/90" />
 		</Button>
-		<VisualisationContainer id="network-view" v-slot="{ height, width }">
+		<VisualisationContainer v-slot="{ height, width }">
 			<PharmacyViewer v-if="height && width" />
 		</VisualisationContainer>
 	</div>
