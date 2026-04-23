@@ -30,11 +30,15 @@ const emit = defineEmits<{
 	"update:open": [value: boolean];
 }>();
 
-const { data } = useGetEntity(
+const { data, isPending } = useGetEntity(
 	computed(() => {
 		return { entityId: props.id };
 	}),
 );
+
+const isLoading = computed(() => {
+	return isPending.value;
+});
 
 const entity = computed(() => {
 	return data.value;
@@ -230,22 +234,27 @@ watch(
 						</div>
 					</div>
 
-					<!-- Entity Content -->
-					<EntityPrimaryDetails
-						v-if="entity"
-						:entity="entity"
-						@handled-relations="updateHandledRelations"
-					/>
+					<Centered v-if="isLoading" class="pointer-events-none">
+						<LoadingIndicator class="text-neutral-200" size="lg" />
+					</Centered>
+					<div v-if="entity != null && !isLoading">
+						<!-- Entity Content -->
+						<EntityPrimaryDetails
+							v-if="entity"
+							:entity="entity"
+							@handled-relations="updateHandledRelations"
+						/>
 
-					<slot name="custom-details" />
+						<slot name="custom-details" />
 
-					<EntityDetails
-						v-if="entity"
-						:handled-relations="handledRelations"
-						:relations="nonEmptyRelations ?? {}"
-						:entity="entity"
-						class="rounded-md border px-4 py-3 text-sm"
-					/>
+						<EntityDetails
+							v-if="entity"
+							:handled-relations="handledRelations"
+							:relations="nonEmptyRelations ?? {}"
+							:entity="entity"
+							class="rounded-md border px-4 py-3 text-sm"
+						/>
+					</div>
 				</div>
 			</div>
 		</div>
