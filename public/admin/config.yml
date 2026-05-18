@@ -37,7 +37,7 @@ system_classes: &ref_0
   - bibliography
   - event
   - feature
-  - file
+  - files
   - group
   - human_remains
   - involvement
@@ -46,10 +46,10 @@ system_classes: &ref_0
   - person
   - place
   - production
-  - external_reference
+  - externalReferenceSystems
   - type
   - type_tools
-  - reference_system
+  - references
   - source
   - source_translation
   - stratigraphic_unit
