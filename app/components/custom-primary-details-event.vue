@@ -8,7 +8,7 @@ const t = useTranslations();
 const props = defineProps<{ entity: PresentationViewModel }>();
 const route = useRoute();
 
-const previousFeature = computed(() => {
+const nextFeature = computed(() => {
 	const movement = props.entity.relations?.activity
 		?.concat(props.entity.relations.move ?? [])
 		.find((rel) => {
@@ -26,14 +26,17 @@ const previousFeature = computed(() => {
 	return null;
 });
 
-const nextFeature = computed(() => {
+const previousFeature = computed(() => {
 	const movement = props.entity.relations?.activity
 		?.concat(props.entity.relations.move ?? [])
 		.find((rel) => {
 			return rel?.relationTypes?.find((type) => {
-				return type?.property === "crm:P134i_was_continued_by";
+				return (
+					type?.property === "crm:P134i_was_continued_by" && type.relationTo === props.entity.id
+				);
 			});
 		});
+
 	if (movement)
 		return {
 			id: movement.id,
