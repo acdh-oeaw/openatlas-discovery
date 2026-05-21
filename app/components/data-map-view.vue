@@ -274,6 +274,43 @@ function extractRenderPoint(
 	return null;
 }
 
+// Icon handling
+const iconCoordinateSet = computed(() => {
+	const set = new Set<string>();
+
+	for (const f of features.value) {
+		if (!f.properties.isIcon) continue;
+
+		if (f.geometry.type === "Point") {
+			set.add(f.geometry.coordinates.join(","));
+		}
+
+		if (f.geometry.type === "GeometryCollection") {
+			for (const g of f.geometry.geometries) {
+				if (g.type === "Point") {
+					set.add(g.coordinates.join(","));
+				}
+			}
+		}
+	}
+
+	return set;
+});
+
+function isHiddenByIcon(feature: GeoJsonFeature): boolean {
+	if (feature.geometry.type === "Point") {
+		return iconCoordinateSet.value.has(feature.geometry.coordinates.join(","));
+	}
+
+	if (feature.geometry.type === "GeometryCollection") {
+		return feature.geometry.geometries
+			.filter((g) => g.type === "Point")
+			.some((g) => iconCoordinateSet.value.has(g.coordinates.join(",")));
+	}
+
+	return false;
+}
+
 const movements = computed(() => {
 	const move = entities.value
 		.filter((move) => {
@@ -344,7 +381,8 @@ const movements = computed(() => {
 			feature.properties.isDisplayed =
 				customConfig[1].entityType in filteredCustomMoveEntries.value;
 		} else {
-			feature.properties.isDisplayed = (-1) in filteredCustomMoveEntries.value;
+			feature.properties.isDisplayed =
+				(-1) in filteredCustomMoveEntries.value && !isHiddenByIcon(feature);
 		}
 		return feature;
 	});
@@ -368,7 +406,7 @@ const events = computed(() => {
 				feature.properties.color = customConfig[1].color;
 			}
 
-			feature.properties.isDisplayed = true;
+			feature.properties.isDisplayed = !isHiddenByIcon(feature);
 
 			return feature;
 		})
