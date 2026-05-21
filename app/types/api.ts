@@ -62,3 +62,8 @@ export interface CustomMapLegendEntry {
 	color?: string;
 	entities: Array<GeoJsonFeature>;
 }
+
+export type GeometryCollectionPoint = Extract<
+	components["schemas"]["GeometryCollection"]["geometries"][number],
+	{ type: "Point" }
+>;

@@ -9,8 +9,8 @@ import MapAdvancedLegendPanel from "@/components/map-advanced-legend-panel.vue";
 import type { SearchFormData } from "@/components/search-form.vue";
 import type { EntityFeature } from "@/composables/use-create-entity";
 import { categories, operatorMap } from "@/composables/use-get-search-results";
-import type { CustomMapLegendEntry } from "@/types/api";
-import type { GeoJsonFeature } from "@/utils/create-geojson-feature";
+import type { CustomMapLegendEntry, GeometryCollectionPoint } from "@/types/api";
+import type { CustomGeoJsonFeature, GeoJsonFeature } from "@/utils/create-geojson-feature";
 
 import { project } from "../config/project.config";
 
@@ -147,98 +147,132 @@ const mode = computed(() => {
  */
 const features = computed(() => {
 	const mappedFeatures = entities.value
-		.filter((entity) => {
-			if (!entity.geometry) return false;
-
-			return entity.geometry;
-		})
 		.map((entity) => {
-			const feature = createGeoJsonFeature(entity);
+			const customConfig = Object.entries(project.map.customIconConfig).findLast(([, cfg]) =>
+				entity.types?.some(
+					(type) => getUnprefixedId(type.identifier ?? "") === String(cfg.entityType),
+				),
+			);
 
-			const customConfig = Object.entries(project.map.customIconConfig).findLast((entry) => {
-				return entity.types?.find((type) => {
-					return getUnprefixedId(type.identifier ?? "") === String(entry[1].entityType);
-				});
-			});
-			if (customConfig != null) {
+			const feature = extractRenderPoint(entity, customConfig != null);
+
+			if (!feature) return null;
+
+			if (customConfig) {
 				feature.properties.color = customConfig[1].color;
 				feature.properties.size = 10;
 				feature.properties.isIcon = true;
-				feature.properties.isDisplayed = true;
 			}
+
 			return feature;
-		});
+		})
+		.filter(Boolean) as Array<CustomGeoJsonFeature>;
 
-	mappedFeatures.forEach((feature, index, self) => {
-		let foundIcon;
+	mappedFeatures.forEach((feature, featureIdx, self) => {
+		let foundIcon = false;
 
-		// For GeometryCollections such as areas
 		if (feature.geometry.type === "GeometryCollection") {
 			feature.geometry.geometries.forEach((geo) => {
-				if (geo.type === "Polygon" && "shapeType" in geo)
+				if (geo.type === "Polygon" && "shapeType" in geo) {
 					feature.properties.shapeType = geo.shapeType;
+				}
+
 				if (geo.type !== "Point") return;
+
 				const coords = geo.coordinates.join(",");
-				const matchingCoordinatesFeatures = self.filter((f) => {
-					if (f.geometry.type !== "Point") return false;
-					return f.geometry.coordinates.join(",") === coords;
+
+				const matchingPointFeatures = self.filter((f) => {
+					return f.geometry.type === "Point" && f.geometry.coordinates.join(",") === coords;
 				});
+
 				if (
-					matchingCoordinatesFeatures.some((f) => {
+					matchingPointFeatures.some((f) => {
 						return f.properties.isIcon;
 					})
-				)
+				) {
 					foundIcon = true;
+				}
 			});
 		}
 
-		// For single points
 		if (feature.geometry.type === "Point") {
 			const coords = feature.geometry.coordinates.join(",");
-			const matchingCoordinatesFeatures = self.filter((f) => {
-				if (f.geometry.type !== "Point") return false;
-				return f.geometry.coordinates.join(",") === coords;
+
+			const matchingPointFeatures = self.filter((f) => {
+				return f.geometry.type === "Point" && f.geometry.coordinates.join(",") === coords;
 			});
-			foundIcon = matchingCoordinatesFeatures.some((f) => {
-				return f.properties.isIcon;
+
+			foundIcon = matchingPointFeatures.some((f) => {
+				return f.properties.isIcon && f.properties._id !== feature.properties._id;
 			});
 		}
 
-		if (foundIcon) {
-			feature.properties.isDisplayed = false;
-		} else {
-			feature.properties.isDisplayed = true;
-		}
+		feature.properties.isDisplayed = !foundIcon;
 	});
 
-	//find other features with the same polygons to prevent overlapping
 	mappedFeatures.forEach((feature, featureIdx) => {
-		if (feature.geometry.type === "GeometryCollection") {
-			const foundIdx = mappedFeatures.findIndex((f) => {
-				//if (f.properties._id == feature.properties._id) return false;
-				if (f.geometry.type === "GeometryCollection") {
-					return f.geometry.geometries.some((geo) => {
-						assert(feature.geometry.type === "GeometryCollection", "1");
-						return (
-							geo.type === "Polygon" &&
-							feature.geometry.geometries.find((g) => {
-								return (
-									g.type === "Polygon" && g.coordinates.join(",") === geo.coordinates.join(",")
-								);
-							})
-						);
-					});
-				}
-				return false;
+		if (feature.geometry.type !== "GeometryCollection") return;
+
+		const foundIdx = mappedFeatures.findIndex((f) => {
+			if (f.geometry.type !== "GeometryCollection") return false;
+
+			return f.geometry.geometries.some((geo) => {
+				return (
+					geo.type === "Polygon" &&
+					feature.geometry.geometries.find((g) => {
+						return g.type === "Polygon" && g.coordinates.join(",") === geo.coordinates.join(",");
+					})
+				);
 			});
-			if (foundIdx !== featureIdx) {
-				feature.properties.isDisplayed = false;
-			} else feature.properties.isDisplayed = true;
+		});
+
+		if (foundIdx !== featureIdx) {
+			feature.properties.isDisplayed = false;
 		}
 	});
 
 	return mappedFeatures;
 });
+
+function extractRenderPoint(
+	entity: EntityFeature,
+	convertGeometryCollectionToPoint = false,
+): CustomGeoJsonFeature | null {
+	if (!entity.geometry) {
+		return null;
+	}
+
+	if (entity.geometry.type === "Point") {
+		return createGeoJsonFeature(entity);
+	}
+
+	if (entity.geometry.type === "GeometryCollection") {
+		if (!convertGeometryCollectionToPoint) {
+			return createGeoJsonFeature(entity);
+		}
+
+		const centerpoint = entity.geometry.geometries.find(
+			(g): g is GeometryCollectionPoint =>
+				g.type === "Point" &&
+				g.shapeType === "centerpoint" &&
+				!g.title?.includes("(autogenerated)"),
+		);
+
+		if (!centerpoint) {
+			return createGeoJsonFeature(entity);
+		}
+
+		return createGeoJsonFeature({
+			...entity,
+			geometry: {
+				type: "Point",
+				coordinates: centerpoint.coordinates,
+			},
+		});
+	}
+
+	return null;
+}
 
 const movements = computed(() => {
 	const move = entities.value
@@ -317,109 +351,39 @@ const movements = computed(() => {
 });
 
 const events = computed(() => {
-	const event = entities.value
-		.filter((event) => {
-			return event.viewClass === "event";
-		})
-		.filter((feature) => {
-			return feature.geometry && "geometries" in feature.geometry;
-		})
-		.filter((feature) => {
-			return !feature.types?.find((type) => {
-				return project.map.customIconConfig.find((config) => {
-					return String(config.entityType) === getUnprefixedId(type.identifier ?? "");
-				});
-			});
-		})
-		.map((feature) => {
-			assert(feature.geometry, "Feature has no geometry");
-			assert("geometries" in feature.geometry, "Feature has no geometries");
-			const featureClone = {
-				...feature,
-				geometry: {
-					...feature.geometry,
-					geometries: feature.geometry.geometries.filter((geo) => {
-						return (
-							geo.type === "Point" &&
-							geo.shapeType === "centerpoint" &&
-							!geo.title?.includes("(autogenerated)")
-						);
-					}),
-				},
-			};
-			return featureClone;
-		});
+	return entities.value
+		.filter((e) => e.viewClass === "event")
+		.map((entity) => {
+			const feature = extractRenderPoint(entity);
+			if (!feature) return null;
 
-	const mappedEvents = event.map((entity) => {
-		const feature = createGeoJsonFeature(entity);
-		const customConfig = Object.entries(project.map.customMovementConfig.colorConfig).findLast(
-			(entry) => {
-				return entity.types?.find((type) => {
-					return getUnprefixedId(type.identifier ?? "") === String(entry[1].entityType);
-				});
-			},
-		);
-		if (customConfig != null) {
-			feature.properties.color = customConfig[1].color;
-		}
-		return feature;
-	});
-	mappedEvents.forEach((feature) => {
-		if (feature.geometry.type !== "GeometryCollection") {
-			return;
-		}
-		const eventPoint = feature.geometry.geometries[0];
-		if (!eventPoint || eventPoint.type !== "Point") return;
-		const coords = eventPoint.coordinates.join(",");
+			const customConfig = Object.entries(project.map.customMovementConfig.colorConfig).findLast(
+				([, cfg]) =>
+					entity.types?.some(
+						(type) => getUnprefixedId(type.identifier ?? "") === String(cfg.entityType),
+					),
+			);
 
-		const matchingCoordinatesFeatures = features.value.filter((f) => {
-			if (f.geometry.type !== "Point") return false;
-			return f.geometry.coordinates.join(",") === coords;
-		});
+			if (customConfig) {
+				feature.properties.color = customConfig[1].color;
+			}
 
-		const foundIcon = matchingCoordinatesFeatures.some((f) => {
-			return f.properties.isIcon;
-		});
-
-		if (foundIcon) {
-			feature.properties.isDisplayed = false;
-		} else {
 			feature.properties.isDisplayed = true;
-		}
 
-		const matchingCoordinatesEvents = mappedEvents.filter((e) => {
-			if (e.geometry.type !== "GeometryCollection" || e.properties._id === feature.properties._id)
-				return false;
-			return e.geometry.geometries.find((g) => {
-				return (
-					g.type === "Point" &&
-					"geometries" in feature.geometry &&
-					feature.geometry.geometries.find((geo) => {
-						if ("coordinates" in geo) return g.coordinates.join(",") === geo.coordinates.join(",");
-						return false;
-					})
-				);
-			});
-		});
-
-		feature.properties.otherFeatures = matchingCoordinatesEvents.map((f) => {
-			return f.properties._id;
-		});
-	});
-	return mappedEvents.toSorted((a, b) => {
-		return Number(Boolean(b.properties.color)) - Number(Boolean(a.properties.color));
-	});
+			return feature;
+		})
+		.filter(Boolean) as Array<GeoJsonFeature>;
 });
 
 const centerpoints = computed(() => {
 	return features.value.filter((centerpoint) => {
-		return centerpoint.geometry.type === "GeometryCollection";
+		return centerpoint.geometry != null && centerpoint.geometry.type === "GeometryCollection";
 	});
 });
 
 const points = computed(() => {
 	return features.value.filter((point) => {
-		return point.geometry.type === "Point";
+		return point.geometry != null && point.geometry?.type === "Point";
 	});
 });
 
@@ -522,7 +486,6 @@ function setCoordinates(entity: EntityFeature, coordinates: Ref<[number, number]
 watchEffect(() => {
 	const showOnMap = detailOnMap.value; // forces dependency tracking
 	if (mode.value && selection.value) {
-		// console.log("mode & selection set", selection.value);
 		const entity = entities.value.find((feature) => {
 			const id = getUnprefixedId(feature["@id"]);
 			return id === selection.value;
@@ -593,7 +556,6 @@ const linkedMovements = computed(() => {
 		currentMovement = currentMovement.children[0];
 	}
 
-	// Now map through the features to get the IDs
 	return features.map((movement) => {
 		return {
 			id: String(movement.id),
@@ -614,45 +576,43 @@ function setMovementId({ id }: { id: string | null }) {
 
 const customIconEntries = computed(() => {
 	const entries: Record<string, CustomMapLegendEntry> = {};
+
 	entities.value.forEach((entity) => {
 		const foundType = entity.types?.findLast((type) => {
 			return project.map.customIconConfig.find((config) => {
 				return String(config.entityType) === getUnprefixedId(type.identifier ?? "");
 			});
 		});
-		const unprefixedType = getUnprefixedId(foundType?.identifier ?? "");
-		if (foundType) {
-			if (!(unprefixedType in entries)) {
-				const configEntry = project.map.customIconConfig.find((config) => {
-					return String(config.entityType) === unprefixedType;
-				});
-				const customEntry: CustomMapLegendEntry = {
-					type: foundType,
-					icon: configEntry?.iconName,
-					color: configEntry?.color,
-					entities: [],
-				};
-				entries[unprefixedType] = customEntry;
-			}
-			if (entity.geometry) {
-				const feature = createGeoJsonFeature(entity);
-				const customConfig = Object.entries(project.map.customIconConfig).findLast((entry) => {
-					return entity.types?.find((type) => {
-						return getUnprefixedId(type.identifier ?? "") === String(entry[1].entityType);
-					});
-				});
-				if (customConfig != null) {
-					feature.properties.color = customConfig[1].color;
-					feature.properties.size = 10;
-					feature.properties.isIcon = true;
-				}
 
-				entries[unprefixedType]?.entities.push(feature);
-			}
+		if (!foundType) return;
+
+		const unprefixedType = getUnprefixedId(foundType.identifier ?? "");
+
+		if (!(unprefixedType in entries)) {
+			const configEntry = project.map.customIconConfig.find((config) => {
+				return String(config.entityType) === unprefixedType;
+			});
+
+			entries[unprefixedType] = {
+				type: foundType,
+				icon: configEntry?.iconName,
+				color: configEntry?.color,
+				entities: [],
+			};
 		}
+
+		const processedFeature = features.value.find((feature) => {
+			return feature.properties._id === entity.properties._id;
+		});
+
+		if (!processedFeature) return;
+
+		entries[unprefixedType]?.entities.push(processedFeature);
 	});
+
 	return entries;
 });
+
 const customMovementEntries = computed(() => {
 	const result: Record<string, CustomMapLegendEntry> = {};
 	project.map.customMovementConfig.colorConfig.forEach((config) => {

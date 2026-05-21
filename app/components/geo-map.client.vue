@@ -765,7 +765,7 @@ function updatePolygons() {
 			source: sourcePolygonsId,
 			paint: {
 				"fill-color": colors.areaCenterPoints,
-				"fill-opacity": ["case", ["==", ["get", "isDisplayed"], false], 0, 0.35],
+				"fill-opacity": 0.35,
 			},
 		});
 
