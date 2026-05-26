@@ -210,25 +210,31 @@ const features = computed(() => {
 		feature.properties.isDisplayed = !foundIcon;
 	});
 
-	mappedFeatures.forEach((feature, featureIdx) => {
+	const seenPolygons = new Set<string>();
+
+	mappedFeatures.forEach((feature) => {
 		if (feature.geometry.type !== "GeometryCollection") return;
 
-		const foundIdx = mappedFeatures.findIndex((f) => {
-			if (f.geometry.type !== "GeometryCollection") return false;
+		const polygons = feature.geometry.geometries.filter(
+			(g): g is Extract<typeof g, { type: "Polygon" }> => g.type === "Polygon",
+		);
 
-			return f.geometry.geometries.some((geo) => {
-				return (
-					geo.type === "Polygon" &&
-					feature.geometry.geometries.find((g) => {
-						return g.type === "Polygon" && g.coordinates.join(",") === geo.coordinates.join(",");
-					})
-				);
-			});
+		if (polygons.length === 0) return;
+
+		// Polygon Handling
+		const hasUniquePolygon = polygons.some((polygon) => {
+			// normalize coordinates
+			const key = JSON.stringify(polygon.coordinates);
+
+			if (seenPolygons.has(key)) {
+				return false;
+			}
+
+			seenPolygons.add(key);
+			return true;
 		});
 
-		if (foundIdx !== featureIdx) {
-			feature.properties.isDisplayed = false;
-		}
+		feature.properties.isDisplayed = hasUniquePolygon;
 	});
 
 	return mappedFeatures;

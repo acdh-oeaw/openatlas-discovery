@@ -765,7 +765,7 @@ function updatePolygons() {
 			source: sourcePolygonsId,
 			paint: {
 				"fill-color": colors.areaCenterPoints,
-				"fill-opacity": 0.35,
+				"fill-opacity": ["case", ["==", ["get", "isDisplayed"], false], 0, 0.35],
 			},
 		});
 
@@ -776,12 +776,19 @@ function updatePolygons() {
 			source: sourcePolygonsId,
 			paint: {
 				"line-color": colors.areaCenterPoints,
-				"line-opacity": 0.35,
+				"line-opacity": ["case", ["==", ["get", "isDisplayed"], false], 0, 0.35],
 				"line-width": 5,
 			},
 		});
 
-		context.map.moveLayer("polygons", "points");
+		if (
+			context.map.getLayer("polygons") &&
+			context.map.getLayer("points") &&
+			context.map.getLayer("polygon-lines")
+		) {
+			context.map.moveLayer("polygons", "points");
+			context.map.moveLayer("polygon-lines", "polygons");
+		}
 	} else {
 		polygonOverlay.value.finalize();
 		context.map.removeControl(polygonOverlay.value);
