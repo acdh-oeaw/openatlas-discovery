@@ -15,6 +15,7 @@ export interface CustomGeoJsonFeature extends GeoJsonFeature {
 		size?: number;
 		isIcon?: boolean;
 		isDisplayed?: boolean;
+		isPolygonDisplayed?: boolean;
 		otherFeatures?: Array<string>;
 		shapeType?: string;
 		types?: Array<NonNullable<EntityFeature["types"]>[0]>;

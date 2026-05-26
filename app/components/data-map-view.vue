@@ -234,7 +234,7 @@ const features = computed(() => {
 			return true;
 		});
 
-		feature.properties.isDisplayed = hasUniquePolygon;
+		feature.properties.isPolygonDisplayed = hasUniquePolygon;
 	});
 
 	return mappedFeatures;
