@@ -115,23 +115,6 @@ As a (currently semi, as data is still being fetched from the API) static websit
 pnpm run generate
 ```
 
-At the moment this will be stuck after the nuxt generate step for about 15 minutes, despite having
-finished generating successfully. So alternatively you can run the following command to generate the
-static files:
-
-```bash
-pnpm run generate:server
-```
-
-Once it says `✔ You can now deploy .output/public to any static hosting!` you can stop the process.
-
-Then, run the following command to generate the `index.html` to fix the current issue of the index
-page not being generated when using nuxt/i18n:
-
-```bash
-pnpm run generate:reroute-index
-```
-
 Now you can deploy the static files to a web server. The generated files are in the
 `.output/public/` directory.
 
@@ -140,21 +123,31 @@ host configuration for permalinks to work. Adapt as needed.
 
 ```bash
 <VirtualHost *:443>
+
         ...
-        <IfModule mod_rewrite.c>
-                # Already localized? do nothing
-                RewriteCond %{REQUEST_URI} ^/(en|de)(/|$) [NC]
+
+        <Directory /var/www/...>
+                Options +FollowSymLinks -MultiViews -Indexes
+                AllowOverride None
+                Require all granted
+
+                RewriteEngine On
+
+                RewriteRule ^/?$ /en/ [R=302,L]
+                RewriteRule ^/?entity/([0-9]+)$ /en/entity/$1 [R=302,L]
+
+                RewriteCond %{REQUEST_FILENAME} -f [OR]
+                RewriteCond %{REQUEST_FILENAME} -d
                 RewriteRule ^ - [L]
 
-                # Bypass static & API
-                RewriteCond %{REQUEST_URI} ^/(assets|dist|_nuxt|static|img|images|css|js|fonts|favicon\.ico|robots\.txt|sitemap\.xml|api)(/|$) [NC]
-                RewriteRule ^ - [L]
+                RewriteCond %{REQUEST_URI} \.(js|json|css|png|jpg|jpeg|gif|ico|svg|woff2?)$ [NC]
+                RewriteRule ^ - [R=404,L]
 
-                # Fallback to English
-                RewriteCond %{REQUEST_URI} ^/entity/([0-9]+)$
-                RewriteRule ^/entity/([0-9]+)$ /en/entity/%1 [R=302,L,QSA]
-        </IfModule>
-        ...
+                RewriteRule ^ /200.html [L]
+        </Directory>
+
+				...
+
 </VirtualHost>
 ```
 

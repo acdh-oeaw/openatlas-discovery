@@ -93,10 +93,16 @@ export default defineNuxtConfig({
 		"@nuxtjs/i18n",
 		"@vueuse/nuxt",
 	],
+	routeRules: {
+		"/en/entity/**": { ssr: false, prerender: false },
+		"/de/entity/**": { ssr: false, prerender: false },
+		"/entity/**": { ssr: false, prerender: false },
+	},
 	nitro: {
 		compressPublicAssets: true,
 		prerender: {
 			crawlLinks: true,
+			ignore: ["/en/entity", "/de/entity", "/entity"],
 			routes: ["/manifest.webmanifest", "/robots.txt", "/sitemap.xml"],
 		},
 	},
