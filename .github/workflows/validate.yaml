@@ -37,6 +37,8 @@ jobs:
     name: Validate
     needs: [changes]
     if: ${{ needs.changes.outputs.src == 'true' }}
+    environment:
+      name: ${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'development' }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
 

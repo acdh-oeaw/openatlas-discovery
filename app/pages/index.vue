@@ -201,49 +201,49 @@ const currentMode = computed(() => {
 								</div>
 							</div>
 							<div class="min-w-0">
-							<Carousel
-								:opts="{ loop: true }"
-								:plugins="[
-									Autoplay({
-										delay: 5000,
-										stopOnMouseEnter: true,
-										stopOnFocusIn: true,
-										stopOnInteraction: false,
-									}),
-								]"
-								class="relative flex h-100 w-full lg:size-full"
-							>
-								<CarouselPrevious
-									aria-label="Previous slide"
-									class="z-20 ml-14 bg-white opacity-90 dark:bg-black"
-								/>
-								<CarouselContent class="size-full">
-									<CarouselItem v-for="(image, index) of images" :key="index" class="">
-										<Card class="relative flex size-full">
-											<figure class="relative grid size-full grid-rows-[1fr_auto] gap-y-1.5">
-												<div class="relative flex size-full">
-													<img alt="" class="absolute size-full object-cover" :src="image.url" />
-												</div>
-												<figcaption class="grid w-full grid-rows-2 place-items-center text-sm">
-													<div>{{ image.license }}</div>
-													<NavLink
-														class="flex items-center text-center underline decoration-dotted transition hover:no-underline focus-visible:no-underline"
-														:external="true"
-														:href="image.link"
-														>{{ image.link }}</NavLink
-													>
-												</figcaption>
-											</figure>
-										</Card>
-									</CarouselItem>
-								</CarouselContent>
-								<CarouselNext
-									v-if="images.length > 1"
-									aria-label="Next slide"
-									class="z-20 mr-14 bg-white opacity-90 dark:bg-black"
-								/>
-							</Carousel>
-						</div>
+								<Carousel
+									:opts="{ loop: true }"
+									:plugins="[
+										Autoplay({
+											delay: 5000,
+											stopOnMouseEnter: true,
+											stopOnFocusIn: true,
+											stopOnInteraction: false,
+										}),
+									]"
+									class="relative flex h-100 w-full lg:size-full"
+								>
+									<CarouselPrevious
+										aria-label="Previous slide"
+										class="z-20 ml-14 bg-white opacity-90 dark:bg-black"
+									/>
+									<CarouselContent class="size-full">
+										<CarouselItem v-for="(image, index) of images" :key="index" class="">
+											<Card class="relative flex size-full">
+												<figure class="relative grid size-full grid-rows-[1fr_auto] gap-y-1.5">
+													<div class="relative flex size-full">
+														<img alt="" class="absolute size-full object-cover" :src="image.url" />
+													</div>
+													<figcaption class="grid w-full grid-rows-2 place-items-center text-sm">
+														<div>{{ image.license }}</div>
+														<NavLink
+															class="flex items-center text-center underline decoration-dotted transition hover:no-underline focus-visible:no-underline"
+															:external="true"
+															:href="image.link"
+															>{{ image.link }}</NavLink
+														>
+													</figcaption>
+												</figure>
+											</Card>
+										</CarouselItem>
+									</CarouselContent>
+									<CarouselNext
+										v-if="images.length > 1"
+										aria-label="Next slide"
+										class="z-20 mr-14 bg-white opacity-90 dark:bg-black"
+									/>
+								</Carousel>
+							</div>
 						</div>
 					</div>
 				</div>
