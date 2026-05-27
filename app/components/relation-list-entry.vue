@@ -121,8 +121,8 @@ function getPropertyTranslation(property: string) {
 
 const dateSpan = computed(() => {
 	const span: { start?: string; end?: string } = {
-		start: createDateSpan(props.relation.when.start),
-		end: createDateSpan(props.relation.when.end),
+		start: createDateSpan(props.relation.when!.start),
+		end: createDateSpan(props.relation.when!.end),
 	};
 	if (span.start === span.end) delete span.end;
 	return span;
