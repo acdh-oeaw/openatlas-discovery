@@ -14,7 +14,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-	<div class="absolute right-0 bottom-0 z-10 mb-2 flex hidden w-full justify-center lg:flex">
+	<div class="absolute right-0 bottom-0 z-10 mb-2 hidden w-full justify-center lg:flex">
 		<div
 			class="max-h-72 gap-2 overflow-x-hidden overflow-y-auto rounded-md border-2 border-transparent bg-white/90 p-2 text-sm font-medium shadow-md dark:bg-neutral-900"
 		>

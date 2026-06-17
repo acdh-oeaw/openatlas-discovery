@@ -139,8 +139,8 @@ const sourceAccordionOpen = ref(false);
 			class="mr-1 inline size-5 pb-1"
 			:class="related.length > 1 ? 'mt-2 self-start' : ''"
 		/>
-		<div class="grid flex-[2] grid-cols-[auto_1fr] items-center gap-2">
-			<span class="grid grid-rows-2 data-[oneRow]:grid-rows-1" :data-oneRow="type === null">
+		<div class="grid flex-2 grid-cols-[auto_1fr] items-center gap-2">
+			<span class="grid grid-rows-2 data-oneRow:grid-rows-1" :data-oneRow="type === null">
 				<NavLink
 					class="underline decoration-dotted hover:no-underline"
 					:href="{
@@ -164,7 +164,7 @@ const sourceAccordionOpen = ref(false);
 							<Tooltip>
 								<TooltipTrigger
 									class="inline-flex items-center hover:text-neutral-1000 dark:hover:text-neutral-0"
-									><span class="!text-muted-foreground">| </span>
+									><span class="text-muted-foreground!">| </span>
 									<ClockIcon class="ml-1 size-3"></ClockIcon
 									><span class="sr-only">{{ t("EntityPage.dateSpan-to") }}</span></TooltipTrigger
 								>

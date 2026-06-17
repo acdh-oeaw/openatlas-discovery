@@ -46,7 +46,7 @@ function onClickControls(
 				</Button>
 			</PopoverTrigger>
 
-			<PopoverContent class="content-fit mr-2 space-y-2 p-2">
+			<PopoverContent class="size-fit mr-2 space-y-2 p-2">
 				<Button
 					variant="ghost"
 					size="icon"

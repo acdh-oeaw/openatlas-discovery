@@ -220,7 +220,7 @@ watch(
 								</Tooltip>
 							</TooltipProvider>
 							<Button
-								class="rounded p-2 hover:bg-gray-100"
+								class="rounded-sm p-2 hover:bg-gray-100"
 								aria-label="Close"
 								variant="transparent"
 								@click="clearSelection"

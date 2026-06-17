@@ -117,7 +117,7 @@ function toggleExpandedState() {
 										:style="{
 											'--customColor': entry.color,
 										}"
-										class="mr-2 size-6 scale-[0.7] text-[var(--customColor)] group-hover:text-primary-foreground group-data-[state=on]:text-primary-foreground dark:text-white dark:group-hover:text-white dark:group-data-[state=on]:text-white"
+										class="mr-2 size-6 scale-[0.7] text-(--customColor) group-hover:text-primary-foreground dark:text-white dark:group-hover:text-white dark:group-data-[state=on]:text-white group-data-[state=on]:text-primary-foreground"
 										v-html="LucideIcons[entry.icon.replaceAll('-', '') as keyof typeof LucideIcons]"
 									></div>
 									<span
@@ -149,7 +149,7 @@ function toggleExpandedState() {
 										:style="{
 											'--customColor': entry.color,
 										}"
-										:class="`size-6 scale-[0.7] text-[var(--customColor)] group-hover:text-primary-foreground group-data-[state=on]:text-primary-foreground dark:text-white dark:group-data-[state=on]:text-white dark:group-hover:text-white`"
+										:class="`size-6 scale-[0.7] text-(--customColor) group-hover:text-primary-foreground dark:text-white dark:group-hover:text-white dark:group-data-[state=on]:text-white group-data-[state=on]:text-primary-foreground`"
 									></SplineIcon>
 									<span
 										>{{ entry.type?.label
@@ -210,7 +210,7 @@ function toggleExpandedState() {
 												:style="{
 													'--customColor': entry.color,
 												}"
-												class="mr-2 size-6 scale-[0.7] text-[var(--customColor)] group-hover:text-primary-foreground group-data-[state=on]:text-primary-foreground dark:text-white dark:group-hover:text-white dark:group-data-[state=on]:text-white"
+												class="mr-2 size-6 scale-[0.7] text-(--customColor) group-hover:text-primary-foreground dark:text-white dark:group-hover:text-white dark:group-data-[state=on]:text-white group-data-[state=on]:text-primary-foreground"
 												v-html="
 													LucideIcons[entry.icon.replaceAll('-', '') as keyof typeof LucideIcons]
 												"
@@ -244,7 +244,7 @@ function toggleExpandedState() {
 												:style="{
 													'--customColor': entry.color,
 												}"
-												:class="`size-6 scale-[0.7] text-[var(--customColor)] group-hover:text-primary-foreground group-data-[state=on]:text-primary-foreground dark:text-white dark:group-data-[state=on]:text-white dark:group-hover:text-white`"
+												:class="`size-6 scale-[0.7] text-(--customColor) group-hover:text-primary-foreground dark:text-white dark:group-hover:text-white dark:group-data-[state=on]:text-white group-data-[state=on]:text-primary-foreground`"
 											></SplineIcon>
 											<span
 												>{{ entry.type?.label

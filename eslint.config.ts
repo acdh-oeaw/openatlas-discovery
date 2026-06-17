@@ -1,4 +1,4 @@
-import { resolve } from "node:path";
+import * as path from "node:path";
 
 import baseConfig from "@acdh-oeaw/eslint-config";
 import nodeConfig from "@acdh-oeaw/eslint-config-node";
@@ -18,11 +18,15 @@ const configs = defineConfig(
 	baseConfig,
 	vueConfig,
 	nuxtConfig,
-	tailwindcssConfig,
 	{
+		name: "tailwindcss-config",
+		extends: [tailwindcssConfig],
+		rules: {
+			"better-tailwindcss/no-unknown-classes": ["error", { ignore: ["lead", "not-richtext", "not-prose", "toaster"] }],
+		},
 		settings: {
-			tailwindcss: {
-				config: resolve("./app/styles/index.css"),
+			"better-tailwindcss": {
+				entryPoint: path.resolve("./app/styles/index.css"),
 			},
 		},
 	},

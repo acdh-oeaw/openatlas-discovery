@@ -82,7 +82,7 @@ onMounted(() => {
 				<EntitySidebar :id="id" :no-table-sidebar="true" :mode="currentMode" />
 			</template>
 			<div
-				class="relative grid h-full grid-cols-[0px_1fr] transition-all delay-150 ease-in-out data-[sidepanel]:grid-cols-[25vw_1fr]"
+				class="relative grid h-full grid-cols-[0px_1fr] transition-all delay-150 ease-in-out data-sidepanel:grid-cols-[25vw_1fr]"
 				:data-sidepanel="!isMobile && id != null && currentMode === 'table' ? 'true' : undefined"
 			>
 				<div class="grid h-full" :class="{ 'z-10': sidebarOpen }">
