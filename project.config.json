@@ -10,14 +10,14 @@
 		"excludeSystemClasses": [
 			"type",
 			"reference_system",
-			"source_translation",
+			"text",
 			"bibliography",
 			"external_reference",
 			"administrative_unit",
 			"edition",
 			"type_tools",
 			"file",
-			"appellation"
+			"alias"
 		]
 	},
 	"colors": {
