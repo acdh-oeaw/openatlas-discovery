@@ -93,7 +93,7 @@ const { data, isPending, isPlaceholderData } = useGetSearchResults(
 			...params,
 			search: searchQuery,
 			show: ["description", "when"],
-			view_classes: ["actor", "artifact", "event", "place", "reference", "source", "type"],
+			view_classes: ["actor", "item", "event", "place", "reference", "source", "type"],
 		};
 	}),
 );
