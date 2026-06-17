@@ -171,8 +171,8 @@ importers:
         specifier: ^0.173.0
         version: 0.173.0
       threebox-plugin:
-        specifier: github:jscastro76/threebox
-        version: https://codeload.github.com/jscastro76/threebox/tar.gz/40d4111ab426a4c0c3a52bb4de260f0232734b37
+        specifier: ^2.2.7
+        version: 2.2.7
       valibot:
         specifier: ^1.4.1
         version: 1.4.1(typescript@5.9.3)
@@ -8382,9 +8382,8 @@ packages:
   three@0.173.0:
     resolution: {integrity: sha512-AUwVmViIEUgBwxJJ7stnF0NkPpZxx1aZ6WiAbQ/Qq61h6I9UR4grXtZDmO8mnlaNORhHnIBlXJ1uBxILEKuVyw==}
 
-  threebox-plugin@https://codeload.github.com/jscastro76/threebox/tar.gz/40d4111ab426a4c0c3a52bb4de260f0232734b37:
-    resolution: {tarball: https://codeload.github.com/jscastro76/threebox/tar.gz/40d4111ab426a4c0c3a52bb4de260f0232734b37}
-    version: 2.2.7
+  threebox-plugin@2.2.7:
+    resolution: {integrity: sha512-H87Nm4w1PfisHPHzavTGXlwIoJpx2+QU57GooQYIhF51lsg+U5A0KGf3Jrv/HWsLCGOwV2BTnv7UTLfpO1EccQ==}
 
   throttle-debounce@5.0.2:
     resolution: {integrity: sha512-B71/4oyj61iNH0KeCamLuE2rmKuTO5byTOSVwECM5FA7TiAiAW+UqTKZ9ERueC4qvgSttUhdmq1mXC3kJqGX7A==}
@@ -19266,7 +19265,7 @@ snapshots:
 
   three@0.173.0: {}
 
-  threebox-plugin@https://codeload.github.com/jscastro76/threebox/tar.gz/40d4111ab426a4c0c3a52bb4de260f0232734b37: {}
+  threebox-plugin@2.2.7: {}
 
   throttle-debounce@5.0.2: {}
 
